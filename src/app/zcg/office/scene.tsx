@@ -6,20 +6,17 @@ import {
   Grid,
   Html,
   OrbitControls,
+  useCursor,
   useGLTF,
   useTexture,
 } from "@react-three/drei";
 import * as THREE from "three";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
+import type { OfficeProposalDTO } from "@/lib/zcg/github-applications";
+import { ProposalDialog } from "./proposal-dialog";
 
 export type OfficeMember = { name: string; img: string; tags: string[] };
-export type OfficeProposal = {
-  /** GitHub issue number — stable id for React keys + live diffing. */
-  number: number;
-  title: string;
-  amount: number | null;
-  applicant: string;
-};
+export type OfficeProposal = OfficeProposalDTO;
 
 const GOLD = "#f4b728";
 const M = "/office-assets/models/furniture";
@@ -464,12 +461,19 @@ function ProposalZebra({
   index,
   count,
   color,
+  paused,
+  onSelect,
 }: {
   p: OfficeProposal;
   index: number;
   count: number;
   color: string;
+  paused: boolean;
+  onSelect: (number: number) => void;
 }) {
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  useCursor(hovered && !paused);
   const offset = count > 0 ? index / count : 0;
   const cell = useMemo(() => cellFor(index, count), [index, count]);
   const { scene, animations } = useGLTF(ZEBRA_ANIM_URL);
@@ -510,6 +514,7 @@ function ProposalZebra({
   const targetRef = useRef<THREE.Vector2>(freeTargetInCell(cell));
   const yawRef = useRef(0);
   useFrame((_, dt) => {
+    if (paused || hovered || focused) return;
     mixer.update(dt);
     const p2 = posRef.current;
     const t = targetRef.current;
@@ -539,7 +544,19 @@ function ProposalZebra({
   const amount =
     p.amount != null ? `$${p.amount.toLocaleString("en-US")}` : "·";
   return (
-    <group ref={ref}>
+    <group
+      ref={ref}
+      onClick={(event) => {
+        if (event.delta > 4) return; // Orbiting the room should not open a proposal.
+        event.stopPropagation();
+        onSelect(p.number);
+      }}
+      onPointerOver={(event) => {
+        event.stopPropagation();
+        setHovered(true);
+      }}
+      onPointerOut={() => setHovered(false)}
+    >
       {/* inner group isolates the model's scale + floor offset from any root motion */}
       <group scale={norm} position={[0, ZEBRA_Y, 0]}>
         <primitive object={model} />
@@ -556,10 +573,24 @@ function ProposalZebra({
       </mesh>
       {/* floating label */}
       <Html position={[0, headY, 0]} center distanceFactor={9}>
-        <div
+        <button
+          type="button"
+          aria-label={`View proposal: ${p.title}`}
+          aria-haspopup="dialog"
+          onPointerDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            event.stopPropagation();
+            onSelect(p.number);
+          }}
+          onPointerEnter={() => setHovered(true)}
+          onPointerLeave={() => setHovered(false)}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          className="text-left transition-[filter] hover:brightness-125 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
           style={{
             width: 172,
-            pointerEvents: "none",
+            pointerEvents: "auto",
+            cursor: "pointer",
             fontFamily: "Inter, system-ui, sans-serif",
             background: "rgba(4,10,24,0.9)",
             border: `1px solid ${color}`,
@@ -568,12 +599,12 @@ function ProposalZebra({
             boxShadow: `0 0 18px ${color}66`,
           }}
         >
-          <div
-            style={{ fontSize: 8, letterSpacing: 1, color, fontWeight: 700 }}
+          <span
+            style={{ display: "block", fontSize: 8, letterSpacing: 1, color, fontWeight: 700 }}
           >
             ▲ UNDER REVIEW
-          </div>
-          <div
+          </span>
+          <span
             style={{
               marginTop: 3,
               color: "#eaf1ff",
@@ -587,8 +618,8 @@ function ProposalZebra({
             }}
           >
             {p.title}
-          </div>
-          <div
+          </span>
+          <span
             style={{
               marginTop: 5,
               display: "flex",
@@ -602,8 +633,8 @@ function ProposalZebra({
             <span style={{ fontSize: 12, fontWeight: 700, color: GOLD }}>
               {amount}
             </span>
-          </div>
-        </div>
+          </span>
+        </button>
       </Html>
     </group>
   );
@@ -613,9 +644,13 @@ function ProposalZebra({
 function Scene({
   members,
   proposals,
+  paused,
+  onSelect,
 }: {
   members: OfficeMember[];
   proposals: OfficeProposal[];
+  paused: boolean;
+  onSelect: (number: number) => void;
 }) {
   // Show every proposal under review (one zebra each). Cap only as a safety net
   // against a pathological spike; the real bound is the count the page fetches.
@@ -665,11 +700,14 @@ function Scene({
             index={i}
             count={shown.length}
             color={WALK_COLORS[i % WALK_COLORS.length]}
+            paused={paused}
+            onSelect={onSelect}
           />
         ))}
       </Suspense>
 
       <OrbitControls
+        enabled={!paused}
         enablePan={false}
         target={[0, 1.4, 0]}
         minDistance={9}
@@ -677,7 +715,7 @@ function Scene({
         minPolarAngle={0.2}
         maxPolarAngle={Math.PI / 2.15}
         enableDamping
-        autoRotate
+        autoRotate={!paused}
         autoRotateSpeed={0.25}
       />
     </>
@@ -692,10 +730,7 @@ function Scene({
  */
 const POLL_MS = 180_000; // 3 min (the API itself is cached ~15 min server-side)
 function proposalsKey(list: OfficeProposal[]): string {
-  return list
-    .map((p) => `${p.number}:${p.amount}:${p.applicant}:${p.title}`)
-    .sort()
-    .join("|");
+  return JSON.stringify([...list].sort((a, b) => a.number - b.number));
 }
 function useLiveProposals(initial: OfficeProposal[]): OfficeProposal[] {
   const [proposals, setProposals] = useState(initial);
@@ -737,15 +772,27 @@ export default function OfficeScene({
   proposals: OfficeProposal[];
 }) {
   const live = useLiveProposals(proposals);
+  const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
+  const selected = live.find((proposal) => proposal.number === selectedNumber);
   return (
-    <Canvas
-      shadows
-      dpr={[1, 2]}
-      camera={{ position: [0, 8, 17], fov: 48 }}
-      gl={{ antialias: true, toneMappingExposure: 1 }}
-    >
-      <Scene members={members} proposals={live} />
-    </Canvas>
+    <>
+      <Canvas
+        shadows
+        dpr={[1, 2]}
+        camera={{ position: [0, 8, 17], fov: 48 }}
+        gl={{ antialias: true, toneMappingExposure: 1 }}
+      >
+        <Scene
+          members={members}
+          proposals={live}
+          paused={!!selected}
+          onSelect={setSelectedNumber}
+        />
+      </Canvas>
+      {selected && (
+        <ProposalDialog proposal={selected} onClose={() => setSelectedNumber(null)} />
+      )}
+    </>
   );
 }
 

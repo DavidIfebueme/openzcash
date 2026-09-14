@@ -66,8 +66,9 @@ export default async function OfficePage() {
       </div>
 
       <p className="mt-3 text-[11px] leading-relaxed text-stone-600">
-        Each zebra is a live grant proposal under review (source: GitHub). Drag
-        to orbit, scroll to zoom. Credits: 3D model{" "}
+        Each zebra is a live grant proposal under review (source: GitHub). Click
+        a proposal to see its summary and application date. Drag to orbit,
+        scroll to zoom. Credits: 3D model{" "}
         <a
           href="https://sketchfab.com/3d-models/cartoon-zebra-with-7-animations-c77056f81b564805a1001f3933d5d0fc"
           target="_blank"

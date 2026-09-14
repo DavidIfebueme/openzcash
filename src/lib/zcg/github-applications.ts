@@ -1,6 +1,6 @@
 import "server-only";
 import { ghHeaders } from "./github-headers";
-import { requestedAmountFromBody } from "./github-applications-parse";
+import { projectSummaryFromBody, requestedAmountFromBody } from "./github-applications-parse";
 
 /**
  * Live ZCG grant applications, read first-hand from the GitHub repo where they
@@ -24,6 +24,7 @@ export interface GrantApplication {
   url: string;
   applicant: string;
   createdAt: string; // ISO
+  summary: string | null;
   status: AppStatus;
   comments: number;
   /** "Requested Grant Amount (USD)" from the issue form, in whole USD, or null. */
@@ -120,6 +121,7 @@ export async function getGrantApplications(
         url: it.html_url,
         applicant: it.user?.login ?? "",
         createdAt: it.created_at,
+        summary: projectSummaryFromBody(it.body),
         status: statusFromLabels(labels),
         comments: it.comments ?? 0,
         amountUsd: requestedAmountFromBody(it.body),
@@ -149,6 +151,9 @@ export interface OfficeProposalDTO {
   applicant: string;
   /** Submission date (YYYY-MM-DD) — bounds time-sensitive signal matching. */
   createdAt: string;
+  /** Plain-text excerpt from the application, or null when not provided. */
+  summary: string | null;
+  url: string;
 }
 
 export const ZCG_APPLICATIONS_REPO_URL = `https://github.com/${REPO}/issues`;

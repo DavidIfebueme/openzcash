@@ -49,3 +49,39 @@ export function requestedAmountFromBody(
     sectionAmount(body, "Total Budget (USD)")
   );
 }
+
+/** A short, plain-text excerpt of the applicant's own project summary. */
+export function projectSummaryFromBody(
+  body: string | null | undefined,
+): string | null {
+  if (!body) return null;
+  const lines = body.split(/\r?\n/);
+  const heading = /^#{1,6}\s+/;
+  for (const section of ["project summary", "project description"]) {
+    const start = lines.findIndex((line) =>
+      heading.test(line.trim()) &&
+      line.trim().replace(heading, "").replace(/\s*#+\s*$/, "").trim().toLowerCase() === section,
+    );
+    if (start < 0) continue;
+    const end = lines.findIndex((line, index) => index > start && heading.test(line.trim()));
+    const text = lines.slice(start + 1, end < 0 ? undefined : end).join("\n")
+      .replace(/<!--[\s\S]*?-->/g, "")
+      .replace(/```[\s\S]*?```/g, "")
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+      .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+      .replace(/\[([^\]]+)\]\[[^\]]*\]/g, "$1")
+      .replace(/<[^>]*>/g, "")
+      .replace(/^\s*(?:[-*+]\s+|\d+\.\s+|>\s*)/gm, "")
+      .replace(/[*`~]/g, "")
+      .replace(/__([^_]+)__/g, "$1")
+      .replace(/(^|\s)_([^_]+)_(?=\s|[.,;:!?]|$)/g, "$1$2")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (!text || /^(?:no response|n\/a|none)\.?$/i.test(text)) continue;
+    if (text.length <= 480) return text;
+    const excerpt = text.slice(0, 479);
+    const boundary = excerpt.lastIndexOf(" ");
+    return `${excerpt.slice(0, boundary > 0 ? boundary : undefined).trimEnd()}…`;
+  }
+  return null;
+}

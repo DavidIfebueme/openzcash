@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { requestedAmountFromBody } from "./github-applications-parse";
+import { projectSummaryFromBody, requestedAmountFromBody } from "./github-applications-parse";
 
 const clean = `### Requested Grant Amount (USD)
 
@@ -107,5 +107,45 @@ describe("requestedAmountFromBody", () => {
 
   it("does not leak an amount from a later '##' section", () => {
     expect(requestedAmountFromBody(h2BlankRequested)).toBeNull();
+  });
+});
+
+describe("projectSummaryFromBody", () => {
+  it("uses the applicant's summary without taking text from adjacent fields", () => {
+    expect(projectSummaryFromBody(`### Project Lead
+Private contact details
+### Project Summary
+Build **open-source** tools for [Zcash](https://z.cash) using \`zcash_client_sqlite\`.
+### Project Description
+The full application continues here.`)).toBe(
+      "Build open-source tools for Zcash using zcash_client_sqlite.",
+    );
+  });
+
+  it("supports hand-written headings, lists, and Windows line endings", () => {
+    expect(projectSummaryFromBody("## Project Summary\r\n\r\n- Wallet tools.\r\n- Community education.\r\n## Budget\r\n$5,000"))
+      .toBe("Wallet tools. Community education.");
+  });
+
+  it("falls back to the project description when the summary is blank", () => {
+    expect(projectSummaryFromBody("### Project Summary\n_No response_\n### Project Description\nA privacy education project."))
+      .toBe("A privacy education project.");
+  });
+
+  it("returns null when neither field contains a summary", () => {
+    for (const body of [undefined, null, "", "### Project Lead\nApplicant bio", "### Project Summary\n_No response_\n### Total Budget (USD)\n5000"]) {
+      expect(projectSummaryFromBody(body)).toBeNull();
+    }
+  });
+
+  it("removes comments, images and HTML formatting from the excerpt", () => {
+    expect(projectSummaryFromBody("### Project Summary\n<!-- form instructions -->\n<b>Wallet tooling.</b> ![logo](https://example.org/logo.png)"))
+      .toBe("Wallet tooling.");
+  });
+
+  it("keeps long summaries brief without cutting a word in half", () => {
+    const summary = projectSummaryFromBody(`### Project Summary\n${"Community wallet infrastructure. ".repeat(40)}`);
+    expect(summary?.length).toBeLessThanOrEqual(480);
+    expect(summary).toMatch(/(?:Community|wallet|infrastructure\.)…$/);
   });
 });
