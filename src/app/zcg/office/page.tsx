@@ -66,7 +66,8 @@ export default async function OfficePage() {
       </div>
 
       <p className="mt-3 text-[11px] leading-relaxed text-stone-600">
-        Each zebra is a live grant proposal under review (source: GitHub). Click
+        Each zebra is a grant proposal under review. Status changes appear the
+        next day (Brasília time), based on GitHub and the official spreadsheet. Click
         a proposal to see its summary and application date. Drag to orbit,
         scroll to zoom. Credits: 3D model{" "}
         <a

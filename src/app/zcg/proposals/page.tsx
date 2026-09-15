@@ -22,6 +22,7 @@ import {
 } from "@/lib/zcg/issue-amounts";
 import { issueNumberFromLink } from "@/lib/zcg/issue-link";
 import { Synced } from "@/components/synced";
+import { publicationDay } from "@/lib/zcg/publication-policy";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "ZCG Proposals · OpenZcash" };
@@ -67,7 +68,7 @@ export default async function PropostasPage({
   const { status: filterRaw } = await searchParams;
   const [isAdmin, all, links, applications] = await Promise.all([
     getIsAdmin(),
-    cached("listProposals:all", LEDGER_TTL_MS, () => listProposals({})),
+    cached(`listProposals:all:${publicationDay()}`, LEDGER_TTL_MS, () => listProposals({})),
     cached("links", LEDGER_TTL_MS, () => getLinks()),
     getGrantApplications(40),
   ]);
@@ -85,8 +86,9 @@ export default async function PropostasPage({
   // under review), plus applications deleted from GitHub (dead links).
   // Cache-only reads, warmed by the same cron.
   const issueAmounts = getIssueAmounts();
-  const missingIssues = getMissingIssues();
-  const issueDecisions = getIssueDecisions();
+  const [missingIssues, issueDecisions] = await Promise.all([
+    getMissingIssues(), getIssueDecisions(),
+  ]);
 
   // A sheet row still marked under review whose GitHub application was
   // DELETED upstream (404) is not a real, verifiable proposal anymore — drop
@@ -223,7 +225,7 @@ export default async function PropostasPage({
     <>
       <PageHeader
         title="Proposals · Pipeline"
-        subtitle="The complete mirrored ZCG and Coinholder proposal history, supplemented by current ZCG applications. Approval is not evidence of payment or delivery."
+        subtitle="ZCG and Coinholder proposal history. Status changes are published the next day (Brasília time). Approval is not evidence of payment or delivery."
         actions={
           <a
             href={submitUrl}
@@ -251,7 +253,7 @@ export default async function PropostasPage({
         <Stat
           label="Ready for review"
           value={String(ghApps.length)}
-          sub="GitHub review labels"
+          sub="Published review queue"
           tone="warn"
         />
         <Stat

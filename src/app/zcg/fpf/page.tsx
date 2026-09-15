@@ -10,6 +10,7 @@ import {
   type ProposalTableRow,
 } from "./fpf-tables";
 import { cached, LEDGER_TTL_MS } from "@/lib/cache/memo";
+import { publicationDay } from "@/lib/zcg/publication-policy";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -45,10 +46,10 @@ export default async function FpfCoinholderGrantsPage() {
     cached("listGrants:coinholder", LEDGER_TTL_MS, () =>
       listGrants({ program: "coinholder" }),
     ),
-    cached("listProposals:coinholder", LEDGER_TTL_MS, () =>
+    cached(`listProposals:coinholder:${publicationDay()}`, LEDGER_TTL_MS, () =>
       listProposals({ program: "coinholder" }),
     ),
-    cached("proposalsFunnel", LEDGER_TTL_MS, () => proposalsFunnel()),
+    cached(`proposalsFunnel:${publicationDay()}`, LEDGER_TTL_MS, () => proposalsFunnel()),
     cached("links", LEDGER_TTL_MS, () => getLinks()),
   ]);
   const proposalFpf = links.proposal_fpf ?? "#";

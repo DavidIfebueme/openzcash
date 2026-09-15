@@ -83,7 +83,9 @@ export async function refreshZcg() {
   if (ok) await markRefreshed();
 
   let changelogEntries = 0;
-  if (ok && changelogBefore) {
+  // Each importer commits independently. Record successful changes even when
+  // another tab failed, or the next refresh would no longer see their diff.
+  if (changelogBefore) {
     changelogEntries = await recordChangelog(changelogBefore).catch(() => 0);
   }
 

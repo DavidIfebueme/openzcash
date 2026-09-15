@@ -44,7 +44,7 @@ export async function GET() {
   <channel>
     <title>OpenZcash · ZCG changes</title>
     <link>${SITE}/zcg</link>
-    <description>Automatic diff of the official ZCG spreadsheet: new proposals, verdict changes, and newly recorded payments.</description>
+    <description>Official ZCG spreadsheet updates through the previous day (D-1, Brasília time): new proposals, verdict changes, and recorded payments.</description>
     <language>en</language>
 ${items}
   </channel>

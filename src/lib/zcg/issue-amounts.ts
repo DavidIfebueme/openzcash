@@ -4,6 +4,8 @@ import { getGrantApplications } from "./github-applications";
 import { requestedAmountFromBody } from "./github-applications-parse";
 import { ghHeaders } from "./github-headers";
 import { issueNumberFromLink } from "./issue-link";
+import { getDb } from "@/lib/db/client";
+import { readPublications, recordPublications } from "./publications-repo";
 
 /**
  * Requested amounts for sheet under-review rows whose GitHub application is
@@ -25,6 +27,7 @@ const TTL_MS = 24 * 60 * 60 * 1000;
 /** Outcome read from the issue itself: a decision label on a closed issue,
  * or — closed with NO decision label — withdrawn by the applicant. */
 export type IssueDecision = "approved" | "rejected" | "withdrawn";
+type IssuePublication = { missing: boolean; decision: IssueDecision | null };
 
 type Entry = {
   amountUsd: number | null;
@@ -68,6 +71,11 @@ export async function warmIssueAmounts(): Promise<{
       const hit = store.byNumber.get(n);
       if (hit && now - hit.at < TTL_MS) continue;
       const issue = await fetchIssue(n);
+      if (!issue) continue; // A transient failure is not a new source observation.
+      await getDb().transaction((tx) => recordPublications(tx, "github-decision", [{
+        key: String(n), value: { missing: issue.missing, decision: issue.decision },
+        initial: { missing: false, decision: null },
+      }]));
       store.byNumber.set(n, {
         amountUsd: requestedAmountFromBody(issue.body),
         missing: issue.missing,
@@ -88,7 +96,7 @@ async function fetchIssue(n: number): Promise<{
   body?: string;
   missing: boolean;
   decision: IssueDecision | null;
-}> {
+} | null> {
   try {
     const res = await fetch(GH_ISSUE(n), {
       headers: ghHeaders(),
@@ -99,7 +107,7 @@ async function fetchIssue(n: number): Promise<{
     // row). Other failures are treated as transient: no amount this round,
     // but not flagged missing.
     if (res.status === 404) return { missing: true, decision: null };
-    if (!res.ok) return { missing: false, decision: null };
+    if (!res.ok) return null;
     const json = (await res.json()) as {
       body?: string;
       state?: string;
@@ -120,7 +128,7 @@ async function fetchIssue(n: number): Promise<{
     }
     return { body: json.body ?? undefined, missing: false, decision };
   } catch {
-    return { missing: false, decision: null };
+    return null;
   }
 }
 
@@ -132,16 +140,18 @@ export function getIssueAmounts(): Map<number, number | null> {
 }
 
 /** Issue numbers whose application was deleted from GitHub (404). */
-export function getMissingIssues(): Set<number> {
+export async function getMissingIssues(): Promise<Set<number>> {
   const out = new Set<number>();
-  for (const [n, e] of store.byNumber) if (e.missing) out.add(n);
+  const published = await readPublications<IssuePublication>("github-decision");
+  for (const [n, e] of published) if (e?.missing) out.add(Number(n));
   return out;
 }
 
 /** Committee decisions already visible on GitHub (closed + decision label)
  * for issues the spreadsheet still lists as under review. Cache-only. */
-export function getIssueDecisions(): Map<number, IssueDecision> {
+export async function getIssueDecisions(): Promise<Map<number, IssueDecision>> {
   const out = new Map<number, IssueDecision>();
-  for (const [n, e] of store.byNumber) if (e.decision) out.set(n, e.decision);
+  const published = await readPublications<IssuePublication>("github-decision");
+  for (const [n, e] of published) if (e?.decision) out.set(Number(n), e.decision);
   return out;
 }

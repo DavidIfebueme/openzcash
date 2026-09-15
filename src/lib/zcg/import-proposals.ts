@@ -6,6 +6,8 @@ import { getZcgIssueCreatedAt } from "./github-issue-date";
 import { normalizeKey, parseUsdCents, parseZcgDate } from "./normalize";
 import { reconcileFutureProposalDates } from "./proposal-date";
 import { fetchSheetCsv, readSheetStatus, sha256, ZCG_GIDS } from "./sheets";
+import { recordPublications } from "./publications-repo";
+import { initialProposalVerdict, proposalPublicationKey, proposalVerdict } from "./publication-policy";
 
 type ProposalInput = typeof zcgProposals.$inferInsert;
 
@@ -290,6 +292,16 @@ export async function importProposals(): Promise<ProposalImportResult[]> {
       const proposals = reconciliation.rows;
 
       await db.transaction(async (tx) => {
+        const previous = await tx.select().from(zcgProposals)
+          .where(eq(zcgProposals.sourceSheetGid, spec.gid));
+        const byKey = new Map(previous.map((p) => [proposalPublicationKey(p), p]));
+        await recordPublications(tx, "proposal-status", proposals.flatMap((p) => {
+          const key = proposalPublicationKey(p);
+          const old = byKey.get(key);
+          if (old?.locked) return [];
+          return [{ key, value: proposalVerdict(p),
+            initial: old ? proposalVerdict(old) : initialProposalVerdict(p) }];
+        }));
         await tx
           .delete(zcgProposals)
           .where(

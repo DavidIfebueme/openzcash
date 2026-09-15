@@ -1,6 +1,8 @@
 import "server-only";
 import { ghHeaders } from "./github-headers";
 import { projectSummaryFromBody, requestedAmountFromBody } from "./github-applications-parse";
+import { getDb } from "@/lib/db/client";
+import { readPublications, recordPublications } from "./publications-repo";
 
 /**
  * Live ZCG grant applications, read first-hand from the GitHub repo where they
@@ -46,7 +48,14 @@ interface GhIssue {
   pull_request?: unknown;
 }
 
-let cache: { at: number; items: GrantApplication[] } | null = null;
+let fetchedAt = 0;
+
+async function publishedApplications(limit: number): Promise<GrantApplication[]> {
+  const published = await readPublications<GrantApplication>("github-application");
+  return [...published.values()].filter((a): a is GrantApplication => a != null)
+    .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.number - a.number)
+    .slice(0, limit);
+}
 
 function statusFromLabels(labels: string[]): AppStatus {
   const has = (s: string) => labels.some((l) => l.includes(s));
@@ -82,30 +91,37 @@ export async function getGrantApplications(
   limit = 40,
 ): Promise<GrantApplication[]> {
   const now = Date.now();
-  if (cache && now - cache.at < TTL_MS) return cache.items.slice(0, limit);
+  if (fetchedAt && now - fetchedAt < TTL_MS) return publishedApplications(limit);
   try {
-    const url = `https://api.github.com/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=desc`;
-    // One retry: Railway's shared egress can land a request on an IP whose
-    // unauthenticated GitHub budget another tenant already burned.
-    let res = await fetch(url, {
-      headers: ghHeaders(),
-      signal: AbortSignal.timeout(20_000),
-      cache: "no-store",
-    });
-    if (!res.ok) {
-      await new Promise((r) => setTimeout(r, 2_000));
-      res = await fetch(url, {
+    const arr: GhIssue[] = [];
+    // A complete snapshot is required before staging missing/closed issues.
+    // An incomplete page or transient error must never delist applications.
+    for (let page = 1; ; page++) {
+      if (page > 10) throw new Error("Incomplete application listing");
+      const url = `https://api.github.com/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=desc&page=${page}`;
+      // One retry: Railway's shared egress can land a request on an IP whose
+      // unauthenticated GitHub budget another tenant already burned.
+      let res = await fetch(url, {
         headers: ghHeaders(),
         signal: AbortSignal.timeout(20_000),
         cache: "no-store",
       });
+      if (!res.ok) {
+        await new Promise((r) => setTimeout(r, 2_000));
+        res = await fetch(url, {
+          headers: ghHeaders(),
+          signal: AbortSignal.timeout(20_000),
+          cache: "no-store",
+        });
+      }
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const batch = (await res.json()) as GhIssue[];
+      if (!Array.isArray(batch)) throw new Error("Invalid application listing");
+      arr.push(...batch);
+      if (batch.length < 100) break;
     }
-    if (!res.ok) {
-      console.error(`[gh-apps] issue listing failed: HTTP ${res.status}`);
-      return cache?.items.slice(0, limit) ?? [];
-    }
-    const arr = (await res.json()) as GhIssue[];
-    if (!Array.isArray(arr)) return cache?.items.slice(0, limit) ?? [];
 
     const items: GrantApplication[] = arr
       .filter((it) => !it.pull_request)
@@ -127,16 +143,18 @@ export async function getGrantApplications(
         amountUsd: requestedAmountFromBody(it.body),
       }));
 
-    if (items.length === 0) return cache?.items.slice(0, limit) ?? [];
-    cache = { at: now, items };
-    return items.slice(0, limit);
+    await getDb().transaction((tx) => recordPublications(tx, "github-application",
+      items.map((app) => ({ key: String(app.number), value: app,
+        initial: app.status === "review" ? app : null })), { complete: true }));
+    fetchedAt = now;
   } catch (e) {
     console.error(
       "[gh-apps] issue listing failed:",
       e instanceof Error ? e.message : e,
     );
-    return cache?.items.slice(0, limit) ?? [];
   }
+  // Read persisted publication state even after failures or a server restart.
+  return publishedApplications(limit);
 }
 
 /** One under-review proposal, shaped for the 3D office (one zebra each).

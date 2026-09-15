@@ -481,11 +481,21 @@ export const zcgChangelog = pgTable("zcg_changelog", {
   /** proposal_new | proposal_status | payments */
   kind: text("kind").notNull(),
   title: text("title").notNull(),
+  entityKey: text("entity_key"),
   fromVal: text("from_val"),
   toVal: text("to_val"),
   /** Extra context, e.g. "3 payments · $28,400" for a payments entry. */
   detail: text("detail"),
 });
+
+/** Source observations and the last public value survive imports and restarts. */
+export const zcgPublications = pgTable("zcg_publications", {
+  scope: text("scope").notNull(),
+  key: text("key").notNull(),
+  published: jsonb("published"),
+  pending: jsonb("pending"),
+  observedAt: timestamp("observed_at", { withTimezone: true }).notNull(),
+}, (t) => [primaryKey({ columns: [t.scope, t.key] })]);
 
 // ── ZecHub DAO treasury (mirror of their public dashboard spreadsheet). ──
 

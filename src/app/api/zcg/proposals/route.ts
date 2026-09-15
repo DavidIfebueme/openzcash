@@ -8,10 +8,12 @@
  *            unedited, silently discarding the admin's change.
  */
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { zcgProposals } from "@/lib/db/schema";
+import { zcgProposals, zcgPublications } from "@/lib/db/schema";
 import { normalizeKey } from "@/lib/zcg/normalize";
+import { recordPublications } from "@/lib/zcg/publications-repo";
+import { initialProposalVerdict, proposalPublicationKey, proposalVerdict, publishedValue, type PublicationState, type ProposalVerdict } from "@/lib/zcg/publication-policy";
 import {
   proposalCreateSchema,
   proposalDeleteSchema,
@@ -38,25 +40,31 @@ export async function POST(req: Request) {
   try {
     const p = proposalCreateSchema.parse(await req.json());
     const title = p.title.trim();
-    await getDb()
-      .insert(zcgProposals)
-      .values({
-        id: randomUUID(),
-        program: p.program,
-        title,
-        titleKey: normalizeKey(title),
-        status: p.status,
-        statusRaw: p.status,
-        applicantsRaw: clean(p.applicantsRaw),
-        requestedUsdCents: usdToCents(p.requestedUsd),
-        platformLink: clean(p.platformLink),
-        forumLink: clean(p.forumLink),
-        submittedDate: clean(p.submittedDate),
-        country: clean(p.country),
-        origin: "admin",
-        sourceSheetGid: null,
-        sourceRowIndex: null,
-      });
+    await getDb().transaction(async (tx) => {
+      const [created] = await tx
+        .insert(zcgProposals)
+        .values({
+          id: randomUUID(),
+          program: p.program,
+          title,
+          titleKey: normalizeKey(title),
+          status: p.status,
+          statusRaw: p.status,
+          applicantsRaw: clean(p.applicantsRaw),
+          requestedUsdCents: usdToCents(p.requestedUsd),
+          platformLink: clean(p.platformLink),
+          forumLink: clean(p.forumLink),
+          submittedDate: clean(p.submittedDate),
+          country: clean(p.country),
+          origin: "admin",
+          sourceSheetGid: null,
+          sourceRowIndex: null,
+        }).returning();
+      await recordPublications(tx, "proposal-status", [{
+        key: proposalPublicationKey(created), value: proposalVerdict(created),
+        initial: initialProposalVerdict(created),
+      }]);
+    });
     return Response.json({ ok: true });
   } catch (e) {
     return fail(e);
@@ -84,10 +92,21 @@ export async function PATCH(req: Request) {
     if (p.platformLink !== undefined)
       patch.platformLink = clean(p.platformLink);
 
-    await getDb()
-      .update(zcgProposals)
-      .set(patch)
-      .where(eq(zcgProposals.id, p.id));
+    await getDb().transaction(async (tx) => {
+      const [old] = await tx.select().from(zcgProposals).where(eq(zcgProposals.id, p.id));
+      if (!old) throw new Error("proposal not found");
+      const [publication] = await tx.select().from(zcgPublications).where(and(
+        eq(zcgPublications.scope, "proposal-status"),
+        eq(zcgPublications.key, proposalPublicationKey(old)),
+      ));
+      const initial = publication
+        ? publishedValue(publication as PublicationState<ProposalVerdict>) : proposalVerdict(old);
+      const [updated] = await tx.update(zcgProposals).set(patch)
+        .where(eq(zcgProposals.id, p.id)).returning();
+      await recordPublications(tx, "proposal-status", [{
+        key: proposalPublicationKey(updated), value: proposalVerdict(updated), initial,
+      }]);
+    });
     return Response.json({ ok: true });
   } catch (e) {
     return fail(e);

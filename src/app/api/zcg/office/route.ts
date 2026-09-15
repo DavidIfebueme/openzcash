@@ -1,8 +1,7 @@
 /**
  * Public read path for the 3D office (/zcg/office). Returns the live "under
  * review" grant proposals — the ones rendered as walking zebras. The client
- * polls this so an open tab drops a zebra as soon as its proposal leaves the
- * review stage (approved, paid, or the GitHub issue closed).
+ * polls this so an open tab follows the D-1 publication of status changes.
  *
  * Not gated by the admin middleware (see ADMIN_APIS). Backed by the same 15-min
  * in-process cache as the page, so polling never hammers GitHub.
@@ -19,6 +18,6 @@ export async function GET() {
       { headers: { "cache-control": "no-store" } },
     );
   } catch {
-    return Response.json({ proposals: [] }, { status: 200 });
+    return Response.json({ error: "Proposal updates temporarily unavailable" }, { status: 503 });
   }
 }
