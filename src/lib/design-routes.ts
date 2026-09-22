@@ -38,6 +38,7 @@ export type AppDef = {
 export const APPS: AppDef[] = [
   { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
   { id: "news", label: "News", href: "/news", sub: "What's new", logo: "/logos/marks/news.png", icon: "news", pages: [] },
+  { id: "cex-zec-dex", label: "CEX < ZEC > DEX", href: "/cex-zec-dex", sub: "Trading & custody", icon: "swap", pages: [] },
   {
     id: "zcg",
     label: "ZCG",

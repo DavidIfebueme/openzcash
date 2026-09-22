@@ -33,6 +33,8 @@ export default async function DefiPage() {
       <p className="ws-copilot-fine" style={{ marginBottom: 18 }}>
         ZCG&rsquo;s own position on Maya, its value and the fees it earns, is on{" "}
         <Link href="/zcg/investments">Investments →</Link>.
+        {" "}Compare trading activity and public exchange balances on{" "}
+        <Link href="/cex-zec-dex">CEX &lt; ZEC &gt; DEX →</Link>.
       </p>
 
       <SectionHeading
