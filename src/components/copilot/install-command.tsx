@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { copyText } from "./copy-text";
 import { installCommand } from "./command";
+import type { CopilotSkill } from "./profiles";
 
 /** The install command with a copy button. */
-export function InstallCommand({ skill }: { skill: string }) {
+export function InstallCommand({ skill }: { skill: CopilotSkill }) {
   const cmd = installCommand(skill);
   const [copied, setCopied] = useState(false);
   return (

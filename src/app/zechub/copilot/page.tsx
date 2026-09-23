@@ -1,36 +1,35 @@
-import { Terminal } from "./terminal";
 import { CopilotPage } from "@/components/copilot/copilot-page";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "ZecHub Copilot · OpenZcash",
   description:
-    "An agent skill for the ZecHub DAO: live, cited answers about proposals, votes, members and the treasury, plus the rule that actually decides a vote.",
+    "Research ZecHub DAO votes and treasury records in your AI assistant. Start without installation, save instructions, or add an optional agent skill.",
 };
 
 const USE_CASES = [
   {
     q: "Did proposal A116 pass? It had twice as many yes as no.",
-    a: "No. It computes both tests and shows which one failed: 66.67% approval against a 67% bar. A yes-majority is not enough, and 25 proposals have died that way.",
+    a: "Check the proposal's recorded outcome and compute quorum and approval separately using its own voting rules.",
   },
   {
     q: "What is ZecHub voting on right now?",
-    a: "Every open proposal with its tally, turnout, and what it still needs: more votes for quorum, or more yes for the 67% bar.",
+    a: "Find open proposals, read their tallies and voting rules, and distinguish current support from a final outcome.",
   },
   {
     q: "How much can ZecHub actually spend?",
-    a: "The spendable balance, not the headline total. Three separate pots, and the biggest one is donations rather than working capital.",
+    a: "Separate the three treasury pots, reserved amounts, and recorded unreserved funds. Preserve the snapshot date.",
   },
   {
     q: "What has ZecHub paid contributors?",
-    a: "The payout table reconciled against the dashboard total. They differ by $5,200 because one is per-period and the other cumulative.",
+    a: "Reconcile recorded payout rows with the sheet's total, flag missing amounts, and keep commitments separate from payments.",
   },
 ];
 
 const SOURCES = [
   {
     name: "DAO indexer",
-    desc: "Proposals, votes, and members straight from the ZecHub DAO on Juno: 173 proposals of history, each vote attributable.",
+    desc: "Public proposals, votes, and members from the ZecHub DAO on Juno, with pagination and proposal-specific voting rules.",
   },
   {
     name: "Juno LCD",
@@ -54,11 +53,9 @@ export default function ZecHubCopilotPage() {
       skill="zechub-copilot"
       intro={
         <>
-          ZecHub decides its funding on-chain, and the rule is stricter than it
-          looks: a proposal needs 67% of yes+no <em>and</em> 40% turnout. This
-          skill turns your coding agent into a copilot that computes both tests
-          from the live indexer, names every voter, and reads the treasury
-          without falling into its traps. Every figure comes with a citation.
+          Explore ZecHub DAO decisions and treasury records with your own AI
+          assistant. Understand voting rules, trace contributor funding, and
+          check each finding against dated public sources.
         </>
       }
       examples={USE_CASES}
@@ -74,7 +71,6 @@ export default function ZecHubCopilotPage() {
           never submits or votes.
         </>
       }
-      terminal={<Terminal />}
     />
   );
 }

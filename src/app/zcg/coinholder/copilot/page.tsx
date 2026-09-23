@@ -1,12 +1,11 @@
 import Link from "next/link";
-import { Terminal } from "./terminal";
 import { CopilotPage } from "@/components/copilot/copilot-page";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "Coinholder Copilot · OpenZcash",
   description:
-    "An agent skill for pre-vote diligence on the Coinholder-Directed Retroactive Grants Program: live, cited answers about the open round and every applicant's funding history.",
+    "Research Coinholder grant proposals and funding history in your AI assistant. Start without installation, save instructions, or add an optional agent skill.",
 };
 
 const USE_CASES = [
@@ -16,22 +15,22 @@ const USE_CASES = [
   },
   {
     q: "Who in this round was funded before, and did they deliver?",
-    a: "Every applicant cross-referenced against the audited ledger and prior rounds: funded-and-delivered, rejected-before, two-track orgs, first-timers.",
+    a: "Compare public payment records and earlier applications. Check delivery evidence separately from funding status.",
   },
   {
     q: "How does the ballot actually work?",
-    a: "Four options, two of which are 'no' votes with different signals. Plus the keyholder veto that already zeroed out a coinholder-approved $2.67M grant.",
+    a: "Check the published round's options, dates, and keyholder veto rules against the FPF announcement.",
   },
   {
     q: "What has the Coinholder program actually paid so far?",
-    a: "The completed grants and their per-payment ZEC trail, kept distinct from the $9M currently being requested.",
+    a: "Recorded paid rows and their payment trail, kept distinct from requested amounts and grant budgets.",
   },
 ];
 
 const SOURCES = [
   {
     name: "Round mirror",
-    desc: "The open review round (proposals, asks, key dates, ballot options), curated from FPF's announcement, which runs ahead of the spreadsheet.",
+    desc: "A dated record of proposals, asks, and ballot options from FPF's announcement. Check its dates before treating the round as open.",
   },
   {
     name: "OpenZcash ledger",
@@ -55,11 +54,9 @@ export default function CoinholderCopilotPage() {
       skill="coinholder-copilot"
       intro={
         <>
-          Retroactive grants ask you to judge work already done. This skill
-          turns your coding agent into a diligence copilot for the review
-          round: every applicant cross-referenced against the audited payment
-          ledger, prior round verdicts, and their own submitted evidence. Every
-          figure is cited, never recalled from the model&apos;s memory.
+          Research retroactive grant proposals with your own AI assistant.
+          Compare submitted evidence, prior rounds, and recorded payments.
+          Check the sources and make your own voting decision.
         </>
       }
       examples={USE_CASES}
@@ -74,7 +71,6 @@ export default function CoinholderCopilotPage() {
           <Link href="/zcg/methodology">how we compute this</Link>.
         </>
       }
-      terminal={<Terminal />}
     />
   );
 }

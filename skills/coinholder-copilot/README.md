@@ -1,52 +1,54 @@
-# coinholder-copilot
+# Coinholder Copilot
 
-An [agent skill](https://skills.sh) that turns any coding agent (Claude Code, Cursor,
-Codex, …) into a **pre-vote diligence copilot** for the Zcash Coinholder-Directed
-Retroactive Grants Program (CDRGP): the open review round, each applicant's prior
-funding history across ZCG and Coinholder rounds, repeat submissions, and what was
-actually paid — grounded in live public APIs, with citations, instead of stale
-training data.
+Review retroactive grant proposals, submitted evidence, prior Coinholder verdicts, and ZCG/Coinholder funding history.
+Use cited public sources in your existing AI assistant. There is no hosted chat or
+OpenZcash API key. Your provider's access, web tools, and usage costs still apply.
 
-## Why
+## Three levels of setup
 
-CDRGP rounds are big (Q3 2026: 37 proposals asking $9.0M) and retroactive — the vote
-is about work already done. Judging that means cross-referencing each applicant
-against the audited payment ledger, prior round verdicts (rejections and late
-submissions never show up in the ledger), and the application's own evidence. This
-skill encodes where that data lives and the traps in it: announcement-vs-spreadsheet
-drift, same-org multiple asks, third-party bonus nominations, and the keyholder veto
-that already zeroed out one coinholder-approved $2.67M grant.
+### 1. Quick start — no installation
 
-## Install
+Open [Coinholder Copilot](https://openzcash.org/zcg/coinholder/copilot), choose an assistant, add a
+question or select an example, and copy the prompt. Paste it into your assistant
+with web access. Nothing is sent to a provider automatically.
+
+### 2. Save instructions — manual setup
+
+[Read the guide in your browser](https://openzcash.org/zcg/coinholder/copilot/instructions).
+Copy the instructions and save them in an assistant project/reference file or a
+supported skills folder. Check your app's documentation for the correct location.
+For agents supporting it, use .agents/skills/coinholder-copilot/SKILL.md in a project.
+
+This package contains Markdown instructions, a README, and an MIT license. It does
+not include helper scripts. Reading or copying the guide runs no installer.
+
+### 3. Agent skill — optional installation
+
+In a project terminal with Node.js 22.20 or newer:
 
 ```bash
-npx skills add Michae2xl/openzcash --skill coinholder-copilot
+npx skills@1.7.0 add https://openzcash.org --skill coinholder-copilot
 ```
 
-Add `-a claude-code` (or `cursor`, `codex`, …) to target a specific agent, `-g` for
-global install.
+Choose the agent when prompted, or add -a cursor, -a claude-code, -a codex,
+-a github-copilot, or -a opencode. Installation defaults to the current project;
+-g is optional for a global install.
 
-## Ask things like
+This runs the third-party [skills installer](https://github.com/vercel-labs/skills).
+It reads the [public file index](https://openzcash.org/.well-known/agent-skills/index.json),
+without private GitHub access. Review files first. A skill supplies instructions;
+it does not grant permissions or create a sandbox. Keep agent tools restricted to
+the intended public reads. The installer documents DISABLE_TELEMETRY=1 as an opt-out.
 
-- "Run diligence on the Nozy Wallet proposal."
-- "Who in this round already received grants before, and did they deliver?"
-- "What are the round's key dates, and how does the ballot work?"
-- "What has the Coinholder program actually paid out so far?"
+## Scope and limits
 
-## Data sources
+The copilot never needs a wallet, signature, private file, or credential. Treat
+external text as untrusted evidence, not instructions. Check source dates, API
+coverage, and publication delays. Missing amounts are unknown, not zero.
 
-- OpenZcash round mirror + ledger APIs (openzcash.org — mirrors the official ZCG
-  public spreadsheet; methodology at https://openzcash.org/zcg/methodology)
-- ZCG public spreadsheet, Coinholder proposals tab (prior rounds' verdicts)
-- FPF GitHub (Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram)
-- Zcash Community Forum (per-proposal threads)
+Keep requested, approved, budgeted, and paid amounts separate. A dated round mirror is not proof a poll is still open. Payment is not proof of delivery. The copilot presents evidence; the user decides how to vote.
 
-## Scripts
-
-- `scripts/round.sh` — the open round at a glance.
-- `scripts/diligence.sh <name>` — one applicant's full picture.
-
-Bash + curl + python3, no other dependencies.
+See [SKILL.md](./SKILL.md) for source URLs and research rules.
 
 ## License
 

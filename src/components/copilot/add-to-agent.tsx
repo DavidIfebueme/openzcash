@@ -3,22 +3,20 @@
 import { useState } from "react";
 import { copyText } from "./copy-text";
 import { installCommand } from "./command";
+import type { CopilotSkill } from "./profiles";
 
 /**
- * One click copies the install command with the agent's flag. The marks are
- * brand glyphs from simple-icons rasterised in ink (public/logos/agents);
- * Codex has no published mark and keeps a plain glyph.
+ * Copies a command for an explicitly supported coding agent.
  */
 const AGENTS = [
-  { name: "Claude Code", flag: "claude-code" },
-  { name: "Cursor", flag: "cursor" },
-  { name: "OpenCode", flag: "opencode" },
-  { name: "Codex", flag: "codex" },
-  { name: "Windsurf", flag: "windsurf" },
-  { name: "Copilot", flag: "github-copilot" },
+  { name: "Cursor", flag: "cursor", logo: "/logos/agents/cursor.png" },
+  { name: "Claude Code", flag: "claude-code", logo: "/logos/assistants/claude.svg" },
+  { name: "Codex", flag: "codex", logo: "/logos/assistants/openai.png" },
+  { name: "GitHub Copilot", flag: "github-copilot", logo: "/logos/agents/github-copilot.png" },
+  { name: "OpenCode", flag: "opencode", logo: "/logos/agents/opencode.png" },
 ];
 
-export function AddToAgent({ skill }: { skill: string }) {
+export function AddToAgent({ skill }: { skill: CopilotSkill }) {
   const [copied, setCopied] = useState<string | null>(null);
   const copy = async (flag: string) => {
     const ok = await copyText(
@@ -43,7 +41,7 @@ export function AddToAgent({ skill }: { skill: string }) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`/logos/agents/${a.flag}.png`}
+              src={a.logo}
               alt=""
               width={16}
               height={16}
@@ -55,7 +53,7 @@ export function AddToAgent({ skill }: { skill: string }) {
         ))}
       </div>
       <p className="ws-copilot-fine">
-        …and 40+ more agents the{" "}
+        More agents are supported by the{" "}
         <a
           href="https://github.com/vercel-labs/skills"
           target="_blank"
@@ -63,7 +61,7 @@ export function AddToAgent({ skill }: { skill: string }) {
         >
           skills
         </a>{" "}
-        CLI supports. Omit <code>-a</code> to auto-detect your agent, or add{" "}
+        CLI. Omit <code>-a</code> to auto-detect your agent, or add{" "}
         <code>-g</code> to install globally.
       </p>
     </div>

@@ -4,7 +4,7 @@ Research Zcash grants, funded projects, spending, and proposals in your AI agent
 Use public sources to compare existing work, identify gaps to investigate, and
 prepare a stronger grant or hackathon idea. Read the evidence behind each finding.
 
-## Start without installing
+## 1. Quick start — no installation
 
 Open [ZCG Copilot](https://openzcash.org/zcg/copilot), copy the research prompt, and
 paste it into an AI assistant with web access. Add your idea and ask for cited
@@ -14,7 +14,18 @@ Your AI provider's usual access and usage costs still apply.
 You can [read the full instructions in your browser](https://openzcash.org/zcg/copilot/instructions)
 before using them. No installer or helper script runs when you read that page.
 
-## Optional: install as a skill
+## 2. Save instructions — manual setup
+
+Read and save [SKILL.md](https://openzcash.org/.well-known/agent-skills/zcg-copilot/SKILL.md)
+in a `zcg-copilot` folder in your agent's skills directory. For example, Codex uses
+`.agents/skills/zcg-copilot/SKILL.md` in a project. Check your agent's documentation
+for its supported location. The Markdown instructions work without helper scripts.
+
+The [public file index](https://openzcash.org/.well-known/agent-skills/index.json)
+lists every available file. To use the optional helpers, save the listed `scripts/*`
+files under the same skill's `scripts/` directory. The installer does this for you.
+
+## 3. Agent skill — optional installation
 
 Run in your project terminal with Node.js 22.20 or newer installed:
 
@@ -42,17 +53,6 @@ Then ask your agent:
 > Use ZCG Copilot to research my Zcash payments idea for Colosseum. Compare existing
 > grants and proposals, distinguish budgeted and paid amounts, and suggest gaps worth
 > investigating. Cite the sources and their dates.
-
-## Without the installer
-
-Read and save [SKILL.md](https://openzcash.org/.well-known/agent-skills/zcg-copilot/SKILL.md)
-in a `zcg-copilot` folder in your agent's skills directory. For example, Codex uses
-`.agents/skills/zcg-copilot/SKILL.md` in a project. Check your agent's documentation
-for its supported location. The Markdown instructions work without helper scripts.
-
-The [public file index](https://openzcash.org/.well-known/agent-skills/index.json)
-lists every available file. To use the optional helpers, save the listed `scripts/*`
-files under the same skill's `scripts/` directory. The installer does this for you.
 
 ## Optional helpers
 

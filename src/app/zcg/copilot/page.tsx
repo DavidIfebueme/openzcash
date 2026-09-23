@@ -1,9 +1,5 @@
 import Link from "next/link";
-import { Terminal } from "./terminal";
 import { CopilotPage } from "@/components/copilot/copilot-page";
-import { CopyResearchPrompt } from "@/components/copilot/copy-prompt";
-import { AddToAgent } from "@/components/copilot/add-to-agent";
-import { InstallCommand } from "@/components/copilot/install-command";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
@@ -72,30 +68,6 @@ export default function ZcgCopilotPage() {
           milestone double counting. Methodology:{" "}
           <Link href="/zcg/methodology">how we compute this</Link>.
         </>
-      }
-      terminal={<Terminal />}
-      start={<CopyResearchPrompt />}
-      setup={
-        <div className="ws-copilot-setup">
-          <p className="ws-copilot-fine">
-            Public data. No wallet or OpenZcash API key. Your AI provider&apos;s
-            usual access and usage costs apply.
-            {" "}<Link href="/zcg/copilot/instructions">Read the research guide</Link>.
-          </p>
-          <details className="ws-copilot-disclosure ws-copilot-advanced">
-            <summary>Advanced: install as a skill</summary>
-            <p>Optional, for people who want the instructions saved in their coding agent.</p>
-            <InstallCommand skill="zcg-copilot" />
-            <AddToAgent skill="zcg-copilot" />
-            <p className="ws-copilot-fine">
-              This command runs the third-party skills installer from npm.
-              Review the instructions and files before installing; your agent&apos;s
-              existing permissions still apply. Requires Node.js 22.20+.
-              Optional helpers use Python 3.
-              {" "}<a href="/.well-known/agent-skills/index.json">View the file list</a>.
-            </p>
-          </details>
-        </div>
       }
     />
   );

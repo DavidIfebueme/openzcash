@@ -1,14 +1,15 @@
 import type { ReactNode } from "react";
 import { PageHeader } from "@/components/ui";
-import { AddToAgent } from "./add-to-agent";
-import { InstallCommand } from "./install-command";
+import { CopilotSetup } from "./copilot-setup";
+import { ResearchBrief } from "./research-brief";
+import { COPILOT_PROFILES, type CopilotSkill } from "./profiles";
 
 export type CopilotExample = { q: string; a: string };
 export type CopilotSource = { name: string; desc: string };
 
 /**
- * One quiet layout for the three copilot skills: what it is, how to install
- * it, a demo transcript, the questions it answers and the sources it reads.
+ * Shared entry point: three optional setup levels, domain-specific prompts,
+ * examples, and the public sources behind each copilot.
  */
 export function CopilotPage({
   title,
@@ -18,40 +19,21 @@ export function CopilotPage({
   examples,
   sources,
   note,
-  terminal,
-  setup,
-  start,
 }: {
   title: string;
   subtitle: string;
-  skill: string;
+  skill: CopilotSkill;
   intro: ReactNode;
   examples: CopilotExample[];
   sources: CopilotSource[];
   note: ReactNode;
-  terminal: ReactNode;
-  setup?: ReactNode;
-  start?: ReactNode;
 }) {
+  const profile = COPILOT_PROFILES[skill];
   return (
     <div className="ws-copilot" data-skill={skill}>
       <PageHeader title={title} subtitle={subtitle} />
-      <section className="ws-copilot-hero">
-        <div>
-          <p className="ws-copilot-intro">{intro}</p>
-          {start ?? (
-            <>
-              <InstallCommand skill={skill} />
-              <p className="ws-copilot-fine">
-                Use your existing AI agent. No OpenZcash API key required.
-              </p>
-              <AddToAgent skill={skill} />
-            </>
-          )}
-          {setup}
-        </div>
-        <div className="ws-copilot-demo">{terminal}</div>
-      </section>
+      <p className="ws-copilot-intro">{intro}</p>
+      <CopilotSetup profile={profile} brief={<ResearchBrief profile={profile} />} />
       <section className="ws-copilot-block">
         <h2>Ask things like</h2>
         <ul className="ws-copilot-examples">
