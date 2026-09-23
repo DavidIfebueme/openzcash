@@ -5,6 +5,7 @@ import {
   WRAPPED_ASSETS,
   parseWrappedPools,
   aggregateWrappedPools,
+  resolveWrappedPools,
   parseSolanaSupply,
   tokenUnits,
   rpcHex,
@@ -22,6 +23,25 @@ const pool = {
   volume: { h24: 120 },
 };
 describe("issuer-identified ZEC pools", () => {
+  it("keeps populated fallback coverage but never disguises a failed index as an empty market", () => {
+    const failed = {
+      status: "rejected" as const,
+      reason: new Error("Rate limit"),
+    };
+    const empty = { status: "fulfilled" as const, value: [] };
+    const populated = {
+      status: "fulfilled" as const,
+      value: parseWrappedPools([pool], asset, asOf),
+    };
+    expect(resolveWrappedPools([failed, populated])).toHaveLength(1);
+    expect(resolveWrappedPools([empty, empty])).toEqual([]);
+    expect(() => resolveWrappedPools([empty, failed])).toThrow(
+      "Pool coverage unavailable",
+    );
+    expect(() => resolveWrappedPools([failed, failed])).toThrow(
+      "Pool coverage unavailable",
+    );
+  });
   it("counts a pool once even when returned for both ZEC tokens and multiple indexers", () => {
     const other = WRAPPED_ASSETS.find((a) => a.id === "universal-base")!;
     const pair = { ...pool, quoteToken: { address: other.token } };

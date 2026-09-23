@@ -9,6 +9,7 @@ import {
   parseWrappedPools,
   wrappedUrl,
   aggregateWrappedPools,
+  resolveWrappedPools,
   parseSolanaSupply,
   rpcHex,
   tokenUnits,
@@ -218,9 +219,7 @@ const wrappedFeeds = WRAPPED_ASSETS.map((asset) => ({
           ]
         : []),
     ]);
-    const success = reads.filter((r) => r.status === "fulfilled");
-    if (!success.length) throw new Error("Pool indexers unavailable");
-    return aggregateWrappedPools(success.flatMap((r) => r.value)).pools;
+    return resolveWrappedPools(reads);
   }),
   supply: cachedFeed(async () => {
     if (asset.chain === "solana")

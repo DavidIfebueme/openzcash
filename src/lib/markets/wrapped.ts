@@ -216,6 +216,17 @@ export function aggregateWrappedPools(pools: WrappedPool[]): {
   }
   return { venues: [...venues.values()], pools: [...unique.values()] };
 }
+export function resolveWrappedPools(
+  reads: PromiseSettledResult<WrappedPool[]>[],
+) {
+  const success = reads.filter((r) => r.status === "fulfilled");
+  const pools = success.flatMap((r) => r.value);
+  // An empty index cannot stand in for an unavailable alternative index.
+  // Keep nonempty fallback coverage usable without inventing a zero market.
+  if (!success.length || (!pools.length && success.length !== reads.length))
+    throw new Error("Pool coverage unavailable");
+  return aggregateWrappedPools(pools).pools;
+}
 const uint = z.string().regex(/^\d+$/);
 export function tokenUnits(raw: string, decimals: number): number {
   uint.parse(raw);
