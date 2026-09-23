@@ -1225,19 +1225,17 @@
   font-size: 12px;
   color: var(--muted);
 }
+/* Dark surfaces, text and chart accents follow the shared workspace theme. */
 :global([data-theme="dark"]) .page {
-  --ink: #ecf0e7;
-  --muted: #b2bbac;
-  --line: #3d4639;
-  --paper: #242b21;
-  --soft: #2b3327;
-  --gold: #d9ba71;
-  --cex: #bea46c;
-  --dex: #84d7b4;
-  --mint: #273d30;
-}
-:global([data-theme="dark"]) .track {
-  background: #3a4434;
+  --ink: inherit;
+  --muted: inherit;
+  --line: inherit;
+  --paper: var(--surface);
+  --soft: var(--surface2);
+  --gold: var(--accent-ink);
+  --cex: var(--accent);
+  --dex: var(--pos);
+  --mint: var(--pos-soft);
 }
 @media (min-width: 1400px) {
   .race {

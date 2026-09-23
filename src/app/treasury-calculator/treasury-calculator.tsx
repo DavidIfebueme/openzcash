@@ -83,7 +83,7 @@ function reportDate(value: string): string {
 }
 
 function SourceLink({ href, children }: { href: string; children: ReactNode }) {
-  return <a href={href} target="_blank" rel="noreferrer" className="underline decoration-stone-300 underline-offset-4 transition hover:text-amber-800 hover:decoration-amber-600">{children}</a>;
+  return <a href={href} target="_blank" rel="noreferrer" className="underline decoration-stone-300 underline-offset-4 transition hover:text-[var(--accent-ink)] hover:decoration-[var(--accent)]">{children}</a>;
 }
 
 function Field({ label, value, onChange, unit, min = 0, max, showStepper = false }: {
@@ -96,7 +96,7 @@ function Field({ label, value, onChange, unit, min = 0, max, showStepper = false
         <input type="number" inputMode="decimal" min={min} max={max} step={showStepper ? 1 : "any"} value={value} data-stepper={showStepper || undefined}
           onChange={(event) => onChange(event.target.value)}
           className={`${styles.numberInput} tnum h-full min-w-0 w-full border-0 bg-transparent px-3.5 text-base font-semibold text-stone-900 outline-none`} />
-        {unit && <span className="flex min-w-12 items-center justify-center border-l border-stone-200/80 bg-stone-50/80 px-3 text-xs font-medium text-stone-500">{unit}</span>}
+        {unit && <span className="flex min-w-12 items-center justify-center border-l border-stone-200/80 bg-[var(--surface2)] px-3 text-xs font-medium text-stone-500">{unit}</span>}
       </span>
     </label>
   );
@@ -220,7 +220,7 @@ export function TreasuryCalculator({
   const otherMinerOffersPerDay = scenario ? scenario.otherMinersPerDayZec * toNumber(values.minerSales) / 100 : null;
 
   return (
-    <div ref={calculatorTop} className="mx-auto max-w-5xl scroll-mt-20 text-stone-900">
+    <div ref={calculatorTop} className="mx-auto max-w-[1280px] scroll-mt-20 text-stone-900">
       <PageHeader
         title="Treasury calculator"
         subtitle="Compare company ownership and community funding using public Zcash data."
@@ -233,8 +233,8 @@ export function TreasuryCalculator({
         </label> : undefined}
       />
 
-      <div className="sticky top-14 z-10 -mx-1 mb-4 rounded-2xl bg-stone-50/95 px-1 py-2 backdrop-blur-xl">
-        <div role="tablist" aria-label="Choose a treasury analysis" className="grid grid-cols-2 gap-1 rounded-2xl border border-stone-200 bg-stone-100/80 p-1">
+      <div className="sticky top-14 z-10 -mx-1 mb-4 rounded-2xl bg-[var(--bg)]/95 px-1 py-2 backdrop-blur-xl">
+        <div role="tablist" aria-label="Choose a treasury analysis" className="grid grid-cols-2 gap-1 rounded-2xl border border-stone-200 bg-[var(--surface2)] p-1">
           {CALCULATOR_VIEWS.map(({ id, label, description, Icon }) => <button
             key={id} ref={(element) => { viewTabs.current[id] = element; }} type="button" role="tab"
             id={`treasury-${id}-tab`} aria-controls={`treasury-${id}-panel`} aria-selected={activeView === id}
@@ -248,16 +248,16 @@ export function TreasuryCalculator({
               event.preventDefault();
               selectView(next, true);
             }}
-            className={`flex min-w-0 items-center justify-start gap-3 rounded-xl px-3 py-3 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600 sm:px-4 ${activeView === id ? "bg-white text-stone-900 shadow-sm ring-1 ring-stone-200/60" : "text-stone-500 hover:bg-white/60 hover:text-stone-800"}`}
+            className={`flex min-w-0 items-center justify-start gap-3 rounded-xl px-3 py-3 text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent)] sm:px-4 ${activeView === id ? "bg-white text-stone-900 shadow-sm ring-1 ring-[var(--line)]" : "text-stone-500 hover:bg-[var(--surface)] hover:text-[var(--ink)]"}`}
           >
-            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${activeView === id ? "bg-amber-50 text-amber-800" : "bg-stone-200/40 text-stone-400"}`}><Icon className="h-[18px] w-[18px]" /></span>
+            <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${activeView === id ? "bg-amber-50 text-amber-800" : "bg-[var(--surface2)] text-stone-400"}`}><Icon className="h-[18px] w-[18px]" /></span>
             <span className="min-w-0"><span className="block text-sm font-semibold">{label}</span><span className="mt-0.5 block text-[11px] leading-snug text-stone-500">{description}</span></span>
           </button>)}
         </div>
       </div>
 
       <section id="treasury-company-panel" role="tabpanel" aria-labelledby="treasury-company-tab" tabIndex={0} hidden={activeView !== "company"} className="overflow-hidden rounded-[20px] border border-stone-200 bg-white shadow-[0_8px_32px_-20px_rgba(60,45,20,0.22)]">
-        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-stone-200/80 bg-[#fcfbf8] px-5 py-4 sm:px-6">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-stone-200/80 bg-[var(--surface2)] px-5 py-4 sm:px-6">
           <div className="min-w-0">
             <p className="truncate text-xs font-medium text-stone-500">{company}{preset === "cypherpunk" ? holdingsChanged ? " · edited scenario" : " · latest reported balance" : " · your scenario"}</p>
             <p className="tnum mt-1 text-base font-semibold tracking-tight sm:text-lg">{Number.isFinite(toNumber(values.holdings)) ? number.format(toNumber(values.holdings)) : "—"} <span className="text-[11px] font-medium text-stone-500 sm:text-xs">ZEC held</span></p>
@@ -269,15 +269,15 @@ export function TreasuryCalculator({
           </div>
         </div>
 
-        <div className="border-b border-stone-200/80 bg-stone-50/50 px-5 py-3.5 sm:px-6">
+        <div className="border-b border-stone-200/80 bg-[var(--surface2)] px-5 py-3.5 sm:px-6">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
             <span className="text-xs font-medium text-stone-600" id="target-basis-label">Calculate ownership using</span>
-            <div className="grid grid-cols-2 gap-1 rounded-xl border border-stone-200/80 bg-stone-100/80 p-1" role="group" aria-labelledby="target-basis-label">
+            <div className="grid grid-cols-2 gap-1 rounded-xl border border-stone-200/80 bg-[var(--surface2)] p-1" role="group" aria-labelledby="target-basis-label">
               {([
                 ["circulating", "Circulating supply"],
                 ["maximum", "21M lifetime limit"],
               ] as const).map(([value, label]) => <button type="button" key={value} aria-pressed={basis === value} onClick={() => setBasis(value)}
-                className={`rounded-lg px-3 py-2 text-[11px] font-medium transition ${basis === value ? "bg-white text-amber-900 shadow-sm ring-1 ring-stone-200/70" : "text-stone-500 hover:bg-white/60 hover:text-stone-900"}`}>{label}</button>)}
+                className={`rounded-lg px-3 py-2 text-[11px] font-medium transition ${basis === value ? "bg-white text-amber-900 shadow-sm ring-1 ring-[var(--line)]" : "text-stone-500 hover:bg-[var(--surface)] hover:text-[var(--ink)]"}`}>{label}</button>)}
             </div>
           </div>
           {scenario && <p className="tnum mt-2 text-xs text-stone-500">
@@ -287,7 +287,7 @@ export function TreasuryCalculator({
           <p className="mt-1 text-[11px] leading-relaxed text-stone-500">{basis === "circulating" ? `${preset === "cypherpunk" ? "Cypherpunk’s stated goal uses circulating supply: " : "Circulating supply means "}ZEC already in circulation.` : "The lifetime limit includes all ZEC that can ever be created."}</p>
         </div>
 
-        <div className="grid gap-px bg-stone-200/80 sm:grid-cols-3">
+        <div className="grid gap-px bg-[var(--line)] sm:grid-cols-3">
           <div className="min-w-0 bg-white px-5 py-4 sm:px-6">
             <Field label="Ownership target" value={values.target} onChange={(value) => edit("target", value)} min={0.01} max={100} unit="%" />
             <p className="mt-2.5 flex min-h-7 items-center text-[11px] text-stone-500">Share of {basisLabel}</p>
@@ -296,7 +296,7 @@ export function TreasuryCalculator({
             <Field label="Future ZEC price (your estimate)" value={futurePriceDisplay} onChange={(value) => { setMultiple(null); edit("customFuturePrice", value); }} min={0.01} unit="USD" />
             <div className="mt-2.5 grid grid-cols-5 gap-1.5 sm:grid-cols-4 lg:grid-cols-5" role="group" aria-label="Price multipliers">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value) => <button key={value} type="button" onClick={() => setMultiple(value)} aria-pressed={multiple === value}
-                className={`min-h-8 min-w-0 rounded-md border px-1 py-1 text-[11px] font-semibold transition ${multiple === value ? "border-stone-900 bg-stone-900 text-white" : "border-stone-200/80 bg-white text-stone-500 hover:border-stone-300 hover:bg-stone-50"}`}>{value}×</button>)}
+                className={`min-h-8 min-w-0 rounded-md border px-1 py-1 text-[11px] font-semibold transition ${multiple === value ? "border-transparent bg-stone-900 text-white" : "border-stone-200/80 bg-white text-stone-500 hover:border-[var(--line-strong)] hover:bg-[var(--surface2)]"}`}>{value}×</button>)}
             </div>
             <p className="tnum mt-2 text-[11px] text-stone-500">{Number.isFinite(currentPrice) ? `1× = today’s price of ${price.format(currentPrice)} / ZEC` : "Multipliers use the current ZEC price you enter."}</p>
           </div>
@@ -319,11 +319,11 @@ export function TreasuryCalculator({
                 <p className="tnum mt-1 text-xs text-stone-500">{number.format(scenario.todayGapZec)} ZEC to reach {target}</p>
                 <p className="mt-4 text-xs text-stone-500">One purchase today at {price.format(currentPrice)} / ZEC</p>
               </div>
-              <div className="bg-[#fff9e9] px-4 py-5 sm:px-6">
-                <p className="text-xs font-medium text-amber-900/70">{years === 0 ? "Buy now at your chosen price" : `Buy after ${horizon} of mining`}</p>
-                <p className="tnum mt-2 flex flex-wrap items-baseline gap-x-2 text-[27px] font-semibold leading-tight tracking-[-0.05em] text-amber-950 sm:text-[32px]" title={money.format(scenario.futurePurchaseUsd)}>{compactMoney.format(scenario.futurePurchaseUsd)} <span className="text-[11px] font-medium tracking-normal text-amber-900/70">USD total</span></p>
-                <p className="tnum mt-1 text-xs text-amber-900/70">{number.format(scenario.futureGapZec)} ZEC still to buy</p>
-                <p className="mt-4 text-xs text-amber-900/70">{years === 0 ? "One purchase now" : "One purchase at the end"}, at {price.format(futurePrice)} / ZEC</p>
+              <div className="bg-[var(--accent-soft)] px-4 py-5 sm:px-6">
+                <p className="text-xs font-medium text-[var(--accent-ink)]">{years === 0 ? "Buy now at your chosen price" : `Buy after ${horizon} of mining`}</p>
+                <p className="tnum mt-2 flex flex-wrap items-baseline gap-x-2 text-[27px] font-semibold leading-tight tracking-[-0.05em] text-[var(--accent-ink)] sm:text-[32px]" title={money.format(scenario.futurePurchaseUsd)}>{compactMoney.format(scenario.futurePurchaseUsd)} <span className="text-[11px] font-medium tracking-normal text-[var(--accent-ink)]">USD total</span></p>
+                <p className="tnum mt-1 text-xs text-[var(--accent-ink)]">{number.format(scenario.futureGapZec)} ZEC still to buy</p>
+                <p className="mt-4 text-xs text-[var(--accent-ink)]">{years === 0 ? "One purchase now" : "One purchase at the end"}, at {price.format(futurePrice)} / ZEC</p>
                 <p className="mt-1.5 text-xs font-medium text-amber-900">{costDifference === 0 ? "Same total purchase cost as today" : `${compactMoney.format(Math.abs(costDifference))} ${costDifference > 0 ? "more" : "less"} than buying today`}</p>
               </div>
               <div className="col-span-2 bg-white px-5 py-5 sm:px-6 md:col-span-1">
@@ -356,12 +356,12 @@ export function TreasuryCalculator({
                 aria-valuemin={0} aria-valuemax={toNumber(values.target)} aria-valuenow={Math.min(scenario.futureSharePercent, toNumber(values.target))}
                 aria-valuetext={`${scenario.futureSharePercent.toFixed(2)}% of ${basis === "maximum" ? "21M maximum supply" : "projected circulating supply"}, before market purchases. Target: ${target}.`}
                 className="flex h-2.5 overflow-hidden rounded-full bg-stone-100">
-                <div className="bg-stone-800 transition-[width] duration-300" style={{ width: `${heldWidth}%` }} />
+                <div className="bg-[var(--ink)] transition-[width] duration-300" style={{ width: `${heldWidth}%` }} />
                 <div className="bg-amber-400 transition-[width] duration-300" style={{ width: `${minedWidth}%` }} />
               </div>
               <div className="tnum mt-1.5 flex justify-between text-[10px] text-stone-500"><span>0%</span><span>{target} target</span></div>
               <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-stone-500">
-                <span className="tnum flex items-center gap-1.5"><i className="h-1.5 w-1.5 rounded-full bg-stone-800" />Starting balance: {number.format(toNumber(values.holdings))} ZEC</span>
+                <span className="tnum flex items-center gap-1.5"><i className="h-1.5 w-1.5 rounded-full bg-[var(--ink)]" />Starting balance: {number.format(toNumber(values.holdings))} ZEC</span>
                 <span className="tnum flex items-center gap-1.5"><i className="h-1.5 w-1.5 rounded-full bg-amber-400" />Mined in this period: +{number.format(scenario.projectedMinedZec)} ZEC</span>
                 <span className="tnum flex items-center gap-1.5"><i className="h-1.5 w-1.5 rounded-full bg-stone-200" />Left to buy: {number.format(scenario.futureGapZec)} ZEC</span>
               </div>
@@ -375,12 +375,12 @@ export function TreasuryCalculator({
         )}
 
         <details key={preset} open={preset === "custom" || initialPriceUsd === null ? true : undefined} className="group border-t border-stone-200/80">
-          <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-3.5 text-xs font-medium text-stone-600 hover:bg-stone-50 sm:px-6">
+          <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-3.5 text-xs font-medium text-stone-600 hover:bg-[var(--surface2)] sm:px-6">
             Edit company assumptions <span aria-hidden="true" className="text-lg leading-none text-stone-400 transition-transform group-open:rotate-45">+</span>
           </summary>
           <div className="grid gap-4 px-5 pb-5 sm:grid-cols-2 sm:px-6 lg:grid-cols-3">
             <label className="block text-xs font-medium text-stone-600">Company name
-              <input type="text" value={values.company} onChange={(event) => edit("company", event.target.value)} maxLength={70} className="mt-1.5 block w-full rounded-lg border border-stone-200 px-3 py-2.5 text-base text-stone-900 outline-none focus:border-amber-500" />
+              <input type="text" value={values.company} onChange={(event) => edit("company", event.target.value)} maxLength={70} className="mt-1.5 block w-full rounded-lg border border-stone-200 px-3 py-2.5 text-base text-stone-900 outline-none focus:border-[var(--accent)]" />
             </label>
             <Field label="ZEC held" value={values.holdings} onChange={(value) => edit("holdings", value)} max={MAX_ZEC_SUPPLY} unit="ZEC" />
             <Field label="Mining output over 14 days" value={values.mining} onChange={(value) => edit("mining", value)} unit="ZEC" />
@@ -390,15 +390,15 @@ export function TreasuryCalculator({
               <Field label="Other miners’ rewards for sale (assumed)" value={values.minerSales} onChange={(value) => edit("minerSales", value)} max={100} unit="%" />
               <p className="mt-1.5 text-[11px] leading-relaxed text-stone-500">100% assumes all their new rewards are offered for sale.</p>
             </div>
-            {scenario && otherMinerOffersPerDay !== null && <div className="rounded-xl border border-amber-200/70 bg-[#fff9e9] px-4 py-3 sm:col-span-2 lg:col-span-3" aria-live="polite" aria-atomic="true">
+            {scenario && otherMinerOffersPerDay !== null && <div className="rounded-xl border border-[var(--accent-muted)] bg-[var(--accent-soft)] px-4 py-3 sm:col-span-2 lg:col-span-3" aria-live="polite" aria-atomic="true">
               <div className="flex flex-wrap items-center justify-between gap-x-5 gap-y-2">
                 <div>
-                  <p className="text-xs font-medium text-amber-900/80">Estimated offers from other miners · today</p>
-                  <p className="tnum mt-1 text-xl font-semibold tracking-tight text-amber-950">{number.format(otherMinerOffersPerDay)} <span className="text-xs font-medium tracking-normal text-amber-900/70">ZEC / day</span></p>
+                  <p className="text-xs font-medium text-[var(--accent-ink)]">Estimated offers from other miners · today</p>
+                  <p className="tnum mt-1 text-xl font-semibold tracking-tight text-[var(--accent-ink)]">{number.format(otherMinerOffersPerDay)} <span className="text-xs font-medium tracking-normal text-[var(--accent-ink)]">ZEC / day</span></p>
                 </div>
-                <p className="tnum text-xs text-amber-900/80">{number.format(scenario.otherMinersPerDayZec)} ZEC / day × {number.format(toNumber(values.minerSales))}% offered</p>
+                <p className="tnum text-xs text-[var(--accent-ink)]">{number.format(scenario.otherMinersPerDayZec)} ZEC / day × {number.format(toNumber(values.minerSales))}% offered</p>
               </div>
-              <p className="mt-2 text-[11px] leading-relaxed text-amber-900/75">This changes estimated market supply. Purchase costs use the price you enter; the company’s ownership uses its own holdings and mining.</p>
+              <p className="mt-2 text-[11px] leading-relaxed text-[var(--accent-ink)]">This changes estimated market supply. Purchase costs use the price you enter; the company’s ownership uses its own holdings and mining.</p>
             </div>}
           </div>
         </details>
@@ -407,7 +407,7 @@ export function TreasuryCalculator({
       <section id="treasury-community-panel" role="tabpanel" aria-labelledby="treasury-community-tab" tabIndex={0} hidden={activeView !== "community"} className="overflow-hidden rounded-[20px] border border-stone-200 bg-white shadow-[0_8px_32px_-20px_rgba(60,45,20,0.22)]">
         <header className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/80 px-5 py-4 sm:px-6">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-[#fcfbf8] text-stone-600"><IconWallet className="h-5 w-5" /></span>
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-stone-200 bg-[var(--surface2)] text-stone-600"><IconWallet className="h-5 w-5" /></span>
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-500">Community treasury</p>
               <h2 id="community-treasury-title" className="mt-0.5 text-lg font-semibold tracking-tight">ZCG + Lockbox</h2>
@@ -417,7 +417,7 @@ export function TreasuryCalculator({
         </header>
 
         <div className="grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-          <div className="border-b border-stone-200/80 bg-[#f8f7f3] px-5 py-5 sm:px-6 lg:border-r lg:border-b-0">
+          <div className="border-b border-stone-200/80 bg-[var(--surface2)] px-5 py-5 sm:px-6 lg:border-r lg:border-b-0">
             <div className="flex items-center gap-2 text-amber-900">
               <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4"><path d="m12.5 3.5 4 4M3 17l4.5-1 9-9a2.83 2.83 0 0 0-4-4l-9 9L3 17Z" /></svg>
               <h3 className="text-sm font-semibold">Edit your assumptions</h3>
@@ -444,7 +444,7 @@ export function TreasuryCalculator({
                 <Field label="Dev fund allocation" value={values.fundAllocation} onChange={(value) => edit("fundAllocation", value)} max={100} unit="%" />
               </div>
               <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-xs leading-relaxed text-stone-600">
-                <input type="checkbox" checked={continueDevFund} onChange={(event) => setContinueDevFund(event.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-amber-600" />
+                <input type="checkbox" checked={continueDevFund} onChange={(event) => setContinueDevFund(event.target.checked)} className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--accent)]" />
                 <span>Keep funding after the next halving <span className="block text-[11px] text-stone-500">Optional scenario. The current schedule ends funding at that halving.</span></span>
               </label>
               <p className="mt-2 text-[11px] leading-relaxed text-stone-500">These settings also change mining results in the Company tab.</p>
@@ -453,14 +453,14 @@ export function TreasuryCalculator({
 
           <div className="min-w-0 px-5 py-5 sm:px-6" aria-live="polite" aria-atomic="true">
             {fundBudget ? <>
-              <div className="rounded-xl border border-amber-200/60 bg-[#fff9e9] px-4 py-4 sm:px-5">
-                <p className="text-xs font-medium text-amber-900/80">Budget years represented by gross assets</p>
-                <p className={`tnum mt-1 flex flex-wrap items-baseline gap-x-2 font-semibold leading-tight tracking-[-0.045em] text-amber-950 ${fundBudget.coverageYearsFuture === null ? "text-[28px]" : "text-[38px]"}`}>
-                  {fundBudget.coverageYearsFuture === null ? "No annual spending" : <>{number.format(fundBudget.coverageYearsFuture)} <span className="text-base font-medium tracking-normal text-amber-900/70">years</span></>}
+              <div className="rounded-xl border border-[var(--accent-muted)] bg-[var(--accent-soft)] px-4 py-4 sm:px-5">
+                <p className="text-xs font-medium text-[var(--accent-ink)]">Budget years represented by gross assets</p>
+                <p className={`tnum mt-1 flex flex-wrap items-baseline gap-x-2 font-semibold leading-tight tracking-[-0.045em] text-[var(--accent-ink)] ${fundBudget.coverageYearsFuture === null ? "text-[28px]" : "text-[38px]"}`}>
+                  {fundBudget.coverageYearsFuture === null ? "No annual spending" : <>{number.format(fundBudget.coverageYearsFuture)} <span className="text-base font-medium tracking-normal text-[var(--accent-ink)]">years</span></>}
                 </p>
-                {fundBudget.coverageYearsFuture === null ? <p className="mt-1 text-xs text-amber-900/80">Enter grant spending above zero to calculate years of coverage.</p> : <>
-                  <p className="tnum mt-1 text-xs leading-relaxed text-amber-900/80">At {price.format(futurePrice)} / ZEC <span className="mx-1 text-amber-900/30">·</span> {number.format(fundBudget.coverageYearsNow!)} years at today’s price</p>
-                  <p className="mt-2 text-[11px] leading-relaxed text-amber-900/70">Assumes the ZEC price and annual USD budget stay fixed for the entire period.</p>
+                {fundBudget.coverageYearsFuture === null ? <p className="mt-1 text-xs text-[var(--accent-ink)]">Enter grant spending above zero to calculate years of coverage.</p> : <>
+                  <p className="tnum mt-1 text-xs leading-relaxed text-[var(--accent-ink)]">At {price.format(futurePrice)} / ZEC <span className="mx-1 text-[var(--accent-muted)]">·</span> {number.format(fundBudget.coverageYearsNow!)} years at today’s price</p>
+                  <p className="mt-2 text-[11px] leading-relaxed text-[var(--accent-ink)]">Assumes the ZEC price and annual USD budget stay fixed for the entire period.</p>
                 </>}
               </div>
 
@@ -477,7 +477,7 @@ export function TreasuryCalculator({
                   <th scope="col" className="pb-2 text-right font-medium">Today<span className="mt-0.5 block text-[10px] font-normal">{price.format(currentPrice)} / ZEC</span></th>
                   <th scope="col" className="pb-2 text-right font-semibold text-amber-900">Your scenario<span className="mt-0.5 block text-[10px] font-normal">{price.format(futurePrice)} / ZEC</span></th>
                 </tr></thead>
-                <tbody className="divide-y divide-stone-100">
+                <tbody className="divide-y divide-[var(--line)]">
                   <tr>
                     <th scope="row" className="py-3 pr-2 font-medium text-stone-600">Treasury value</th>
                     <td className="py-3 text-right"><span className="text-base font-semibold" title={money.format(fundBudget.currentTreasuryUsd)}>{compactMoney.format(fundBudget.currentTreasuryUsd)}</span></td>
@@ -496,7 +496,7 @@ export function TreasuryCalculator({
                 </tbody>
               </table>
               <p className="mt-3 text-[11px] leading-relaxed text-stone-500">Gross assets include funds already committed to unpaid grants. ZCG and Lockbox require separate approvals to spend. This comparison excludes future funding and rising expenses; it does not forecast how long accessible funds will last.</p>
-            </> : <div role="alert" className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Enter valid spending, asset values, a period above zero, and positive ZEC prices to see fund coverage.</div>}
+            </> : <div role="alert" className="rounded-xl border border-[var(--accent-muted)] bg-amber-50 p-4 text-sm text-amber-900">Enter valid spending, asset values, a period above zero, and positive ZEC prices to see fund coverage.</div>}
           </div>
         </div>
 
@@ -508,7 +508,7 @@ export function TreasuryCalculator({
             </div>
             <span className="text-[11px] text-stone-500"><SourceLink href={devFundData.zcg?.sourceUrl ?? SOURCES.zcg}>View official report ↗</SourceLink></span>
           </div>
-          <dl className="grid gap-3 sm:grid-cols-3 sm:divide-x sm:divide-stone-200">
+          <dl className="grid gap-3 sm:grid-cols-3 sm:divide-x sm:divide-[var(--line)]">
             <div>
               <dt className="text-[11px] text-stone-500">ZCG + Lockbox holdings</dt>
               <dd className="tnum mt-1 text-base font-semibold">{Number.isFinite(fundZec) ? number.format(fundZec) : "Unavailable"}<span className="ml-1 text-[11px] font-normal text-stone-500">ZEC</span></dd>
@@ -522,8 +522,8 @@ export function TreasuryCalculator({
               <dd className="tnum mt-1 text-base font-semibold">{Number.isFinite(toNumber(values.historicalSpend)) ? money.format(toNumber(values.historicalSpend)) : "Unavailable"}</dd>
             </div>
           </dl>
-          <details className="group mt-3 rounded-lg border border-stone-200/90 bg-stone-50/60">
-            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-xs font-medium text-stone-700 transition hover:bg-stone-100/70">
+          <details className="group mt-3 rounded-lg border border-stone-200 bg-[var(--surface2)]">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2.5 text-xs font-medium text-stone-700 transition hover:bg-[var(--surface2)]">
               Edit starting balances & spending history <span aria-hidden="true" className="text-base leading-none text-stone-400 transition-transform group-open:rotate-45">+</span>
             </summary>
             <div className="grid gap-3 px-3 pt-1 pb-3 sm:grid-cols-3">
@@ -540,7 +540,7 @@ export function TreasuryCalculator({
           </p>
         </div>
 
-        {fundBudget && scenario && <details className="group border-t border-stone-200/80 bg-[#fcfbf8]">
+        {fundBudget && scenario && <details className="group border-t border-stone-200/80 bg-[var(--surface2)]">
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-5 py-3.5 text-xs font-medium text-stone-600 sm:px-6">
             <span className="min-w-0 flex-1">Funding schedule & estimated market supply<span className="mt-1 block text-[11px] font-normal text-stone-500">Other miners + fund sales at today’s price</span></span>
             <span className="tnum shrink-0 text-right" aria-live="polite" aria-atomic="true"><span className="block text-sm font-semibold text-stone-800">{number.format(scenario.potentialMarketSalesPerDayZec)} ZEC/day</span><span className="mt-0.5 block text-[10px] font-normal text-stone-500">assumed offers</span></span>
