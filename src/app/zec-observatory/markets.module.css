@@ -1022,6 +1022,18 @@
   padding: 16px 22px;
   border-top: 1px solid var(--line);
 }
+.holdingDisclosure {
+  display: grid;
+  gap: 8px;
+  padding: 16px 22px;
+  border-top: 1px solid var(--line);
+  background: var(--soft);
+  color: var(--muted);
+  font-size: 13px;
+}
+.holdingDisclosure strong {
+  color: var(--ink);
+}
 .addressList > p {
   font-size: 13px;
   color: var(--muted);
@@ -1517,6 +1529,9 @@
     width: 80px;
   }
   .addressList {
+    padding: 15px 18px;
+  }
+  .holdingDisclosure {
     padding: 15px 18px;
   }
   .addressList > div {

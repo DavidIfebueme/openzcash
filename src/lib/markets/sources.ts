@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { cachedFeed, type Feed } from "./cache";
+import { PUBLIC_ADDRESS_ATTRIBUTIONS } from "./attributions";
 import {
   parseKaminoRegistry,
   parseKaminoMetrics,
@@ -114,7 +115,7 @@ const holdings = cachedFeed(async () => {
     json(`${CIPHER}/api/labels`),
     json(`${CIPHER}/api/rich-list?limit=500`),
   ]);
-  const registry = parseCustodyRegistry(labelRaw, richRaw);
+  const registry = parseCustodyRegistry(labelRaw, richRaw, PUBLIC_ADDRESS_ATTRIBUTIONS);
   const { labels, balances } = registry;
   const missing = labels.filter((a) => !balances.has(a.address));
   const deadline = Date.now() + 30_000;
@@ -148,6 +149,8 @@ const holdings = cachedFeed(async () => {
   return {
     holders: groupHolders(addresses),
     labelCount: labels.length,
+    cipherLabelCount: registry.cipherLabelCount,
+    publicLabelCount: registry.publicLabelCount,
     resolved: addresses.filter((a) => a.zec !== null).length,
     largeAddresses: registry.addresses.filter((a) => a.zec >= 10_000),
     indexedAddresses: registry.addresses.length,
@@ -639,7 +642,7 @@ async function collectMarketDashboard() {
       "CipherScan addresses",
       `${CIPHER}/api/labels`,
       h,
-      "Every label is retained, including addresses outside the rich list. Public labels do not prove ownership or solvency.",
+      "Every CipherScan label is retained, including addresses outside the rich list. Sourced public attributions are marked separately and never treated as CipherScan-verified ownership.",
     ),
     status(
       "Cypherpunk",
@@ -727,7 +730,7 @@ const dashboardSnapshot = cachedFeed(
         (source.status === "unavailable" || source.status === "saved") &&
         source.name !== "Grayscale",
     ) || data.wrapped.some((w) => (w.feed.data?.failedSources ?? 0) > 0),
-  { key: "zec-observatory:dashboard:v1", staleWhileRevalidate: true },
+  { key: "zec-observatory:dashboard:v2", staleWhileRevalidate: true },
 );
 
 /** One atomic, dated snapshot for server rendering and the refresh endpoint. */

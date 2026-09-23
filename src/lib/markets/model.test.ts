@@ -532,6 +532,53 @@ describe("on-chain denominator and labeled custody", () => {
       category: "other",
     });
   });
+  it("shows a sourced public attribution in labels and whales without claiming CipherScan verification", () => {
+    const whale = "t1gGCYpyURMo2FcYDSqeR8pgp2Kx9rnT72V";
+    const attribution = {
+      address: whale,
+      label: "Garrett Jin",
+      publisher: "Ember",
+      source: "https://www.binance.com/en/square/post/368329271524964",
+      asOf: "2026-09-19",
+    };
+    const parsed = parseCustodyRegistry(
+      { labels: [{ address, label: "Binance", category: "exchange", verified: true }], count: 1 },
+      { success: true, addresses: [{ address: whale, balanceZat: "20207620700000", label: null }] },
+      [attribution],
+    );
+    expect(parsed.labels.find((a) => a.address === whale)).toMatchObject({
+      label: "Garrett Jin",
+      verified: false,
+      attribution: { publisher: "Ember", source: attribution.source, asOf: attribution.asOf },
+    });
+    expect(parsed.addresses[0]).toMatchObject({
+      address: whale,
+      zec: 202076.207,
+      label: { label: "Garrett Jin", verified: false },
+    });
+    expect(parsed.cipherLabelCount).toBe(1);
+    expect(parsed.publicLabelCount).toBe(1);
+  });
+  it("keeps upstream labels ahead of public reports and does not invent a reported address balance", () => {
+    const absent = "t1" + "D".repeat(33);
+    const report = {
+      label: "Reported whale",
+      publisher: "Example researcher",
+      source: "https://example.com/report",
+      asOf: "2026-09-19",
+    };
+    const parsed = parseCustodyRegistry(
+      { labels: [{ address, label: "Binance", category: "exchange", verified: true }], count: 1 },
+      { success: true, addresses: [{ address, balanceZat: "10000000000000" }] },
+      [{ ...report, address }, { ...report, address: absent }, { ...report, address: absent }],
+    );
+    expect(parsed.labels).toHaveLength(2);
+    expect(parsed.labels[0]).toMatchObject({ label: "Binance", verified: true });
+    expect(parsed.labels[0].attribution).toBeUndefined();
+    expect(parsed.balances.has(absent)).toBe(false);
+    expect(parsed.addresses).toHaveLength(1);
+    expect(parsed.publicLabelCount).toBe(1);
+  });
 });
 
 describe("issuer disclosures", () => {

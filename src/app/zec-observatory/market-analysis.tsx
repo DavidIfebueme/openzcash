@@ -27,6 +27,7 @@ import {
 } from "@/lib/markets/model";
 import styles from "./markets.module.css";
 import { marketLogo } from "@/lib/markets/logos";
+import { holdingRows, type HoldingRow } from "@/lib/markets/holdings";
 import { Pagination, usePagination } from "./pagination";
 
 const compact = (n: number, digits = 1) =>
@@ -152,8 +153,15 @@ function HolderAddresses({
             <small>
               {a.category === "unknown"
                 ? "No public ownership label"
-                : `${a.label} · ${a.verified ? "CipherScan verified label" : "Unverified label"}`}
+                : `${a.label} · ${a.attribution ? "Public attribution" : a.verified ? "CipherScan verified label" : "Unverified label"}`}
             </small>
+            {a.attribution && (
+              <small>
+                <Out href={a.attribution.source}>{a.attribution.publisher} report</Out>
+                {" · "}{stamp(a.attribution.asOf, true)}
+                {" · "}Ownership not independently verified
+              </small>
+            )}
           </div>
           <strong>
             {a.zec === null ? "Unavailable" : `${number(a.zec, 8)} ZEC`}
@@ -166,6 +174,31 @@ function HolderAddresses({
           label={`${holder.name} addresses`}
           itemLabel="addresses"
         />
+      )}
+    </div>
+  );
+}
+
+function HoldingDisclosure({ holder }: { holder: HoldingRow }) {
+  const disclosure = holder.disclosure;
+  if (!disclosure) return null;
+  const { data: report } = disclosure;
+  return (
+    <div className={styles.holdingDisclosure}>
+      <p>
+        <Out href={report.source}>Issuer disclosure</Out>
+        {" · "}{stamp(report.asOf, true)}
+        {disclosure.stale ? " · saved disclosure" : ""}
+      </p>
+      <p>{report.method}</p>
+      <p>Custody: {report.custody}.</p>
+      {holder.addresses.length > 0 ? (
+        <p>
+          Separately tracked addresses: <strong>{holder.addressZec === null ? "unavailable" : `${number(holder.addressZec)} ZEC`}</strong>.
+          {" "}This partial view is not added to the disclosed holding.
+        </p>
+      ) : (
+        <p>No public address is attributed to this position here.</p>
       )}
     </div>
   );
@@ -206,7 +239,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   const request = useRef<AbortController | null>(null);
   const [holderFilter, setHolderFilter] = useState<
     "all" | "whales" | HolderKind
-  >("cex");
+  >("all");
   const [query, setQuery] = useState("");
   const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
   const [milestonesOpen, setMilestonesOpen] = useState(false);
@@ -297,13 +330,14 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     supply && n !== null ? (n / supply.zec) * 100 : null;
   const holdingShare = (n: number | null) =>
     data.holdingsConsistent ? share(n) : null;
-  const holderRows =
+  const holderRows: HoldingRow[] =
     holderFilter === "whales"
       ? (data.holdings.data?.largeAddresses ?? []).map((a) => ({
           id: a.address,
           name: a.label?.label ?? "Unlabeled address",
           kind: a.label ? holderIdentity(a.label).kind : ("other" as const),
           zec: a.zec,
+          addressZec: a.zec,
           missing: 0,
           addresses: [
             {
@@ -318,7 +352,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             },
           ],
         }))
-      : holders;
+      : holdingRows(holders, data.disclosures);
   const filteredHolders = holderRows.filter(
     (h) =>
       (holderFilter === "all" ||
@@ -976,7 +1010,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         <Title
           id="holdings"
           title="Exchanges & large holders"
-          caption="Public balances and CipherScan labels. Open any row to inspect its addresses."
+          caption="Public addresses and issuer disclosures. Positions may overlap with exchange custody."
         />
         <div className={styles.supplyStrip}>
           <div>
@@ -1009,7 +1043,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   { id: "cex", label: "CEX" },
                   { id: "dex", label: "DEX & bridges" },
                   { id: "whales", label: "Whales" },
-                  { id: "all", label: "All labels" },
+                  { id: "all", label: "All holders" },
                 ] as const
               ).map((f) => (
                 <button
@@ -1027,7 +1061,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <input
               type="search"
               aria-label="Search entities or addresses"
-              placeholder="Find an exchange or address…"
+              placeholder="Find a holder or address…"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -1045,9 +1079,9 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <span>
               {holderFilter === "whales"
                 ? "Address / public label"
-                : "Entity / grouped addresses"}
+                : "Entity / source"}
             </span>
-            <span>Balance · ZEC</span>
+            <span>{holderFilter === "all" ? "Holdings · ZEC" : "Balance · ZEC"}</span>
             <span>% of supply</span>
           </div>
           {holderPagination.items.map((h, i) => (
@@ -1059,12 +1093,15 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   </span>
                   <Logo name={h.name} />
                   <div>
-                    <strong>{h.name}</strong>
+                    <strong>{h.name.replace(" · The Zcash ETF", "")}</strong>
                     <small>
-                      {holderFilter === "whales"
+                      {h.disclosure
+                        ? `Issuer reported · ${stamp(h.disclosure.data.asOf, true)}${h.disclosure.stale ? " · saved" : ""}`
+                        : holderFilter === "whales"
                         ? `${h.id.slice(0, 9)}…${h.id.slice(-7)}`
                         : `${h.addresses.length} ${h.addresses.length === 1 ? "address" : "addresses"}`}
-                      {h.missing ? ` · ${h.missing} unavailable` : ""}
+                      {!h.disclosure && h.missing ? ` · ${h.missing} unavailable` : ""}
+                      {h.addresses.some((a) => a.attribution) ? " · public attribution" : ""}
                     </small>
                   </div>
                 </div>
@@ -1075,16 +1112,19 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   </div>
                 </div>
                 <span className={styles.marketShare}>
-                  {pct(holdingShare(h.zec))}
+                  {pct(h.disclosure ? share(h.zec) : holdingShare(h.zec))}
                   <span aria-hidden="true">＋</span>
                 </span>
               </summary>
-              <HolderAddresses
-                key={`${h.id}:${query}`}
-                holder={h}
-                whale={holderFilter === "whales"}
-                query={query}
-              />
+              <HoldingDisclosure holder={h} />
+              {h.addresses.length > 0 && (
+                <HolderAddresses
+                  key={`${h.id}:${query}`}
+                  holder={h}
+                  whale={holderFilter === "whales"}
+                  query={query}
+                />
+              )}
             </details>
           ))}
           {filteredHolders.length === 0 && (
@@ -1108,7 +1148,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               {data.holdings.data
                 ? holderFilter === "whales"
                   ? `${data.holdings.data.largeAddresses.length} large addresses · top ${data.holdings.data.indexedAddresses} scanned`
-                  : `${data.holdings.data.resolved}/${data.holdings.data.labelCount} labeled address balances resolved`
+                  : `${data.holdings.data.resolved}/${data.holdings.data.labelCount} address balances resolved${data.holdings.data.publicLabelCount ? ` · ${data.holdings.data.publicLabelCount} public attribution` : ""}`
                 : "Registry unavailable"}{" "}
               · {data.holdings.stale && data.holdings.data ? "Saved · " : ""}
               {stamp(data.holdings.fetchedAt)}
@@ -1222,6 +1262,12 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 .
               </p>
               <h3>Holdings are not additive</h3>
+              <p>
+                All holders combines labeled addresses with issuer disclosures.
+                A fund’s reported holding and its visible addresses appear in one
+                row; they are never added together. Public attributions carry
+                their own source and date and are not CipherScan-verified labels.
+              </p>
               <p>
                 Funds may use exchange custodians. Wrapped tokens represent
                 already-issued native ZEC; Kamino deposits are part of token

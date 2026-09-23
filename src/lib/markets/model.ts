@@ -331,7 +331,18 @@ export const labelSchema = z.object({
   verified: z.boolean(),
   description: z.string().nullable().optional(),
 });
-export type AddressLabel = z.infer<typeof labelSchema>;
+const attributionSchema = z.object({
+  publisher: z.string().min(1),
+  source: z.string().url(),
+  asOf: date,
+});
+export type PublicAddressAttribution = z.infer<typeof attributionSchema> & {
+  address: string;
+  label: string;
+};
+export type AddressLabel = z.infer<typeof labelSchema> & {
+  attribution?: z.infer<typeof attributionSchema>;
+};
 export type AddressBalance = AddressLabel & {
   zec: number | null;
   source: string;
@@ -344,7 +355,11 @@ export type PublicAddress = {
 };
 
 /** Keep newly published rich-list labels even before the label registry catches up. */
-export function parseCustodyRegistry(labelRaw: unknown, richRaw: unknown) {
+export function parseCustodyRegistry(
+  labelRaw: unknown,
+  richRaw: unknown,
+  publicAttributions: readonly PublicAddressAttribution[] = [],
+) {
   const registry = z
     .object({
       labels: z.array(labelSchema).min(1),
@@ -353,7 +368,7 @@ export function parseCustodyRegistry(labelRaw: unknown, richRaw: unknown) {
     .parse(labelRaw);
   if (registry.labels.length !== registry.count)
     throw new Error("Incomplete label registry");
-  const labels = new Map(registry.labels.map((a) => [a.address, a]));
+  const labels = new Map<string, AddressLabel>(registry.labels.map((a) => [a.address, a]));
   if (labels.size !== registry.count)
     throw new Error("Duplicate registry address");
   const rich = z
@@ -389,6 +404,20 @@ export function parseCustodyRegistry(labelRaw: unknown, richRaw: unknown) {
       );
     }
   }
+  const cipherLabelCount = labels.size;
+  for (const report of publicAttributions) {
+    // A reported identity never replaces an explorer label or proves ownership.
+    if (labels.has(report.address)) continue;
+    labels.set(report.address, {
+      ...labelSchema.parse({
+        address: report.address,
+        label: report.label,
+        category: "whale",
+        verified: false,
+      }),
+      attribution: attributionSchema.parse(report),
+    });
+  }
   const addresses: PublicAddress[] = [...balances]
     .map(([address, zec]) => ({
       address,
@@ -397,7 +426,13 @@ export function parseCustodyRegistry(labelRaw: unknown, richRaw: unknown) {
       source: `https://cipherscan.app/address/${address}`,
     }))
     .sort((a, b) => b.zec - a.zec);
-  return { labels: [...labels.values()], addresses, balances };
+  return {
+    labels: [...labels.values()],
+    addresses,
+    balances,
+    cipherLabelCount,
+    publicLabelCount: labels.size - cipherLabelCount,
+  };
 }
 export type HolderKind = "cex" | "dex" | "fund" | "treasury" | "other";
 export type Holder = {
