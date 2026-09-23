@@ -6,11 +6,13 @@ import {
   parse21Shares,
   parseAddressDetail,
   parseAddressZec,
+  parseCustodyRegistry,
   parseCypherpunk,
   parseGrayscale,
   parseHyperliquid,
   parseMarkets,
   parseNearExplorer,
+  parseNearConfidential,
   parseSupply,
   simulateShift,
   type AddressBalance,
@@ -134,6 +136,7 @@ describe("fair volume comparison", () => {
   it("reads one filtered NEAR token total without adding the repeated filter total", () => {
     const volume = {
       lastDay: "$$7,000",
+      allTime: "$$2,000,000",
       last7Days: "$$42,000",
       last30Days: "$$100,000",
       fetchedAt: new Date(now).toISOString(),
@@ -144,7 +147,32 @@ describe("fair volume comparison", () => {
       fromVolume: volume,
       toVolume: volume,
     };
-    expect(parseNearExplorer(renderData(raw), now).volumeUsd).toBe(7000);
+    expect(parseNearExplorer(renderData(raw), now)).toMatchObject({
+      volumeUsd: 7000,
+      volumeAllTimeUsd: 2000000,
+    });
+    expect(() =>
+      parseNearExplorer(
+        renderData({
+          ...raw,
+          toTokenId: "$undefined",
+          fromTokenId: "$undefined",
+        }),
+        now,
+      ),
+    ).toThrow();
+    expect(
+      parseNearExplorer(
+        renderData({
+          ...raw,
+          toTokenId: "$undefined",
+          fromTokenId: "$undefined",
+        }),
+        now,
+        "all",
+      ).volumeUsd,
+    ).toBe(7000);
+    expect(() => parseNearExplorer(renderData(raw), now, "all")).toThrow();
     expect(() =>
       parseNearExplorer(renderData({ ...raw, toTokenId: ["btc"] }), now),
     ).toThrow();
@@ -231,6 +259,100 @@ describe("on-chain denominator and labeled custody", () => {
     expect(groups[0].addresses).toHaveLength(2);
     expect(groupHolders([{ ...a, zec: null }])[0].zec).toBeNull();
   });
+  it("retains new rich-list labels without inventing owners for unlabeled whales", () => {
+    const known = {
+      address,
+      label: "Binance Cold Wallet",
+      category: "exchange",
+      verified: true,
+    };
+    const newAddress = "t1" + "A".repeat(33);
+    const unknownAddress = "t1" + "B".repeat(33);
+    const rows = [
+      { ...known, label: "Older name", balanceZat: "2000000000000" },
+      {
+        address: newAddress,
+        label: "Whale 7",
+        category: "whale",
+        verified: true,
+        balanceZat: "1500000000000",
+      },
+      {
+        address: unknownAddress,
+        label: null,
+        category: null,
+        verified: null,
+        balanceZat: "9000000000000",
+      },
+    ];
+    const parsed = parseCustodyRegistry(
+      { labels: [known], count: 1 },
+      { success: true, addresses: [...rows, rows[0]] },
+    );
+    expect(parsed.labels).toHaveLength(2);
+    expect(parsed.labels[0].label).toBe("Binance Cold Wallet");
+    expect(parsed.labels[1]).toMatchObject({
+      label: "Whale 7",
+      verified: true,
+    });
+    expect(parsed.addresses).toHaveLength(3);
+    expect(parsed.addresses[0]).toMatchObject({
+      address: unknownAddress,
+      zec: 90000,
+      label: null,
+    });
+    expect(parsed.balances.get(address)).toBe(20000);
+    expect(holderIdentity(parsed.labels[1]).kind).toBe("other");
+  });
+  it("rejects conflicting rich-list balances and incomplete label registries", () => {
+    const known = {
+      address,
+      label: "Binance",
+      category: "exchange",
+      verified: true,
+    };
+    const rich = {
+      success: true,
+      addresses: [
+        { address, balanceZat: "100000000" },
+        { address, balanceZat: "200000000" },
+      ],
+    };
+    expect(() =>
+      parseCustodyRegistry({ labels: [known], count: 1 }, rich),
+    ).toThrow("Conflicting");
+    expect(() =>
+      parseCustodyRegistry({ labels: [known], count: 2 }, rich),
+    ).toThrow("Incomplete");
+    expect(() =>
+      parseCustodyRegistry({ labels: [known, known], count: 2 }, rich),
+    ).toThrow("Duplicate");
+  });
+  it("never upgrades a newly published label to verified when its flag is absent", () => {
+    const known = {
+      address,
+      label: "Binance",
+      category: "exchange",
+      verified: true,
+    };
+    const parsed = parseCustodyRegistry(
+      { labels: [known], count: 1 },
+      {
+        success: true,
+        addresses: [
+          {
+            address: "t1" + "C".repeat(33),
+            label: "New whale",
+            balanceZat: "1230000000000",
+          },
+        ],
+      },
+    );
+    expect(parsed.labels[1]).toMatchObject({
+      verified: false,
+      category: "other",
+    });
+  });
 });
 
 describe("issuer disclosures", () => {
@@ -275,5 +397,26 @@ describe("issuer disclosures", () => {
       ),
     ).toMatchObject({ zec: 464514.8551, asOf: "2026-09-08" });
     expect(() => parseGrayscale("Vercel Security Checkpoint")).toThrow();
+  });
+});
+
+describe("confidential NEAR data is TVL, not ZEC trading", () => {
+  const page = (currentTvl: number, date = "2026-09-21") =>
+    "NEAR Intents Confidential TVL " +
+    renderData({ data: [{ date, value: 113248972.55 }], currentTvl });
+  it("keeps a dated, reconciled TVL observation", () => {
+    expect(parseNearConfidential(page(113248972.55), now)).toEqual({
+      tvlUsd: 113248972.55,
+      asOf: "2026-09-21",
+    });
+  });
+  it("rejects a mismatched or outdated observation", () => {
+    expect(() => parseNearConfidential(page(99), now)).toThrow();
+    expect(() =>
+      parseNearConfidential(page(113248972.55, "2026-08-01"), now),
+    ).toThrow();
+    expect(() =>
+      parseNearConfidential(page(113248972.55, "2026-09-24"), now),
+    ).toThrow();
   });
 });

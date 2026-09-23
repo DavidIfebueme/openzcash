@@ -58,6 +58,13 @@ export const DIRECT_VENUES = new Set([
   "near-intents",
   "ref-finance",
   "rhea-finance",
+  "pancakeswap-v3-bsc",
+  "pancakeswap",
+  "apeswap",
+  "uniswap-v3-bsc",
+  "orca",
+  "raydium",
+  "meteora",
 ]);
 
 export function parseMarkets(
@@ -250,6 +257,69 @@ export type AddressBalance = AddressLabel & {
   zec: number | null;
   source: string;
 };
+export type PublicAddress = {
+  address: string;
+  zec: number;
+  label: AddressLabel | null;
+  source: string;
+};
+
+/** Keep newly published rich-list labels even before the label registry catches up. */
+export function parseCustodyRegistry(labelRaw: unknown, richRaw: unknown) {
+  const registry = z
+    .object({
+      labels: z.array(labelSchema).min(1),
+      count: z.number().int().positive(),
+    })
+    .parse(labelRaw);
+  if (registry.labels.length !== registry.count)
+    throw new Error("Incomplete label registry");
+  const labels = new Map(registry.labels.map((a) => [a.address, a]));
+  if (labels.size !== registry.count)
+    throw new Error("Duplicate registry address");
+  const rich = z
+    .object({
+      success: z.literal(true),
+      addresses: z.array(
+        z.object({
+          address: labelSchema.shape.address,
+          balanceZat: zat,
+          label: z.string().nullable().optional(),
+          category: z.string().nullable().optional(),
+          verified: z.boolean().nullable().optional(),
+          description: z.string().nullable().optional(),
+        }),
+      ),
+    })
+    .parse(richRaw);
+  const balances = new Map<string, number>();
+  for (const a of rich.addresses) {
+    const zec = parseAddressZec(a);
+    const previous = balances.get(a.address);
+    if (previous !== undefined && previous !== zec)
+      throw new Error("Conflicting address balances");
+    balances.set(a.address, zec);
+    if (!labels.has(a.address) && a.label?.trim()) {
+      labels.set(
+        a.address,
+        labelSchema.parse({
+          ...a,
+          category: a.category ?? "other",
+          verified: a.verified === true,
+        }),
+      );
+    }
+  }
+  const addresses: PublicAddress[] = [...balances]
+    .map(([address, zec]) => ({
+      address,
+      zec,
+      label: labels.get(address) ?? null,
+      source: `https://cipherscan.app/address/${address}`,
+    }))
+    .sort((a, b) => b.zec - a.zec);
+  return { labels: [...labels.values()], addresses, balances };
+}
 export type HolderKind = "cex" | "dex" | "fund" | "treasury" | "other";
 export type Holder = {
   id: string;
@@ -428,14 +498,25 @@ export function publicPageData(html: string): string {
     })
     .join("\n");
 }
-export function parseNearExplorer(html: string, now: number) {
+export function parseNearExplorer(
+  html: string,
+  now: number,
+  scope: "zec" | "all" = "zec",
+) {
   const s = publicPageData(html);
-  if (!s.includes('"toTokenId":["nep141:zec.omft.near"]'))
+  if (scope === "zec" && !s.includes('"toTokenId":["nep141:zec.omft.near"]'))
     throw new Error("ZEC filter missing");
+  if (
+    scope === "all" &&
+    (!s.includes('"toTokenId":"$undefined"') ||
+      !s.includes('"fromTokenId":"$undefined"'))
+  )
+    throw new Error("Expected unfiltered protocol volume");
   const match = s.match(/"toVolume":(\{[^}]+\})/);
   if (!match) throw new Error("ZEC volume not available");
   const n = z
     .object({
+      allTime: z.string(),
       lastDay: z.string(),
       last7Days: z.string(),
       last30Days: z.string(),
@@ -456,8 +537,33 @@ export function parseNearExplorer(html: string, now: number) {
     volumeUsd: dollars(n.lastDay),
     volume7dUsd: dollars(n.last7Days),
     volume30dUsd: dollars(n.last30Days),
+    volumeAllTimeUsd: dollars(n.allTime),
     asOf: n.fetchedAt,
   };
+}
+
+/** Official NEAR Revenue's dated TVL series. TVL is never trading volume. */
+export function parseNearConfidential(html: string, now: number) {
+  const s = publicPageData(html);
+  if (!html.includes("NEAR Intents Confidential TVL"))
+    throw new Error("Confidential context missing");
+  const match = s.match(/"data":(\[[^\]]+\]),"currentTvl":([^,}]+)/);
+  if (!match) throw new Error("Confidential TVL series unavailable");
+  const series = z
+    .array(z.object({ date, value: amount }))
+    .min(1)
+    .parse(JSON.parse(match[1]));
+  const latest = [...series].sort(
+    (a, b) => Date.parse(b.date) - Date.parse(a.date),
+  )[0];
+  const current = amount.parse(JSON.parse(match[2]));
+  if (
+    Math.abs(current - latest.value) > 0.01 ||
+    Date.parse(latest.date) > now ||
+    now - Date.parse(latest.date) > 72 * HOUR
+  )
+    throw new Error("Confidential TVL date or total not verified");
+  return { tvlUsd: current, asOf: latest.date };
 }
 export function parseCypherpunk(html: string): Disclosure {
   const s = publicPageData(html);

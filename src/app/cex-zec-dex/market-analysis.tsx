@@ -8,10 +8,17 @@ import {
   type CSSProperties,
   type ReactNode,
 } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { MarketDashboard } from "@/lib/markets/sources";
-import { simulateShift, type HolderKind } from "@/lib/markets/model";
+import {
+  simulateShift,
+  holderIdentity,
+  type HolderKind,
+  type Venue,
+} from "@/lib/markets/model";
 import styles from "./markets.module.css";
+import exchangeLogos from "../../../public/logos/markets/exchanges.json";
 
 const compact = (n: number, digits = 1) =>
   new Intl.NumberFormat("en-US", {
@@ -34,17 +41,70 @@ function stamp(s: string | null, dayOnly = false) {
           : { hour: "2-digit", minute: "2-digit", timeZoneName: "short" }),
         timeZone: "UTC",
       }).format(new Date(s))
-    : "Not available";
+    : "Unavailable";
 }
-const width = (value: number) =>
-  ({ "--fill": `${Math.max(0, Math.min(100, value))}%` }) as CSSProperties;
+const width = (n: number) =>
+  ({ "--fill": `${Math.max(0, Math.min(100, n))}%` }) as CSSProperties;
 const kinds: Record<HolderKind, string> = {
   cex: "Exchange / custody",
   dex: "DEX / bridge",
-  fund: "Fund addresses",
-  treasury: "Public treasury",
-  other: "Other public label",
+  fund: "Fund",
+  treasury: "Treasury",
+  other: "Public label",
 };
+const logos: [string, string][] = [
+  ["omnibridge", "omnibridge.webp"],
+  ["coinbase", "coinbase.png"],
+  ["binance", "binance.svg"],
+  ["bnb", "binance.svg"],
+  ["gemini", "gemini.png"],
+  ["kraken", "kraken.png"],
+  ["kucoin", "kucoin.svg"],
+  ["okx", "okx-mark.png"],
+  ["okex", "okx-mark.png"],
+  ["near", "near.svg"],
+  ["hyper", "hyperliquid.png"],
+  ["solana", "solana.svg"],
+  ["base", "base.svg"],
+  ["orca", "orca.png"],
+  ["raydium", "raydium.ico"],
+  ["meteora", "meteora.svg"],
+  ["aerodrome", "aerodrome.svg"],
+  ["uniswap", "uniswap.png"],
+  ["pancake", "pancakeswap.png"],
+  ["zenrock", "zenrock.png"],
+  ["universal", "universal.svg"],
+  ["cypherpunk", "cypherpunk.svg"],
+  ["21shares", "shares21.png"],
+  ["kamino", "kamino.png"],
+];
+function Logo({ name }: { name: string }) {
+  const key = name.toLowerCase();
+  const src = key.includes("maya")
+    ? "/logos/maya.svg"
+    : ((exchangeLogos as Record<string, string>)[key] ??
+      (logos.find(([id]) => key.startsWith(id)) ??
+        logos.find(([id]) => key.includes(id)))?.[1]);
+  return (
+    <span
+      className={`${styles.logo} ${/maya|zenrock/.test(key) ? styles.lightMark : ""}`}
+    >
+      {src ? (
+        <Image
+          src={src.startsWith("/") ? src : `/logos/markets/${src}`}
+          alt=""
+          width={32}
+          height={32}
+          unoptimized
+        />
+      ) : (
+        <span aria-hidden="true">
+          {name === "Unlabeled address" ? "?" : name[0]}
+        </span>
+      )}
+    </span>
+  );
+}
 function Out({ href, children }: { href: string; children: ReactNode }) {
   return (
     <a href={href} target="_blank" rel="noreferrer">
@@ -53,36 +113,64 @@ function Out({ href, children }: { href: string; children: ReactNode }) {
     </a>
   );
 }
-function SectionTitle({
+function Title({
   id,
-  step,
   title,
-  description,
+  caption,
 }: {
   id: string;
-  step: string;
   title: string;
-  description: string;
+  caption: string;
 }) {
   return (
     <header className={styles.sectionTitle}>
-      <div>
-        <p className={styles.eyebrow}>{step}</p>
-        <h2 id={id}>{title}</h2>
-      </div>
-      <p>{description}</p>
+      <h2 id={id}>{title}</h2>
+      <p>{caption}</p>
     </header>
   );
 }
 
+/** Chains combine execution venues for the overview; expanded rows retain every source. */
+function leaderboard(venues: Venue[]) {
+  const grouped = new Map<string, Venue & { members: Venue[] }>();
+  for (const v of venues) {
+    const chain = v.id.startsWith("wrapped-") ? v.id.split("-")[1] : null;
+    const id = chain ? `chain-${chain}` : v.id;
+    const name = chain
+      ? ({
+          solana: "Solana",
+          base: "Base",
+          bsc: "BNB Chain",
+          polygon: "Polygon",
+          worldchain: "World Chain",
+          katana: "Katana",
+          starknet: "Starknet",
+          aptos: "Aptos",
+        }[chain] ?? chain)
+      : v.name;
+    const previous = grouped.get(id);
+    if (previous) {
+      previous.volumeUsd += v.volumeUsd;
+      previous.pairs += v.pairs;
+      previous.members.push(v);
+    } else grouped.set(id, { ...v, id, name, members: [v] });
+  }
+  return [...grouped.values()].sort((a, b) => b.volumeUsd - a.volumeUsd);
+}
+
 export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   const [data, setData] = useState(initial);
-  const [refreshing, setRefreshing] = useState(false);
-  const [refreshFailed, setRefreshFailed] = useState(false);
+  const [refreshing, setRefreshing] = useState(false),
+    [refreshFailed, setRefreshFailed] = useState(false);
   const request = useRef<AbortController | null>(null);
-  const [holderFilter, setHolderFilter] = useState<"all" | HolderKind>("cex");
+  const [holderFilter, setHolderFilter] = useState<
+    "all" | "whales" | HolderKind
+  >("cex");
+  const [whaleLimit, setWhaleLimit] = useState(8);
   const [query, setQuery] = useState("");
-  const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("all");
+  const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
+  const [allVenues, setAllVenues] = useState(false);
+  const [allTokens, setAllTokens] = useState(false);
   const [migration, setMigration] = useState(0);
   const refresh = useCallback(async () => {
     if (request.current) return;
@@ -91,12 +179,12 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     setRefreshing(true);
     const timeout = setTimeout(() => controller.abort(), 45_000);
     try {
-      const response = await fetch("/api/markets", {
+      const r = await fetch("/api/markets", {
         signal: controller.signal,
         cache: "no-store",
       });
-      if (!response.ok) throw new Error("Refresh failed");
-      setData((await response.json()) as MarketDashboard);
+      if (!r.ok) throw Error();
+      setData(await r.json());
       setRefreshFailed(false);
     } catch {
       setRefreshFailed(true);
@@ -107,40 +195,123 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     }
   }, []);
   useEffect(() => {
-    const interval = setInterval(() => {
+    const timer = setInterval(() => {
       if (document.visibilityState === "visible") void refresh();
     }, 5 * 60_000);
     return () => {
-      clearInterval(interval);
+      clearInterval(timer);
       request.current?.abort();
     };
   }, [refresh]);
-  const m = data.metrics;
+  const m = data.metrics,
+    supply = data.supply.data;
   const holders = data.holdings.data?.holders ?? [];
   const cexHolders = holders.filter((h) => h.kind === "cex");
-  const cexBalance = cexHolders.reduce((n, h) => n + (h.zec ?? 0), 0);
-  const hasCexBalance = cexHolders.some((h) => h.zec !== null);
-  const supply = data.supply.data;
-  const denominator = supply && data.holdingsConsistent ? supply.zec : null;
+  const cexBalance = cexHolders.some((h) => h.zec !== null)
+    ? cexHolders.reduce((sum, h) => sum + (h.zec ?? 0), 0)
+    : null;
   const share = (n: number | null) =>
-    denominator && n !== null ? (n / denominator) * 100 : null;
-  const filteredHolders = holders.filter(
+    supply && n !== null ? (n / supply.zec) * 100 : null;
+  const holdingShare = (n: number | null) =>
+    data.holdingsConsistent ? share(n) : null;
+  const holderRows =
+    holderFilter === "whales"
+      ? (data.holdings.data?.largeAddresses ?? []).map((a) => ({
+          id: a.address,
+          name: a.label?.label ?? "Unlabeled address",
+          kind: a.label ? holderIdentity(a.label).kind : ("other" as const),
+          zec: a.zec,
+          missing: 0,
+          addresses: [
+            {
+              ...(a.label ?? {
+                address: a.address,
+                label: "Unlabeled address",
+                category: "unknown",
+                verified: false,
+              }),
+              zec: a.zec,
+              source: a.source,
+            },
+          ],
+        }))
+      : holders;
+  const filteredHolders = holderRows.filter(
     (h) =>
-      (holderFilter === "all" || h.kind === holderFilter) &&
+      (holderFilter === "all" ||
+        holderFilter === "whales" ||
+        h.kind === holderFilter) &&
       `${h.name} ${h.addresses.map((a) => `${a.label} ${a.address}`).join(" ")}`
         .toLowerCase()
         .includes(query.toLowerCase()),
   );
   const largest = Math.max(1, ...filteredHolders.map((h) => h.zec ?? 0));
-  const venues = data.venues.filter(
+  const shownHolders =
+    holderFilter === "whales"
+      ? filteredHolders.slice(0, whaleLimit)
+      : filteredHolders;
+  const rows = leaderboard(data.venues).filter(
     (v) => venueFilter === "all" || v.kind === venueFilter,
   );
+  const shownRows = allVenues ? rows : rows.slice(0, 8);
   const simulation = m ? simulateShift(m.cex, m.dex, migration) : null;
-  const cexCount = data.venues.filter((v) => v.kind === "cex").length;
-  const dexCount = data.venues.filter((v) => v.kind === "dex").length;
-  const unmapped = data.venues.filter(
-    (v) => v.kind === "cex" && !cexHolders.some((h) => h.id === v.id),
-  );
+  const near = data.nearActivity.data,
+    maya = data.venues.find((v) => v.id === "maya");
+  const chainVolume = (chain: string) => {
+    const vs = data.venues.filter((v) => v.id.startsWith(`wrapped-${chain}-`));
+    return vs.length ? vs.reduce((s, v) => s + v.volumeUsd, 0) : null;
+  };
+  const cb = data.wrapped.find((w) => w.asset.id === "cbzec-base");
+  const solana = data.wrapped.filter((w) => w.asset.chain === "solana");
+  const solSupply = solana.every((w) => w.supply.data && !w.supply.stale)
+    ? solana.reduce((s, w) => s + (w.supply.data?.zec ?? 0), 0)
+    : null;
+  const featured = [
+    {
+      name: "Solana",
+      value: chainVolume("solana"),
+      label: "Spot volume · 24h",
+      detail:
+        solSupply === null
+          ? "3 registered ZEC mints"
+          : `${compact(solSupply, 2)} ZEC issued · 3 mints`,
+      href: "#crosschain",
+    },
+    {
+      name: "NEAR Intents",
+      value: near && !data.nearActivity.stale ? near.volumeUsd : null,
+      label: "ZEC activity · 24h",
+      detail: near
+        ? `${usd(near.volume30dUsd)} over 30 days${data.nearActivity.stale ? " · saved" : ""}`
+        : "ZEC token feed unavailable",
+      href: "#near-detail",
+    },
+    {
+      name: "Maya",
+      value: maya?.volumeUsd ?? null,
+      label: "ZEC swaps · 24h",
+      detail: data.mayaHistory.data
+        ? `${usd(data.mayaHistory.data.volumeAllTimeUsd)} all-time${data.mayaHistory.stale ? " · saved" : ""}`
+        : "Native ZEC liquidity",
+      href: "/zcg/investments",
+    },
+    {
+      name: "Base",
+      value: chainVolume("base"),
+      label: "Spot volume · 24h",
+      detail: cb?.supply.data
+        ? `${compact(cb.supply.data.zec, 2)} cbZEC issued${cb.supply.stale ? " · saved" : ""}`
+        : "cbZEC + Universal uZEC",
+      href: "#crosschain",
+    },
+  ];
+  const tokenRows = allTokens
+    ? data.wrapped
+    : data.wrapped.filter((w) =>
+        ["base", "solana", "bsc"].includes(w.asset.chain),
+      );
+  const kaminoDeposits =
+    data.kamino.data?.reserves.reduce((sum, r) => sum + r.zec, 0) ?? null;
 
   return (
     <div className={styles.page}>
@@ -148,74 +319,57 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         <div>
           <p className={styles.eyebrow}>Zcash market observatory</p>
           <h1>
-            CEX <span className={styles.bracket}>&lt;</span>{" "}
-            <span className={styles.zec}>ZEC</span>{" "}
-            <span className={styles.bracket}>&gt;</span> DEX
+            CEX <span>&lt;</span> <em>ZEC</em> <span>&gt;</span> DEX
           </h1>
-          <p>
-            Follow the volume. Understand the custody. Build the next chapter.
-          </p>
+          <p>Trading activity. Public holdings. One clear view.</p>
         </div>
         <div className={styles.refresh}>
-          <button
-            type="button"
-            onClick={() => void refresh()}
-            disabled={refreshing}
-          >
-            <span aria-hidden="true">↻</span>{" "}
-            {refreshing ? "Checking sources…" : "Refresh data"}
+          <button onClick={() => void refresh()} disabled={refreshing}>
+            ↻ {refreshing ? "Updating…" : "Refresh"}
           </button>
           <span role="status">
             {refreshFailed
-              ? "Refresh failed · showing previous data"
-              : "Auto-checks every 5 min while open"}
+              ? "Refresh failed · previous snapshot"
+              : "Auto-refresh · 5 min"}
           </span>
         </div>
       </header>
       <nav className={styles.jumpNav} aria-label="On this page">
-        <a href="#volume">01 · The mission</a>
-        <a href="#holdings">02 · Where ZEC sits</a>
-        <a href="#funds">03 · Funds & treasuries</a>
-        <a href="#methodology">04 · Verify the data</a>
+        <a href="#volume">The mission</a>
+        <a href="#trading">Markets</a>
+        <a href="#crosschain">ZEC across chains</a>
+        <a href="#holdings">Holdings & whales</a>
+        <a href="#funds">Funds</a>
       </nav>
 
       <section className={styles.mission} aria-labelledby="volume">
-        <div className={styles.missionTop}>
-          <p className={styles.eyebrow}>01 / The community mission</p>
-          <span className={styles.window}>Rolling 24 hours · USD</span>
-        </div>
         <div className={styles.missionGrid}>
           <div className={styles.race}>
-            <h2 id="volume">
-              When does DEX
-              <br />
-              overtake CEX?
-            </h2>
-            <p className={styles.intro}>
-              The milestone is more than{" "}
-              <strong>50% of observed trading activity</strong> on DEXs and
-              intent protocols. Here is today’s distance.
-            </p>
+            <div className={styles.missionHeading}>
+              <div>
+                <p className={styles.eyebrow}>The community mission</p>
+                <h2 id="volume">Make DEX the majority.</h2>
+              </div>
+              <span className={styles.pill}>24h · USD</span>
+            </div>
             <div
               className={styles.bars}
               role="img"
               aria-label={
                 m
-                  ? `Observed volume: CEX ${pct(m.cexPct)}, DEX and intents ${pct(m.dexPct)}. Both bars use the same total-volume scale.`
+                  ? `CEX ${pct(m.cexPct)}; DEX and intents ${pct(m.dexPct)} of observed volume. Bars share the same scale.`
                   : "Volume comparison unavailable"
               }
             >
               {[
                 {
                   label: "CEX",
-                  desc: "Centralized spot markets",
                   value: m?.cex,
                   percent: m?.cexPct,
                   tone: styles.cex,
                 },
                 {
                   label: "DEX + intents",
-                  desc: "Decentralized & cross-chain activity",
                   value: m?.dex,
                   percent: m?.dexPct,
                   tone: styles.dex,
@@ -223,10 +377,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               ].map((b) => (
                 <div key={b.label} className={`${styles.barGroup} ${b.tone}`}>
                   <div className={styles.barLabel}>
-                    <div>
-                      <strong>{b.label}</strong>
-                      <span>{b.desc}</span>
-                    </div>
+                    <strong>{b.label}</strong>
                     <div>
                       <strong>
                         {b.value === undefined ? "—" : usd(b.value)}
@@ -235,321 +386,468 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                     </div>
                   </div>
                   <div className={styles.track}>
-                    <div
-                      className={styles.fill}
-                      style={width(b.percent ?? 0)}
-                    />
+                    <div style={width(b.percent ?? 0)} />
                   </div>
                 </div>
               ))}
             </div>
-            <div className={styles.coverageLine}>
+            <p className={styles.coverageLine}>
               <span
                 className={
                   data.volumeComplete ? styles.goodDot : styles.warnDot
                 }
               />
-              <span>
-                {cexCount} CEX · {dexCount} DEX / intent venues ·{" "}
-                {data.volumeComplete
-                  ? "Tracked feeds available"
-                  : "Partial coverage · some feeds unavailable"}
-              </span>
-              <a href="#methodology">Coverage details ↗</a>
-            </div>
+              {data.volumeComplete ? "Tracked feeds available" : "Partial data"}{" "}
+              · Observed activity <a href="#methodology">Coverage ↗</a>
+            </p>
           </div>
           <aside className={styles.target}>
-            <p className={styles.eyebrow}>
-              {m?.reached
-                ? "Milestone reached in this sample"
-                : "DEX share of observed volume"}
-            </p>
-            <div className={styles.heroNumber}>
-              {m ? m.dexPct.toFixed(2) : "—"}
-              <span>%</span>
-            </div>
-            <div className={styles.goalLine}>
-              <span>Today</span>
-              <strong>Goal &gt; 50%</strong>
-            </div>
+            <span>DEX share · target &gt;50%</span>
+            <strong className={styles.heroNumber}>
+              {m ? number(m.dexPct) : "—"}
+              <small>%</small>
+            </strong>
             <div className={styles.goalTrack}>
-              <div style={width(m ? Math.min(100, m.dexPct * 2) : 0)} />
-              <span />
+              <div style={width(m ? m.dexPct * 2 : 0)} />
             </div>
             <div className={styles.gap}>
               <span>
-                {m?.reached ? "DEX lead" : "Additional DEX volume to match CEX"}
+                {m?.reached ? "DEX lead" : "Extra DEX volume to match CEX"}
               </span>
               <strong>
                 {m ? usd(m.reached ? m.dex - m.cex : m.gap) : "—"}
                 <small> / day</small>
               </strong>
-              <p>
-                {m?.reached
-                  ? "In the currently observed sources. Keep checking the coverage and timing."
-                  : "If CEX volume stays at its current level. Exceed this amount to take the lead."}
-              </p>
-            </div>
-            <div className={styles.targetFooter}>
-              <span>DEX scale needed for parity</span>
-              <strong>
-                {m?.multiplier == null
-                  ? "—"
-                  : m.reached
-                    ? "Already ahead"
-                    : `${number(m.multiplier, 1)}×`}
-              </strong>
+              <span>CEX volume held constant</span>
             </div>
           </aside>
         </div>
-        <div className={styles.readout}>
-          <span className={styles.readoutMark}>↗</span>
-          <p>
-            {m ? (
-              <>
-                <strong>
-                  {m.reached
-                    ? "DEX leads the observed sample."
-                    : m.tied
-                      ? "The observed sample is at parity."
-                      : `CEX still represents ${pct(m.cexPct)} of this sample.`}
-                </strong>{" "}
-                {m.gap > 0 && (
-                  <>
-                    At a constant combined volume, moving{" "}
-                    <strong>{usd(m.shiftToParity)} per day</strong> from CEX to
-                    DEX would bring both sides to parity.{" "}
-                  </>
-                )}
-                This is a changing activity benchmark, not a forecast.{" "}
-                {data.volumeComplete
-                  ? "Source coverage is broader than any single protocol, but is not the entire market."
-                  : "The displayed gap uses available feeds and may change materially when missing sources recover."}
-              </>
-            ) : (
-              "A current comparison requires both CEX and DEX data. Missing volume is not treated as zero; check source health below."
-            )}
-          </p>
-        </div>
-      </section>
-
-      <section
-        className={styles.analysisGrid}
-        aria-label="Explore the volume comparison"
-      >
-        <div className={styles.simulator}>
-          <p className={styles.eyebrow}>Explore the path · scenario only</p>
-          <h3>What if trading moved?</h3>
-          <p>
-            Shift part of today’s CEX volume to DEX. Total activity stays the
-            same.
-          </p>
-          <div className={styles.sliderLabel}>
-            <label htmlFor="migration">CEX volume moved</label>
-            <output htmlFor="migration">{migration.toFixed(1)}%</output>
-          </div>
-          <input
-            id="migration"
-            type="range"
-            min="0"
-            max="100"
-            step="0.1"
-            value={migration}
-            disabled={!m}
-            onChange={(e) => setMigration(Number(e.target.value))}
-          />
-          <div className={styles.sliderEnds}>
-            <span>0%</span>
-            <button
-              type="button"
-              disabled={!m}
-              onClick={() =>
-                setMigration(
-                  m && m.cex > 0
-                    ? Math.min(
-                        100,
-                        Math.ceil((m.shiftToParity / m.cex) * 1000) / 10 + 0.1,
-                      )
-                    : 0,
-                )
-              }
-            >
-              Find the crossover →
-            </button>
-            <span>100%</span>
-          </div>
-          <div className={styles.simResult} aria-live="polite">
-            <div>
-              <span>DEX share in this scenario</span>
-              <strong>{pct(simulation?.dexPct ?? null)}</strong>
-            </div>
-            <span
-              className={simulation?.reached ? styles.successPill : styles.pill}
-            >
-              {simulation?.reached
-                ? "DEX takes the lead"
-                : simulation?.tied
-                  ? "At parity"
-                  : "Below the milestone"}
+        <details className={styles.simulator}>
+          <summary>
+            <span>Explore the crossover</span>
+            <span>
+              {m
+                ? `${usd(m.shiftToParity)} shifted from CEX reaches parity`
+                : "Data unavailable"}{" "}
+              <b aria-hidden="true">＋</b>
             </span>
+          </summary>
+          <div className={styles.simulatorBody}>
+            <p>
+              Move existing CEX activity to DEX. Combined volume stays constant;
+              this is a scenario.
+            </p>
+            <label htmlFor="migration">
+              CEX volume moved <output>{number(migration, 1)}%</output>
+            </label>
+            <input
+              id="migration"
+              type="range"
+              min="0"
+              max="100"
+              step="0.1"
+              value={migration}
+              disabled={!m}
+              onChange={(e) => setMigration(Number(e.target.value))}
+            />
+            <div className={styles.simResult}>
+              <button
+                disabled={!m}
+                onClick={() =>
+                  setMigration(
+                    m && m.cex > 0
+                      ? Math.min(
+                          100,
+                          Math.ceil((m.shiftToParity / m.cex) * 1000) / 10 +
+                            0.1,
+                        )
+                      : 0,
+                  )
+                }
+              >
+                Find the crossover →
+              </button>
+              <span aria-live="polite">
+                DEX share <strong>{pct(simulation?.dexPct ?? null)}</strong>
+                {simulation?.reached ? " · DEX leads" : ""}
+              </span>
+            </div>
           </div>
-        </div>
-        <div className={styles.guide}>
-          <p className={styles.eyebrow}>Read the comparison correctly</p>
-          <h3>
-            Activity and ownership
-            <br />
-            are different questions.
-          </h3>
-          <p>
-            A coin can trade many times in a day. Volume measures activity;
-            balances measure ZEC held at a point in time.
-          </p>
-          <div className={styles.guideRule} />
-          <p>
-            CEX numbers are venue-reported spot volume. DEX includes native and
-            wrapped ZEC plus intent activity. Futures, ETF share trading and
-            duplicated venue feeds stay outside the comparison.
-          </p>
-          <a href="#methodology">
-            See the inclusion rules <span aria-hidden="true">↗</span>
-          </a>
-        </div>
+        </details>
       </section>
 
-      <details className={styles.venueDetails}>
-        <summary>
-          <span>Explore every trading venue</span>
-          <span>
-            {data.venues.length} included venues{" "}
-            <span aria-hidden="true">＋</span>
-          </span>
-        </summary>
-        <div className={styles.detailsBody}>
+      <div className={styles.featureGrid}>
+        {featured.map((f) => (
+          <a key={f.name} href={f.href} className={styles.feature}>
+            <div className={styles.featureTitle}>
+              <Logo name={f.name} />
+              <strong>{f.name}</strong>
+              <span aria-hidden="true">↗</span>
+            </div>
+            <span>{f.label}</span>
+            <strong className={styles.featureNumber}>
+              {f.value === null ? "—" : usd(f.value)}
+            </strong>
+            <small>{f.detail}</small>
+          </a>
+        ))}
+      </div>
+
+      <section className={styles.panel} aria-labelledby="trading">
+        <div className={styles.panelHeader}>
+          <Title
+            id="trading"
+            title="Where ZEC trades"
+            caption="Chains combine their tracked DEX pools. Share uses the CEX + DEX total."
+          />
           <div className={styles.filters} aria-label="Venue type">
-            {(["all", "cex", "dex"] as const).map((f) => (
+            {(["dex", "cex", "all"] as const).map((f) => (
               <button
                 key={f}
-                type="button"
                 aria-pressed={venueFilter === f}
-                onClick={() => setVenueFilter(f)}
+                onClick={() => {
+                  setVenueFilter(f);
+                  setAllVenues(false);
+                }}
               >
-                {f === "all" ? "All venues" : f.toUpperCase()}
+                {f === "all" ? "All" : f.toUpperCase()}
               </button>
             ))}
           </div>
-          <div className={styles.tableScroll}>
-            <table>
-              <caption>
-                Rolling 24-hour activity · percentages of the included CEX + DEX
-                total
-              </caption>
-              <thead>
-                <tr>
-                  <th>Venue</th>
-                  <th>24h volume</th>
-                  <th>Share</th>
-                  <th>Source time</th>
-                </tr>
-              </thead>
-              <tbody>
-                {venues.map((v) => (
-                  <tr key={v.id}>
-                    <td>
-                      <Out href={v.source}>{v.name}</Out>
-                      <small>
-                        {v.kind.toUpperCase()} ·{" "}
-                        {v.pairs
-                          ? `${v.pairs} spot market${v.pairs > 1 ? "s" : ""}`
-                          : "Token activity"}
-                      </small>
-                      <p>{v.note}</p>
-                    </td>
-                    <td>{usd(v.volumeUsd)}</td>
-                    <td>{pct(m ? (v.volumeUsd / m.total) * 100 : null)}</td>
-                    <td>{stamp(v.asOf)}</td>
-                  </tr>
+        </div>
+        <div className={styles.marketHead} aria-hidden="true">
+          <span>Market / network</span>
+          <span>Volume · 24h</span>
+          <span>Share</span>
+        </div>
+        <div className={styles.marketList}>
+          {shownRows.map((v, i) => (
+            <details className={styles.marketRow} key={v.id}>
+              <summary>
+                <div className={styles.entity}>
+                  <span className={styles.rank}>{i + 1}</span>
+                  <Logo name={v.name} />
+                  <div>
+                    <strong>{v.name}</strong>
+                    <small>
+                      {v.id.startsWith("chain-")
+                        ? `${v.members.length} DEX venues · ${v.pairs} pools`
+                        : v.kind === "cex"
+                          ? "Centralized spot"
+                          : v.id === "near-intents"
+                            ? "Cross-chain intents"
+                            : "DEX spot"}
+                    </small>
+                  </div>
+                </div>
+                <strong>{usd(v.volumeUsd)}</strong>
+                <span className={styles.marketShare}>
+                  {pct(m ? (v.volumeUsd / m.total) * 100 : null)}
+                  <span aria-hidden="true">＋</span>
+                </span>
+              </summary>
+              <div className={styles.marketSources}>
+                {v.members.map((member) => (
+                  <div key={member.id}>
+                    <div className={styles.entity}>
+                      <Logo name={member.name} />
+                      <div>
+                        <Out href={member.source}>{member.name}</Out>
+                        <small>{stamp(member.asOf)}</small>
+                      </div>
+                    </div>
+                    <strong>{usd(member.volumeUsd)}</strong>
+                    <p>{member.note}</p>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </details>
+          ))}
+        </div>
+        {rows.length === 0 && (
+          <p className={styles.empty}>No current data for this selection.</p>
+        )}
+        {rows.length > 8 && (
+          <button
+            className={styles.showMore}
+            onClick={() => setAllVenues((v) => !v)}
+          >
+            {allVenues ? "Show fewer" : `View all ${rows.length} markets`}{" "}
+            <span aria-hidden="true">↓</span>
+          </button>
+        )}
+        <p className={styles.panelFoot}>
+          Spot and intent activity; routed swaps can overlap across protocols.
+          Futures excluded.
+        </p>
+      </section>
+
+      <details id="near-detail" className={styles.nearDetails}>
+        <summary>
+          <span className={styles.entity}>
+            <Logo name="NEAR" />
+            <strong>NEAR Intents · public & confidential</strong>
+          </span>
+          <span>
+            See ZEC activity <b aria-hidden="true">＋</b>
+          </span>
+        </summary>
+        <div className={styles.nearBody}>
+          <div className={styles.miniStats}>
+            {[
+              { label: "ZEC · 24 hours", value: near?.volumeUsd },
+              { label: "ZEC · 30 days", value: near?.volume30dUsd },
+              { label: "ZEC · all-time", value: near?.volumeAllTimeUsd },
+            ].map((n) => (
+              <div key={n.label}>
+                <span>{n.label}</span>
+                <strong>{n.value === undefined ? "—" : usd(n.value)}</strong>
+              </div>
+            ))}
           </div>
-          {data.rheaContext && (
-            <p className={styles.fine}>
-              Rhea Finance additionally reports{" "}
-              {usd(data.rheaContext.volumeUsd)} / 24h. Shown outside the
-              headline because routing overlap with NEAR cannot be fully
-              removed.
+          <p>
+            <Out href="https://explorer.near-intents.org/?toTokenId=nep141%3Azec.omft.near">
+              ZEC explorer
+            </Out>{" "}
+            · {stamp(near?.asOf ?? null)}
+            {data.nearActivity.stale && near ? " · saved snapshot" : ""}.{" "}
+            {data.nearProtocol.data
+              ? `The explorer’s ${usd(data.nearProtocol.data.volumeUsd)} headline includes all assets.`
+              : "The explorer homepage includes all assets."}
+          </p>
+          <div className={styles.confidential}>
+            <div>
+              <span>Confidential TVL · all assets</span>
+              <strong>
+                {data.nearConfidential.data
+                  ? usd(data.nearConfidential.data.tvlUsd)
+                  : "—"}
+              </strong>
+              <small>
+                {data.nearConfidential.data
+                  ? stamp(data.nearConfidential.data.asOf, true)
+                  : "Unavailable"}
+                {data.nearConfidential.stale && data.nearConfidential.data
+                  ? " · saved"
+                  : ""}
+              </small>
+            </div>
+            <p>
+              Confidential trading is supported. A separate ZEC volume total is
+              not publicly disclosed; TVL is not added to trading volume.{" "}
+              <Out href="https://revenue.near.org/">TVL source</Out> ·{" "}
+              <Out href="https://intents.near.org/confidential">
+                How it works
+              </Out>
             </p>
-          )}
+          </div>
         </div>
       </details>
 
-      <section className={styles.holdingsSection} aria-labelledby="holdings">
-        <SectionTitle
+      <section aria-labelledby="crosschain">
+        <Title
+          id="crosschain"
+          title="ZEC across chains"
+          caption="Verified token identities. Issued tokens represent existing ZEC; they do not increase native supply."
+        />
+        <div className={styles.panel}>
+          <div className={styles.tokenHead} aria-hidden="true">
+            <span>Token / issuer</span>
+            <span>Network</span>
+            <span>Issued supply</span>
+            <span>Spot volume · 24h</span>
+          </div>
+          {tokenRows.map((w) => (
+            <details key={w.asset.id} className={styles.tokenRow}>
+              <summary>
+                <div className={styles.entity}>
+                  <Logo name={w.asset.issuer} />
+                  <div>
+                    <strong>{w.asset.symbol}</strong>
+                    <small>{w.asset.issuer}</small>
+                  </div>
+                </div>
+                <span className={styles.network}>
+                  <Logo name={w.asset.chainName} />
+                  {w.asset.chainName}
+                </span>
+                <div className={styles.tokenValue}>
+                  <strong>
+                    {w.supply.data ? number(w.supply.data.zec) : "—"}
+                  </strong>
+                  <small>
+                    {w.supply.stale && w.supply.data
+                      ? "Saved supply"
+                      : w.supply.data
+                        ? "ZEC represented"
+                        : "Not verified"}
+                  </small>
+                </div>
+                <div className={styles.tokenValue}>
+                  <strong>
+                    {w.volumeUsd === null ? "—" : usd(w.volumeUsd)}
+                  </strong>
+                  <small>
+                    {!w.feed.data || w.feed.stale
+                      ? "Feed unavailable"
+                      : w.feed.data.length === 0
+                        ? "No indexed pool"
+                        : `${w.feed.data.length} tracked pools`}
+                  </small>
+                </div>
+              </summary>
+              <div className={styles.tokenDetail}>
+                <div>
+                  <span>Exact contract / mint</span>
+                  <Out href={w.asset.explorer + w.asset.token}>
+                    <code>{w.asset.token}</code>
+                  </Out>
+                </div>
+                <div>
+                  <Out href={w.asset.registry}>Issuer registry</Out>
+                  {w.supply.data && (
+                    <span>
+                      Block / slot {w.supply.data.block} ·{" "}
+                      {stamp(w.supply.fetchedAt)}
+                    </span>
+                  )}
+                </div>
+                <p>
+                  {w.supply.data
+                    ? `${pct(share(w.supply.data.zec))} of native ZEC supply represented. `
+                    : ""}
+                  Token supply is not an independent backing audit. Pool
+                  coverage is limited to the indexers’ returned markets.
+                </p>
+              </div>
+            </details>
+          ))}
+          <button
+            className={styles.showMore}
+            onClick={() => setAllTokens((v) => !v)}
+          >
+            {allTokens
+              ? "Show main networks"
+              : `Explore all ${data.wrapped.length} registered tokens · ${new Set(data.wrapped.map((w) => w.asset.chain)).size} networks`}{" "}
+            <span aria-hidden="true">↓</span>
+          </button>
+          <div className={styles.lending}>
+            <div className={styles.entity}>
+              <Logo name="Kamino" />
+              <div>
+                <strong>Kamino · ZEC deposits</strong>
+                <small>OmniBridge ZEC · Solana lending</small>
+              </div>
+            </div>
+            <div>
+              <strong>
+                {kaminoDeposits === null
+                  ? "—"
+                  : `${number(kaminoDeposits)} ZEC`}
+              </strong>
+              <small>
+                {data.kamino.stale
+                  ? "Saved / unavailable"
+                  : "Included in issued supply above"}
+              </small>
+            </div>
+            <Out href="https://api.kamino.finance/markets/collateral-reserves">
+              Verify
+            </Out>
+          </div>
+          <details className={styles.legacyContract}>
+            <summary>
+              <strong>Solana contract archive</strong>
+              <span>renZEC · legacy ＋</span>
+            </summary>
+            <p>
+              Ren 1.0 was sunset. This issuer-published mint is retained for
+              completeness and excluded from current ZEC trading and
+              represented-supply totals.
+            </p>
+            <p>
+              <Out href="https://explorer.solana.com/address/E99CQ2gFMmbiyK2bwiaFNWUUmwz4r8k2CVEFxwuvQ7ue">
+                <code>E99CQ2gFMmbiyK2bwiaFNWUUmwz4r8k2CVEFxwuvQ7ue</code>
+              </Out>
+            </p>
+            <p>
+              On-chain tokens:{" "}
+              <strong>
+                {data.legacySolana.data
+                  ? number(data.legacySolana.data.zec, 8)
+                  : "Unavailable"}{" "}
+                renZEC
+              </strong>{" "}
+              · {stamp(data.legacySolana.fetchedAt)}
+              {data.legacySolana.stale ? " · saved / unavailable" : ""}. Current
+              redemption is not verified.
+            </p>
+            <p>
+              <Out href="https://medium.com/renprotocol/renvm-integrates-with-solana-for-interoperability-cee10832356a">
+                Original mint registry
+              </Out>{" "}
+              ·{" "}
+              <Out href="https://medium.com/renprotocol/moving-on-from-alameda-da62a823ce93">
+                Issuer sunset notice
+              </Out>
+            </p>
+          </details>
+          {!!data.kamino.data?.unidentified.length && (
+            <p className={styles.scopeNote}>
+              A new ZEC-labeled Kamino mint needs issuer verification and is not
+              included yet.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <section aria-labelledby="holdings">
+        <Title
           id="holdings"
-          step="02 / Where ZEC sits"
-          title="The visible custody map."
-          description="Ranked ZEC balances in publicly labeled addresses. Open a row to inspect every address behind the number."
+          title="Exchanges & large holders"
+          caption="Public balances and CipherScan labels. Open any row to inspect its addresses."
         />
         <div className={styles.supplyStrip}>
           <div>
-            <span>Known CEX / custody balances</span>
+            <span>Known CEX balances</span>
             <strong>
-              {hasCexBalance ? compact(cexBalance, 2) : "—"} <small>ZEC</small>
+              {cexBalance === null ? "—" : compact(cexBalance, 2)}{" "}
+              <small>ZEC</small>
             </strong>
-            <p>
-              {cexHolders.length} entities ·{" "}
-              {cexHolders.reduce((s, h) => s + h.addresses.length, 0)} labeled
-              addresses
-            </p>
           </div>
           <div>
-            <span>Share of on-chain supply</span>
-            <strong>{pct(share(hasCexBalance ? cexBalance : null))}</strong>
-            <p>Publicly observed minimum</p>
+            <span>Share of native supply</span>
+            <strong>{pct(holdingShare(cexBalance))}</strong>
           </div>
           <div>
-            <span>Reconciled on-chain supply</span>
+            <span>Reconciled native supply</span>
             <strong>
               {supply ? compact(supply.zec, 3) : "—"} <small>ZEC</small>
             </strong>
-            <p>
-              {supply ? (
-                <>
-                  Block{" "}
-                  <Out href={`https://cipherscan.app/block/${supply.height}`}>
-                    {number(supply.height, 0)}
-                  </Out>
-                </>
-              ) : (
-                "Source unavailable"
-              )}
-            </p>
           </div>
         </div>
         <p className={styles.scopeNote}>
-          <strong>
-            These are visible balances, not full exchange reserves.
-          </strong>{" "}
-          Unlabeled and shielded holdings cannot be assigned to an owner.
-          Custody addresses may hold customer or fund assets. A label does not
-          establish solvency.
+          Observed minimum. Unlabeled and shielded balances cannot be assigned
+          to an exchange.
         </p>
-        <div className={styles.holdingsPanel}>
+        <div className={styles.panel}>
           <div className={styles.rankControls}>
             <div className={styles.filters} aria-label="Balance category">
               {(
                 [
-                  { id: "cex", label: "CEX & custody" },
+                  { id: "cex", label: "CEX" },
                   { id: "dex", label: "DEX & bridges" },
-                  { id: "all", label: "All public labels" },
+                  { id: "whales", label: "Whales" },
+                  { id: "all", label: "All labels" },
                 ] as const
               ).map((f) => (
                 <button
-                  type="button"
                   key={f.id}
                   aria-pressed={holderFilter === f.id}
-                  onClick={() => setHolderFilter(f.id)}
+                  onClick={() => {
+                    setHolderFilter(f.id);
+                    setWhaleLimit(8);
+                  }}
                 >
                   {f.label}
                 </button>
@@ -558,340 +856,324 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <input
               type="search"
               aria-label="Search entities or addresses"
-              placeholder="Find an entity or address…"
+              placeholder="Find an exchange or address…"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                setWhaleLimit(8);
+              }}
             />
           </div>
-          <div className={styles.rankHead} aria-hidden="true">
-            <span>Entity / address coverage</span>
+          {holderFilter === "whales" && (
+            <p className={styles.whaleNote}>
+              ≥10,000 ZEC per transparent address. One address is not
+              necessarily one owner.
+            </p>
+          )}
+          <div className={styles.holderHead} aria-hidden="true">
+            <span>
+              {holderFilter === "whales" ? "Address / public label" : "Entity"}
+            </span>
             <span>Balance · ZEC</span>
             <span>% of supply</span>
-            <span />
           </div>
-          <div className={styles.ranking}>
-            {filteredHolders.map((h, i) => (
-              <details key={h.id} className={styles.holder}>
-                <summary>
-                  <div className={styles.entity}>
-                    <span className={styles.rank}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span>
-                      <strong>{h.name}</strong>
-                      <small>
-                        {h.addresses.length} address
-                        {h.addresses.length !== 1 ? "es" : ""} · {kinds[h.kind]}
-                        {h.missing > 0 ? ` · ${h.missing} unavailable` : ""}
-                      </small>
-                    </span>
+          {shownHolders.map((h, i) => (
+            <details key={h.id} className={styles.holder}>
+              <summary>
+                <div className={styles.entity}>
+                  <span className={styles.rank}>{i + 1}</span>
+                  <Logo name={h.name} />
+                  <div>
+                    <strong>{h.name}</strong>
+                    <small>
+                      {holderFilter === "whales"
+                        ? `${h.id.slice(0, 9)}…${h.id.slice(-7)}`
+                        : `${h.addresses.length} ${h.addresses.length === 1 ? "address" : "addresses"}`}
+                      {h.missing ? ` · ${h.missing} unavailable` : ""}
+                    </small>
                   </div>
-                  <div className={styles.holderValue}>
-                    <strong>
-                      {h.zec === null ? "Unavailable" : number(h.zec)}
-                    </strong>
-                    <div className={styles.miniTrack}>
-                      <span style={width(((h.zec ?? 0) / largest) * 100)} />
-                    </div>
-                  </div>
-                  <div className={styles.supplyPercent}>
-                    {pct(share(h.zec))}
-                  </div>
-                  <span className={styles.plus} aria-hidden="true">
-                    ＋
-                  </span>
-                </summary>
-                <div className={styles.addressList}>
-                  {h.addresses.map((a) => (
-                    <div key={a.address}>
-                      <div>
-                        <Out href={a.source}>
-                          <code>{a.address}</code>
-                        </Out>
-                        <small>
-                          {a.label} ·{" "}
-                          {a.verified
-                            ? "Label marked verified by CipherScan"
-                            : "Unverified source label"}
-                        </small>
-                      </div>
-                      <strong>
-                        {a.zec === null
-                          ? "Unavailable"
-                          : `${number(a.zec, 8)} ZEC`}
-                      </strong>
-                    </div>
-                  ))}
                 </div>
-              </details>
-            ))}
-          </div>
+                <div className={styles.holderValue}>
+                  <strong>{h.zec === null ? "—" : number(h.zec)}</strong>
+                  <div className={styles.miniTrack}>
+                    <span style={width(((h.zec ?? 0) / largest) * 100)} />
+                  </div>
+                </div>
+                <span className={styles.marketShare}>
+                  {pct(holdingShare(h.zec))}
+                  <span aria-hidden="true">＋</span>
+                </span>
+              </summary>
+              <div className={styles.addressList}>
+                <p>
+                  {holderFilter === "whales"
+                    ? "Address balance, not total wealth. No owner is inferred from transaction activity."
+                    : `${kinds[h.kind]} · labels do not prove complete reserves or solvency.`}
+                </p>
+                {h.addresses.map((a) => (
+                  <div key={a.address}>
+                    <div>
+                      <Out href={a.source}>
+                        <code>{a.address}</code>
+                      </Out>
+                      <small>
+                        {a.category === "unknown"
+                          ? "No public ownership label"
+                          : a.label + " · "}
+                        {a.category === "unknown"
+                          ? ""
+                          : a.verified
+                            ? "CipherScan verified label"
+                            : "Unverified label"}
+                      </small>
+                    </div>
+                    <strong>
+                      {a.zec === null
+                        ? "Unavailable"
+                        : `${number(a.zec, 8)} ZEC`}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+            </details>
+          ))}
           {filteredHolders.length === 0 && (
             <p className={styles.empty}>
               {data.holdings.data
-                ? "No entities match this filter."
-                : "Address balances are temporarily unavailable. No zero balances have been substituted."}
+                ? "No matching entities."
+                : "Address balances unavailable."}
             </p>
           )}
-          <footer className={styles.rankFooter}>
+          {holderFilter === "whales" &&
+            shownHolders.length < filteredHolders.length && (
+              <button
+                className={styles.showMore}
+                onClick={() => setWhaleLimit((n) => n + 20)}
+              >
+                Show more addresses · {shownHolders.length}/
+                {filteredHolders.length} <span aria-hidden="true">↓</span>
+              </button>
+            )}
+          <div className={styles.panelFoot}>
             <span>
               {data.holdings.data
-                ? `${data.holdings.data.resolved} / ${data.holdings.data.labelCount} public labels resolved`
+                ? holderFilter === "whales"
+                  ? `${data.holdings.data.largeAddresses.length} large addresses · top ${data.holdings.data.indexedAddresses} scanned`
+                  : `${data.holdings.data.resolved}/${data.holdings.data.labelCount} labels resolved`
                 : "Registry unavailable"}{" "}
-              · {data.holdings.stale ? "Saved data · " : ""}
+              · {data.holdings.stale && data.holdings.data ? "Saved · " : ""}
               {stamp(data.holdings.fetchedAt)}
-              <br />
-              Bars compare balances with the largest entity shown.
             </span>
-            <Out href="https://cipherscan.app/rich-list">
-              Explore CipherScan
-            </Out>
-          </footer>
+            <Out href="https://cipherscan.app/rich-list">CipherScan</Out>
+          </div>
         </div>
-        {unmapped.length > 0 && (
-          <details className={styles.unmapped}>
-            <summary>
-              {unmapped.length} trading venues without a matched public wallet{" "}
-              <span aria-hidden="true">＋</span>
-            </summary>
-            <p>
-              The volume source reports these venues, but CipherScan’s registry
-              does not identify their ZEC wallets. Their balances are unknown,
-              not zero.
-            </p>
-            <div>
-              {unmapped.map((v) => (
-                <span key={v.id}>{v.name}</span>
-              ))}
-            </div>
-          </details>
-        )}
         {holderFilter === "dex" && data.mayaPoolZec !== null && (
           <p className={styles.scopeNote}>
-            Maya additionally reports{" "}
-            <strong>{number(data.mayaPoolZec)} ZEC</strong> of pool depth. This
-            protocol balance is shown separately from labeled bridge addresses.{" "}
+            Maya pool depth: <strong>{number(data.mayaPoolZec)} ZEC</strong>.{" "}
             <Link href="/defi">Explore liquidity →</Link>
           </p>
         )}
       </section>
 
       <section aria-labelledby="funds">
-        <SectionTitle
+        <Title
           id="funds"
-          step="03 / Public institutional disclosures"
-          title="Funds, ETPs & treasury holders."
-          description="Issuer-reported ZEC, with an explicit reporting date. These positions may already sit inside the custodial addresses above."
+          title="Funds & treasuries"
+          caption="Issuer disclosures, with their original reporting dates. May overlap with exchange custody."
         />
         <div className={styles.fundGrid}>
           {data.disclosures.map(({ data: f, stale }) => (
-            <article key={f.id} className={styles.fundCard}>
-              <div className={styles.fundTop}>
-                <span className={styles.ticker}>{f.ticker}</span>
-                <span className={styles.pill}>
-                  {f.kind === "fund" ? "Fund / ETP" : "Company treasury"}
-                </span>
+            <article className={styles.fundCard} key={f.id}>
+              <div className={styles.entity}>
+                <Logo name={f.name} />
+                <div>
+                  <h3>{f.name.replace(" · The Zcash ETF", "")}</h3>
+                  <small>
+                    {f.ticker} · {f.kind === "fund" ? "Fund / ETP" : "Treasury"}
+                  </small>
+                </div>
               </div>
-              <h3>{f.name}</h3>
               <strong className={styles.fundNumber}>
-                {number(f.zec)} <small>ZEC</small>
+                {compact(f.zec, 2)} <small>ZEC</small>
               </strong>
               <div className={styles.fundMeta}>
-                <span>{pct(share(f.zec))} of on-chain supply</span>
-                <span>As of {stamp(f.asOf, true)}</span>
+                <span>{pct(share(f.zec))} of supply</span>
+                <span>{stamp(f.asOf, true)}</span>
               </div>
-              <p>{f.method}</p>
-              <div className={styles.custody}>
-                <span>Custody / attribution</span>
-                <strong>{f.custody}</strong>
-              </div>
+              <details>
+                <summary>
+                  Disclosure details <span aria-hidden="true">＋</span>
+                </summary>
+                <p>{f.method}</p>
+                <p>Custody: {f.custody}</p>
+                {f.id === "grayscale" &&
+                  holders.some((h) => h.id === "grayscale") && (
+                    <p>
+                      Separately,{" "}
+                      {number(
+                        holders.find((h) => h.id === "grayscale")?.zec ?? 0,
+                      )}{" "}
+                      ZEC is visible in labeled addresses. This is a partial
+                      view, not an additional holding.
+                    </p>
+                  )}
+              </details>
               <footer>
                 <Out href={f.source}>Issuer source</Out>
                 {stale && <span>Saved disclosure</span>}
               </footer>
-              {f.id === "grayscale" &&
-                holders.find((h) => h.id === "grayscale") && (
-                  <details className={styles.fundWallets}>
-                    <summary>Compare with labeled addresses</summary>
-                    <p>
-                      {number(
-                        holders.find((h) => h.id === "grayscale")!.zec ?? 0,
-                      )}{" "}
-                      ZEC visible in CipherScan’s Grayscale-labeled addresses.
-                      This partial wallet view and the issuer’s total are
-                      alternative evidence, not amounts to add.
-                    </p>
-                  </details>
-                )}
             </article>
           ))}
         </div>
-        <div className={styles.nonAdditive}>
-          <span aria-hidden="true">≠</span>
-          <p>
-            <strong>Do not add these balances to exchange custody.</strong>{" "}
-            Grayscale lists Coinbase Custody as its custodian. Without a
-            complete ownership reconciliation, a combined “institutional +
-            exchange” total would risk counting the same coins twice. An ETF
-            filing or derivatives exposure alone does not verify any ZEC
-            holdings.
-          </p>
-        </div>
       </section>
 
-      <section className={styles.methodology} aria-labelledby="methodology">
-        <SectionTitle
-          id="methodology"
-          step="04 / Open methodology"
-          title="A number you can inspect."
-          description="Sources, timestamps and exclusions travel with the analysis. Missing coverage remains visible."
-        />
-        <div className={styles.methodGrid}>
-          <div>
-            <h3>One denominator. All value pools.</h3>
-            <p>
-              Balance percentages use CipherScan’s mainnet{" "}
-              <code>chainSupply</code>, including the lockbox. The value pools
-              must sum exactly to that supply in zatoshis before the supply is
-              accepted. The 21 million maximum is not used as today’s
-              denominator.
-            </p>
-            {supply && (
-              <dl className={styles.poolList}>
-                {supply.pools.map((p) => (
-                  <div key={p.id}>
-                    <dt>{p.id}</dt>
-                    <dd>{number(p.zec, 4)} ZEC</dd>
-                  </div>
-                ))}
-                <div className={styles.poolTotal}>
-                  <dt>Reconciled total</dt>
-                  <dd>{number(supply.zec, 8)} ZEC</dd>
-                </div>
-              </dl>
-            )}
-            <p className={styles.fine}>
-              {data.supply.stale
-                ? "Saved node snapshot · "
-                : "Node snapshot · "}
-              {stamp(data.supply.fetchedAt)}. Reconciliation verifies internal
-              consistency of the node response; it is not an independent reserve
-              audit.
-            </p>
-          </div>
-          <div>
-            <h3>What this comparison includes.</h3>
-            <ul>
-              <li>
-                Rolling 24-hour USD activity from the available sources.
-                Provider timestamps differ; old CEX quotes over two hours are
-                excluded.
-              </li>
-              <li>
-                Spot CEX, verified Unit UZEC and Universal uZEC markets, Maya,
-                and NEAR Intents’ ZEC token activity. NEAR is an intent
-                protocol, not an AMM.
-              </li>
-              <li>
-                Each venue is included once. Wallet interfaces are not added on
-                top of their underlying protocol. Rhea is contextual because
-                routing overlap is unresolved.
-              </li>
-              <li>
-                Futures, perpetuals, ETF share turnover, outliers and unknown
-                venue classifications are excluded. Reported volume is not
-                independently audited for wash trading.
-              </li>
-              <li>
-                All CipherScan labels are checked, including those outside the
-                top 500. Grayscale and Unit labels are reclassified by economic
-                role; original labels remain on each address.
-              </li>
-            </ul>
-            <h3>Coverage has a boundary.</h3>
-            <p>
-              Public addresses and issuer disclosures cannot reveal every
-              exchange wallet, private trade or shielded owner. This page tracks
-              the identified public sources; it does not claim a complete global
-              ownership census. Missing values stay unavailable, and saved
-              disclosures keep their original dates.
-            </p>
-          </div>
-        </div>
+      <section
+        className={styles.methodology}
+        id="methodology"
+        aria-label="Sources and methodology"
+      >
         <details className={styles.sourceDetails}>
           <summary>
-            Source health & exclusions <span aria-hidden="true">＋</span>
+            <strong>Calculation & coverage</strong>
+            <span>
+              Inspect the methodology <b aria-hidden="true">＋</b>
+            </span>
           </summary>
-          <div className={styles.detailsBody}>
-            <div className={styles.sourceList}>
-              {data.sources.map((s) => (
-                <div key={s.name}>
+          <div className={styles.methodGrid}>
+            <div>
+              <h3>Native supply, reconciled</h3>
+              <p>
+                All CipherScan value pools must sum exactly in zatoshis,
+                including the lockbox. Today’s on-chain supply is the
+                denominator, not the 21 million maximum.
+              </p>
+              {supply && (
+                <dl className={styles.poolList}>
+                  {supply.pools.map((p) => (
+                    <div key={p.id}>
+                      <dt>{p.id}</dt>
+                      <dd>{number(p.zec, 4)} ZEC</dd>
+                    </div>
+                  ))}
                   <div>
-                    <Out href={s.url}>{s.name}</Out>
-                    <p>{s.note}</p>
+                    <dt>Total · block {number(supply.height, 0)}</dt>
+                    <dd>{number(supply.zec, 8)} ZEC</dd>
                   </div>
-                  <div>
-                    <span
-                      className={
-                        s.status === "current"
-                          ? styles.successPill
-                          : styles.pill
-                      }
-                    >
-                      {s.status === "current"
-                        ? "Fetched"
-                        : s.status === "not-listed"
-                          ? "ZEC pool not listed"
-                          : s.status === "context"
-                            ? "Outside headline"
-                            : s.status === "saved"
-                              ? "Saved data"
-                              : "Unavailable"}
-                    </span>
-                    <small>{stamp(s.fetchedAt)}</small>
-                  </div>
-                </div>
-              ))}
+                </dl>
+              )}
+              <p>
+                {data.supply.stale && supply
+                  ? "Saved snapshot · "
+                  : "Snapshot · "}
+                {stamp(data.supply.fetchedAt)}. This checks the node response’s
+                consistency, not proof of reserves.{" "}
+                <Out href="https://cipherscan.app/ironwood">
+                  Ironwood tracker
+                </Out>
+                .
+              </p>
+              <h3>Holdings are not additive</h3>
+              <p>
+                Funds may use exchange custodians. Wrapped tokens represent
+                already-issued native ZEC; Kamino deposits are part of token
+                supply. Never add these categories into a new native supply
+                total.
+              </p>
             </div>
-            {data.marketCoverage && (
-              <>
-                <h3>
-                  {data.marketCoverage.included} of{" "}
-                  {data.marketCoverage.received} returned markets included
-                </h3>
-                <div className={styles.tableScroll}>
-                  <table>
-                    <caption>Markets excluded by the stated rules</caption>
-                    <thead>
-                      <tr>
-                        <th>Venue / pair</th>
-                        <th>Reason</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {data.marketCoverage.excluded.map((e, i) => (
-                        <tr key={`${e.name}-${e.pair}-${i}`}>
-                          <td>
-                            {e.name}
-                            <small>{e.pair}</small>
-                          </td>
-                          <td>{e.reason}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
+            <div>
+              <h3>Observed activity, not the entire market</h3>
+              <p>
+                CEX uses reported spot markets; quotes older than two hours,
+                derivatives, outliers and unknown classifications are excluded.
+                Direct feeds replace the same aggregator venues.
+              </p>
+              <p>
+                DEX includes verified ZEC tokens, native Maya swaps, Unit UZEC
+                spot and NEAR Intents activity. Pools are deduplicated by
+                network and address, including pools containing two ZEC tokens.
+                Solana is checked against DEX Screener and up to three pages per
+                token on GeckoTerminal.
+              </p>
+              <p>
+                Intents can route through DEXs. Cross-protocol execution cannot
+                be fully reconciled, so these percentages describe observed
+                gross activity, not unique global trades or audited market
+                share. Provider windows can differ.
+              </p>
+              {data.rheaContext && (
+                <p>
+                  Rhea’s {usd(data.rheaContext.volumeUsd)} / 24h remains outside
+                  the headline because NEAR routing overlap is unresolved.
+                </p>
+              )}
+              <h3>Token registry</h3>
+              <p>
+                Contracts are pinned to issuer records. Solana covers OmniBridge
+                ZEC, Zenrock zenZEC and Universal uZEC. Kamino’s complete public
+                collateral registry is checked for those mints; newly discovered
+                ZEC-labeled mints are flagged for verification. An absence of
+                indexed pools is not proof of no trading.
+              </p>
+              <p>
+                Private ZEC volume, unlabeled wallets and undisclosed ownership
+                cannot be quantified from public sources. No balance is inferred
+                as zero when a source is missing.
+              </p>
+            </div>
           </div>
         </details>
+        <details className={styles.sourceDetails}>
+          <summary>
+            <strong>Sources & exclusions</strong>
+            <span>
+              {data.sources.length} feeds <b aria-hidden="true">＋</b>
+            </span>
+          </summary>
+          <div className={styles.sourceList}>
+            {data.sources.map((s) => (
+              <div key={s.name}>
+                <div>
+                  <Out href={s.url}>{s.name}</Out>
+                  <p>{s.note}</p>
+                </div>
+                <div>
+                  <span
+                    className={
+                      s.status === "current" ? styles.successPill : styles.pill
+                    }
+                  >
+                    {
+                      {
+                        current: "Available",
+                        saved: "Saved",
+                        unavailable: "Unavailable",
+                        "not-listed": "No indexed pool",
+                        context: "Outside total",
+                      }[s.status]
+                    }
+                  </span>
+                  <small>{stamp(s.fetchedAt)}</small>
+                </div>
+              </div>
+            ))}
+          </div>
+          {!!data.marketCoverage?.excluded.length && (
+            <div className={styles.exclusions}>
+              <h3>Excluded market quotes</h3>
+              {data.marketCoverage.excluded.map((e, i) => (
+                <p key={`${e.name}-${i}`}>
+                  <strong>
+                    {e.name} · {e.pair}
+                  </strong>
+                  <span>{e.reason}</span>
+                </p>
+              ))}
+            </div>
+          )}
+        </details>
         <footer className={styles.pageFooter}>
-          <span>
-            Snapshot assembled {stamp(data.generatedAt)} · public data only
-          </span>
-          <a href="/api/markets" target="_blank" rel="noreferrer">
-            Open the complete data · JSON ↗
-          </a>
+          <span>{stamp(data.generatedAt)} · Public data</span>
+          <Link href="/zcg/investments">Community investments →</Link>
         </footer>
       </section>
     </div>

@@ -2,22 +2,32 @@ import "server-only";
 import { z } from "zod";
 import { cachedFeed, type Feed } from "./cache";
 import {
-  UNIVERSAL_ASSETS,
-  parseUniversalPools,
-  universalUrl,
-} from "./universal";
+  parseKaminoRegistry,
+  parseKaminoMetrics,
+  LEGACY_SOLANA_ZEC,
+  WRAPPED_ASSETS,
+  parseWrappedPools,
+  wrappedUrl,
+  aggregateWrappedPools,
+  parseSolanaSupply,
+  rpcHex,
+  tokenUnits,
+  type WrappedAsset,
+  parseGeckoPools,
+  geckoPoolsUrl,
+} from "./wrapped";
 import {
   comparison,
   groupHolders,
-  labelSchema,
+  parseCustodyRegistry,
   parseAddressDetail,
-  parseAddressZec,
   parseCypherpunk,
   parseGrayscale,
   parse21Shares,
   parseHyperliquid,
   parseMarkets,
   parseNearExplorer,
+  parseNearConfidential,
   parseSupply,
   type AddressBalance,
   type Disclosure,
@@ -86,29 +96,9 @@ const holdings = cachedFeed(async () => {
     json(`${CIPHER}/api/labels`),
     json(`${CIPHER}/api/rich-list?limit=500`),
   ]);
-  const labels = z
-    .object({
-      labels: z.array(labelSchema).min(1),
-      count: z.number().int().positive(),
-    })
-    .parse(labelRaw);
-  if (labels.labels.length !== labels.count)
-    throw new Error("Incomplete label registry");
-  const rich = z
-    .object({
-      success: z.literal(true),
-      addresses: z.array(
-        z.object({
-          address: z.string(),
-          balanceZat: z.union([z.string(), z.number()]),
-        }),
-      ),
-    })
-    .parse(richRaw);
-  const balances = new Map(
-    rich.addresses.map((a) => [a.address, parseAddressZec(a)]),
-  );
-  const missing = labels.labels.filter((a) => !balances.has(a.address));
+  const registry = parseCustodyRegistry(labelRaw, richRaw);
+  const { labels, balances } = registry;
+  const missing = labels.filter((a) => !balances.has(a.address));
   const deadline = Date.now() + 30_000;
   // Include the ENTIRE registry, including labels outside the top 500 and zero
   // balances. Bound concurrency so a refresh is gentle on the public explorer.
@@ -132,24 +122,29 @@ const holdings = cachedFeed(async () => {
         }
       }),
     );
-  const addresses: AddressBalance[] = labels.labels.map((a) => ({
+  const addresses: AddressBalance[] = labels.map((a) => ({
     ...a,
     zec: balances.get(a.address) ?? null,
     source: `https://cipherscan.app/address/${a.address}`,
   }));
   return {
     holders: groupHolders(addresses),
-    labelCount: labels.count,
+    labelCount: labels.length,
     resolved: addresses.filter((a) => a.zec !== null).length,
+    largeAddresses: registry.addresses.filter((a) => a.zec >= 10_000),
+    indexedAddresses: registry.addresses.length,
+    largeAddressThreshold: 10_000,
+    indexedZec: registry.addresses.reduce((sum, a) => sum + a.zec, 0),
   };
 }, 10 * 60_000);
 
-const near = cachedFeed(async (): Promise<Venue> => {
+const near = cachedFeed(async () => {
   const n = parseNearExplorer(await html(NEAR_VOLUME), Date.now());
   return {
+    ...n,
     id: "near-intents",
     name: "NEAR Intents",
-    kind: "dex",
+    kind: "dex" as const,
     volumeUsd: n.volumeUsd,
     pairs: 0,
     asOf: n.asOf,
@@ -176,12 +171,130 @@ const hyper = cachedFeed(async (): Promise<Venue> => {
     note: "Verified Unit Zcash / USDC spot market. USDC notional treated as USD. Perpetual futures and unrelated ZEC-named tokens excluded.",
   };
 });
-const universalFeeds = UNIVERSAL_ASSETS.map((asset) => ({
-  asset,
-  read: cachedFeed(async () =>
-    parseUniversalPools(await json(universalUrl(asset)), asset, iso()),
+const nearConfidential = cachedFeed(
+  async () =>
+    parseNearConfidential(await html("https://revenue.near.org/"), Date.now()),
+  3_600_000,
+);
+const nearTotal = cachedFeed(async () =>
+  parseNearExplorer(
+    await html("https://explorer.near-intents.org/"),
+    Date.now(),
+    "all",
   ),
+);
+async function rpc(asset: WrappedAsset, method: string, params: unknown[]) {
+  if (!asset.rpc)
+    throw new Error("Supply reader not available for this network");
+  return json(asset.rpc, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+  });
+}
+const wrappedFeeds = WRAPPED_ASSETS.map((asset) => ({
+  asset,
+  read: cachedFeed(async () => {
+    const asOf = iso();
+    const reads = await Promise.allSettled([
+      json(wrappedUrl(asset)).then((raw) =>
+        parseWrappedPools(raw, asset, asOf),
+      ),
+      ...(asset.chain === "solana"
+        ? [
+            (async () => {
+              const pools = [];
+              for (let page = 1; page <= 3; page++) {
+                const batch = parseGeckoPools(
+                  await json(geckoPoolsUrl(asset, page)),
+                  asset,
+                  asOf,
+                );
+                pools.push(...batch);
+                if (batch.length < 20) break;
+              }
+              return pools;
+            })(),
+          ]
+        : []),
+    ]);
+    const success = reads.filter((r) => r.status === "fulfilled");
+    if (!success.length) throw new Error("Pool indexers unavailable");
+    return aggregateWrappedPools(success.flatMap((r) => r.value)).pools;
+  }),
+  supply: cachedFeed(async () => {
+    if (asset.chain === "solana")
+      return parseSolanaSupply(
+        await rpc(asset, "getTokenSupply", [
+          asset.token,
+          { commitment: "finalized" },
+        ]),
+      );
+    // Pin both ERC-20 reads to the same block, and verify the network.
+    const [chain, blockRaw] = await Promise.all([
+      rpc(asset, "eth_chainId", []),
+      rpc(asset, "eth_blockNumber", []),
+    ]);
+    if (Number(BigInt(rpcHex(chain))) !== asset.chainId)
+      throw new Error("Wrong RPC network");
+    const block = rpcHex(blockRaw);
+    const [total, decimals] = await Promise.all(
+      ["0x18160ddd", "0x313ce567"].map((data) =>
+        rpc(asset, "eth_call", [{ to: asset.token, data }, block]),
+      ),
+    );
+    return {
+      zec: tokenUnits(
+        BigInt(rpcHex(total)).toString(),
+        Number(BigInt(rpcHex(decimals))),
+      ),
+      block: BigInt(block).toString(),
+    };
+  }, 10 * 60_000),
 }));
+const legacySolana = cachedFeed(
+  async () => ({
+    asset: LEGACY_SOLANA_ZEC,
+    ...parseSolanaSupply(
+      await rpc(LEGACY_SOLANA_ZEC, "getTokenSupply", [
+        LEGACY_SOLANA_ZEC.token,
+        { commitment: "finalized" },
+      ]),
+    ),
+  }),
+  10 * 60_000,
+);
+const kamino = cachedFeed(async () => {
+  const { reserves, unidentified } = parseKaminoRegistry(
+    await json("https://api.kamino.finance/markets/collateral-reserves"),
+  );
+  const all = await Promise.all(
+    [...new Set(reserves.map((r) => r.lendingMarket))].map(async (market) =>
+      parseKaminoMetrics(
+        await json(
+          `https://api.kamino.finance/kamino-market/${market}/reserves/metrics`,
+        ),
+        reserves.filter((r) => r.lendingMarket === market),
+      ),
+    ),
+  );
+  return { reserves: all.flat(), unidentified };
+}, 10 * 60_000);
+const mayaHistory = cachedFeed(async () => {
+  const to = Math.floor(Date.now() / 1000);
+  const [all, month] = await Promise.all([
+    json(`${MAYA}/history/swaps?pool=ZEC.ZEC`),
+    json(`${MAYA}/history/swaps?pool=ZEC.ZEC&from=${to - 30 * 86400}&to=${to}`),
+  ]);
+  const allTime = parseSwapSummary(all),
+    last30d = parseSwapSummary(month);
+  if (!allTime || !last30d || Math.abs(last30d.to - to) > 120)
+    throw new Error("Maya history unavailable");
+  return {
+    volumeAllTimeUsd: allTime.volumeUsd,
+    volume30dUsd: last30d.volumeUsd,
+  };
+});
 const maya = cachedFeed(async () => {
   const to = Math.floor(Date.now() / 1000);
   const from = to - 86400;
@@ -314,26 +427,48 @@ function status<T>(
 }
 
 export async function getMarketDashboard() {
-  const [m, s, h, n, hy, ma, th, rh, cp, etp, gray, universal] =
-    await Promise.all([
-      markets(),
-      supply(),
-      holdings(),
-      near(),
-      hyper(),
-      maya(),
-      thor(),
-      rhea(),
-      cypherpunk(),
-      shares21(),
-      grayscale(),
-      Promise.all(
-        universalFeeds.map(async ({ asset, read }) => ({
-          asset,
-          feed: await read(),
-        })),
-      ),
-    ]);
+  const [
+    m,
+    s,
+    h,
+    n,
+    hy,
+    ma,
+    th,
+    rh,
+    cp,
+    etp,
+    gray,
+    wrapped,
+    nc,
+    nt,
+    mh,
+    ka,
+    legacy,
+  ] = await Promise.all([
+    markets(),
+    supply(),
+    holdings(),
+    near(),
+    hyper(),
+    maya(),
+    thor(),
+    rhea(),
+    cypherpunk(),
+    shares21(),
+    grayscale(),
+    Promise.all(
+      wrappedFeeds.map(async ({ asset, read, supply }) => {
+        const [feed, balance] = await Promise.all([read(), supply()]);
+        return { asset, feed, supply: balance };
+      }),
+    ),
+    nearConfidential(),
+    nearTotal(),
+    mayaHistory(),
+    kamino(),
+    legacySolana(),
+  ]);
   // A failed or stale volume source stays visible in coverage but cannot
   // silently enter a rolling-day comparison alongside fresh numbers.
   const venues = m.data && !m.stale ? [...m.data.venues] : [];
@@ -341,8 +476,10 @@ export async function getMarketDashboard() {
     if (feed.data && !feed.stale) venues.push(feed.data);
   if (ma.data && !ma.stale) venues.push(ma.data.venue);
   if (th.data?.venue && !th.stale) venues.push(th.data.venue);
-  for (const { feed } of universal)
-    if (feed.data && !feed.stale) venues.push(...feed.data);
+  const wrappedMarkets = aggregateWrappedPools(
+    wrapped.flatMap(({ feed }) => (feed.data && !feed.stale ? feed.data : [])),
+  );
+  venues.push(...wrappedMarkets.venues);
   venues.sort((a, b) => b.volumeUsd - a.volumeUsd);
   const cex = venues.filter((v) => v.kind === "cex");
   const dex = venues.filter((v) => v.kind === "dex");
@@ -357,9 +494,15 @@ export async function getMarketDashboard() {
     hy,
     ma,
     th,
-    ...universal.map((u) => u.feed),
+    ...wrapped.map((u) => u.feed),
   ].some((f) => f.stale || !f.data);
   const sourceStatuses: SourceStatus[] = [
+    status(
+      "renZEC · legacy Solana mint",
+      LEGACY_SOLANA_ZEC.explorer + LEGACY_SOLANA_ZEC.token,
+      legacy,
+      "Historical Ren 1.0 token supply only. Excluded from active volumes and represented-ZEC totals; current redemption is not verified.",
+    ),
     status(
       "CoinPaprika spot markets",
       `${PAPRIKA}/coins/zec-zcash/markets`,
@@ -373,6 +516,28 @@ export async function getMarketDashboard() {
       "ZEC token activity, once per explorer total. Includes cross-chain intents.",
     ),
     status(
+      "Kamino ZEC deposits",
+      "https://api.kamino.finance/markets/collateral-reserves",
+      ka,
+      "All listed collateral reserves scanned by exact registered mint. Deposits are existing issued tokens, not additional supply or swap volume.",
+    ),
+    status(
+      "NEAR confidential TVL",
+      "https://revenue.near.org/",
+      nc,
+      "All-asset TVL, not ZEC trading volume. Not added to the comparison.",
+    ),
+    ...wrapped
+      .filter((w) => w.asset.rpc)
+      .map((w) =>
+        status(
+          `${w.asset.symbol} supply · ${w.asset.issuer} · ${w.asset.chainName}`,
+          w.asset.explorer + w.asset.token,
+          w.supply,
+          "Direct token supply at a recorded block or finalized slot; not a proof-of-reserves audit.",
+        ),
+      ),
+    status(
       "Hyperliquid",
       "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api/info-endpoint/spot",
       hy,
@@ -384,12 +549,12 @@ export async function getMarketDashboard() {
       ma,
       "Exact rolling 24-hour window; synchronized Midgard required.",
     ),
-    ...universal.map(({ asset, feed }) => ({
+    ...wrapped.map(({ asset, feed }) => ({
       ...status(
-        `Universal uZEC · ${asset.name}`,
-        universalUrl(asset),
+        `${asset.issuer} ${asset.symbol} · ${asset.chainName}`,
+        wrappedUrl(asset),
         feed,
-        "Issuer-listed contract; every pool returned by DEX Screener is checked and deduplicated. No returned pool means no indexed market, not verified zero activity across the chain.",
+        "Issuer-listed contract; DEX Screener pools plus up to three GeckoTerminal pages for Solana, deduplicated by chain and pool. No indexed market does not prove zero activity. Indexer coverage is bounded.",
       ),
       ...(feed.data?.length === 0 && !feed.stale
         ? { status: "not-listed" as const }
@@ -464,9 +629,27 @@ export async function getMarketDashboard() {
   const transparent = s.data?.pools.find((p) => p.id === "transparent")?.zec;
   const observed = h.data?.holders.reduce((sum, a) => sum + (a.zec ?? 0), 0);
   const holdingsConsistent =
-    transparent != null && observed != null && observed <= transparent;
+    transparent != null &&
+    observed != null &&
+    observed <= transparent &&
+    (h.data?.indexedZec ?? Infinity) <= transparent;
   return {
     generatedAt: iso(),
+    kamino: ka,
+    legacySolana: legacy,
+    nearActivity: n,
+    nearProtocol: nt,
+    nearConfidential: nc,
+    mayaHistory: mh,
+    wrapped: wrapped.map((w) => ({
+      ...w,
+      volumeUsd:
+        w.feed.data && !w.feed.stale && w.feed.data.length
+          ? wrappedMarkets.pools
+              .filter((p) => p.assetId === w.asset.id)
+              .reduce((sum, p) => sum + p.volumeUsd, 0)
+          : null,
+    })),
     metrics,
     volumeComplete,
     venues,

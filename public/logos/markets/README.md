@@ -1,0 +1,53 @@
+# Brand asset provenance
+
+Official site icons and brand shapes. Used for identification, without implying endorsement. Retrieved September 22, 2026. Maya uses the existing official `../maya.svg` asset.
+
+- aerodrome.svg: https://aerodrome.finance/svg/AERO/favicon.svg (official website icon).
+- binance.svg: https://binance.com (brand geometry distributed by simple-icons 16.32.0).
+- coinbase.png: https://docs.cdp.coinbase.com/mintlify-assets/_mintlify/favicons/coinbase-prod/c38WXP1QDRE4hnu6/_generated/favicon/android-chrome-192x192.png (official Coinbase developer documentation).
+- cypherpunk.svg: https://www.cypherpunk.com/icon.svg?icon.2i947yu28iyj0.svg (official website icon).
+- gemini.png: https://www.gemini.com/favicon-96x96.png (official website icon).
+- hyperliquid.png: https://app.hyperliquid.xyz/apple-touch-icon.png (official website icon).
+- kraken.png: https://www.kraken.com/_assets/icons/apple-touch-icon.png (official website icon).
+- kucoin.svg: https://www.kucoin.com/news/en-kucoin-media-kit (brand geometry distributed by simple-icons 16.32.0).
+- meteora.svg: https://www.meteora.ag/icons/v2.svg (official website icon).
+- near.svg: https://near.org/brand (brand geometry distributed by simple-icons 16.32.0).
+- orca.png: https://www.orca.so/images/favicon.png (official website icon).
+- pancakeswap.png: https://pancakeswap.finance/logo.png (official website icon).
+- shares21.png: https://cdn.prod.website-files.com/68b01c26946cffef7d668608/692dabc55252f5599b45b40f_Frame%202.png (official website icon).
+- solana.svg: https://solana.com/branding (brand geometry distributed by simple-icons 16.32.0).
+- uniswap.png: https://app.uniswap.org/images/192x192_App_Icon.png (official website icon).
+- zenrock.png: https://zenrocklabs.io/dct-assets/zen-logo.png (official website icon).
+
+- base.svg: https://brand.base.org/base-brand.zip — The Square/Base_square_blue.svg, official Base brand kit.
+- raydium.ico: https://raydium.io/favicon.ico (official site).
+- universal.svg: https://www.universal.xyz/brand/consumer/universal-mark-dark.svg (official site).
+- kamino.png: https://kamino.com/apple-touch-icon.png, published on the official Kamino site.
+- omnibridge.webp: https://storage.googleapis.com/tokens-asset-logos-prd/solana/A7bdiYdS5GjqGFtxf17ppRHtDKPkkRqbKtR27dxvQXaS.webp, published on the official Solana token directory.
+- toobit.ico: https://www.toobit.com/favicon.ico (official site listed in CoinPaprika's exchange registry: https://www.toobit.com/).
+- xt.ico: https://www.xt.com/favicon.ico?v=1 (official site listed in CoinPaprika's exchange registry: https://www.xt.com/).
+- lbank.webp: https://www.lbank.info/static-client/common/images/favicon.png?x-oss-process=image/format,webp (official site listed in CoinPaprika's exchange registry: https://www.lbank.info/).
+- poloniex.png: https://poloniex.com/v3/static/polo-icon-32x32.png (official site listed in CoinPaprika's exchange registry: https://poloniex.com/).
+- biconomy.ico: https://static.biconomy.com/public/static/favicon.ico (official site listed in CoinPaprika's exchange registry: https://www.biconomy.com/).
+- gateio.ico: https://www.gate.com/favicon.ico (official site listed in CoinPaprika's exchange registry: https://www.gate.com/).
+- phemex.ico: https://static.phemex.com/s/home/logo/favicon-v4.ico (official site listed in CoinPaprika's exchange registry: https://phemex.com/).
+- mexc.png: https://static.mocortech.com/image-host/web/common/favicon/icon-192x192.png (official site listed in CoinPaprika's exchange registry: https://www.mexc.com/).
+- bigone.ico: https://b.peatio.com/logos/favicon.ico (official site listed in CoinPaprika's exchange registry: https://big.one/).
+- bitfinex.ico: https://bitfinex.com/assets/favicons/bitfinex.ico (official site listed in CoinPaprika's exchange registry: https://bitfinex.com/).
+- digifinex.ico: https://www.digifinex.com/main_static/digifinex.ico (official site listed in CoinPaprika's exchange registry: https://www.digifinex.com/).
+- htx.png: https://www.huobi.com/pwa/icon-pwa-180.png (official site listed in CoinPaprika's exchange registry: https://www.huobi.com/en-us/?invite_code=hd454&invite_code=hd454).
+- coinex.png: https://www.coinex.com/apple-touch-icon.png (official site listed in CoinPaprika's exchange registry: https://www.coinex.com/).
+- nexdax.ico: https://nexdax.com/favicon.ico?v=1.1 (official site listed in CoinPaprika's exchange registry: https://nexdax.com/).
+- trubit-pro.ico: https://www.trubit.com/new/favicon.ico (official site listed in CoinPaprika's exchange registry: https://www.trubit.com/pro).
+- vindax.ico: https://vindax.com/favicon.ico (official site listed in CoinPaprika's exchange registry: https://vindax.com/).
+- nonkycio.webp: https://nonkyc.io/icon-192x192.webp (official site listed in CoinPaprika's exchange registry: https://nonkyc.io/).
+- kanga-exchange.ico: https://kanga.global/favicon.ico?favicon.006fhzndb3igu.ico (official site listed in CoinPaprika's exchange registry: https://kanga.global/).
+- fmfwio.png: https://fmfw.io/static/img/favicons/broker-files/bcom/apple-touch-icon.png?v=1.0 (official site listed in CoinPaprika's exchange registry: https://fmfw.io/btc-to-usdt).
+- wazirx.png: https://wazirx.com/logo.png (official site listed in CoinPaprika's exchange registry: https://wazirx.com/).
+- gleec-btc-exchange.png: https://exchange.gleec.com/static/img/favicons/broker-files/gleec/apple-touch-icon.png?v=1.0 (official site listed in CoinPaprika's exchange registry: https://exchange.gleec.com/).
+- coinut.png: https://coinut.com/public-assets/apple-icon-57x57.png (official site listed in CoinPaprika's exchange registry: https://coinut.com/).
+- latoken.svg: https://latoken.com/favicon/apple-touch-icon.svg (official site listed in CoinPaprika's exchange registry: https://latoken.com/).
+- bequant.ico: https://bequant.io/favicon.ico (official site listed in CoinPaprika's exchange registry: https://bequant.io/).
+- btc-trade-ua.ico: https://btc-trade.com.ua/static/favicon.ico (official site listed in CoinPaprika's exchange registry: https://btc-trade.com.ua/).
+- freiexchange.ico: https://freiexchange.com/favicon.ico (official site listed in CoinPaprika's exchange registry: https://freiexchange.com/).
+- okx-mark.png: https://www.okx.com/cdn/assets/imgs/253/59830BB78B18A776.png (official website icon).
