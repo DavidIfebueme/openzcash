@@ -16,6 +16,7 @@ export type Venue = {
   kind: "cex" | "dex";
   role?: "execution" | "routing";
   volumeUsd: number;
+  liquidityUsd?: number | null;
   pairs: number;
   asOf: string;
   source: string;
@@ -68,6 +69,51 @@ export const DIRECT_VENUES = new Set([
   "meteora",
 ]);
 
+/**
+ * Public order-book aliases verified 2026-09-23. These are execution identities,
+ * not generic stablecoin equivalence: unrelated USD/USDC/USDT books stay separate.
+ * Coinbase: https://www.coinbase.com/advanced-trade/spot
+ * Gemini: https://www.gemini.com/blog/introducing-combined-usd-and-usd-stablecoin-order-books
+ * HitBTC/Gleec/FMFW/Bequant public /api/3/public/trades/ZECBTC and ZECUSDT
+ * return the same trade IDs, timestamps, prices and quantities.
+ */
+function marketBook(m: z.infer<typeof marketSchema>) {
+  const ordinary = {
+    key: `${m.exchange_id}:${m.base_currency_id}:${m.quote_currency_id}`,
+    priority: 0,
+    shared: false,
+  };
+  if (m.base_currency_id !== "zec-zcash") return ordinary;
+  const usd = "usd-us-dollars";
+  const usdc = "usdc-usd-coin";
+  const unifiedQuotes: Record<string, string[]> = {
+    coinbase: [usd, usdc],
+    gemini: [usd, usdc, "gusd-gemini-dollar", "rlusd-ripple-usd"],
+  };
+  const quoteRank = unifiedQuotes[m.exchange_id]?.indexOf(m.quote_currency_id);
+  if (quoteRank !== undefined && quoteRank >= 0)
+    return {
+      key: `${m.exchange_id}:zec-zcash:unified-usd`,
+      priority: quoteRank,
+      shared: true,
+    };
+
+  const sharedVenues = ["hitbtc", "gleec-btc-exchange", "fmfwio", "bequant"];
+  const venueRank = sharedVenues.indexOf(m.exchange_id);
+  // FMFW's legacy USD label refers to its USDT execution book.
+  const quote =
+    m.exchange_id === "fmfwio" && m.quote_currency_id === usd
+      ? "usdt-tether"
+      : m.quote_currency_id;
+  if (venueRank >= 0 && ["btc-bitcoin", "usdt-tether"].includes(quote))
+    return {
+      key: `hitbtc-shared:zec-zcash:${quote}`,
+      priority: venueRank,
+      shared: true,
+    };
+  return ordinary;
+}
+
 export function parseMarkets(
   raw: unknown,
   exchanges: unknown,
@@ -81,13 +127,16 @@ export function parseMarkets(
   const excluded: Exclusion[] = [];
   const seen = new Set<string>();
   let included = 0;
-  // Latest quote wins if an upstream response repeats a market.
+  // Prefer the canonical book when valid; fresh aliases remain a fallback.
+  // Within the same book/feed priority, the latest quote wins.
   const ordered = rows
     .map((row) => marketSchema.safeParse(row))
     .sort(
       (a, b) =>
+        (a.success ? marketBook(a.data).priority : 0) -
+          (b.success ? marketBook(b.data).priority : 0) ||
         (b.success ? Date.parse(b.data.last_updated) : 0) -
-        (a.success ? Date.parse(a.data.last_updated) : 0),
+          (a.success ? Date.parse(a.data.last_updated) : 0),
     );
   for (const result of ordered) {
     if (!result.success) {
@@ -101,7 +150,7 @@ export function parseMarkets(
     }
     const m = result.data;
     const kind = types.get(m.exchange_id);
-    const key = `${m.exchange_id}:${m.base_currency_id}:${m.quote_currency_id}`;
+    const { key, shared } = marketBook(m);
     let reason = "";
     if (
       m.base_currency_id !== "zec-zcash" &&
@@ -124,7 +173,10 @@ export function parseMarkets(
       reason = "Replaced by the direct protocol source";
     else if (!kind || kind.includes("cex") === kind.includes("dex"))
       reason = "Venue type not verified";
-    else if (seen.has(key)) reason = "Duplicate market";
+    else if (seen.has(key))
+      reason = shared
+        ? "Shared order book already counted"
+        : "Duplicate market";
     if (reason) {
       excluded.push({
         name: m.exchange_name,

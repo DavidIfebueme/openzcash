@@ -42,6 +42,34 @@ export type MayaPool = {
 };
 export type MayaHealth = { inSync: boolean; indexedAt: string | null };
 
+/** Pool availability does not describe chain halts; use MayaNode's flags. */
+export function parseMayaNetwork(raw: unknown) {
+  const rows = z
+    .array(
+      z.object({
+        chain: z.string(),
+        halted: z.boolean(),
+        chain_trading_paused: z.boolean(),
+        global_trading_paused: z.boolean().optional(),
+      }),
+    )
+    .parse(raw);
+  const zec = rows.find((row) => row.chain === "ZEC");
+  if (!zec) throw new Error("ZEC network status unavailable");
+  return {
+    paused:
+      zec.halted ||
+      zec.chain_trading_paused ||
+      zec.global_trading_paused === true,
+  };
+}
+
+export function mayaIndexCurrent(health: MayaHealth | null, now: number) {
+  if (!health?.inSync || !health.indexedAt) return false;
+  const age = now - Date.parse(health.indexedAt);
+  return age >= -60_000 && age <= 5 * 60_000;
+}
+
 function swapTotals(input: z.infer<typeof swapSchema>): SwapTotals | null {
   if (input.endTime <= input.startTime || input.endTime > 8_640_000_000_000)
     return null;

@@ -25,7 +25,7 @@ import {
   type Venue,
 } from "@/lib/markets/model";
 import styles from "./markets.module.css";
-import exchangeLogos from "../../../public/logos/markets/exchanges.json";
+import { marketLogo } from "@/lib/markets/logos";
 
 const compact = (n: number, digits = 1) =>
   new Intl.NumberFormat("en-US", {
@@ -66,55 +66,29 @@ const kinds: Record<HolderKind, string> = {
   treasury: "Treasury",
   other: "Public label",
 };
-const logos: [string, string][] = [
-  ["omnibridge", "omnibridge.webp"],
-  ["coinbase", "coinbase.png"],
-  ["binance", "binance.svg"],
-  ["bnb", "binance.svg"],
-  ["gemini", "gemini.png"],
-  ["kraken", "kraken.png"],
-  ["kucoin", "kucoin.svg"],
-  ["okx", "okx-mark.png"],
-  ["okex", "okx-mark.png"],
-  ["near", "near.svg"],
-  ["hyper", "hyperliquid.png"],
-  ["solana", "solana.svg"],
-  ["base", "base.svg"],
-  ["orca", "orca.png"],
-  ["raydium", "raydium.ico"],
-  ["meteora", "meteora.svg"],
-  ["aerodrome", "aerodrome.svg"],
-  ["uniswap", "uniswap.png"],
-  ["pancake", "pancakeswap.png"],
-  ["zenrock", "zenrock.png"],
-  ["universal", "universal.svg"],
-  ["cypherpunk", "cypherpunk.svg"],
-  ["21shares", "shares21.png"],
-  ["kamino", "kamino.png"],
-];
 function Logo({ name }: { name: string }) {
-  const key = name.toLowerCase();
-  const src = key.includes("maya")
-    ? "/logos/maya.svg"
-    : ((exchangeLogos as Record<string, string>)[key] ??
-      (logos.find(([id]) => key.startsWith(id)) ??
-        logos.find(([id]) => key.includes(id)))?.[1]);
+  const src = marketLogo(name);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const lightMark =
+    failedSrc !== src &&
+    (src === "/logos/maya.svg" ||
+      src === "/logos/markets/zenrock.png" ||
+      src === "/logos/markets/katana.svg");
   return (
     <span
-      className={`${styles.logo} ${/maya|zenrock/.test(key) ? styles.lightMark : ""}`}
+      className={`${styles.logo} ${lightMark ? styles.lightMark : ""}`}
     >
-      {src ? (
+      {src && failedSrc !== src ? (
         <Image
-          src={src.startsWith("/") ? src : `/logos/markets/${src}`}
+          src={src}
           alt=""
           width={32}
           height={32}
           unoptimized
+          onError={() => setFailedSrc(src)}
         />
       ) : (
-        <span aria-hidden="true">
-          {name === "Unlabeled address" ? "?" : name[0]}
-        </span>
+        <IconGlobe />
       )}
     </span>
   );
@@ -334,7 +308,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
       value: maya?.volumeUsd ?? null,
       label: "ZEC swaps · 24h",
       detail: data.mayaHistory.data
-        ? `${usd(data.mayaHistory.data.volumeAllTimeUsd)} all-time${data.mayaHistory.stale ? " · saved" : ""}`
+        ? `${usd(data.mayaHistory.data.volumeAllTimeUsd)} all-time${data.mayaHistory.stale ? " · saved" : ""}${data.mayaNetwork.data && !data.mayaNetwork.stale ? (data.mayaNetwork.data.paused ? " · trading paused" : "") : " · status unavailable"}`
         : "Native ZEC liquidity",
       href: "/zcg/investments",
     },
@@ -419,8 +393,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           <div className={styles.race}>
             <div className={styles.missionHeading}>
               <div>
-                <p className={styles.eyebrow}>CEX vs DEX</p>
-                <h2 id="volume">ZEC spot volume</h2>
+                <h2 id="volume">Spot Volume</h2>
               </div>
               <span className={styles.pill}>24h · USD</span>
             </div>
@@ -470,7 +443,8 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 }
               />
               {data.volumeComplete ? "Tracked feeds available" : "Partial data"}{" "}
-              · Spot execution <a href="#methodology">Coverage ↗</a>
+              · Reported spot · Perpetuals excluded{" "}
+              <a href="#methodology">Coverage ↗</a>
             </p>
           </div>
           <aside className={styles.target}>
@@ -648,7 +622,22 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                         <small>{stamp(member.asOf)}</small>
                       </div>
                     </div>
-                    <strong>{usd(member.volumeUsd)}</strong>
+                    <div className={styles.marketAmounts}>
+                      <span>
+                        <small>Volume · 24h</small>
+                        <strong>{usd(member.volumeUsd)}</strong>
+                      </span>
+                      {member.id.startsWith("wrapped-") && (
+                        <span>
+                          <small>Pool liquidity</small>
+                          <strong>
+                            {member.liquidityUsd == null
+                              ? "—"
+                              : usd(member.liquidityUsd)}
+                          </strong>
+                        </span>
+                      )}
+                    </div>
                     <p>{member.note}</p>
                   </div>
                 ))}
@@ -713,7 +702,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           </p>
           <div className={styles.confidential}>
             <div>
-              <span>Confidential TVL · all assets</span>
+              <span>Illustrative TVL · all assets</span>
               <strong>
                 {data.nearConfidential.data
                   ? usd(data.nearConfidential.data.tvlUsd)
@@ -729,8 +718,9 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               </small>
             </div>
             <p>
-              Confidential trading is supported. A separate ZEC volume total is
-              not publicly disclosed; TVL is not added to trading volume.{" "}
+              The publisher marks these figures as illustrative. A separate ZEC
+              confidential volume total is not publicly disclosed; this TVL is
+              outside the benchmark.{" "}
               <Out href="https://revenue.near.org/">TVL source</Out> ·{" "}
               <Out href="https://intents.near.org/confidential">
                 How it works
@@ -786,9 +776,9 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   <small>
                     {!w.feed.data || w.feed.stale
                       ? "Feed unavailable"
-                      : w.feed.data.length === 0
+                      : w.feed.data.pools.length === 0
                         ? "No indexed pool"
-                        : `${w.feed.data.length} tracked pools`}
+                        : `${w.feed.data.pools.length} pools${w.feed.data.partial ? " · partial coverage" : ""}`}
                   </small>
                 </div>
               </summary>
@@ -1181,14 +1171,18 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               <p>
                 CEX uses reported spot markets; quotes older than two hours,
                 derivatives, outliers and unknown classifications are excluded.
-                Direct feeds replace the same aggregator venues.
+                Direct feeds replace the same aggregator venues. Provider USD
+                conversions can differ; this is not a consolidated trade tape or
+                an independent wash-trading audit. Shared Coinbase/Gemini quote
+                books and verified HitBTC-family execution aliases count once.
               </p>
               <p>
-                DEX includes verified ZEC tokens, native Maya swaps and Unit
-                UZEC spot. Pools are deduplicated by network and address,
-                including pools containing two ZEC tokens. Solana is checked
-                against DEX Screener and up to three pages per token on
-                GeckoTerminal.
+                DEX includes registered ZEC tokens, native Maya swaps and Unit
+                UZEC/USDC spot on Hyperliquid. ZEC perpetual contracts are
+                derivatives and excluded from both sides. Pools are deduplicated
+                by network and address, including pools containing two ZEC
+                tokens. Solana is checked against DEX Screener and up to three
+                pages per token on GeckoTerminal.
               </p>
               <p>
                 NEAR Intents is a separate routing layer. Its ZEC volume stays
@@ -1264,6 +1258,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                         unavailable: "Unavailable",
                         "not-listed": "No indexed pool",
                         context: "Outside total",
+                        partial: "Partial coverage",
                       }[s.status]
                     }
                   </span>

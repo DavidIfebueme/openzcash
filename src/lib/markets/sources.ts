@@ -9,12 +9,12 @@ import {
   parseWrappedPools,
   wrappedUrl,
   aggregateWrappedPools,
-  resolveWrappedPools,
+  resolveWrappedCoverage,
+  readGeckoPoolCoverage,
   parseSolanaSupply,
   rpcHex,
   tokenUnits,
   type WrappedAsset,
-  parseGeckoPools,
   geckoPoolsUrl,
 } from "./wrapped";
 import {
@@ -36,6 +36,8 @@ import {
 } from "./model";
 import {
   parseMayaHealth,
+  parseMayaNetwork,
+  mayaIndexCurrent,
   parseMayaPool,
   parseSwapSummary,
 } from "@/lib/defi/maya-activity-model";
@@ -75,6 +77,21 @@ async function json(
 }
 async function html(url: string): Promise<string> {
   return (await request(url)).text();
+}
+
+// Spread indexer requests across SSR/API bundles in the same server process.
+// Fail a saturated queue rather than extending the page's wait indefinitely.
+const geckoSchedule = globalThis as typeof globalThis & {
+  __openZcashGeckoNext?: number;
+};
+async function geckoJson(url: string) {
+  const now = Date.now();
+  const start = Math.max(now, geckoSchedule.__openZcashGeckoNext ?? 0);
+  if (start - now > 20_000) throw new Error("Pool indexer busy");
+  geckoSchedule.__openZcashGeckoNext = start + 1_000;
+  if (start > now)
+    await new Promise((resolve) => setTimeout(resolve, start - now));
+  return json(url);
 }
 
 const exchangeTypes = cachedFeed(
@@ -196,32 +213,35 @@ async function rpc(asset: WrappedAsset, method: string, params: unknown[]) {
 }
 const wrappedFeeds = WRAPPED_ASSETS.map((asset) => ({
   asset,
-  read: cachedFeed(async () => {
-    const asOf = iso();
-    const reads = await Promise.allSettled([
-      json(wrappedUrl(asset)).then((raw) =>
-        parseWrappedPools(raw, asset, asOf),
-      ),
-      ...(asset.chain === "solana"
-        ? [
-            (async () => {
-              const pools = [];
-              for (let page = 1; page <= 3; page++) {
-                const batch = parseGeckoPools(
-                  await json(geckoPoolsUrl(asset, page)),
-                  asset,
-                  asOf,
-                );
-                pools.push(...batch);
-                if (batch.length < 20) break;
-              }
-              return pools;
-            })(),
-          ]
-        : []),
-    ]);
-    return resolveWrappedPools(reads);
-  }),
+  read: cachedFeed(
+    async () => {
+      const asOf = iso();
+      const reads = await Promise.allSettled([
+        json(wrappedUrl(asset)).then((raw) => {
+          const pools = parseWrappedPools(raw, asset, asOf);
+          // The endpoint returns at most 30 pools; a full page may be truncated.
+          return {
+            pools,
+            partial: Array.isArray(raw) && raw.length >= 30,
+            limited: Array.isArray(raw) && raw.length >= 30,
+            failedSources: 0,
+          };
+        }),
+        ...(["solana", "base", "bsc"].includes(asset.chain)
+          ? [
+              readGeckoPoolCoverage(
+                asset,
+                (page) => geckoJson(geckoPoolsUrl(asset, page)),
+                asOf,
+              ),
+            ]
+          : []),
+      ]);
+      return resolveWrappedCoverage(reads);
+    },
+    5 * 60_000,
+    (coverage) => coverage.failedSources > 0,
+  ),
   supply: cachedFeed(async () => {
     if (asset.chain === "solana")
       return parseSolanaSupply(
@@ -295,6 +315,11 @@ const mayaHistory = cachedFeed(async () => {
     volume30dUsd: last30d.volumeUsd,
   };
 });
+const MAYA_NETWORK =
+  "https://mayanode.mayachain.info/mayachain/inbound_addresses";
+const mayaNetwork = cachedFeed(async () =>
+  parseMayaNetwork(await json(MAYA_NETWORK)),
+);
 const maya = cachedFeed(async () => {
   const to = Math.floor(Date.now() / 1000);
   const from = to - 86400;
@@ -310,7 +335,7 @@ const maya = cachedFeed(async () => {
   if (
     !s ||
     !p ||
-    !h?.inSync ||
+    !mayaIndexCurrent(h, Date.now()) ||
     Math.abs(s.from - from) > 120 ||
     Math.abs(s.to - to) > 120
   )
@@ -414,7 +439,13 @@ const GRAYSCALE_DISCLOSURE: Disclosure = {
 
 export type SourceStatus = {
   name: string;
-  status: "current" | "saved" | "unavailable" | "not-listed" | "context";
+  status:
+    | "current"
+    | "saved"
+    | "unavailable"
+    | "not-listed"
+    | "context"
+    | "partial";
   url: string;
   fetchedAt: string | null;
   note: string;
@@ -454,6 +485,7 @@ export async function getMarketDashboard() {
     mh,
     ka,
     legacy,
+    mn,
   ] = await Promise.all([
     markets(),
     supply(),
@@ -477,6 +509,7 @@ export async function getMarketDashboard() {
     mayaHistory(),
     kamino(),
     legacySolana(),
+    mayaNetwork(),
   ]);
   // A failed or stale volume source stays visible in coverage but cannot
   // silently enter a rolling-day comparison alongside fresh numbers.
@@ -487,19 +520,17 @@ export async function getMarketDashboard() {
   if (th.data?.venue && !th.stale) tracked.push(th.data.venue);
   if (rh.data && !rh.stale) tracked.push(rh.data);
   const wrappedMarkets = aggregateWrappedPools(
-    wrapped.flatMap(({ feed }) => (feed.data && !feed.stale ? feed.data : [])),
+    wrapped.flatMap(({ feed }) =>
+      feed.data && !feed.stale ? feed.data.pools : [],
+    ),
   );
   tracked.push(...wrappedMarkets.venues);
   const { venues, metrics } = spotBenchmark(tracked);
   venues.sort((a, b) => b.volumeUsd - a.volumeUsd);
-  const volumeComplete = ![
-    m,
-    hy,
-    ma,
-    th,
-    rh,
-    ...wrapped.map((u) => u.feed),
-  ].some((f) => f.stale || !f.data);
+  const volumeComplete =
+    ![m, hy, ma, th, rh, ...wrapped.map((u) => u.feed)].some(
+      (f) => f.stale || !f.data,
+    ) && !wrapped.some((w) => w.feed.data?.partial);
   const sourceStatuses: SourceStatus[] = [
     status(
       "renZEC · legacy Solana mint",
@@ -532,7 +563,7 @@ export async function getMarketDashboard() {
       "NEAR confidential TVL",
       "https://revenue.near.org/",
       nc,
-      "All-asset TVL, not ZEC trading volume. Not added to the comparison.",
+      "Publisher labels figures illustrative. All-asset TVL, not verified ZEC trading volume; excluded from the comparison.",
     ),
     ...wrapped
       .filter((w) => w.asset.rpc)
@@ -554,17 +585,29 @@ export async function getMarketDashboard() {
       "Maya",
       `${MAYA}/doc`,
       ma,
-      "Exact rolling 24-hour window; synchronized Midgard required.",
+      "Exact rolling 24-hour window; synchronized Midgard with a block less than five minutes old required.",
+    ),
+    status(
+      "Maya network status",
+      MAYA_NETWORK,
+      mn,
+      "ZEC inbound halt and trading-pause flags. Pool status alone does not confirm trading is active.",
     ),
     ...wrapped.map(({ asset, feed }) => ({
       ...status(
         `${asset.issuer} ${asset.symbol} · ${asset.chainName}`,
         wrappedUrl(asset),
         feed,
-        "Issuer-listed contract; DEX Screener pools plus up to three GeckoTerminal pages for Solana, deduplicated by chain and pool. No indexed market does not prove zero activity. Indexer coverage is bounded.",
+        "Issuer-listed contract; DEX Screener pools plus up to three GeckoTerminal pages for Solana, Base and BNB Chain, deduplicated by chain and pool. No indexed market does not prove zero activity. Indexer coverage is bounded.",
       ),
-      ...(feed.data?.length === 0 && !feed.stale
-        ? { status: "not-listed" as const }
+      ...(feed.data && !feed.stale
+        ? {
+            status: feed.data.partial
+              ? ("partial" as const)
+              : feed.data.pools.length === 0
+                ? ("not-listed" as const)
+                : ("current" as const),
+          }
         : {}),
     })),
     {
@@ -645,10 +688,11 @@ export async function getMarketDashboard() {
     nearProtocol: nt,
     nearConfidential: nc,
     mayaHistory: mh,
+    mayaNetwork: mn,
     wrapped: wrapped.map((w) => ({
       ...w,
       volumeUsd:
-        w.feed.data && !w.feed.stale && w.feed.data.length
+        w.feed.data && !w.feed.stale && w.feed.data.pools.length
           ? wrappedMarkets.pools
               .filter((p) => p.assetId === w.asset.id)
               .reduce((sum, p) => sum + p.volumeUsd, 0)

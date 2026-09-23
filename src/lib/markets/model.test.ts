@@ -167,6 +167,110 @@ describe("fair volume comparison", () => {
       ),
     ).toBe(true);
   });
+  it("counts Coinbase and Gemini unified dollar books once without merging other venues' stablecoin markets", () => {
+    const quotes = [
+      ["USD", "usd-us-dollars"],
+      ["USDC", "usdc-usd-coin"],
+      ["GUSD", "gusd-gemini-dollar"],
+      ["RLUSD", "rlusd-ripple-usd"],
+    ];
+    const row = (id: string, quote: string[], volume: number) => ({
+      ...market,
+      exchange_id: id,
+      exchange_name: id,
+      pair: `ZEC/${quote[0]}`,
+      quote_currency_id: quote[1],
+      quotes: { USD: { price: 1500, volume_24h: volume } },
+    });
+    const registry = ["coinbase", "gemini", "binance"].map((id) => ({
+      id,
+      type: ["cex"],
+    }));
+    const parsed = parseMarkets(
+      [
+        // Put aliases first to prove that upstream ordering cannot multiply volume.
+        row("coinbase", quotes[1], 999),
+        row("coinbase", quotes[0], 1000),
+        ...quotes
+          .slice()
+          .reverse()
+          .map((q) => row("gemini", q, 100)),
+        row("binance", quotes[0], 200),
+        row("binance", quotes[1], 300),
+      ],
+      registry,
+      now,
+    );
+    expect(parsed.venues.map((v) => [v.id, v.volumeUsd, v.pairs])).toEqual([
+      ["coinbase", 1000, 1],
+      ["binance", 500, 2],
+      ["gemini", 100, 1],
+    ]);
+    expect(parsed.excluded).toHaveLength(4);
+    expect(
+      parsed.excluded.every(
+        (e) => e.reason === "Shared order book already counted",
+      ),
+    ).toBe(true);
+  });
+  it("uses a valid shared-book alias if the preferred USD market is stale or rejected", () => {
+    const usd = { ...market, exchange_id: "coinbase" };
+    const alias = {
+      ...usd,
+      pair: "ZEC/USDC",
+      quote_currency_id: "usdc-usd-coin",
+      last_updated: "2026-09-22T21:58:00Z",
+      quotes: { USD: { price: 1500, volume_24h: 899 } },
+    };
+    const registry = [{ id: "coinbase", type: ["cex"] }];
+    for (const bad of [
+      { ...usd, last_updated: "2026-09-21T00:00:00Z" },
+      { ...usd, outlier: true },
+    ]) {
+      const parsed = parseMarkets([bad, alias], registry, now);
+      expect(parsed.included).toBe(1);
+      expect(parsed.venues[0].volumeUsd).toBe(899);
+    }
+  });
+  it("deduplicates the verified HitBTC shared BTC and USDT books across branded feeds", () => {
+    const ids = ["bequant", "fmfwio", "gleec-btc-exchange", "hitbtc"];
+    const registry = ids.map((id) => ({ id, type: ["cex"] }));
+    const rows = ids.flatMap((id) =>
+      ["btc-bitcoin", id === "fmfwio" ? "usd-us-dollars" : "usdt-tether"].map(
+        (quote) => ({
+          ...market,
+          exchange_id: id,
+          exchange_name: id,
+          quote_currency_id: quote,
+          pair: `ZEC/${quote}`,
+        }),
+      ),
+    );
+    const parsed = parseMarkets(rows, registry, now);
+    expect(parsed.venues).toHaveLength(1);
+    expect(parsed.venues[0]).toMatchObject({
+      id: "hitbtc",
+      volumeUsd: 1800,
+      pairs: 2,
+    });
+    expect(parsed.excluded).toHaveLength(6);
+    expect(
+      parsed.excluded.every(
+        (e) => e.reason === "Shared order book already counted",
+      ),
+    ).toBe(true);
+    // A missing preferred branded feed must not remove the actual shared book.
+    const fallback = parseMarkets(
+      rows.filter((r) => r.exchange_id !== "hitbtc"),
+      registry,
+      now,
+    );
+    expect(fallback.venues[0]).toMatchObject({
+      id: "gleec-btc-exchange",
+      volumeUsd: 1800,
+      pairs: 2,
+    });
+  });
   it("handles ZEC as quote and zero activity, but rejects impossible timestamps", () => {
     const p = parseMarkets(
       [

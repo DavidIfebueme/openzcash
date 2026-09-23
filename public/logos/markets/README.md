@@ -51,3 +51,40 @@ Official site icons and brand shapes. Used for identification, without implying 
 - btc-trade-ua.ico: https://btc-trade.com.ua/static/favicon.ico (official site listed in CoinPaprika's exchange registry: https://btc-trade.com.ua/).
 - freiexchange.ico: https://freiexchange.com/favicon.ico (official site listed in CoinPaprika's exchange registry: https://freiexchange.com/).
 - okx-mark.png: https://www.okx.com/cdn/assets/imgs/253/59830BB78B18A776.png (official website icon).
+
+## Observatory logo corrections — September 22, 2026
+
+Logos identify brands only. Files are served locally. Site favicons are preferred; where the origin was unavailable, the CoinGecko exchange directory or cached official-site favicon supplies the existing mark. Cached icons are not a fresh brand-kit verification.
+
+- apeswap.png: https://apeswap.finance/meta/apeswap/favicon.ico — https://apeswap.finance/.
+- aptos.svg: https://aptos.dev/favicon.svg — https://aptos.dev/.
+- babyswap.jpg: https://coin-images.coingecko.com/markets/images/853/small/babyswap.jpeg?1706864872 — CoinGecko exchange directory; official site https://exchange.babyswap.finance/#/swap.
+- blynex.png: https://www.google.com/s2/favicons?domain=blynex.com&sz=128 — Cached official site icon; direct site returned 403.
+- bydfi-spot.png: https://static.corex-static.com/image-host/web/bydfi-dark_200×200.ec4816d65f92.png — https://www.bydfi.com/.
+- coinw.png: https://coin-images.coingecko.com/markets/images/1172/small/coinw_new_logo.png?1713879109 — CoinGecko exchange directory; official site https://www.coinw.com/.
+- ekubo.svg: https://docs.ekubo.org/favicon.svg — https://docs.ekubo.org/.
+- flap.ico: https://flap.sh/favicon.ico — https://flap.sh/.
+- gleec-wallet.png: https://gleec.com/favicon-black.png — https://gleec.com/.
+- grayscale.png: https://www.google.com/s2/favicons?domain=www.grayscale.com&sz=128 — Cached website icon for grayscale.com; primary website currently returns 429.
+- hitbtc.png: https://coin-images.coingecko.com/markets/images/24/small/hitbtc.png?1706864259 — CoinGecko exchange directory; official site https://hitbtc.com/.
+- hydrex.png: https://www.hydrex.fi/hydrexIcon.png — https://www.hydrex.fi/swap.
+- hyperjump.png: https://avatars.githubusercontent.com/u/79239658?v=4 — https://github.com/HyperJump-DeFi.
+- katana.svg: https://katana.network/images/logomark.svg — https://katana.network/.
+- nofinex.png: https://www.nofinex.com/Public/Home/images/logo_5.png?v=20250711 — Official NOFINEX header logo.
+- pionex.png: https://coin-images.coingecko.com/markets/images/1026/small/pionex.png?1706865056 — CoinGecko exchange directory; official site https://www.pionex.com.
+- polygon.png: https://polygon.technology/apple-touch-icon.png — https://polygon.technology/.
+- pumpswap.png: https://swap.pump.fun/icon.png?c2a22dd8671140c9 — https://swap.pump.fun/.
+- rhea.png: https://rhea.finance/favicon2.ico — https://rhea.finance/.
+- safetrade.png: https://coin-images.coingecko.com/markets/images/215/small/safe-trade-logo.png?1706864330 — CoinGecko exchange directory; official site https://safetrade.com.
+- starknet.png: https://www.starknet.io/wp-content/uploads/2024/05/SN-Symbol-Flat-colour.png — https://www.starknet.io/media-kit/.
+- topaz.png: https://www.topazdex.com/images/512x512_App_Icon.png — https://www.topazdex.com/.
+- trapix-exchange.png: https://trapix.com/apple-touch-icon.png — https://trapix.com.
+- whitebit.jpg: https://coin-images.coingecko.com/markets/images/418/small/800_800.jpg?1706864419 — CoinGecko exchange directory; official site https://whitebit.com.
+- world.png: https://world.org/favicon/apple-touch-icon.png — https://world.org/world-chain.
+- yobit.png: https://www.google.com/s2/favicons?domain=yobit.net&sz=128 — Cached official site icon; direct site timed out.
+
+ZeroFi (Solana prop AMM) remains a neutral icon: no issuer-owned mark was confirmed. The unrelated zerofi.io bridge is deliberately not used. Unidentified pool addresses, unlabeled holders and ZIP-271 multisig also use neutral icons.
+
+Brand matching is anchored to the entity before the network suffix. In particular, HyperJump is distinct from Hyperliquid, and a DEX does not inherit its chain logo.
+
+- unit.png: https://hyperunit.xyz/brands/unit/apple-touch-icon.png — official Unit bridge site https://hyperunit.xyz/.

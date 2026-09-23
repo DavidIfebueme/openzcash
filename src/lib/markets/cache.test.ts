@@ -3,6 +3,21 @@ import { cachedFeed } from "./cache";
 
 afterEach(() => vi.useRealTimers());
 describe("public-source cache", () => {
+  it("retries failed partial coverage early without discarding its valid pools", async () => {
+    vi.useFakeTimers();
+    const loader = vi
+      .fn()
+      .mockResolvedValueOnce({ pools: [1], failed: true })
+      .mockResolvedValueOnce({ pools: [1, 2], failed: false });
+    const read = cachedFeed(loader, 300_000, (data) => data.failed);
+    expect((await read()).data?.pools).toEqual([1]);
+    vi.advanceTimersByTime(59_999);
+    await read();
+    expect(loader).toHaveBeenCalledTimes(1);
+    vi.advanceTimersByTime(1);
+    expect((await read()).data?.pools).toEqual([1, 2]);
+    expect(loader).toHaveBeenCalledTimes(2);
+  });
   it("deduplicates concurrent loads and respects the TTL", async () => {
     vi.useFakeTimers();
     const loader = vi.fn().mockResolvedValue({ volume: 100 });

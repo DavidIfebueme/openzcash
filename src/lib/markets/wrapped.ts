@@ -129,6 +129,7 @@ export type WrappedPool = {
   id: string;
   dex: string;
   volumeUsd: number;
+  liquidityUsd: number | null;
   assetId: string;
   chain: string;
   asOf: string;
@@ -148,6 +149,9 @@ export function parseWrappedPools(
         baseToken: z.object({ address: z.string() }),
         quoteToken: z.object({ address: z.string() }),
         volume: z.object({ h24: z.number().finite().nonnegative() }),
+        liquidity: z
+          .object({ usd: z.number().finite().nonnegative().nullish() })
+          .nullish(),
       }),
     )
     .parse(raw);
@@ -165,8 +169,9 @@ export function parseWrappedPools(
     if (!pools.has(id))
       pools.set(id, {
         id,
-        dex: row.dexId,
+        dex: normalizeDexId(row.dexId),
         volumeUsd: row.volume.h24,
+        liquidityUsd: row.liquidity?.usd ?? null,
         assetId: asset.id,
         chain: asset.chain,
         asOf,
@@ -185,6 +190,22 @@ export const dexNames: Record<string, string> = {
   apeswap: "ApeSwap",
   pumpswap: "PumpSwap",
 };
+/** Keep protocol versions under one venue without conflating different chains. */
+export function normalizeDexId(id: string): string {
+  if (
+    /^uniswap(?:[-_]v[234])?(?:[-_](?:base|bsc|solana|polygon|worldchain|katana|starknet|aptos))?$/.test(
+      id,
+    )
+  )
+    return "uniswap";
+  if (
+    /^pancakeswap(?:[-_](?:v[234]|infinity-clmm|infinity-bin))?(?:[-_](?:base|bsc|solana|polygon|worldchain|katana|starknet|aptos))?$/.test(
+      id,
+    )
+  )
+    return "pancakeswap";
+  return id;
+}
 /** Deduplicate across asset feeds too: a cbZEC/uZEC pool is still one market. */
 export function aggregateWrappedPools(pools: WrappedPool[]): {
   venues: Venue[];
@@ -201,6 +222,10 @@ export function aggregateWrappedPools(pools: WrappedPool[]): {
     const v = venues.get(id);
     if (v) {
       v.volumeUsd += p.volumeUsd;
+      v.liquidityUsd =
+        v.liquidityUsd != null && p.liquidityUsd != null
+          ? v.liquidityUsd + p.liquidityUsd
+          : null;
       v.pairs++;
     } else
       venues.set(id, {
@@ -208,6 +233,7 @@ export function aggregateWrappedPools(pools: WrappedPool[]): {
         name: `${dexNames[p.dex] ?? p.dex} · ${WRAPPED_ASSETS.find((a) => a.chain === p.chain)?.chainName ?? p.chain}`,
         kind: "dex",
         volumeUsd: p.volumeUsd,
+        liquidityUsd: p.liquidityUsd,
         pairs: 1,
         asOf: p.asOf,
         source: p.source,
@@ -219,13 +245,40 @@ export function aggregateWrappedPools(pools: WrappedPool[]): {
 export function resolveWrappedPools(
   reads: PromiseSettledResult<WrappedPool[]>[],
 ) {
+  return resolveWrappedCoverage(reads).pools;
+}
+
+export type WrappedPoolCoverage = {
+  pools: WrappedPool[];
+  /** Some queried coverage failed or reached a provider/page limit. */
+  partial: boolean;
+  /** A limit was reached; additional pools may exist. */
+  limited: boolean;
+  failedSources: number;
+};
+
+export function resolveWrappedCoverage(
+  reads: PromiseSettledResult<WrappedPool[] | WrappedPoolCoverage>[],
+): WrappedPoolCoverage {
   const success = reads.filter((r) => r.status === "fulfilled");
-  const pools = success.flatMap((r) => r.value);
-  // An empty index cannot stand in for an unavailable alternative index.
-  // Keep nonempty fallback coverage usable without inventing a zero market.
-  if (!success.length || (!pools.length && success.length !== reads.length))
+  const coverages = success.map((r) =>
+    Array.isArray(r.value)
+      ? { pools: r.value, partial: false, limited: false, failedSources: 0 }
+      : r.value,
+  );
+  const failedSources =
+    reads.length -
+    success.length +
+    coverages.reduce((sum, c) => sum + c.failedSources, 0);
+  const limited = coverages.some((c) => c.limited);
+  const partial =
+    failedSources > 0 || limited || coverages.some((c) => c.partial);
+  const pools = aggregateWrappedPools(coverages.flatMap((c) => c.pools)).pools;
+  // An empty alternative cannot prove an empty market when coverage failed.
+  // Nonempty partial coverage is retained, with its limitations attached.
+  if (!success.length || (!pools.length && partial))
     throw new Error("Pool coverage unavailable");
-  return aggregateWrappedPools(pools).pools;
+  return { pools, partial, limited, failedSources };
 }
 const uint = z.string().regex(/^\d+$/);
 export function tokenUnits(raw: string, decimals: number): number {
@@ -265,7 +318,7 @@ export function parseGeckoPools(
   asOf: string,
 ): WrappedPool[] {
   const numeric = z
-    .union([z.number(), z.string().regex(/^\d+(?:\.\d+)?$/)])
+    .union([z.number(), z.string().regex(/^\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$/)])
     .transform(Number)
     .pipe(z.number().finite().nonnegative());
   const relationship = z.object({ data: z.object({ id: z.string() }) });
@@ -276,6 +329,7 @@ export function parseGeckoPools(
           attributes: z.object({
             address: z.string().min(1),
             volume_usd: z.object({ h24: numeric }),
+            reserve_in_usd: numeric.nullish(),
           }),
           relationships: z.object({
             base_token: relationship,
@@ -304,11 +358,49 @@ export function parseGeckoPools(
         ),
       },
       volume: { h24: r.attributes.volume_usd.h24 },
+      liquidity: { usd: r.attributes.reserve_in_usd ?? null },
     })),
     asset,
     asOf,
   );
   return parsed.map((p) => ({ ...p, source: geckoPoolsUrl(asset) }));
+}
+
+/** Keep verified pages even if a subsequent request fails or is rate limited. */
+export async function readGeckoPoolCoverage(
+  asset: WrappedAsset,
+  loadPage: (page: number) => Promise<unknown>,
+  asOf: string,
+  maxPages = 3,
+): Promise<WrappedPoolCoverage> {
+  if (!Number.isInteger(maxPages) || maxPages < 1)
+    throw new Error("Invalid pool page limit");
+  const pools: WrappedPool[] = [];
+  let limited = false;
+  let failedSources = 0;
+  for (let page = 1; page <= maxPages; page++) {
+    try {
+      const raw = await loadPage(page);
+      const batch = parseGeckoPools(raw, asset, asOf);
+      // Use the provider row count: duplicate rows must not stop pagination.
+      const count = z.object({ data: z.array(z.unknown()) }).parse(raw)
+        .data.length;
+      pools.push(
+        ...batch.map((p) => ({ ...p, source: geckoPoolsUrl(asset, page) })),
+      );
+      if (count < 20) break;
+      if (page === maxPages) limited = true;
+    } catch {
+      failedSources = 1;
+      break;
+    }
+  }
+  return {
+    pools: aggregateWrappedPools(pools).pools,
+    partial: limited || failedSources > 0,
+    limited,
+    failedSources,
+  };
 }
 
 const kaminoReserve = z.object({

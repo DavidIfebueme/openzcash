@@ -7,7 +7,11 @@ export type Feed<T> = {
 };
 
 /** Bounded retries, shared in-flight work, and truthful dates on saved data. */
-export function cachedFeed<T>(loader: () => Promise<T>, ttl = 5 * 60_000) {
+export function cachedFeed<T>(
+  loader: () => Promise<T>,
+  ttl = 5 * 60_000,
+  retryPartial?: (data: T) => boolean,
+) {
   let cache: Feed<T> | null = null;
   let retryAt = 0;
   let pending: Promise<Feed<T>> | null = null;
@@ -25,7 +29,8 @@ export function cachedFeed<T>(loader: () => Promise<T>, ttl = 5 * 60_000) {
           stale: false,
           error: null,
         };
-        retryAt = Date.now() + ttl;
+        retryAt =
+          Date.now() + (retryPartial?.(data) ? Math.min(ttl, 60_000) : ttl);
       } catch {
         cache = {
           data: cache?.data ?? null,

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   parseMayaHealth,
+  parseMayaNetwork,
+  mayaIndexCurrent,
   parseMayaPool,
   parseSwapSummary,
   parseVolumeHistory,
@@ -29,6 +31,40 @@ const interval = (month: number, volume: string, count = "1") => ({
 });
 
 describe("Maya ZEC activity", () => {
+  it("keeps halted trading separate from available pool status", () => {
+    expect(
+      parseMayaNetwork([
+        { chain: "ZEC", halted: true, chain_trading_paused: false },
+      ]).paused,
+    ).toBe(true);
+    expect(
+      parseMayaNetwork([
+        { chain: "ZEC", halted: false, chain_trading_paused: true },
+      ]).paused,
+    ).toBe(true);
+    expect(
+      parseMayaNetwork([
+        { chain: "ZEC", halted: false, chain_trading_paused: false },
+      ]).paused,
+    ).toBe(false);
+    expect(() => parseMayaNetwork([])).toThrow();
+    expect(() =>
+      parseMayaNetwork([{ chain: "ZEC", halted: "false" }]),
+    ).toThrow();
+  });
+  it("rejects a frozen index even when inSync remains true", () => {
+    const now = Date.UTC(2026, 8, 23);
+    const health = (age: number) => ({
+      inSync: true,
+      indexedAt: new Date(now - age).toISOString(),
+    });
+    expect(mayaIndexCurrent(health(10_000), now)).toBe(true);
+    expect(mayaIndexCurrent(health(301_000), now)).toBe(false);
+    expect(mayaIndexCurrent(health(-61_000), now)).toBe(false);
+    expect(mayaIndexCurrent({ inSync: true, indexedAt: null }, now)).toBe(
+      false,
+    );
+  });
   it("converts historical USD cents once and reconciles all three swap categories", () => {
     const result = parseSwapSummary({ meta: totals })!;
     expect(result.volumeUsd).toBe(273_903_692.18);
