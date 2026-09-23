@@ -12,6 +12,7 @@
  * é ignorado de propósito. Preço de snapshot é único por block height.
  */
 
+import { lte } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import {
   zcgBalanceSnapshots,
@@ -480,8 +481,9 @@ function summarizeBalance(b: BalanceInput): string {
   return parts.join(", ") || "no fields";
 }
 
+type BalanceScope = "zcg_operating" | "lockbox_coinholder" | "overview_reconciliation" | "maya_liquidity";
 type BalanceSpec = {
-  scope: string;
+  scope: BalanceScope;
   gid: string;
   build: (rows: string[][], importedAt: Date) => BalanceInput;
 };
@@ -489,10 +491,10 @@ type BalanceSpec = {
 /**
  * Importa os snapshots de saldo (4 escopos), o budget discricionário (3 linhas)
  * e os aportes Maya. Best-effort por escopo: falha de fetch num escopo não
- * derruba os outros. Insere com onConflictDoNothing (UNIQUE scope+capturedAt e
- * label+capturedAt) — re-rodar com o mesmo block time é idempotente.
+ * derruba os outros. Atualiza saldos revisados mesmo quando a planilha mantém
+ * o mesmo block time. Um filtro limita a importação aos saldos selecionados.
  */
-export async function importSnapshots(): Promise<ScopeResult[]> {
+export async function importSnapshots(balanceScopes?: readonly BalanceScope[]): Promise<ScopeResult[]> {
   const db = getDb();
   const results: ScopeResult[] = [];
 
@@ -534,17 +536,24 @@ export async function importSnapshots(): Promise<ScopeResult[]> {
   ];
 
   for (const spec of balanceSpecs) {
+    if (balanceScopes && !balanceScopes.includes(spec.scope)) continue;
     try {
+      const retrievedAt = new Date();
       const csvText = await fetchSheetCsv(spec.gid);
       const hash = sha256(csvText);
       const rows = parseCsv(csvText);
       const sheetStatus = readSheetStatus(rows);
-      const snapshot = spec.build(rows, new Date());
+      const snapshot = spec.build(rows, retrievedAt);
       await db.transaction(async (tx) => {
         await tx
           .insert(zcgBalanceSnapshots)
           .values(snapshot)
-          .onConflictDoNothing();
+          .onConflictDoUpdate({
+            target: [zcgBalanceSnapshots.scope, zcgBalanceSnapshots.capturedAt],
+            set: snapshot,
+            // An older concurrent fetch must not overwrite a newer reading.
+            setWhere: lte(zcgBalanceSnapshots.importedAt, retrievedAt),
+          });
         await tx
           .insert(zcgSheetImports)
           .values({
@@ -572,6 +581,8 @@ export async function importSnapshots(): Promise<ScopeResult[]> {
       });
     }
   }
+
+  if (balanceScopes) return results;
 
   // Budget discricionário (3 linhas, USD e ZEC separados).
   try {
