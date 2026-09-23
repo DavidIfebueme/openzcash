@@ -12,7 +12,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { MarketDashboard } from "@/lib/markets/sources";
 import {
-  simulateShift,
+  dexMilestone,
   holderIdentity,
   type HolderKind,
   type Venue,
@@ -171,7 +171,6 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
   const [allVenues, setAllVenues] = useState(false);
   const [allTokens, setAllTokens] = useState(false);
-  const [migration, setMigration] = useState(0);
   const refresh = useCallback(async () => {
     if (request.current) return;
     const controller = new AbortController();
@@ -254,7 +253,9 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     (v) => venueFilter === "all" || v.kind === venueFilter,
   );
   const shownRows = allVenues ? rows : rows.slice(0, 8);
-  const simulation = m ? simulateShift(m.cex, m.dex, migration) : null;
+  const milestones = m
+    ? [10, 25, 50].map((target) => dexMilestone(m.cex, m.dex, target))
+    : [];
   const near = data.nearActivity.data,
     maya = data.venues.find((v) => v.id === "maya");
   const chainVolume = (chain: string) => {
@@ -280,9 +281,9 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     {
       name: "NEAR Intents",
       value: near && !data.nearActivity.stale ? near.volumeUsd : null,
-      label: "ZEC activity · 24h",
+      label: "Intent volume · 24h",
       detail: near
-        ? `${usd(near.volume30dUsd)} over 30 days${data.nearActivity.stale ? " · saved" : ""}`
+        ? `${usd(near.volume30dUsd)} / 30d · outside spot total${data.nearActivity.stale ? " · saved" : ""}`
         : "ZEC token feed unavailable",
       href: "#near-detail",
     },
@@ -317,11 +318,11 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Zcash market observatory</p>
+          <p className={styles.eyebrow}>OpenZcash · market intelligence</p>
           <h1>
-            CEX <span>&lt;</span> <em>ZEC</em> <span>&gt;</span> DEX
+            <em>ZEC</em> Observatory
           </h1>
-          <p>Trading activity. Public holdings. One clear view.</p>
+          <p>Markets, supply & public holdings.</p>
         </div>
         <div className={styles.refresh}>
           <button onClick={() => void refresh()} disabled={refreshing}>
@@ -335,7 +336,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         </div>
       </header>
       <nav className={styles.jumpNav} aria-label="On this page">
-        <a href="#volume">The mission</a>
+        <a href="#volume">Spot overview</a>
         <a href="#trading">Markets</a>
         <a href="#crosschain">ZEC across chains</a>
         <a href="#holdings">Holdings & whales</a>
@@ -347,8 +348,8 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           <div className={styles.race}>
             <div className={styles.missionHeading}>
               <div>
-                <p className={styles.eyebrow}>The community mission</p>
-                <h2 id="volume">Make DEX the majority.</h2>
+                <p className={styles.eyebrow}>CEX vs DEX</p>
+                <h2 id="volume">ZEC spot volume</h2>
               </div>
               <span className={styles.pill}>24h · USD</span>
             </div>
@@ -357,7 +358,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               role="img"
               aria-label={
                 m
-                  ? `CEX ${pct(m.cexPct)}; DEX and intents ${pct(m.dexPct)} of observed volume. Bars share the same scale.`
+                  ? `CEX ${pct(m.cexPct)}; DEX ${pct(m.dexPct)} of observed spot volume. Bars share the same scale. Intent routes are separate.`
                   : "Volume comparison unavailable"
               }
             >
@@ -369,7 +370,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   tone: styles.cex,
                 },
                 {
-                  label: "DEX + intents",
+                  label: "DEX",
                   value: m?.dex,
                   percent: m?.dexPct,
                   tone: styles.dex,
@@ -398,7 +399,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 }
               />
               {data.volumeComplete ? "Tracked feeds available" : "Partial data"}{" "}
-              · Observed activity <a href="#methodology">Coverage ↗</a>
+              · Spot execution <a href="#methodology">Coverage ↗</a>
             </p>
           </div>
           <aside className={styles.target}>
@@ -422,55 +423,75 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             </div>
           </aside>
         </div>
-        <details className={styles.simulator}>
+        <details className={styles.milestones}>
           <summary>
-            <span>Explore the crossover</span>
+            <span>Community mission · DEX &gt; CEX</span>
             <span>
-              {m
-                ? `${usd(m.shiftToParity)} shifted from CEX reaches parity`
-                : "Data unavailable"}{" "}
-              <b aria-hidden="true">＋</b>
+              DEX / CEX <strong>{pct(m?.dexCexRatioPct ?? null)}</strong> · 100%
+              at parity <b aria-hidden="true">＋</b>
             </span>
           </summary>
-          <div className={styles.simulatorBody}>
+          <div className={styles.milestoneBody}>
             <p>
-              Move existing CEX activity to DEX. Combined volume stays constant;
-              this is a scenario.
+              Daily DEX volume needed for each milestone, holding today’s CEX
+              volume constant.
             </p>
-            <label htmlFor="migration">
-              CEX volume moved <output>{number(migration, 1)}%</output>
-            </label>
-            <input
-              id="migration"
-              type="range"
-              min="0"
-              max="100"
-              step="0.1"
-              value={migration}
-              disabled={!m}
-              onChange={(e) => setMigration(Number(e.target.value))}
-            />
-            <div className={styles.simResult}>
-              <button
-                disabled={!m}
-                onClick={() =>
-                  setMigration(
-                    m && m.cex > 0
-                      ? Math.min(
-                          100,
-                          Math.ceil((m.shiftToParity / m.cex) * 1000) / 10 +
-                            0.1,
-                        )
-                      : 0,
-                  )
-                }
-              >
-                Find the crossover →
-              </button>
-              <span aria-live="polite">
-                DEX share <strong>{pct(simulation?.dexPct ?? null)}</strong>
-                {simulation?.reached ? " · DEX leads" : ""}
+            {milestones.some(Boolean) ? (
+              <table className={styles.milestoneTable}>
+                <thead>
+                  <tr>
+                    <th scope="col">DEX share</th>
+                    <th scope="col">DEX / day</th>
+                    <th scope="col">Extra / day</th>
+                    <th scope="col">From today</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {milestones.map(
+                    (target) =>
+                      target && (
+                        <tr key={target.targetPct}>
+                          <th scope="row">
+                            {target.targetPct}%{" "}
+                            {target.targetPct === 50 && <small>Parity</small>}
+                          </th>
+                          <td title={`$${number(target.requiredDex)}`}>
+                            {usd(target.requiredDex)}
+                          </td>
+                          <td>
+                            {target.achieved
+                              ? "—"
+                              : `+${usd(target.additionalDex)}`}
+                          </td>
+                          <td>
+                            {target.achieved ? (
+                              <span className={styles.successPill}>
+                                Reached
+                              </span>
+                            ) : target.multiple === null ? (
+                              "From zero"
+                            ) : (
+                              `${number(target.multiple, 1)}×`
+                            )}
+                          </td>
+                        </tr>
+                      ),
+                  )}
+                </tbody>
+              </table>
+            ) : (
+              <p>
+                {m?.cex === 0
+                  ? "DEX already leads the observed spot market."
+                  : "Both spot volume feeds are needed to calculate milestones."}
+              </p>
+            )}
+            <div className={styles.milestoneFoot}>
+              <span>
+                <strong>50% share = 100% DEX/CEX.</strong> DEX leads above this
+                point.
               </span>
+              <a href="#methodology">How it’s calculated ↗</a>
             </div>
           </div>
         </details>
@@ -577,8 +598,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           </button>
         )}
         <p className={styles.panelFoot}>
-          Spot and intent activity; routed swaps can overlap across protocols.
-          Futures excluded.
+          Spot execution only. NEAR Intents activity is shown separately below.
         </p>
       </section>
 
@@ -589,10 +609,15 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <strong>NEAR Intents · public & confidential</strong>
           </span>
           <span>
-            See ZEC activity <b aria-hidden="true">＋</b>
+            {near ? `${usd(near.volumeUsd)} / 24h` : "ZEC activity"}{" "}
+            <b aria-hidden="true">＋</b>
           </span>
         </summary>
         <div className={styles.nearBody}>
+          <p className={styles.routingNote}>
+            Intent routes · outside the spot total. The underlying trades may
+            already appear in DEX volume.
+          </p>
           <div className={styles.miniStats}>
             {[
               { label: "ZEC · 24 hours", value: near?.volumeUsd },
@@ -1088,22 +1113,41 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 Direct feeds replace the same aggregator venues.
               </p>
               <p>
-                DEX includes verified ZEC tokens, native Maya swaps, Unit UZEC
-                spot and NEAR Intents activity. Pools are deduplicated by
-                network and address, including pools containing two ZEC tokens.
-                Solana is checked against DEX Screener and up to three pages per
-                token on GeckoTerminal.
+                DEX includes verified ZEC tokens, native Maya swaps and Unit
+                UZEC spot. Pools are deduplicated by network and address,
+                including pools containing two ZEC tokens. Solana is checked
+                against DEX Screener and up to three pages per token on
+                GeckoTerminal.
               </p>
               <p>
-                Intents can route through DEXs. Cross-protocol execution cannot
-                be fully reconciled, so these percentages describe observed
-                gross activity, not unique global trades or audited market
-                share. Provider windows can differ.
+                NEAR Intents is a separate routing layer. Its ZEC volume stays
+                visible without being added to the DEX venues that may execute
+                those trades. These are reported volumes; provider windows and
+                pool coverage can differ.
               </p>
-              {data.rheaContext && (
+              <h3>Share, ratio & milestones</h3>
+              <p>
+                DEX share is DEX ÷ (CEX + DEX); the DEX/CEX ratio is DEX ÷ CEX.
+                At parity they read 50% and 100%, respectively. For target share
+                q, required DEX volume is CEX × q ÷ (1 − q), with CEX held
+                constant. These are volume targets, not forecasts.
+              </p>
+              <p>
+                Definitions:{" "}
+                <Out href="https://defillama.com/dexs">DefiLlama share</Out>
+                {" · "}
+                <Out href="https://www.theblock.co/data/decentralized-finance/dex-non-custodial/dex-to-cex-spot-trade-volume">
+                  The Block ratio
+                </Out>
+                . This view uses rolling 24h observations; The Block’s chart
+                uses monthly totals.
+              </p>
+              {data.rheaActivity.data && (
                 <p>
-                  Rhea’s {usd(data.rheaContext.volumeUsd)} / 24h remains outside
-                  the headline because NEAR routing overlap is unresolved.
+                  Rhea’s ZEC pool is counted as DEX execution on NEAR.
+                  {data.rheaActivity.stale
+                    ? " Its saved reading is excluded from current totals."
+                    : " The same venue is not added again from an aggregator feed."}
                 </p>
               )}
               <h3>Token registry</h3>

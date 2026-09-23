@@ -5,13 +5,13 @@ export default function Loading() {
     <div
       className={styles.page}
       aria-busy="true"
-      aria-label="Loading Zcash markets"
+      aria-label="Loading ZEC Observatory"
     >
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Zcash market observatory</p>
+          <p className={styles.eyebrow}>OpenZcash · market intelligence</p>
           <h1>
-            CEX &lt; <em>ZEC</em> &gt; DEX
+            <em>ZEC</em> Observatory
           </h1>
           <p role="status">Checking trading activity and on-chain supply…</p>
         </div>

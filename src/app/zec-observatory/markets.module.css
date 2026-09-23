@@ -316,10 +316,10 @@
   display: inline;
   font-size: 13px;
 }
-.simulator {
+.milestones {
   border-top: 1px solid var(--line);
 }
-.simulator > summary {
+.milestones > summary {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -327,54 +327,89 @@
   padding: 13px 24px;
   font-size: 14px;
 }
-.simulator > summary > span:first-child {
+.milestones > summary > span:first-child {
   font-weight: 600;
 }
-.simulator > summary > span:last-child {
+.milestones > summary > span:last-child {
   font-size: 13px;
   color: var(--muted);
 }
-.simulator b,
+.milestones b,
 .nearDetails b,
 .sourceDetails b {
   font-weight: 400;
   margin-left: 14px;
 }
-.simulatorBody {
+.milestoneBody {
   padding: 4px 24px 22px;
-  max-width: 800px;
 }
-.simulatorBody p {
+.milestoneBody p {
   color: var(--muted);
   font-size: 14px;
   margin-bottom: 18px;
 }
-.simulatorBody label {
-  display: flex;
-  justify-content: space-between;
-  font-size: 14px;
-  font-weight: 600;
-}
-.simulatorBody input {
+.page .milestoneTable {
   width: 100%;
-  accent-color: var(--dex);
-  margin: 14px 0;
+  border-collapse: collapse;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
 }
-.simResult {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  font-size: 14px;
+.milestoneTable th,
+.milestoneTable td {
+  padding: 12px 14px;
+  text-align: right;
+  border-bottom: 1px solid var(--line);
 }
-.simResult button {
-  background: none;
-  border: 0;
-  padding: 0;
-  color: var(--dex);
+.milestoneTable th:first-child {
+  text-align: left;
+}
+.milestoneTable thead th {
+  color: var(--muted);
+  background: var(--soft);
+  font-size: 12px;
+  font-weight: 550;
+  letter-spacing: 0;
+}
+.milestoneTable tbody th,
+.milestoneTable tbody td {
   font-weight: 600;
 }
-.simResult strong {
-  font-size: 20px;
+.milestoneTable tbody th {
+  color: var(--ink);
+  background: transparent;
+  font-size: inherit;
+  letter-spacing: 0;
+}
+.milestoneTable tbody tr:last-child {
+  background: var(--soft);
+}
+.milestoneTable small {
+  display: block;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--dex);
+}
+.milestoneFoot {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.milestoneFoot a {
+  color: var(--dex);
+}
+.milestones > summary strong {
+  color: var(--dex);
+  margin-left: 4px;
+  font-size: 15px;
+}
+.routingNote {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
 }
 .featureGrid {
   display: grid;
@@ -1190,20 +1225,17 @@
   .gap > span {
     font-size: 12px;
   }
-  .simulator > summary {
+  .milestones > summary {
     padding: 12px 20px;
     align-items: flex-start;
   }
-  .simulator > summary > span:last-child {
+  .milestones > summary > span:last-child {
     max-width: 52%;
     text-align: right;
     font-size: 12px;
   }
-  .simulatorBody {
+  .milestoneBody {
     padding-inline: 20px;
-  }
-  .simResult {
-    flex-wrap: wrap;
   }
   .featureGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1623,4 +1655,32 @@
 }
 .legacyContract p {
   margin-top: 11px;
+}
+
+@media (max-width: 560px) {
+  .milestones > summary {
+    flex-wrap: wrap;
+  }
+  .milestones > summary > span:last-child {
+    max-width: none;
+  }
+  .page .milestoneTable {
+    font-size: 13px;
+  }
+  .milestoneTable th,
+  .milestoneTable td {
+    padding: 12px 4px;
+    font-size: 13px;
+  }
+  .milestoneTable thead th {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .milestoneTable .successPill {
+    padding: 3px;
+    font-size: 12px;
+  }
+  .milestoneBody p {
+    font-size: 13px;
+  }
 }

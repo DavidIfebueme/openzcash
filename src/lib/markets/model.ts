@@ -14,6 +14,7 @@ export type Venue = {
   id: string;
   name: string;
   kind: "cex" | "dex";
+  role?: "execution" | "routing";
   volumeUsd: number;
   pairs: number;
   asOf: string;
@@ -182,17 +183,43 @@ export function comparison(cex: number | null, dex: number | null) {
     dexPct: (dex / total) * 100,
     cexPct: (cex / total) * 100,
     gap,
-    shiftToParity: gap / 2,
     multiplier: dex > 0 ? cex / dex : null,
-    progress: cex > 0 ? Math.min(100, (dex / cex) * 100) : 100,
+    dexCexRatioPct: cex > 0 ? (dex / cex) * 100 : null,
+    growthRequiredPct: dex > 0 ? (gap / dex) * 100 : null,
     reached: dex > cex,
     tied: dex === cex,
   };
 }
 
-export function simulateShift(cex: number, dex: number, pct: number) {
-  const shifted = (cex * Math.max(0, Math.min(100, pct))) / 100;
-  return comparison(cex - shifted, dex + shifted)!;
+/** Spot execution and routed activity are different accounting layers. */
+export function spotBenchmark(tracked: Venue[]) {
+  const venues = tracked.filter((v) => v.role !== "routing");
+  const total = (kind: Venue["kind"]) => {
+    const rows = venues.filter((v) => v.kind === kind);
+    return rows.length ? rows.reduce((sum, v) => sum + v.volumeUsd, 0) : null;
+  };
+  return { venues, metrics: comparison(total("cex"), total("dex")) };
+}
+
+/** Required DEX activity at a given share, with observed CEX volume held fixed. */
+export function dexMilestone(cex: number, dex: number, targetPct: number) {
+  const current = comparison(cex, dex);
+  if (
+    !current ||
+    cex === 0 ||
+    !Number.isFinite(targetPct) ||
+    targetPct <= 0 ||
+    targetPct >= 100
+  )
+    return null;
+  const requiredDex = cex * (targetPct / (100 - targetPct));
+  return {
+    targetPct,
+    requiredDex,
+    additionalDex: Math.max(0, requiredDex - dex),
+    multiple: dex > 0 ? requiredDex / dex : null,
+    achieved: current.dexPct >= targetPct,
+  };
 }
 
 export type Supply = {

@@ -14,7 +14,9 @@ import {
   parseNearExplorer,
   parseNearConfidential,
   parseSupply,
-  simulateShift,
+  dexMilestone,
+  spotBenchmark,
+  type Venue,
   type AddressBalance,
 } from "./model";
 
@@ -40,23 +42,29 @@ const renderData = (data: unknown) =>
   `<script>self.__next_f.push([1,${JSON.stringify(`1:${JSON.stringify(data)}`)}])</script>`;
 
 describe("fair volume comparison", () => {
-  it("uses one denominator and distinguishes new activity from migration", () => {
+  it("distinguishes share of total from the DEX/CEX ratio, without clamping ratios above 100%", () => {
     const m = comparison(900, 100)!;
     expect(m).toMatchObject({
       cexPct: 90,
       dexPct: 10,
       gap: 800,
-      shiftToParity: 400,
       multiplier: 9,
+      growthRequiredPct: 800,
       reached: false,
     });
-    expect(simulateShift(900, 100, 50)).toMatchObject({
-      cex: 450,
-      dex: 550,
-      total: 1000,
-      reached: true,
+    expect(m.dexCexRatioPct).toBeCloseTo(11.111111);
+    expect(comparison(500, 500)).toMatchObject({
+      tied: true,
+      reached: false,
+      dexPct: 50,
+      dexCexRatioPct: 100,
     });
-    expect(comparison(500, 500)).toMatchObject({ tied: true, reached: false });
+    expect(comparison(400, 600)).toMatchObject({
+      dexPct: 60,
+      dexCexRatioPct: 150,
+      reached: true,
+      growthRequiredPct: 0,
+    });
   });
   it("does not turn a missing side into zero or invent an infinite growth number", () => {
     expect(comparison(null, 100)).toBeNull();
@@ -66,8 +74,75 @@ describe("fair volume comparison", () => {
       multiplier: null,
       gap: 900,
     });
-    expect(comparison(0, 100)).toMatchObject({ dexPct: 100, reached: true });
+    expect(comparison(0, 100)).toMatchObject({
+      dexPct: 100,
+      reached: true,
+      dexCexRatioPct: null,
+    });
     expect(comparison(NaN, 1)).toBeNull();
+  });
+  it("recalculates the total as DEX grows to a milestone while CEX stays fixed", () => {
+    // A 25% share at CEX=900 needs DEX=300, not 25% of the old 1,000 total.
+    expect(dexMilestone(900, 100, 25)).toEqual({
+      targetPct: 25,
+      requiredDex: 300,
+      additionalDex: 200,
+      multiple: 3,
+      achieved: false,
+    });
+    const parity = dexMilestone(900, 100, 50)!;
+    expect(parity.requiredDex).toBe(900);
+    expect(parity.additionalDex).toBe(800);
+    expect(comparison(900, parity.requiredDex)).toMatchObject({
+      dexPct: 50,
+      tied: true,
+      reached: false,
+    });
+    expect(dexMilestone(900, 900, 50)?.achieved).toBe(true);
+    expect(dexMilestone(900, 400, 25)).toMatchObject({
+      additionalDex: 0,
+      achieved: true,
+    });
+  });
+  it("keeps milestones unavailable for invalid targets and represents a zero DEX baseline honestly", () => {
+    for (const target of [0, 100, -1, Infinity, NaN])
+      expect(dexMilestone(900, 100, target)).toBeNull();
+    expect(dexMilestone(0, 100, 50)).toBeNull();
+    expect(dexMilestone(-10, 100, 50)).toBeNull();
+    expect(dexMilestone(900, 0, 50)).toMatchObject({
+      requiredDex: 900,
+      additionalDex: 900,
+      multiple: null,
+      achieved: false,
+    });
+  });
+  it("excludes routed activity from spot execution totals and does not fill a missing DEX side with intents", () => {
+    const venue: Venue = {
+      id: "cex",
+      name: "Exchange",
+      kind: "cex",
+      volumeUsd: 900,
+      pairs: 1,
+      asOf: new Date(now).toISOString(),
+      source: "https://example.com",
+      note: "",
+    };
+    const dex: Venue = { ...venue, id: "dex", kind: "dex", volumeUsd: 100 };
+    const intent: Venue = {
+      ...dex,
+      id: "near-intents",
+      role: "routing",
+      volumeUsd: 2000,
+    };
+    const result = spotBenchmark([venue, dex, intent]);
+    expect(result.venues.map((v) => v.id)).toEqual(["cex", "dex"]);
+    expect(result.metrics).toMatchObject({
+      cex: 900,
+      dex: 100,
+      total: 1000,
+      dexPct: 10,
+    });
+    expect(spotBenchmark([venue, intent]).metrics).toBeNull();
   });
   it("keeps every valid market and independently excludes derivatives, stale rows, outliers and duplicates", () => {
     const rows = [

@@ -47,7 +47,10 @@ const nextConfig: NextConfig = {
   // The home is the ZCG overview. A server redirect answers before any
   // rendering (the page-level redirect would stream behind loading.tsx).
   async redirects() {
-    return [{ source: "/", destination: "/zcg", permanent: false }];
+    return [
+      { source: "/", destination: "/zcg", permanent: false },
+      { source: "/cex-zec-dex", destination: "/zec-observatory", permanent: true },
+    ];
   },
   async headers() {
     return [

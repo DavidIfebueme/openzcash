@@ -43,6 +43,7 @@ const ICON_BY_KEY: Record<string, IconType> = {
   balance: IconBalance,
   wallet: IconWallet,
   swap: IconSwap,
+  chart: IconChart,
   terminal: IconTerminal,
   globe: IconGlobe,
   sigma: IconSigma,

@@ -18,7 +18,7 @@ import {
   geckoPoolsUrl,
 } from "./wrapped";
 import {
-  comparison,
+  spotBenchmark,
   groupHolders,
   parseCustodyRegistry,
   parseAddressDetail,
@@ -146,6 +146,7 @@ const near = cachedFeed(async () => {
     id: "near-intents",
     name: "NEAR Intents",
     kind: "dex" as const,
+    role: "routing" as const,
     volumeUsd: n.volumeUsd,
     pairs: 0,
     asOf: n.asOf,
@@ -369,7 +370,16 @@ const rhea = cachedFeed(async () => {
       }),
     })
     .parse(raw);
-  return { volumeUsd: p.data.attributes.volume_usd.h24 };
+  return {
+    id: "rhea-finance",
+    name: "Rhea Finance · NEAR",
+    kind: "dex" as const,
+    volumeUsd: p.data.attributes.volume_usd.h24,
+    pairs: 1,
+    asOf: iso(),
+    source: "https://www.geckoterminal.com/near/pools/refv1-6065",
+    note: "ZEC omft pool execution on NEAR. Exact pool and token identity verified; routed NEAR Intents volume is not added.",
+  };
 });
 const cypherpunk = cachedFeed(
   async () => parseCypherpunk(await html("https://www.cypherpunk.com/")),
@@ -470,29 +480,24 @@ export async function getMarketDashboard() {
   ]);
   // A failed or stale volume source stays visible in coverage but cannot
   // silently enter a rolling-day comparison alongside fresh numbers.
-  const venues = m.data && !m.stale ? [...m.data.venues] : [];
+  const tracked = m.data && !m.stale ? [...m.data.venues] : [];
   for (const feed of [n, hy])
-    if (feed.data && !feed.stale) venues.push(feed.data);
-  if (ma.data && !ma.stale) venues.push(ma.data.venue);
-  if (th.data?.venue && !th.stale) venues.push(th.data.venue);
+    if (feed.data && !feed.stale) tracked.push(feed.data);
+  if (ma.data && !ma.stale) tracked.push(ma.data.venue);
+  if (th.data?.venue && !th.stale) tracked.push(th.data.venue);
+  if (rh.data && !rh.stale) tracked.push(rh.data);
   const wrappedMarkets = aggregateWrappedPools(
     wrapped.flatMap(({ feed }) => (feed.data && !feed.stale ? feed.data : [])),
   );
-  venues.push(...wrappedMarkets.venues);
+  tracked.push(...wrappedMarkets.venues);
+  const { venues, metrics } = spotBenchmark(tracked);
   venues.sort((a, b) => b.volumeUsd - a.volumeUsd);
-  const cex = venues.filter((v) => v.kind === "cex");
-  const dex = venues.filter((v) => v.kind === "dex");
-  const total = (vs: Venue[]) => vs.reduce((a, v) => a + v.volumeUsd, 0);
-  const metrics = comparison(
-    cex.length ? total(cex) : null,
-    dex.length ? total(dex) : null,
-  );
   const volumeComplete = ![
     m,
-    n,
     hy,
     ma,
     th,
+    rh,
     ...wrapped.map((u) => u.feed),
   ].some((f) => f.stale || !f.data);
   const sourceStatuses: SourceStatus[] = [
@@ -508,12 +513,15 @@ export async function getMarketDashboard() {
       m,
       "All returned ZEC markets examined; classification from the exchange registry.",
     ),
-    status(
-      "NEAR Intents",
-      NEAR_VOLUME,
-      n,
-      "ZEC token activity, once per explorer total. Includes cross-chain intents.",
-    ),
+    {
+      ...status(
+        "NEAR Intents",
+        NEAR_VOLUME,
+        n,
+        "ZEC routed activity, shown separately from spot execution to avoid counting routes and underlying markets together.",
+      ),
+      ...(n.data && !n.stale ? { status: "context" as const } : {}),
+    },
     status(
       "Kamino ZEC deposits",
       "https://api.kamino.finance/markets/collateral-reserves",
@@ -572,15 +580,12 @@ export async function getMarketDashboard() {
         ? { status: "not-listed" as const }
         : {}),
     },
-    {
-      ...status(
-        "Rhea Finance",
-        "https://www.geckoterminal.com/near/pools/refv1-6065",
-        rh,
-        "Shown for context; excluded from headline to avoid possible overlap with NEAR routing.",
-      ),
-      ...(rh.data && !rh.stale ? { status: "context" as const } : {}),
-    },
+    status(
+      "Rhea Finance",
+      "https://www.geckoterminal.com/near/pools/refv1-6065",
+      rh,
+      "Direct ZEC pool execution on NEAR; counted once in spot volume. NEAR Intents routing is a separate layer.",
+    ),
     status(
       "CipherScan supply",
       `${CIPHER}/api/blockchain-info`,
@@ -664,7 +669,7 @@ export async function getMarketDashboard() {
     holdingsConsistent,
     disclosures,
     sources: sourceStatuses,
-    rheaContext: rh.data,
+    rheaActivity: rh,
     mayaPoolZec: ma.data?.zec ?? null,
     thorPoolZec: th.data?.zec ?? null,
   };
