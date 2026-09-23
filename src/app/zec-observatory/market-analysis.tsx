@@ -10,6 +10,13 @@ import {
 } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  IconChart,
+  IconGlobe,
+  IconSwap,
+  IconTrend,
+  IconWallet,
+} from "@/components/icons";
 import type { MarketDashboard } from "@/lib/markets/sources";
 import {
   dexMilestone,
@@ -45,6 +52,13 @@ function stamp(s: string | null, dayOnly = false) {
 }
 const width = (n: number) =>
   ({ "--fill": `${Math.max(0, Math.min(100, n))}%` }) as CSSProperties;
+const sections = [
+  { id: "volume", label: "Overview", Icon: IconChart },
+  { id: "trading", label: "Markets", Icon: IconSwap },
+  { id: "crosschain", label: "Cross-chain", Icon: IconGlobe },
+  { id: "holdings", label: "Holdings", Icon: IconWallet },
+  { id: "funds", label: "Funds", Icon: IconTrend },
+];
 const kinds: Record<HolderKind, string> = {
   cex: "Exchange / custody",
   dex: "DEX / bridge",
@@ -171,6 +185,34 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
   const [allVenues, setAllVenues] = useState(false);
   const [allTokens, setAllTokens] = useState(false);
+  const [activeSection, setActiveSection] = useState("volume");
+  const navigation = useRef<HTMLElement>(null);
+  useEffect(() => {
+    let frame = 0;
+    const updateSection = () => {
+      frame = 0;
+      const boundary =
+        (navigation.current?.getBoundingClientRect().bottom ?? 100) + 36;
+      let current = sections[0].id;
+      for (const section of sections) {
+        const heading = document.getElementById(section.id);
+        if (heading && heading.getBoundingClientRect().top <= boundary)
+          current = section.id;
+      }
+      setActiveSection(current);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(updateSection);
+    };
+    updateSection();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
   const refresh = useCallback(async () => {
     if (request.current) return;
     const controller = new AbortController();
@@ -317,30 +359,59 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>OpenZcash · market intelligence</p>
-          <h1>
-            <em>ZEC</em> Observatory
-          </h1>
-          <p>Markets, supply & public holdings.</p>
-        </div>
+        <h1>
+          <em>ZEC</em> Observatory
+        </h1>
         <div className={styles.refresh}>
-          <button onClick={() => void refresh()} disabled={refreshing}>
-            ↻ {refreshing ? "Updating…" : "Refresh"}
+          <button
+            type="button"
+            onClick={() => void refresh()}
+            disabled={refreshing}
+            aria-label={
+              refreshing ? "Updating market data" : "Refresh market data"
+            }
+            aria-busy={refreshing}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+              className={refreshing ? styles.spinning : undefined}
+            >
+              <path d="M20 7v5h-5M4 17v-5h5" />
+              <path d="M6.1 7a7 7 0 0 1 11.7-1L20 9M4 15l2.2 3A7 7 0 0 0 17.9 17" />
+            </svg>
+            <span>{refreshing ? "Updating…" : "Refresh"}</span>
           </button>
-          <span role="status">
-            {refreshFailed
-              ? "Refresh failed · previous snapshot"
-              : "Auto-refresh · 5 min"}
+          <span
+            className={styles.refreshStatus}
+            role="status"
+            data-error={refreshFailed || undefined}
+          >
+            <i aria-hidden="true" />
+            {refreshFailed ? "Refresh failed · saved data" : "Auto · 5 min"}
           </span>
         </div>
       </header>
-      <nav className={styles.jumpNav} aria-label="On this page">
-        <a href="#volume">Spot overview</a>
-        <a href="#trading">Markets</a>
-        <a href="#crosschain">ZEC across chains</a>
-        <a href="#holdings">Holdings & whales</a>
-        <a href="#funds">Funds</a>
+      <nav
+        ref={navigation}
+        className={styles.jumpNav}
+        aria-label="On this page"
+      >
+        {sections.map(({ id, label, Icon }) => (
+          <a
+            key={id}
+            href={`#${id}`}
+            aria-current={activeSection === id ? "location" : undefined}
+          >
+            <Icon />
+            <span>{label}</span>
+          </a>
+        ))}
       </nav>
 
       <section className={styles.mission} aria-labelledby="volume">

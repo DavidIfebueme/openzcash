@@ -8,13 +8,9 @@ export default function Loading() {
       aria-label="Loading ZEC Observatory"
     >
       <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>OpenZcash · market intelligence</p>
-          <h1>
-            <em>ZEC</em> Observatory
-          </h1>
-          <p role="status">Checking trading activity and on-chain supply…</p>
-        </div>
+        <h1>
+          <em>ZEC</em> Observatory
+        </h1>
       </header>
       <div className={styles.loadingPanel} aria-hidden="true">
         <div className={styles.loadingTitle} />
