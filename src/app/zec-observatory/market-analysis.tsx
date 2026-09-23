@@ -199,8 +199,13 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         cache: "no-store",
       });
       if (!r.ok) throw Error();
-      setData(await r.json());
-      setRefreshFailed(false);
+      const next: MarketDashboard = await r.json();
+      setData((current) =>
+        Date.parse(next.snapshot.updatedAt) >= Date.parse(current.snapshot.updatedAt)
+          ? next
+          : current,
+      );
+      setRefreshFailed(next.snapshot.refreshFailed);
     } catch {
       setRefreshFailed(true);
     } finally {
@@ -210,14 +215,26 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     }
   }, []);
   useEffect(() => {
-    const timer = setInterval(() => {
+    const due = Date.parse(data.snapshot.refreshAfter);
+    // A page can immediately render the last snapshot while its replacement
+    // is collecting. Join that collection without hiding the existing values.
+    const delay = data.snapshot.refreshing
+      ? 1_000
+      : Math.max(5_000, Math.min(5 * 60_000, due - Date.now()));
+    const update = () => {
       if (document.visibilityState === "visible") void refresh();
-    }, 5 * 60_000);
-    return () => {
-      clearInterval(timer);
-      request.current?.abort();
     };
-  }, [refresh]);
+    const timer = setTimeout(update, delay);
+    const onVisible = () => {
+      if (Date.now() >= due || data.snapshot.refreshing) update();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [data.snapshot, refresh]);
+  useEffect(() => () => request.current?.abort(), []);
   const m = data.metrics,
     supply = data.supply.data;
   const holders = data.holdings.data?.holders ?? [];
@@ -364,10 +381,18 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           <span
             className={styles.refreshStatus}
             role="status"
-            data-error={refreshFailed || undefined}
+            data-error={refreshFailed || data.snapshot.refreshFailed || undefined}
           >
             <i aria-hidden="true" />
-            {refreshFailed ? "Refresh failed · saved data" : "Auto · 5 min"}
+            {refreshFailed || data.snapshot.refreshFailed
+              ? "Saved snapshot"
+              : refreshing || data.snapshot.refreshing
+                ? "Updating"
+                : data.snapshot.stale ? "Saved snapshot" : "Updated"}
+            {" · "}
+            <time dateTime={data.snapshot.updatedAt} title={stamp(data.snapshot.updatedAt)}>
+              {new Date(data.snapshot.updatedAt).toISOString().slice(11, 19)} UTC
+            </time>
           </span>
         </div>
       </header>

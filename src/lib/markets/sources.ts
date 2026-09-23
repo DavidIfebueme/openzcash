@@ -466,7 +466,7 @@ function status<T>(
   };
 }
 
-export async function getMarketDashboard() {
+async function collectMarketDashboard() {
   const [
     m,
     s,
@@ -718,4 +718,47 @@ export async function getMarketDashboard() {
     thorPoolZec: th.data?.zec ?? null,
   };
 }
+const dashboardSnapshot = cachedFeed(
+  collectMarketDashboard,
+  5 * 60_000,
+  (data) =>
+    data.sources.some(
+      (source) =>
+        (source.status === "unavailable" || source.status === "saved") &&
+        source.name !== "Grayscale",
+    ) || data.wrapped.some((w) => (w.feed.data?.failedSources ?? 0) > 0),
+  { key: "zec-observatory:dashboard:v1", staleWhileRevalidate: true },
+);
+
+/** One atomic, dated snapshot for server rendering and the refresh endpoint. */
+export async function getMarketDashboard(options?: { waitForRefresh?: boolean }) {
+  const feed = await dashboardSnapshot(options);
+  if (!feed.data) throw new Error("Market snapshot unavailable");
+  return {
+    ...feed.data,
+    snapshot: {
+      updatedAt: feed.fetchedAt!,
+      refreshing: feed.refreshing === true,
+      stale: feed.stale,
+      refreshFailed: feed.error !== null,
+      refreshAfter: feed.refreshAfter!,
+    },
+  };
+}
+
 export type MarketDashboard = Awaited<ReturnType<typeof getMarketDashboard>>;
+
+const snapshotProcess = globalThis as typeof globalThis & {
+  __openZcashMarketWarmTimer?: ReturnType<typeof setInterval>;
+};
+
+/** Railway is always on: warm once at boot and renew due feeds off the request path. */
+export function startMarketSnapshots() {
+  if (snapshotProcess.__openZcashMarketWarmTimer) return;
+  const warm = () => {
+    void getMarketDashboard({ waitForRefresh: true }).catch(() => {});
+  };
+  warm();
+  snapshotProcess.__openZcashMarketWarmTimer = setInterval(warm, 60_000);
+  snapshotProcess.__openZcashMarketWarmTimer.unref();
+}

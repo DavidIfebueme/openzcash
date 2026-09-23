@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { register } from "./instrumentation";
 
 const jobs = vi.hoisted(() => ({
+  startMarketSnapshots: vi.fn(),
   refreshZcg: vi.fn(async () => ({
     ok: true,
     ms: 1,
@@ -15,6 +16,7 @@ const jobs = vi.hoisted(() => ({
   warmIssueAmounts: vi.fn(async () => ({ ok: true, fetched: 0 })),
   warmDiligence: vi.fn(async () => ({ ok: true, proposals: 0 })),
 }));
+vi.mock("@/lib/markets/sources", () => ({ startMarketSnapshots: jobs.startMarketSnapshots }));
 vi.mock("@/lib/zcg/refresh", () => ({ refreshZcg: jobs.refreshZcg }));
 vi.mock("@/lib/zechub/import-treasury", () => ({
   importZechubTreasury: jobs.importZechubTreasury,
@@ -46,6 +48,7 @@ describe("server data collection scheduling", () => {
     vi.stubEnv("DISABLE_AUTO_REFRESH", "true");
     await register();
     // The cycle still runs, but nothing that writes to the database does.
+    expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(vi.getTimerCount()).toBe(2);
     await vi.advanceTimersByTimeAsync(30_000);
     expect(jobs.refreshZcg).not.toHaveBeenCalled();
@@ -59,6 +62,7 @@ describe("server data collection scheduling", () => {
   it("retains startup and recurring collection when enabled", async () => {
     vi.stubEnv("DISABLE_AUTO_REFRESH", undefined);
     await register();
+    expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(vi.getTimerCount()).toBe(2);
     await vi.advanceTimersByTimeAsync(30_000);
     expect(jobs.refreshZcg).toHaveBeenCalledTimes(1);
@@ -70,6 +74,7 @@ describe("server data collection scheduling", () => {
   it("does nothing outside the production Node runtime", async () => {
     vi.stubEnv("NODE_ENV", "test");
     await register();
+    expect(jobs.startMarketSnapshots).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
   });
 });

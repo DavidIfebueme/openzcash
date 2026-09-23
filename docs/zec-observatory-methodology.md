@@ -82,3 +82,9 @@ The default view keeps the two mission bars, NEAR/Maya/Solana/Base highlights, a
 ## Pool liquidity
 
 The expanded DEX rows display the sum of reported pool reserves in USD across unique pools (DEX Screener `liquidity.usd`; GeckoTerminal `reserve_in_usd`). This values both assets, including wrapped ZEC and the other asset. It is not ZEC-only holdings, 24-hour volume, circulating supply, CMC’s CEX liquidity score, or guaranteed executable depth; concentrated liquidity can be outside the current trading range. Missing pool liquidity makes the venue liquidity unavailable instead of adding fabricated zeros. Uniswap and PancakeSwap versions are grouped by protocol and network after exact pool deduplication.
+
+## Snapshot consistency and refresh
+
+The server-rendered page, `/api/markets` and startup collector share one versioned, process-wide dashboard reader. A collection publishes atomically, and `generatedAt` identifies that collection rather than the time of each HTTP request. The header shows the published snapshot time in UTC. A full reload therefore cannot independently return a different cached source set from the refresh button.
+
+The single-instance Railway service warms public market data at startup and checks for due work every minute. Normal snapshots refresh after five minutes; failed volume sources retry after a bounded delay. Page navigation serves the dated snapshot immediately during collection; the refresh endpoint joins that same collection. Source-level timestamps, partial coverage and unavailable fields remain explicit. A provider failure can change observed coverage and the next percentage; it is not evidence that trading activity itself fell. No older source value is silently reclassified as fresh. Cold startup still needs one initial collection. Multiple server instances would require a shared external snapshot store.

@@ -11,6 +11,11 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
   if (process.env.NODE_ENV !== "production") return;
+  // Public read-only market snapshots are shared with both page and API bundles.
+  // Start collection off the request path so visitors do not each wait on providers.
+  const { startMarketSnapshots } = await import("@/lib/markets/sources");
+  startMarketSnapshots();
+
   // DISABLE_AUTO_REFRESH freezes the accounting snapshot: no spreadsheet
   // import, no treasury mirror and no published verdicts. The diligence
   // signals are an in-memory cache built from public GitHub/forum data, so
