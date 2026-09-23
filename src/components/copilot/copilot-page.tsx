@@ -34,29 +34,31 @@ export function CopilotPage({
       <PageHeader title={title} subtitle={subtitle} />
       <p className="ws-copilot-intro">{intro}</p>
       <CopilotSetup profile={profile} brief={<ResearchBrief profile={profile} />} />
-      <section className="ws-copilot-block">
-        <h2>Ask things like</h2>
-        <ul className="ws-copilot-examples">
-          {examples.map((u) => (
-            <li key={u.q}>
-              <p className="ws-copilot-q">{u.q}</p>
-              <p className="ws-copilot-a">{u.a}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-      <section className="ws-copilot-block">
-        <h2>Grounded in public sources</h2>
-        <ul className="ws-copilot-sources">
-          {sources.map((s) => (
-            <li key={s.name}>
-              <strong>{s.name}</strong>
-              <span>{s.desc}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="ws-copilot-note">{note}</p>
-      </section>
+      <div className="ws-copilot-resources">
+        <details>
+          <summary>More examples</summary>
+          <ul className="ws-copilot-examples">
+            {examples.map((u) => (
+              <li key={u.q}>
+                <p className="ws-copilot-q">{u.q}</p>
+                <p className="ws-copilot-a">{u.a}</p>
+              </li>
+            ))}
+          </ul>
+        </details>
+        <details>
+          <summary>Sources & methodology</summary>
+          <ul className="ws-copilot-sources">
+            {sources.map((s) => (
+              <li key={s.name}>
+                <strong>{s.name}</strong>
+                <span>{s.desc}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="ws-copilot-note">{note}</p>
+        </details>
+      </div>
     </div>
   );
 }

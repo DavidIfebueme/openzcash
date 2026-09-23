@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { CopyResearchPrompt } from "./copy-prompt";
 import { AddToAgent } from "./add-to-agent";
@@ -16,8 +16,15 @@ const LEVELS = [
 
 export function CopilotSetup({ profile, brief }: { profile: CopilotProfile; brief: ReactNode }) {
   const [level, setLevel] = useState(0);
+  const [assistantId, setAssistantId] = useState("chatgpt");
+  const quickStartRef = useRef<HTMLDivElement>(null);
   const [copyStatus, setCopyStatus] = useState<"idle" | "loading" | "copied" | "failed">("idle");
   const guide = `${profile.path}/instructions`;
+  function startWithAssistant(id: string) {
+    setAssistantId(id);
+    setLevel(0);
+    requestAnimationFrame(() => quickStartRef.current?.querySelector<HTMLInputElement>("input:checked")?.focus());
+  }
   async function copyInstructions() {
     setCopyStatus("loading");
     try {
@@ -43,8 +50,8 @@ export function CopilotSetup({ profile, brief }: { profile: CopilotProfile; brie
       </div>
       <div className="ws-copilot-hero">
         <div>
-          <div id="copilot-level-1" hidden={level !== 0}>
-            <CopyResearchPrompt profile={profile} />
+          <div id="copilot-level-1" ref={quickStartRef} hidden={level !== 0}>
+            <CopyResearchPrompt profile={profile} selectedId={assistantId} onSelect={setAssistantId} />
           </div>
           <div id="copilot-level-2" hidden={level !== 1} className="ws-research-picker ws-setup-panel">
             <h2>Keep the guide for future chats</h2>
@@ -62,10 +69,14 @@ export function CopilotSetup({ profile, brief }: { profile: CopilotProfile; brie
           </div>
           <div id="copilot-level-3" hidden={level !== 2} className="ws-research-picker ws-setup-panel">
             <h2>Add a skill to your coding agent</h2>
-            <p>For regular use in an existing coding agent. Review the guide before running the command in your project terminal.</p>
+            <p>Copy a command, then run it in your project terminal.</p>
             <InstallCommand skill={profile.skill} />
-            <AddToAgent skill={profile.skill} />
-            <p className="ws-copilot-fine">Requires Node.js 22.20+. This runs the third-party skills installer. Your agent&apos;s permissions still apply.{profile.skill === "zcg-copilot" ? " Optional data helpers require Python 3." : " This package contains text instructions; no helper scripts."}</p>
+            <AddToAgent skill={profile.skill} onUsePrompt={startWithAssistant} />
+            <details className="ws-copilot-disclosure ws-install-details">
+              <summary>Requirements & permissions</summary>
+              <p className="ws-copilot-fine">Requires Node.js 22.20+. This runs the third-party skills installer. Your agent&apos;s permissions still apply.{profile.skill === "zcg-copilot" ? " Optional data helpers require Python 3." : " This package contains text instructions; no helper scripts."}</p>
+              <p className="ws-copilot-fine">Omit <code>-a</code> to detect your agent; add <code>-g</code> for global installation. <a href="https://github.com/vercel-labs/skills" target="_blank" rel="noopener noreferrer">Installer guide ↗</a></p>
+            </details>
             <div className="ws-research-actions"><Link href={guide}>Read the guide ↗</Link><a href="/.well-known/agent-skills/index.json">View published files ↗</a></div>
           </div>
           <p className="ws-copilot-fine ws-setup-access">Public data. No wallet or OpenZcash API key. Your AI provider&apos;s usual access and usage costs apply.</p>

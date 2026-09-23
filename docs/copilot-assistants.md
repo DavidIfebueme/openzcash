@@ -47,6 +47,8 @@ https://survey.stackoverflow.co/2025/ai
   Web Search must be enabled; E2EE mode cannot browse. Do not infer that every mode
   provides the same privacy guarantees.
 - Cursor: https://cursor.com/docs
+- Gemini CLI: https://geminicli.com/docs/cli/skills/
+  The pinned skills 1.7.0 installer supports the gemini-cli agent flag.
 - Claude Code: https://code.claude.com/docs/en/overview
 - Codex: https://github.com/openai/codex
 - GitHub Copilot: https://docs.github.com/en/copilot
@@ -55,6 +57,11 @@ https://survey.stackoverflow.co/2025/ai
 Links are entry points and documentation, not provider integrations. Web access and
 permissions depend on the app, model, plan, and settings. Other agent uses the
 current copilot's guide. The copy-and-paste prompt is provider-independent.
+
+The third setup level also shows the chat assistants as shortcuts back to their
+prompt flow. Grok, Venice, and the other web chats are not assigned invented CLI
+flags. Installer choices come from the same catalog as the quick-start picker,
+using explicit installAgent entries. Gemini web chat and Gemini CLI are separate.
 
 ## Logo provenance
 

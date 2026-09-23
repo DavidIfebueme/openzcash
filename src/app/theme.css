@@ -1705,7 +1705,7 @@
   border-radius: 14px;
   background: var(--surface);
 }
-.rd-content .ws-research-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; margin-bottom: 22px; }
+.rd-content .ws-research-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; margin-bottom: 16px; }
 .rd-content .ws-research-heading h2 { margin: 0; font-size: 18px; font-weight: 600; letter-spacing: -.4px; color: var(--ink); }
 .rd-content .ws-research-heading > span { padding: 3px 8px; border: 1px solid var(--line); border-radius: 5px; font-size: 11px; color: var(--muted); }
 .rd-content .ws-research-assistants { min-width: 0; padding: 0; margin: 0; border: 0; }
@@ -1713,16 +1713,14 @@
 .rd-content .ws-assistant-groups { display: inline-flex; gap: 3px; padding: 3px; margin-bottom: 12px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--line); }
 .rd-content .ws-assistant-groups button { min-height: 32px; padding: 4px 12px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; cursor: pointer; }
 .rd-content .ws-assistant-groups button[aria-pressed="true"] { background: var(--surface); border-color: var(--line); color: var(--ink); box-shadow: 0 1px 3px #00000008; }
-.rd-content .ws-assistant-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.rd-content .ws-assistant-choice { position: relative; display: flex; align-items: center; flex-direction: column; justify-content: center; gap: 7px; min-width: 0; min-height: 82px; padding: 10px 6px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); color: var(--ink); text-align: center; font-size: 12px; font-weight: 500; line-height: 1.25; cursor: pointer; transition: border-color .12s, background .12s; }
+.rd-content .ws-assistant-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+.rd-content .ws-assistant-choice { position: relative; display: inline-flex; align-items: center; gap: 6px; min-width: 0; min-height: 38px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 500; line-height: 1.25; cursor: pointer; transition: border-color .12s, background .12s; }
 .rd-content .ws-assistant-choice:hover { border-color: var(--line-strong); background: var(--surface2); }
 .rd-content .ws-assistant-choice[data-selected="true"] { border-color: var(--accent-ink); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); box-shadow: inset 0 0 0 1px var(--accent-ink); }
 .rd-content .ws-assistant-choice:focus-within { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
-.rd-content .ws-assistant-logo { display: grid; place-items: center; width: 30px; height: 30px; padding: 3px; border-radius: 7px; background: #fff; }
-.rd-content .ws-assistant-logo img { width: 24px; height: 24px; object-fit: contain; }
-.rd-content .ws-assistant-check { position: absolute; top: 5px; right: 7px; color: var(--accent-ink); font-size: 11px; visibility: hidden; }
-.rd-content .ws-assistant-choice[data-selected="true"] .ws-assistant-check { visibility: visible; }
-.rd-content .ws-research-picker > p.ws-assistant-hint { min-height: 42px; margin: 12px 0 18px; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.rd-content .ws-assistant-logo { display: grid; place-items: center; flex-shrink: 0; width: 22px; height: 22px; padding: 2px; border-radius: 5px; background: #fff; }
+.rd-content .ws-assistant-logo img { width: 18px; height: 18px; object-fit: contain; }
+.rd-content .ws-research-picker > p.ws-assistant-hint { min-height: 0; margin: 10px 0 16px; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .rd-content .ws-research-question > label { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-bottom: 8px; font-size: 13px; font-weight: 600; color: var(--ink); }
 .rd-content .ws-research-question > label span { font-size: 11px; font-weight: 400; color: var(--muted); }
 .rd-content #copilot-question { display: block; width: 100%; height: auto; min-height: 86px; resize: vertical; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface2); color: var(--ink); font: inherit; font-size: 13px; line-height: 1.6; }
@@ -1737,10 +1735,10 @@
 .rd-content .ws-research-actions > a:hover { text-decoration: underline; }
 .rd-content .ws-research-picker > p.ws-research-feedback { margin: 12px 0 0; font-size: 11px; line-height: 1.6; color: var(--muted); }
 .rd-content .ws-research-picker .ws-copilot-disclosure > summary { font-size: 12px; }
-.rd-content .ws-research-brief { padding: 30px 28px; background: var(--surface2); border: 1px solid var(--line); border-radius: 14px; }
+.rd-content .ws-research-brief { padding: 26px 24px; background: var(--surface2); border: 1px solid var(--line); border-radius: 14px; }
 .rd-content .ws-research-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); }
-.rd-content .ws-research-brief > h2 { margin: 16px 0 28px; max-width: 15ch; font-size: clamp(26px, 2.5vw, 34px); line-height: 1.1; letter-spacing: -1.2px; font-weight: 600; color: var(--ink); }
-.rd-content .ws-research-brief ol { display: flex; flex-direction: column; gap: 22px; padding: 0; margin: 0; list-style: none; }
+.rd-content .ws-research-brief > h2 { margin: 12px 0 24px; max-width: 20ch; font-size: clamp(24px, 2.2vw, 30px); line-height: 1.15; letter-spacing: -.8px; font-weight: 600; color: var(--ink); }
+.rd-content .ws-research-brief ol { display: flex; flex-direction: column; gap: 16px; padding: 0; margin: 0; list-style: none; }
 .rd-content .ws-research-brief li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; }
 .rd-content .ws-research-brief li > span { padding-top: 2px; font-family: var(--font-geist-mono), monospace; font-size: 12px; color: var(--accent-ink); }
 .rd-content .ws-research-brief h3 { margin: 0 0 5px; font-size: 14px; font-weight: 600; color: var(--ink); }
@@ -1761,7 +1759,7 @@
   .rd-content .ws-setup-levels small { font-size: 11px; }
   .rd-content .ws-research-picker { padding: 16px; }
   .rd-content .ws-assistant-grid { gap: 6px; }
-  .rd-content .ws-assistant-choice { min-height: 78px; font-size: 11px; }
+  .rd-content .ws-assistant-choice { min-height: 44px; font-size: 12px; }
   .rd-content .ws-research-presets button { min-height: 34px; }
   .rd-content .ws-research-brief { padding: 24px 20px; }
 }
@@ -1805,11 +1803,30 @@
   color: var(--dim);
 }
 .rd-content .ws-agent-mark {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  padding: 2px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 4px;
 }
 .rd-shell[data-theme="dark"] .ws-agent-mark {
-  filter: invert(1);
+  filter: none;
+}
+.rd-content .ws-chat-alternatives { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); }
+.rd-content .ws-chat-alternatives .ws-copilot-label { margin: 0 0 10px; }
+.rd-content .ws-chat-alternatives .ws-copilot-label span { margin-left: 8px; font-size: 12px; text-transform: none; letter-spacing: 0; }
+.rd-content .ws-install-details { margin-top: 16px; }
+.rd-content .ws-install-details > summary { font-size: 12px; }
+.rd-content .ws-copilot-resources { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 28px; margin-top: 28px; }
+.rd-content .ws-copilot-resources > details { min-width: 0; padding: 4px 0 12px; border-top: 1px solid var(--line); }
+.rd-content .ws-copilot-resources summary { min-height: 44px; padding: 12px 0; font-size: 14px; font-weight: 500; color: var(--ink); cursor: pointer; }
+.rd-content .ws-copilot-resources summary::marker { color: var(--muted); }
+.rd-content .ws-copilot-resources .ws-copilot-examples,
+.rd-content .ws-copilot-resources .ws-copilot-sources { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 767px) {
+  .rd-content .ws-copilot-resources { grid-template-columns: minmax(0, 1fr); }
+  .rd-content .ws-agent-chip { min-height: 44px; }
 }
 .rd-content .ws-copilot-demo {
   min-width: 0;

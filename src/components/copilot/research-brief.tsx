@@ -12,10 +12,10 @@ export function ResearchBrief({ profile }: { profile: CopilotProfile }) {
         ))}
       </ol>
       <div className="ws-research-brief-links">
-        <span>Explore the records yourself</span>
+        <span>Explore records</span>
         {profile.brief.links.map((link) => <Link key={link.href} href={link.href}>{link.label} <span aria-hidden="true">↗</span></Link>)}
       </div>
-      <p className="ws-research-footnote">Use an assistant with web access. Features depend on your provider, plan, and settings.</p>
+      <p className="ws-research-footnote">Web access required. Provider limits apply.</p>
     </aside>
   );
 }

@@ -5,19 +5,19 @@ import { copyText } from "./copy-text";
 import { RESEARCH_ASSISTANTS } from "./research-assistants";
 import { researchPrompt, type CopilotProfile } from "./profiles";
 
-export function CopyResearchPrompt({ profile }: { profile: CopilotProfile }) {
-  const [selectedId, setSelectedId] = useState("chatgpt");
+export function CopyResearchPrompt({ profile, selectedId, onSelect }: { profile: CopilotProfile; selectedId: string; onSelect: (id: string) => void }) {
   const [question, setQuestion] = useState("");
-  const [status, setStatus] = useState<"idle" | "copied" | "failed">("idle");
+  const [copyResult, setCopyResult] = useState<{ id: string; prompt: string; result: "copied" | "failed" } | null>(null);
   const selected = RESEARCH_ASSISTANTS.find((a) => a.id === selectedId)!;
   const prompt = researchPrompt(profile, question);
+  const status = copyResult?.id === selectedId && copyResult.prompt === prompt ? copyResult.result : "idle";
   function select(id: string) {
-    setSelectedId(id);
-    setStatus("idle");
+    onSelect(id);
+    setCopyResult(null);
   }
   function updateQuestion(value: string) {
     setQuestion(value);
-    setStatus("idle");
+    setCopyResult(null);
   }
   return (
     <div className="ws-copilot-start ws-research-picker">
@@ -37,10 +37,9 @@ export function CopyResearchPrompt({ profile }: { profile: CopilotProfile }) {
               <input className="sr-only" type="radio" name="research-assistant" value={a.id} checked={a.id === selectedId} onChange={() => select(a.id)} />
               <span className="ws-assistant-logo">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={a.logo} width={24} height={24} alt="" />
+                <img src={a.logo} width={18} height={18} alt="" />
               </span>
               <span>{a.name}</span>
-              <span className="ws-assistant-check" aria-hidden="true">✓</span>
             </label>
           ))}
         </div>
@@ -54,13 +53,13 @@ export function CopyResearchPrompt({ profile }: { profile: CopilotProfile }) {
         </div>
       </div>
       <div className="ws-research-actions">
-        <button type="button" onClick={async () => setStatus(await copyText(prompt) ? "copied" : "failed")}>
+        <button type="button" onClick={async () => setCopyResult({ id: selectedId, prompt, result: await copyText(prompt) ? "copied" : "failed" })}>
           {status === "copied" ? "Prompt copied ✓" : `Copy for ${selected.name}`}
         </button>
         <a href={selected.id === "other" ? `${profile.path}/instructions` : selected.url} target="_blank" rel="noopener noreferrer">{selected.action} <span aria-hidden="true">↗</span></a>
       </div>
       <p className="ws-research-feedback" role="status">
-        {status === "failed" ? "Copy failed. Open the preview below and select the text." : status === "copied" ? `Paste into ${selected.name} to begin. Nothing is sent automatically.` : "Copy the prompt, then paste it into your assistant. Your text stays in this page until you share it."}
+        {status === "failed" ? "Copy failed. Select the text in the preview." : status === "copied" ? `Paste into ${selected.name} to begin.` : "Copy and paste into your assistant. Nothing is sent automatically."}
       </p>
       <details className="ws-copilot-disclosure">
         <summary>Preview the prompt</summary>

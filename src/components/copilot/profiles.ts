@@ -32,11 +32,11 @@ export const COPILOT_PROFILES: Record<CopilotSkill, CopilotProfile> = {
     ],
     brief: {
       eyebrow: "Build with context",
-      title: "Give your idea a stronger starting point.",
+      title: "Find your next contribution.",
       steps: [
-        { title: "Know what exists", description: "Find related grants, teams, and proposals before building the same thing." },
-        { title: "Follow the funding", description: "Compare requested, budgeted, and paid amounts with dates and sources." },
-        { title: "Find room to contribute", description: "Turn overlaps and possible gaps into questions to validate with the community." },
+        { title: "Know what exists", description: "Compare related grants and proposals." },
+        { title: "Follow the funding", description: "Separate requests, budgets, and payments." },
+        { title: "Explore the gaps", description: "Validate opportunities with the community." },
       ],
       links: [{ label: "Grants", href: "/zcg/grants" }, { label: "Proposals", href: "/zcg/proposals" }],
     },
@@ -56,11 +56,11 @@ export const COPILOT_PROFILES: Record<CopilotSkill, CopilotProfile> = {
     ],
     brief: {
       eyebrow: "Research before voting",
-      title: "Look at the evidence behind each proposal.",
+      title: "Review the evidence before voting.",
       steps: [
-        { title: "Check the work", description: "Read the application and evidence for the work claimed as delivered." },
-        { title: "Trace earlier funding", description: "Compare prior rounds and ZCG records without mixing requests with payments." },
-        { title: "Make your own decision", description: "Bring unresolved questions to the community. The copilot does not vote for you." },
+        { title: "Check the work", description: "Review the application and delivery evidence." },
+        { title: "Trace earlier funding", description: "Compare prior rounds and recorded payments." },
+        { title: "Make your own decision", description: "Take unresolved questions to the community." },
       ],
       links: [{ label: "Coinholder round", href: "/zcg/coinholder" }, { label: "Funding ledger", href: "/zcg/grants" }],
     },
@@ -80,11 +80,11 @@ export const COPILOT_PROFILES: Record<CopilotSkill, CopilotProfile> = {
     ],
     brief: {
       eyebrow: "Understand the DAO",
-      title: "See how decisions and funding connect.",
+      title: "Understand decisions and funding.",
       steps: [
-        { title: "Understand each vote", description: "Check the proposal's quorum, approval threshold, and recorded outcome." },
-        { title: "Read the treasury", description: "Keep dated balances, reserved funds, payouts, and market valuation separate." },
-        { title: "Explore contributions", description: "Find related work and public funding records before preparing a proposal." },
+        { title: "Understand each vote", description: "Check the voting rules and recorded outcome." },
+        { title: "Read the treasury", description: "Separate dated balances, commitments, and payouts." },
+        { title: "Explore contributions", description: "Find related work and its funding history." },
       ],
       links: [{ label: "ZecHub dashboard", href: "/zechub" }, { label: "ZCG grants", href: "/zcg/grants" }],
     },
