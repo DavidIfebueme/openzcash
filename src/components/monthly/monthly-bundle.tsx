@@ -12,13 +12,15 @@ import styles from "./monthly-bundle-preview.module.css";
 type View = PublicationView;
 type Register = "sources" | "communities" | "requests" | "zcg";
 type Entry = { name: string; detail: string; url: string; amount?: number | null; amountLabel?: string };
-function Symbol({name}: {name: View | "download" | "expand" | "left" | "right" | "search" | "external"}) {
+function Symbol({name}: {name: View | "download" | "expand" | "collapse" | "back" | "left" | "right" | "search" | "external"}) {
   const paths = {
     monthly:<><path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Z"/><path d="M12 5v15"/></>,
     operations:<><path d="M8 5h12M8 12h12M8 19h12"/><circle cx="4" cy="5" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="19" r="1"/></>,
     sources:<><path d="M5 3h12l3 3v15H5V3ZM9 8h6M9 12h7M9 16h7"/></>,
     download:<><path d="M12 3v12m-5-5 5 5 5-5M5 17v4h14v-4"/></>,
     expand:<path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/>,
+    collapse:<path d="M3 8h5V3m8 0v5h5M8 21v-5H3m18 0h-5v5"/>,
+    back:<path d="M19 12H5m6-6-6 6 6 6"/>,
     left:<path d="m14 6-6 6 6 6"/>, right:<path d="m10 6 6 6-6 6"/>,
     search:<><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></>,
     external:<path d="M14 3h7v7m0-7L10 14M10 5H4v15h15v-6"/>,
@@ -76,10 +78,10 @@ function SourcesPanel({data}: {data: MonthlyReadingSet}) {
 export function MonthlyBundle({initialView, data, editions, preview=false, basePath=`/monthly/${data.id}`}:
   {initialView:View; data:MonthlyReadingSet; editions:MonthlyEdition[]; preview?:boolean; basePath?:string}) {
   const docs = data.documents;
-  const tabs: {id:View; name:string; count:string}[] = [
-    {id:"monthly",name:"Monthly",count:`${docs.monthly.pageCount} pages`},
-    {id:"operations",name:"Operations",count:`${docs.operations.pageCount} pages`},
-    {id:"sources",name:"Sources & Data",count:`${data.sources.length} sources`},
+  const tabs: {id:View; name:string; count:number; unit:string}[] = [
+    {id:"monthly",name:"Monthly",count:docs.monthly.pageCount,unit:"pages"},
+    {id:"operations",name:"Operations",count:docs.operations.pageCount,unit:"pages"},
+    {id:"sources",name:"Sources & Data",count:data.sources.length,unit:"sources"},
   ];
   const [view,setView]=useState<View>(initialView);
   const [fullScreen,setFullScreen]=useState(false);
@@ -110,12 +112,26 @@ export function MonthlyBundle({initialView, data, editions, preview=false, baseP
   }
   return <div ref={root} className={styles.preview} data-publication={view}>
     <header className={styles.header}>
-      <Link href="/" className={styles.brand} aria-label="OpenZcash apps"><img src="/logos/marks/openzcash.png" alt="" width="25" height="25"/><strong>OpenZcash</strong><i/><span>MONTHLY</span></Link>
-      <div className={styles.month}><select aria-label="Publication edition" value={data.id} onChange={e=>{window.location.href=`/monthly/${e.target.value}?publication=${view}`;}}>{editions.map(edition=><option key={edition.id} value={edition.id}>{editionLabel(edition)}</option>)}</select><small>{docs.monthly.kind==="period"?"Partial period":docs.monthly.label}</small></div>
-      <div className={styles.actions}>{preview&&<span className={styles.previewBadge}>Layout preview</span>}<button onClick={expand} aria-label={fullScreen?"Exit full screen":"Enter full screen"}><Symbol name="expand"/></button>{view!=="sources"?<a href={docs[view].pdf} download className={styles.download}><Symbol name="download"/><span>Download PDF</span></a>:null}</div>
+      <Link href="/" prefetch={false} className={styles.brand} aria-label="Back to OpenZcash" title="Back to OpenZcash">
+        <Symbol name="back"/><img src="/logos/marks/openzcash.png" alt="" width="28" height="28"/><strong>OpenZcash</strong>
+      </Link>
+      <div className={styles.edition}>
+        <label className={styles.month}>
+          <span>Edition</span>
+          <select aria-label="Publication edition" value={data.id} onChange={e=>{window.location.href=`/monthly/${e.target.value}?publication=${view}`;}}>
+            {editions.map(edition=><option key={edition.id} value={edition.id}>{editionLabel(edition)}</option>)}
+          </select>
+        </label>
+        {docs.monthly.kind==="period"&&<small className={styles.periodBadge}>Partial period</small>}
+      </div>
+      <div className={styles.actions}>
+        {preview&&<span className={styles.previewBadge}>Layout preview</span>}
+        <button onClick={expand} aria-label={fullScreen?"Exit full screen":"Enter full screen"} title={fullScreen?"Exit full screen":"Full screen"}><Symbol name={fullScreen?"collapse":"expand"}/></button>
+        {view!=="sources"&&<a href={docs[view].pdf} download className={styles.download} aria-label={`Download ${view==="monthly"?"Monthly":"Operations"} PDF`}><Symbol name="download"/><span>Download PDF</span></a>}
+      </div>
     </header>
     <nav className={styles.tabBar} aria-label="Publications for this month">
-      <div role="tablist" aria-label="Choose what to read" className={styles.tabs}>{tabs.map((t,i)=><button key={t.id} ref={el=>{tabButtons.current[i]=el;}} role="tab" id={`tab-${t.id}`} aria-controls={`panel-${t.id}`} aria-selected={view===t.id} tabIndex={view===t.id?0:-1} className={styles.tab} onClick={()=>changeView(t.id)} onKeyDown={e=>{if(["ArrowLeft","ArrowRight","Home","End"].includes(e.key)){e.preventDefault();const j=e.key==="Home"?0:e.key==="End"?tabs.length-1:(i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;changeView(tabs[j].id);tabButtons.current[j]?.focus();}}}><Symbol name={t.id}/><span>{t.name}</span><small>{t.count}</small></button>)}</div>
+      <div role="tablist" aria-label="Choose what to read" className={styles.tabs}>{tabs.map((t,i)=><button key={t.id} ref={el=>{tabButtons.current[i]=el;}} role="tab" id={`tab-${t.id}`} aria-controls={`panel-${t.id}`} aria-selected={view===t.id} aria-label={`${t.name}, ${t.count} ${t.unit}`} tabIndex={view===t.id?0:-1} className={styles.tab} onClick={()=>changeView(t.id)} onKeyDown={e=>{if(["ArrowLeft","ArrowRight","Home","End"].includes(e.key)){e.preventDefault();const j=e.key==="Home"?0:e.key==="End"?tabs.length-1:(i+(e.key==="ArrowRight"?1:-1)+tabs.length)%tabs.length;changeView(tabs[j].id);tabButtons.current[j]?.focus();}}}><Symbol name={t.id}/><span>{t.name}</span><small>{t.count}<span className={styles.countUnit}> {t.unit}</span></small></button>)}</div>
       <span className={styles.tabContext}>{view==="monthly"?"Teams & products":view==="operations"?"Funding, votes & communities":"The complete record"}</span>
     </nav>
     <div className={styles.panel} role="tabpanel" id={`panel-${view}`} aria-labelledby={`tab-${view}`}>{view==="sources"?<SourcesPanel data={data}/>:<MonthlyReader key={view} editions={[docs[view]]} edition={docs[view]} embedded publicationName={view==="monthly"?"Monthly":"Operations"} baseHref={`${basePath}?publication=${view}`} onFollowLink={followReportLink}/>}</div>

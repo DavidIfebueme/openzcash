@@ -121,9 +121,28 @@
 .embedded.app { height: 100%; grid-template-rows: minmax(0, 1fr); }
 .embedded > .header, .embedded .library, .embedded .readerHeading { display: none; }
 .embedded .workspace { grid-template-columns: minmax(0, 1fr); }
-.embedded .reader { grid-template-rows: minmax(0, 1fr) 100px; }
-.embedded .readingArea { border-top: 0; }
-.embedded .stagePadding { padding-left: 42px; padding-right: 42px; }
+.embedded.app { --paper: #eef0e9; --ink: #22271f; --muted: #61675c; --line: #dfe2d8; font-family: var(--font-geist), sans-serif; }
+.embedded .reader { grid-template-rows: minmax(0, 1fr) 82px; }
+.embedded .readingArea { grid-template-rows: 50px minmax(0, 1fr) 30px; border-top: 0; background: var(--paper); }
+.embedded .toolbar { padding: 0 24px; background: #fff; border-bottom: 1px solid var(--line); }
+.embedded .chapter { gap: 10px; min-height: 36px; padding: 0 10px; border: 1px solid var(--line); border-radius: 7px; background: #f8f9f5; }
+.embedded .chapter > span { font-size: 10px; font-weight: 550; letter-spacing: .5px; }
+.embedded .chapter select { font-size: 13px; max-width: 260px; padding: 5px 16px 5px 0; }
+.embedded .pagination { gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 7px; background: #f8f9f5; }
+.embedded .pagination label { gap: 5px; font-size: 12px; padding-right: 5px; }
+.embedded .pagination select { font-size: 13px; font-weight: 600; border: 0; background: transparent; min-width: 30px; padding: 4px; }
+.embedded .pagination .iconButton { width: 30px; height: 30px; }
+.embedded .pagination .iconButton:hover:not(:disabled) { background: #e5e9df; }
+.embedded .stagePadding { padding: 16px 32px 8px; }
+.embedded .paper { box-shadow: 0 0 0 1px #cdd2c4, 0 8px 24px #22271f14; }
+.embedded .pageCaption { padding: 0 24px; color: var(--muted); }
+.embedded .pageCaption > span, .embedded .pageCaption small { font-size: 11px; }
+.embedded .filmstrip { gap: 12px; padding: 8px 24px; background: #fff; }
+.embedded .thumbnails { gap: 10px; }
+.embedded .thumbnail { width: 92px; border-radius: 5px; }
+.embedded .thumbnail > span { font-size: 10px; }
+.embedded .thumbnail[aria-current="page"] { border-color: #86672f; background: #f6f1e5; }
+.embedded .filmstrip > .iconButton { border: 1px solid var(--line); border-radius: 7px; }
 
 @media (min-width: 1550px) {
   .workspace { grid-template-columns: 270px minmax(0, 1fr); }
@@ -159,7 +178,15 @@
 }
 @media (max-width: 600px) {
   .embedded .reader { grid-template-rows: minmax(0, 1fr) 52px; }
-  .embedded .stagePadding { padding-left: 12px; padding-right: 12px; }
+  .embedded .readingArea { grid-template-rows: 52px minmax(0, 1fr) 30px; }
+  .embedded .toolbar { padding: 0 12px; gap: 10px; }
+  .embedded .chapter { flex: 1; padding: 0 8px; min-height: 38px; }
+  .embedded .chapter select { width: 100%; max-width: none; font-size: 12px; }
+  .embedded .pagination .iconButton { width: 32px; height: 32px; }
+  .embedded .stagePadding { padding: 12px; }
+  .embedded .pageCaption { padding: 0 14px; }
+  .embedded .pageCaption > span { font-size: 11px; }
+  .embedded .mobileProgress { margin: 0; padding: 0 16px; font-size: 12px; background: #fff; }
   .app { grid-template-rows: 55px minmax(0, 1fr); }
   .header { padding: 0 13px; gap: 8px; }
   .identity { gap: 11px; }
@@ -187,6 +214,8 @@
 }
 @media (max-height: 480px) {
   .embedded .reader { grid-template-rows: minmax(0, 1fr); }
+  .embedded .readingArea { grid-template-rows: 42px minmax(0, 1fr) 22px; }
+  .embedded .stagePadding { padding-top: 6px; padding-bottom: 2px; }
   .app { grid-template-rows: 44px minmax(0, 1fr); }
   .reader { grid-template-rows: 48px minmax(0, 1fr); }
   .filmstrip, .mobileProgress { display: none; }
