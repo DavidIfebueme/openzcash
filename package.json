@@ -6,13 +6,16 @@
     "node": ">=20.9.0"
   },
   "scripts": {
+    "predev": "node scripts/publish-copilot.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/publish-copilot.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:copilot": "node --test scripts/publish-copilot.test.mjs && python3 -B -m unittest discover -s skills/zcg-copilot/tests",
     "probe": "tsx scripts/probe-node.ts",
     "import-ufvk": "tsx scripts/import-ufvk.ts",
     "import-zcg": "node --conditions=react-server --import tsx scripts/import-zcg.ts",

@@ -45,3 +45,6 @@ next-env.d.ts
 .redesign-plan.json
 /.cache/ecosystem-github.json
 /src/data/ecosystem/*.tmp
+/public/.well-known/agent-skills/
+/public/.well-known/skills/
+/skills/zcg-copilot/**/__pycache__/

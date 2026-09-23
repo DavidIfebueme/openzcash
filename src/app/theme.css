@@ -1616,6 +1616,21 @@
   font-family: var(--font-geist-mono), ui-monospace, Menlo, monospace;
   font-size: 11px;
 }
+.rd-content .ws-copilot-setup {
+  margin-top: 20px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.rd-content .ws-copilot-setup > p { margin: 0; }
+.rd-content .ws-copilot-setup ol { margin: 8px 0 12px; padding-left: 20px; }
+.rd-content .ws-copilot-setup .ws-copilot-fine { font-size: 12px; }
+.rd-content .ws-copilot[data-skill="zcg-copilot"] .ws-install code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.rd-content .ws-terminal-body.ws-terminal-example { height: auto; min-height: 360px; overflow: visible; }
 .rd-content .ws-copilot-label {
   margin: 24px 0 10px;
   font-size: 11px;

@@ -55,6 +55,10 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
+      ...["agent-skills", "skills"].map((directory) => ({
+        source: `/.well-known/${directory}/:path*`,
+        headers: [{ key: "Cache-Control", value: "public, max-age=300" }],
+      })),
       // Monthly files are content-addressed. Corrections get a new directory.
       {
         source: "/monthly/editions/:path*",

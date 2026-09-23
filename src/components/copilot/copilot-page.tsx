@@ -19,6 +19,7 @@ export function CopilotPage({
   sources,
   note,
   terminal,
+  setup,
 }: {
   title: string;
   subtitle: string;
@@ -28,18 +29,20 @@ export function CopilotPage({
   sources: CopilotSource[];
   note: ReactNode;
   terminal: ReactNode;
+  setup?: ReactNode;
 }) {
   return (
-    <div className="ws-copilot">
+    <div className="ws-copilot" data-skill={skill}>
       <PageHeader title={title} subtitle={subtitle} />
       <section className="ws-copilot-hero">
         <div>
           <p className="ws-copilot-intro">{intro}</p>
           <InstallCommand skill={skill} />
           <p className="ws-copilot-fine">
-            Bring your own model. No key, no hosted service.
+            Use your existing AI agent. No OpenZcash API key required.
           </p>
           <AddToAgent skill={skill} />
+          {setup}
         </div>
         <div className="ws-copilot-demo">{terminal}</div>
       </section>

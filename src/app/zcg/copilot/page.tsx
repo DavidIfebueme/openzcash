@@ -12,11 +12,11 @@ export const metadata = {
 const USE_CASES = [
   {
     q: "I want to build privacy-preserving payments on Zcash. Vet this idea.",
-    a: "What was funded in that space with exact paid totals, what was declined, and what is pending review right now.",
+    a: "Compare recorded funding, declined applications, and the latest published review queue. Identify gaps to investigate.",
   },
   {
     q: "I'm applying for a wallet grant. Who got funded before, and how much?",
-    a: "Every wallet grant in the ledger: grantee, budget, milestones paid, dates.",
+    a: "Explore wallet grants in the ledger: grantee, budget, milestones paid, and dates.",
   },
   {
     q: "What's ZCG's burn rate this year, month by month?",
@@ -31,14 +31,14 @@ const USE_CASES = [
 const SOURCES = [
   {
     name: "OpenZcash ledger",
-    desc: "Audited mirror of the official ZCG spreadsheet. Payments, recipients, grants. JSON and CSV.",
+    desc: "Mirror of the official ZCG spreadsheet. Payments, recipients, and grants in JSON and CSV, with published methodology.",
   },
   {
-    name: "Live pipeline",
-    desc: "Proposals under review right now, straight from the ZCG issue tracker.",
+    name: "Published review queue",
+    desc: "GitHub applications reconciled with published decisions. Status updates are published the following day.",
   },
   {
-    name: "Canonical records",
+    name: "Supplementary grant records",
     desc: "Requested vs approved amounts from a committee member's grants prototype (zcg.pgpz.org). The Grant Dashboard spreadsheet stays the source of truth.",
   },
   {
@@ -55,10 +55,9 @@ export default function ZcgCopilotPage() {
       skill="zcg-copilot"
       intro={
         <>
-          A skill that turns your coding agent into a ZCG grants copilot. Ask
-          about grants, spending, recipients, and proposals under review.
-          Answers come from the live public ledger, GitHub, and the forum, with
-          a citation on every figure, never from the model&apos;s memory.
+          Research existing grants, compare projects, and find gaps worth
+          building for. Add the skill to your AI agent to query public funding
+          data with source links and clear rules for checking the numbers.
         </>
       }
       examples={USE_CASES}
@@ -72,6 +71,21 @@ export default function ZcgCopilotPage() {
         </>
       }
       terminal={<Terminal />}
+      setup={
+        <div className="ws-copilot-setup">
+          <p><strong>Get started</strong></p>
+          <ol>
+            <li>Copy the command for your agent and run it in your project&apos;s terminal.</li>
+            <li>Open your agent and ask it to use ZCG Copilot to research your idea.</li>
+          </ol>
+          <p className="ws-copilot-fine">
+            Requires Node.js 22.20+ and a compatible agent. Your AI provider&apos;s usual
+            access and usage costs apply. Optional helpers use Python 3.
+            {" "}<a href="/.well-known/agent-skills/zcg-copilot/SKILL.md">Read the skill</a>
+            {" · "}<a href="/.well-known/agent-skills/zcg-copilot/README.md">Installation guide</a>
+          </p>
+        </div>
+      }
     />
   );
 }

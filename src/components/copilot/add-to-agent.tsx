@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { copyText } from "./copy-text";
+import { installCommand } from "./command";
 
 /**
  * One click copies the install command with the agent's flag. The marks are
@@ -21,7 +22,7 @@ export function AddToAgent({ skill }: { skill: string }) {
   const [copied, setCopied] = useState<string | null>(null);
   const copy = async (flag: string) => {
     const ok = await copyText(
-      `npx skills add Michae2xl/openzcash --skill ${skill} -a ${flag}`,
+      installCommand(skill, flag),
     );
     if (ok) {
       setCopied(flag);
