@@ -20,6 +20,7 @@ export function CopilotPage({
   note,
   terminal,
   setup,
+  start,
 }: {
   title: string;
   subtitle: string;
@@ -30,6 +31,7 @@ export function CopilotPage({
   note: ReactNode;
   terminal: ReactNode;
   setup?: ReactNode;
+  start?: ReactNode;
 }) {
   return (
     <div className="ws-copilot" data-skill={skill}>
@@ -37,11 +39,15 @@ export function CopilotPage({
       <section className="ws-copilot-hero">
         <div>
           <p className="ws-copilot-intro">{intro}</p>
-          <InstallCommand skill={skill} />
-          <p className="ws-copilot-fine">
-            Use your existing AI agent. No OpenZcash API key required.
-          </p>
-          <AddToAgent skill={skill} />
+          {start ?? (
+            <>
+              <InstallCommand skill={skill} />
+              <p className="ws-copilot-fine">
+                Use your existing AI agent. No OpenZcash API key required.
+              </p>
+              <AddToAgent skill={skill} />
+            </>
+          )}
           {setup}
         </div>
         <div className="ws-copilot-demo">{terminal}</div>

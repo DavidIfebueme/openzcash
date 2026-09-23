@@ -1631,6 +1631,50 @@
   line-height: 1.6;
 }
 .rd-content .ws-terminal-body.ws-terminal-example { height: auto; min-height: 360px; overflow: visible; }
+.rd-content .ws-copilot-start {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.rd-content .ws-copilot-start > p { margin: 0 0 12px; }
+.rd-content .ws-copilot-start > button {
+  min-height: 44px;
+  margin: 0 0 12px;
+  padding: 10px 18px;
+  border: 1px solid var(--ink);
+  border-radius: 9px;
+  color: var(--surface);
+  background: var(--ink);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+.rd-content .ws-copilot-start > button:hover { opacity: .9; }
+.rd-content .ws-copilot-disclosure { font-size: 13px; line-height: 1.65; }
+.rd-content .ws-copilot-disclosure > summary {
+  padding: 10px 0;
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 500;
+}
+.rd-content .ws-copilot-advanced {
+  margin-top: 18px;
+  padding-top: 6px;
+  border-top: 1px solid var(--line);
+}
+.rd-content .ws-copilot-disclosure pre,
+.rd-content .ws-copilot-guide {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.8;
+}
+.rd-content .ws-copilot-guide { max-width: 100ch; margin-top: 24px; }
 .rd-content .ws-copilot-label {
   margin: 24px 0 10px;
   font-size: 11px;

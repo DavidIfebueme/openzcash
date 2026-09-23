@@ -4,7 +4,17 @@ Research Zcash grants, funded projects, spending, and proposals in your AI agent
 Use public sources to compare existing work, identify gaps to investigate, and
 prepare a stronger grant or hackathon idea. Read the evidence behind each finding.
 
-## Install
+## Start without installing
+
+Open [ZCG Copilot](https://openzcash.org/zcg/copilot), copy the research prompt, and
+paste it into an AI assistant with web access. Add your idea and ask for cited
+findings. This path requires no installer, local scripts, wallet, or OpenZcash key.
+Your AI provider's usual access and usage costs still apply.
+
+You can [read the full instructions in your browser](https://openzcash.org/zcg/copilot/instructions)
+before using them. No installer or helper script runs when you read that page.
+
+## Optional: install as a skill
 
 Run in your project terminal with Node.js 22.20 or newer installed:
 
@@ -17,6 +27,10 @@ from OpenZcash's public well-known endpoint. No private GitHub access is require
 Choose your agent when prompted, or add `-a codex`, `-a claude-code`, `-a cursor`,
 `-a opencode`, `-a windsurf`, or `-a github-copilot`. The installer defaults to the
 current project; global installation is optional (`-g`).
+
+This runs a third-party installer. Review the files first and keep your agent's
+tool permissions restricted to the access you intend to allow. A skill supplies
+instructions; it does not create a security sandbox for the agent.
 
 Use your existing AI agent and its usual provider access. This is not a hosted chat;
 your provider's usage costs may apply. Public OpenZcash data needs no API key,

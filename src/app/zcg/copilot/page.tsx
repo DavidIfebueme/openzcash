@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { Terminal } from "./terminal";
 import { CopilotPage } from "@/components/copilot/copilot-page";
+import { CopyResearchPrompt } from "@/components/copilot/copy-prompt";
+import { AddToAgent } from "@/components/copilot/add-to-agent";
+import { InstallCommand } from "@/components/copilot/install-command";
 
 export const dynamic = "force-dynamic";
 export const metadata = {
   title: "ZCG Copilot · OpenZcash",
   description:
-    "An agent skill that turns your coding agent into a ZCG grants copilot: live, cited answers about Zcash Community Grants funding.",
+    "Research Zcash grants and project ideas with public sources in your AI assistant. Start with a prompt, with no installation required.",
 };
 
 const USE_CASES = [
@@ -56,34 +59,42 @@ export default function ZcgCopilotPage() {
       intro={
         <>
           Research existing grants, compare projects, and find gaps worth
-          building for. Add the skill to your AI agent to query public funding
-          data with source links and clear rules for checking the numbers.
+          building for. Use public funding data in your own AI assistant, with
+          source links and clear rules for checking the numbers.
         </>
       }
       examples={USE_CASES}
       sources={SOURCES}
       note={
         <>
-          The skill also encodes the data&apos;s real failure modes: same-title
+          The research guide covers the data&apos;s real failure modes: same-title
           collisions between re-applications, requested vs paid confusion,
           milestone double counting. Methodology:{" "}
           <Link href="/zcg/methodology">how we compute this</Link>.
         </>
       }
       terminal={<Terminal />}
+      start={<CopyResearchPrompt />}
       setup={
         <div className="ws-copilot-setup">
-          <p><strong>Get started</strong></p>
-          <ol>
-            <li>Copy the command for your agent and run it in your project&apos;s terminal.</li>
-            <li>Open your agent and ask it to use ZCG Copilot to research your idea.</li>
-          </ol>
           <p className="ws-copilot-fine">
-            Requires Node.js 22.20+ and a compatible agent. Your AI provider&apos;s usual
-            access and usage costs apply. Optional helpers use Python 3.
-            {" "}<a href="/.well-known/agent-skills/zcg-copilot/SKILL.md">Read the skill</a>
-            {" · "}<a href="/.well-known/agent-skills/zcg-copilot/README.md">Installation guide</a>
+            Public data. No wallet or OpenZcash API key. Your AI provider&apos;s
+            usual access and usage costs apply.
+            {" "}<Link href="/zcg/copilot/instructions">Read the research guide</Link>.
           </p>
+          <details className="ws-copilot-disclosure ws-copilot-advanced">
+            <summary>Advanced: install as a skill</summary>
+            <p>Optional, for people who want the instructions saved in their coding agent.</p>
+            <InstallCommand skill="zcg-copilot" />
+            <AddToAgent skill="zcg-copilot" />
+            <p className="ws-copilot-fine">
+              This command runs the third-party skills installer from npm.
+              Review the instructions and files before installing; your agent&apos;s
+              existing permissions still apply. Requires Node.js 22.20+.
+              Optional helpers use Python 3.
+              {" "}<a href="/.well-known/agent-skills/index.json">View the file list</a>.
+            </p>
+          </details>
         </div>
       }
     />
