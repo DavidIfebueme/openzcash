@@ -339,10 +339,42 @@
   display: flex;
   flex-direction: column;
 }
-.target > span {
+.targetHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.targetHeading > span {
   font-size: 13px;
   font-weight: 550;
   color: var(--muted);
+}
+.expandMilestones {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.expandMilestones:hover {
+  color: var(--dex);
+  background: var(--mint);
+  border-color: var(--dex);
+}
+.expandMilestones svg {
+  width: 16px;
+  height: 16px;
+  transition: transform 150ms ease;
+}
+.expandMilestones[aria-expanded="true"] svg {
+  transform: rotate(180deg);
 }
 .heroNumber {
   font-size: 57px;
@@ -391,29 +423,16 @@
 .milestones {
   border-top: 1px solid var(--line);
 }
-.milestones > summary {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 13px 24px;
-  font-size: 14px;
-}
-.milestones > summary > span:first-child {
-  font-weight: 600;
-}
-.milestones > summary > span:last-child {
-  font-size: 13px;
-  color: var(--muted);
-}
-.milestones b,
 .nearDetails b,
 .sourceDetails b {
   font-weight: 400;
   margin-left: 14px;
 }
 .milestoneBody {
-  padding: 4px 24px 22px;
+  padding: 22px 24px;
+}
+.milestoneBody h3 {
+  margin-bottom: 8px;
 }
 .milestoneBody p {
   color: var(--muted);
@@ -472,11 +491,6 @@
 }
 .milestoneFoot a {
   color: var(--dex);
-}
-.milestones > summary strong {
-  color: var(--dex);
-  margin-left: 4px;
-  font-size: 15px;
 }
 .routingNote {
   margin: 0 0 16px;
@@ -1324,8 +1338,11 @@
     border-top: 1px solid var(--line);
     padding: 17px 20px;
   }
-  .target > span {
-    grid-column: 1;
+  .targetHeading {
+    grid-column: 1/-1;
+    margin-bottom: 8px;
+  }
+  .targetHeading > span {
     font-size: 12px;
   }
   .heroNumber {
@@ -1344,7 +1361,7 @@
   }
   .gap {
     grid-column: 2;
-    grid-row: 1/4;
+    grid-row: 2/4;
     margin: 0;
     padding-left: 20px;
     border-left: 1px solid var(--line);
@@ -1353,15 +1370,6 @@
     font-size: 23px;
   }
   .gap > span {
-    font-size: 12px;
-  }
-  .milestones > summary {
-    padding: 12px 20px;
-    align-items: flex-start;
-  }
-  .milestones > summary > span:last-child {
-    max-width: 52%;
-    text-align: right;
     font-size: 12px;
   }
   .milestoneBody {
@@ -1791,12 +1799,6 @@
 }
 
 @media (max-width: 560px) {
-  .milestones > summary {
-    flex-wrap: wrap;
-  }
-  .milestones > summary > span:last-child {
-    max-width: none;
-  }
   .page .milestoneTable {
     font-size: 13px;
   }

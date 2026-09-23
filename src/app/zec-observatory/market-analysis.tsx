@@ -209,6 +209,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   >("cex");
   const [query, setQuery] = useState("");
   const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
+  const [milestonesOpen, setMilestonesOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("volume");
   const navigation = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -516,7 +517,30 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             </p>
           </div>
           <aside className={styles.target}>
-            <span>DEX share · target &gt;50%</span>
+            <div className={styles.targetHeading}>
+              <span>DEX share · target &gt;50%</span>
+              <button
+                type="button"
+                className={styles.expandMilestones}
+                aria-expanded={milestonesOpen}
+                aria-controls="dex-milestones"
+                aria-label={milestonesOpen ? "Hide DEX milestones" : "Show DEX milestones"}
+                title={milestonesOpen ? "Hide milestones" : "Explore milestones"}
+                onClick={() => setMilestonesOpen((open) => !open)}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
             <strong className={styles.heroNumber}>
               {m ? number(m.dexPct) : "—"}
               <small>%</small>
@@ -536,18 +560,18 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             </div>
           </aside>
         </div>
-        <details className={styles.milestones}>
-          <summary>
-            <span>Community mission · DEX &gt; CEX</span>
-            <span>
-              DEX / CEX <strong>{pct(m?.dexCexRatioPct ?? null)}</strong> · 100%
-              at parity <b aria-hidden="true">＋</b>
-            </span>
-          </summary>
+        <div
+          id="dex-milestones"
+          className={styles.milestones}
+          hidden={!milestonesOpen}
+          role="region"
+          aria-labelledby="dex-milestones-heading"
+        >
           <div className={styles.milestoneBody}>
+            <h3 id="dex-milestones-heading">Community mission · DEX &gt; CEX</h3>
             <p>
-              Daily DEX volume needed for each milestone, holding today’s CEX
-              volume constant.
+              DEX share = DEX ÷ (CEX + DEX). Daily volume targets below hold
+              today’s CEX volume constant.
             </p>
             {milestones.some(Boolean) ? (
               <table className={styles.milestoneTable}>
@@ -601,13 +625,12 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             )}
             <div className={styles.milestoneFoot}>
               <span>
-                <strong>50% share = 100% DEX/CEX.</strong> DEX leads above this
-                point.
+                <strong>50% share means equal volume.</strong> DEX leads above 50%.
               </span>
               <a href="#methodology">How it’s calculated ↗</a>
             </div>
           </div>
-        </details>
+        </div>
       </section>
 
       <div className={styles.featureGrid}>
