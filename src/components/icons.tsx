@@ -123,6 +123,14 @@ export const IconUsers = svg(
   </>,
 );
 
+export const IconCalculator = svg(
+  <>
+    <rect x="5" y="2.5" width="14" height="19" rx="2.5" />
+    <rect x="8" y="6" width="8" height="3" rx="0.7" />
+    <path d="M8.5 13h.01M12 13h.01M15.5 13h.01M8.5 17h.01M12 17h.01M15.5 17h.01" strokeWidth="2.8" />
+  </>,
+);
+
 export const IconChart = svg(
   <>
     <path d="M3 3v18h18" />

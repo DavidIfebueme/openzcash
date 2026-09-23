@@ -11,6 +11,7 @@ import {
   IconBalance,
   IconBook,
   IconChart,
+  IconCalculator,
   IconCheck,
   IconCoins,
   IconDashboard,
@@ -37,6 +38,7 @@ type IconType = ComponentType<{ className?: string }>;
 /** Line icons by key (apps without a logo) and by route (inner pages). */
 const ICON_BY_KEY: Record<string, IconType> = {
   book: IconBook,
+  calculator: IconCalculator,
   news: IconNews,
   shield: IconShield,
   grant: IconGrant,

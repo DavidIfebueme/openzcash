@@ -1,0 +1,28 @@
+.numberInput {
+  appearance: textfield;
+  border-radius: 0;
+}
+
+/* The complete value + unit field owns the visible focus indicator. */
+.numberInput:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.numberInput::-webkit-inner-spin-button,
+.numberInput::-webkit-outer-spin-button {
+  margin: 0;
+  -webkit-appearance: none;
+}
+
+.numberInput[data-stepper="true"] {
+  appearance: auto;
+}
+
+.numberInput[data-stepper="true"]::-webkit-inner-spin-button,
+.numberInput[data-stepper="true"]::-webkit-outer-spin-button {
+  -webkit-appearance: auto;
+  opacity: 1;
+  cursor: pointer;
+}

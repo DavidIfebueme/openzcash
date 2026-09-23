@@ -30,7 +30,7 @@ const GOLD = "#f4b728", INK = "#1c1917";
 // App marks for apps without an official logo: the ink glyph alone on a
 // transparent square; the sidebar and the launcher put every app mark, official
 // or generated, on the same white rounded tile, so the glyph carries no tile.
-const APPS = { monthly: "IconBook", news: "IconNews", lockbox: "IconShield", defi: "IconSwap", z3: "IconTerminal", wallets: "IconWallet", ecosystem: "IconGlobe", manage: "IconGrid" };
+const APPS = { calculator: "IconCalculator", monthly: "IconBook", news: "IconNews", lockbox: "IconShield", defi: "IconSwap", z3: "IconTerminal", wallets: "IconWallet", ecosystem: "IconGlobe", manage: "IconGrid" };
 for (const [id, icon] of Object.entries(APPS)) {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><g transform="translate(16 16) scale(4)" fill="none" stroke="${INK}" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${shape(icon)}</g></svg>`;
   await sharp(Buffer.from(svg)).png().toFile(`public/logos/marks/${id}.png`);
