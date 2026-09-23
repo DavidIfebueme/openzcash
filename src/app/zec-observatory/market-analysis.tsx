@@ -21,11 +21,13 @@ import type { MarketDashboard } from "@/lib/markets/sources";
 import {
   dexMilestone,
   holderIdentity,
+  type Holder,
   type HolderKind,
   type Venue,
 } from "@/lib/markets/model";
 import styles from "./markets.module.css";
 import { marketLogo } from "@/lib/markets/logos";
+import { Pagination, usePagination } from "./pagination";
 
 const compact = (n: number, digits = 1) =>
   new Intl.NumberFormat("en-US", {
@@ -118,6 +120,57 @@ function Title({
   );
 }
 
+function HolderAddresses({
+  holder,
+  whale,
+  query,
+}: {
+  holder: Holder;
+  whale: boolean;
+  query: string;
+}) {
+  const search = query.toLowerCase();
+  const addresses = holder.name.toLowerCase().includes(search)
+    ? holder.addresses
+    : holder.addresses.filter((a) =>
+        `${a.label} ${a.address}`.toLowerCase().includes(search),
+      );
+  const pagination = usePagination(addresses);
+  return (
+    <div className={styles.addressList}>
+      <p>
+        {whale
+          ? "Address balance, not total wealth. No owner is inferred from transaction activity."
+          : `${kinds[holder.kind]} · labels do not prove complete reserves or solvency.`}
+      </p>
+      {pagination.items.map((a) => (
+        <div key={a.address}>
+          <div>
+            <Out href={a.source}>
+              <code>{a.address}</code>
+            </Out>
+            <small>
+              {a.category === "unknown"
+                ? "No public ownership label"
+                : `${a.label} · ${a.verified ? "CipherScan verified label" : "Unverified label"}`}
+            </small>
+          </div>
+          <strong>
+            {a.zec === null ? "Unavailable" : `${number(a.zec, 8)} ZEC`}
+          </strong>
+        </div>
+      ))}
+      {pagination.pageCount > 1 && (
+        <Pagination
+          pagination={pagination}
+          label={`${holder.name} addresses`}
+          itemLabel="addresses"
+        />
+      )}
+    </div>
+  );
+}
+
 /** Chains combine execution venues for the overview; expanded rows retain every source. */
 function leaderboard(venues: Venue[]) {
   const grouped = new Map<string, Venue & { members: Venue[] }>();
@@ -154,11 +207,8 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
   const [holderFilter, setHolderFilter] = useState<
     "all" | "whales" | HolderKind
   >("cex");
-  const [whaleLimit, setWhaleLimit] = useState(8);
   const [query, setQuery] = useState("");
   const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
-  const [allVenues, setAllVenues] = useState(false);
-  const [allTokens, setAllTokens] = useState(false);
   const [activeSection, setActiveSection] = useState("volume");
   const navigation = useRef<HTMLElement>(null);
   useEffect(() => {
@@ -278,14 +328,11 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         .includes(query.toLowerCase()),
   );
   const largest = Math.max(1, ...filteredHolders.map((h) => h.zec ?? 0));
-  const shownHolders =
-    holderFilter === "whales"
-      ? filteredHolders.slice(0, whaleLimit)
-      : filteredHolders;
+  const holderPagination = usePagination(filteredHolders);
   const rows = leaderboard(data.venues).filter(
     (v) => venueFilter === "all" || v.kind === venueFilter,
   );
-  const shownRows = allVenues ? rows : rows.slice(0, 8);
+  const marketPagination = usePagination(rows);
   const milestones = m
     ? [10, 25, 50].map((target) => dexMilestone(m.cex, m.dex, target))
     : [];
@@ -339,11 +386,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
       href: "#crosschain",
     },
   ];
-  const tokenRows = allTokens
-    ? data.wrapped
-    : data.wrapped.filter((w) =>
-        ["base", "solana", "bsc"].includes(w.asset.chain),
-      );
+  const tokenPagination = usePagination(data.wrapped);
   const kaminoDeposits =
     data.kamino.data?.reserves.reduce((sum, r) => sum + r.zec, 0) ?? null;
 
@@ -598,7 +641,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 aria-pressed={venueFilter === f}
                 onClick={() => {
                   setVenueFilter(f);
-                  setAllVenues(false);
+                  marketPagination.setPage(0);
                 }}
               >
                 {f === "all" ? "All" : f.toUpperCase()}
@@ -612,11 +655,13 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           <span>Share</span>
         </div>
         <div className={styles.marketList}>
-          {shownRows.map((v, i) => (
+          {marketPagination.items.map((v, i) => (
             <details className={styles.marketRow} key={v.id}>
               <summary>
                 <div className={styles.entity}>
-                  <span className={styles.rank}>{i + 1}</span>
+                  <span className={styles.rank}>
+                    {marketPagination.start + i + 1}
+                  </span>
                   <Logo name={v.name} />
                   <div>
                     <strong>{v.name}</strong>
@@ -673,15 +718,11 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         {rows.length === 0 && (
           <p className={styles.empty}>No current data for this selection.</p>
         )}
-        {rows.length > 8 && (
-          <button
-            className={styles.showMore}
-            onClick={() => setAllVenues((v) => !v)}
-          >
-            {allVenues ? "Show fewer" : `View all ${rows.length} markets`}{" "}
-            <span aria-hidden="true">↓</span>
-          </button>
-        )}
+        <Pagination
+          pagination={marketPagination}
+          label="Markets"
+          itemLabel={rows.length === 1 ? "market" : "markets"}
+        />
         <p className={styles.panelFoot}>
           Spot execution only. NEAR Intents activity is shown separately below.
         </p>
@@ -768,7 +809,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <span>Issued supply</span>
             <span>Spot volume · 24h</span>
           </div>
-          {tokenRows.map((w) => (
+          {tokenPagination.items.map((w) => (
             <details key={w.asset.id} className={styles.tokenRow}>
               <summary>
                 <div className={styles.entity}>
@@ -833,15 +874,11 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               </div>
             </details>
           ))}
-          <button
-            className={styles.showMore}
-            onClick={() => setAllTokens((v) => !v)}
-          >
-            {allTokens
-              ? "Show main networks"
-              : `Explore all ${data.wrapped.length} registered tokens · ${new Set(data.wrapped.map((w) => w.asset.chain)).size} networks`}{" "}
-            <span aria-hidden="true">↓</span>
-          </button>
+          <Pagination
+            pagination={tokenPagination}
+            label="Tokens"
+            itemLabel="tokens"
+          />
           <div className={styles.lending}>
             <div className={styles.entity}>
               <Logo name="Kamino" />
@@ -957,7 +994,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   aria-pressed={holderFilter === f.id}
                   onClick={() => {
                     setHolderFilter(f.id);
-                    setWhaleLimit(8);
+                    holderPagination.setPage(0);
                   }}
                 >
                   {f.label}
@@ -971,7 +1008,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
-                setWhaleLimit(8);
+                holderPagination.setPage(0);
               }}
             />
           </div>
@@ -983,16 +1020,20 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           )}
           <div className={styles.holderHead} aria-hidden="true">
             <span>
-              {holderFilter === "whales" ? "Address / public label" : "Entity"}
+              {holderFilter === "whales"
+                ? "Address / public label"
+                : "Entity / grouped addresses"}
             </span>
             <span>Balance · ZEC</span>
             <span>% of supply</span>
           </div>
-          {shownHolders.map((h, i) => (
+          {holderPagination.items.map((h, i) => (
             <details key={h.id} className={styles.holder}>
               <summary>
                 <div className={styles.entity}>
-                  <span className={styles.rank}>{i + 1}</span>
+                  <span className={styles.rank}>
+                    {holderPagination.start + i + 1}
+                  </span>
                   <Logo name={h.name} />
                   <div>
                     <strong>{h.name}</strong>
@@ -1015,37 +1056,12 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                   <span aria-hidden="true">＋</span>
                 </span>
               </summary>
-              <div className={styles.addressList}>
-                <p>
-                  {holderFilter === "whales"
-                    ? "Address balance, not total wealth. No owner is inferred from transaction activity."
-                    : `${kinds[h.kind]} · labels do not prove complete reserves or solvency.`}
-                </p>
-                {h.addresses.map((a) => (
-                  <div key={a.address}>
-                    <div>
-                      <Out href={a.source}>
-                        <code>{a.address}</code>
-                      </Out>
-                      <small>
-                        {a.category === "unknown"
-                          ? "No public ownership label"
-                          : a.label + " · "}
-                        {a.category === "unknown"
-                          ? ""
-                          : a.verified
-                            ? "CipherScan verified label"
-                            : "Unverified label"}
-                      </small>
-                    </div>
-                    <strong>
-                      {a.zec === null
-                        ? "Unavailable"
-                        : `${number(a.zec, 8)} ZEC`}
-                    </strong>
-                  </div>
-                ))}
-              </div>
+              <HolderAddresses
+                key={`${h.id}:${query}`}
+                holder={h}
+                whale={holderFilter === "whales"}
+                query={query}
+              />
             </details>
           ))}
           {filteredHolders.length === 0 && (
@@ -1055,22 +1071,21 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 : "Address balances unavailable."}
             </p>
           )}
-          {holderFilter === "whales" &&
-            shownHolders.length < filteredHolders.length && (
-              <button
-                className={styles.showMore}
-                onClick={() => setWhaleLimit((n) => n + 20)}
-              >
-                Show more addresses · {shownHolders.length}/
-                {filteredHolders.length} <span aria-hidden="true">↓</span>
-              </button>
-            )}
+          <Pagination
+            pagination={holderPagination}
+            label="Holdings"
+            itemLabel={
+              holderFilter === "whales"
+                ? filteredHolders.length === 1 ? "address" : "addresses"
+                : filteredHolders.length === 1 ? "entity" : "entities"
+            }
+          />
           <div className={styles.panelFoot}>
             <span>
               {data.holdings.data
                 ? holderFilter === "whales"
                   ? `${data.holdings.data.largeAddresses.length} large addresses · top ${data.holdings.data.indexedAddresses} scanned`
-                  : `${data.holdings.data.resolved}/${data.holdings.data.labelCount} labels resolved`
+                  : `${data.holdings.data.resolved}/${data.holdings.data.labelCount} labeled address balances resolved`
                 : "Registry unavailable"}{" "}
               · {data.holdings.stale && data.holdings.data ? "Saved · " : ""}
               {stamp(data.holdings.fetchedAt)}
