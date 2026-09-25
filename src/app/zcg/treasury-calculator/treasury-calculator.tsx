@@ -50,6 +50,8 @@ const CALCULATOR_VIEWS = [
   { id: "community", label: "Community", description: "ZCG + Lockbox", Icon: IconWallet },
   { id: "company", label: "Company", description: "Ownership & purchases", Icon: IconChart },
 ] as const;
+/** Scenarios start at the current market price; the 1×–10× buttons scale it. */
+const DEFAULT_PRICE_MULTIPLE = 1;
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
 const compactMoney = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumFractionDigits: 2 });
@@ -121,7 +123,7 @@ export function TreasuryCalculator({
   const [values, setValues] = useState<Editable>(defaults);
   const [preset, setPreset] = useState("cypherpunk");
   const [basis, setBasis] = useState<SupplyBasis>("circulating");
-  const [multiple, setMultiple] = useState<number | null>(2);
+  const [multiple, setMultiple] = useState<number | null>(DEFAULT_PRICE_MULTIPLE);
   const [continueDevFund, setContinueDevFund] = useState(false);
   const [useReportedTreasury, setUseReportedTreasury] = useState(true);
   const [network, setNetwork] = useState({ height: NETWORK_SNAPSHOT_HEIGHT, snapshot: true });
@@ -157,7 +159,7 @@ export function TreasuryCalculator({
     setPreset(value);
     setValues(value === "cypherpunk" ? defaults : { ...defaults, company: "Custom treasury", holdings: "0", mining: "0" });
     setBasis("circulating");
-    setMultiple(2);
+    setMultiple(DEFAULT_PRICE_MULTIPLE);
     setContinueDevFund(false);
     setUseReportedTreasury(true);
   }
@@ -459,7 +461,7 @@ export function TreasuryCalculator({
                   {fundBudget.coverageYearsFuture === null ? "No annual spending" : <>{number.format(fundBudget.coverageYearsFuture)} <span className="text-base font-medium tracking-normal text-[var(--accent-ink)]">years</span></>}
                 </p>
                 {fundBudget.coverageYearsFuture === null ? <p className="mt-1 text-xs text-[var(--accent-ink)]">Enter grant spending above zero to calculate years of coverage.</p> : <>
-                  <p className="tnum mt-1 text-xs leading-relaxed text-[var(--accent-ink)]">At {price.format(futurePrice)} / ZEC <span className="mx-1 text-[var(--accent-muted)]">·</span> {number.format(fundBudget.coverageYearsNow!)} years at today’s price</p>
+                  <p className="tnum mt-1 text-xs leading-relaxed text-[var(--accent-ink)]">At {price.format(futurePrice)} / ZEC{futurePrice !== currentPrice ? <>{" "}<span className="mx-1 text-[var(--accent-muted)]">·</span> {number.format(fundBudget.coverageYearsNow!)} years at today’s price</> : null}</p>
                   <p className="mt-2 text-[11px] leading-relaxed text-[var(--accent-ink)]">Assumes the ZEC price and annual USD budget stay fixed for the entire period.</p>
                 </>}
               </div>
