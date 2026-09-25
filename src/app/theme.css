@@ -36,6 +36,12 @@
   /* The gold band behind the banner and the treasury bar. */
   --band: linear-gradient(180deg, #f6edd3 0%, #f3ebd8 100%);
   --band-glow: rgba(244, 183, 40, 0.5);
+  /* The dark frame around video: dark in both themes, like a screen. */
+  --stage: #17140f;
+  --stage-2: #231e17;
+  --stage-ink: #f1e7d4;
+  --stage-dim: #b3a58a;
+  --stage-line: rgba(241, 231, 212, 0.18);
   --rd-line: var(--line);
   --rd-gold: var(--accent);
   --ws-line: var(--line);
@@ -79,6 +85,8 @@
   --side-active: rgba(255, 255, 255, 0.1);
   --band: linear-gradient(180deg, #2b2416 0%, #15130f 100%);
   --band-glow: rgba(244, 183, 40, 0.42);
+  --stage: #070605;
+  --stage-2: #14110d;
   color-scheme: dark;
   background:
     radial-gradient(1100px 620px at 100% -10%, rgba(244, 183, 40, 0.16), transparent 60%),

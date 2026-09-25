@@ -1,0 +1,478 @@
+/* Zcash Ceremony. Colours come from the workspace tokens only. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+/* Header */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 880px;
+}
+.eyebrow {
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.title {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-ceremony), Georgia, serif;
+  font-size: clamp(40px, 5vw, 64px);
+  font-weight: 600;
+  line-height: 1.02;
+}
+.lede {
+  margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+  line-height: 1.65;
+}
+.h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-ceremony), Georgia, serif;
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 600;
+  line-height: 1.1;
+}
+.sectionHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+}
+.note {
+  margin: 0;
+  color: var(--dim);
+  font-size: 13px;
+  line-height: 1.55;
+}
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+}
+.links a,
+.link {
+  color: var(--accent-ink);
+}
+
+/* Cards and lists */
+.card {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.rows > * {
+  border-bottom: 1px solid var(--line);
+}
+.rows > *:last-child {
+  border-bottom: 0;
+}
+
+/* Overview: the feature, the parts, the countdown */
+.feature {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+  padding: 18px;
+  color: var(--ink);
+}
+.featureMedia {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--stage);
+}
+.featureMedia img {
+  object-fit: cover;
+}
+.playMark {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.playMark span {
+  display: flex;
+  width: 64px;
+  height: 64px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--stage-line);
+  border-radius: 50%;
+  background: var(--stage-2);
+  color: var(--stage-ink);
+}
+.featureText {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.featureTitle {
+  font-family: var(--font-ceremony), Georgia, serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1.05;
+}
+.partRow {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: baseline;
+  padding: 20px 24px;
+  color: var(--ink);
+}
+.partRow:hover .partTitle {
+  color: var(--accent-ink);
+}
+.numeral {
+  color: var(--accent-ink);
+  font-family: var(--font-ceremony), Georgia, serif;
+  font-size: 30px;
+  font-weight: 600;
+}
+.partTitle {
+  font-size: 17px;
+  font-weight: 600;
+}
+.partText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.meta {
+  color: var(--dim);
+  font-size: 12.5px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.countdown {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding: 16px 22px;
+  border: 1px solid var(--accent-muted);
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+.countdownTitle {
+  font-family: var(--font-ceremony), Georgia, serif;
+  font-size: 24px;
+  font-weight: 600;
+}
+.countdownDays {
+  font-size: 26px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Part I: chapters */
+.chapter {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 24px;
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+  scroll-margin-top: 80px;
+}
+.era {
+  color: var(--accent-ink);
+  font-size: 13px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.chapterBody {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 760px;
+}
+.chapterBody p {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15.5px;
+  line-height: 1.7;
+}
+.who {
+  color: var(--dim);
+  font-size: 13px;
+}
+
+/* Part II: people */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  line-height: 1.45;
+  vertical-align: top;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.table td strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.wrap {
+  overflow-x: auto;
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.person {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+}
+.avatar {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.personName {
+  color: var(--ink);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.personText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+/* Part IV: after the ceremony */
+.after {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.afterCard {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+}
+.date {
+  color: var(--accent-ink);
+  font-size: 12px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.afterTitle {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Part V: timeline and corrections */
+.year {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 24px;
+  padding: 22px 0;
+  border-top: 1px solid var(--line);
+}
+.yearNum {
+  color: var(--ink);
+  font-family: var(--font-ceremony), Georgia, serif;
+  font-size: 34px;
+  font-weight: 600;
+  line-height: 1;
+}
+.yearTitle {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 600;
+}
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.items li {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+.items strong {
+  display: block;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 18px 20px;
+  border-right: 1px solid var(--line);
+}
+.stat:last-child {
+  border-right: 0;
+}
+.statLabel {
+  color: var(--dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.statValue {
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.correction {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 20px;
+  padding: 18px 22px;
+}
+.claim {
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Previous and next part */
+.pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.pager a {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 44px;
+  color: var(--ink);
+}
+.pager a:last-child {
+  align-items: flex-end;
+  text-align: right;
+}
+.pager span {
+  color: var(--dim);
+  font-size: 12px;
+}
+.pager strong {
+  color: var(--accent-ink);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .feature {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .after {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .correction {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+  }
+}
+@media (max-width: 640px) {
+  .page {
+    gap: 28px;
+  }
+  .partRow {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 4px 12px;
+    padding: 16px;
+  }
+  .partRow .meta {
+    grid-column: 2;
+    text-align: left;
+  }
+  .chapter,
+  .year {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+  .stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stat {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .stat:last-child {
+    border-bottom: 0;
+  }
+  .table th,
+  .table td {
+    padding: 10px;
+  }
+  .hideSm {
+    display: none;
+  }
+}

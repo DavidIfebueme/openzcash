@@ -51,6 +51,7 @@ const ICON_BY_KEY: Record<string, IconType> = {
   sigma: IconSigma,
   users: IconUsers,
   grid: IconGrid,
+  key: IconKey,
 };
 const PAGE_ICON: Record<string, IconType> = {
   "/zcg/grants": IconGrant,

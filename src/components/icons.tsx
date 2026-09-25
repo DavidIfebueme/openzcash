@@ -65,6 +65,13 @@ export const IconArrowDown = svg(<path d="M12 5v14M19 12l-7 7-7-7" />);
 export const IconArrowUp = svg(<path d="M12 19V5M5 12l7-7 7 7" />);
 
 /** A rising line in a frame: positions and investments. */
+export const IconPlay = svg(
+  <>
+    <circle cx="12" cy="12" r="9" />
+    <path d="M10 8.5v7l6-3.5z" />
+  </>,
+);
+
 export const IconTrend = svg(
   <>
     <rect x="3" y="4" width="18" height="16" rx="2" />

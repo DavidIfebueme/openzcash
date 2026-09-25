@@ -5,6 +5,8 @@
  * related pages) derives from this list, so a route's place in the hierarchy
  * is defined once.
  */
+import { CEREMONY_HREF, PARTS } from "@/lib/ceremony/parts";
+
 export type AppPage = {
   href: string;
   label: string;
@@ -36,9 +38,16 @@ export type AppDef = {
 };
 
 export const APPS: AppDef[] = [
-  { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
   { id: "news", label: "News", href: "/news", sub: "What's new", logo: "/logos/marks/news.png", icon: "news", pages: [] },
-  { id: "zec-observatory", label: "ZEC Observatory", href: "/zec-observatory", sub: "Markets, supply & holdings", icon: "chart", pages: [] },
+  {
+    id: "ceremony",
+    label: "Zcash Ceremony",
+    href: CEREMONY_HREF,
+    sub: "The 2016 ceremony, its people and ten years",
+    logo: "/logos/marks/ceremony.png",
+    icon: "key",
+    pages: PARTS.map((p) => ({ href: p.href, label: p.short, mark: p.mark })),
+  },
   {
     id: "block-zero",
     label: "Zcash's Since block zero",
@@ -57,6 +66,7 @@ export const APPS: AppDef[] = [
     icon: "balance",
     pages: [],
   },
+  { id: "zec-observatory", label: "ZEC Observatory", href: "/zec-observatory", sub: "Markets, supply & holdings", icon: "chart", pages: [] },
   {
     id: "zcg",
     label: "ZCG",
@@ -86,6 +96,7 @@ export const APPS: AppDef[] = [
       { href: "/zcg/budget", label: "Budget", mark: "/logos/glyphs/budget.png", hidden: true },
     ],
   },
+  { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
   { id: "lockbox", label: "Lockbox", href: "/lockbox", sub: "Live funding", logo: "/logos/marks/lockbox.png", icon: "shield", pages: [], hidden: true },
   {
     id: "fpf",

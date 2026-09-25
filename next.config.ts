@@ -15,7 +15,10 @@ const csp = [
   "script-src 'self' 'unsafe-inline'",
   "style-src 'self' 'unsafe-inline'",
   // i.ytimg.com: recording thumbnails on /arborist (YouTube's public CDN).
-  "img-src 'self' data: blob: https://i.ytimg.com",
+  // archive.org: the Zcash Ceremony recordings stream from the Internet
+  // Archive (download URLs redirect to its *.us.archive.org data nodes).
+  "img-src 'self' data: blob: https://i.ytimg.com https://archive.org https://*.archive.org",
+  "media-src 'self' https://archive.org https://*.archive.org",
   "font-src 'self'",
   "connect-src 'self' blob:",
   "worker-src 'self'",
@@ -52,6 +55,7 @@ const nextConfig: NextConfig = {
       { source: "/cex-zec-dex", destination: "/zec-observatory", permanent: true },
       { source: "/decisions", destination: "/zcg/decisions", permanent: true },
       { source: "/treasury-calculator", destination: "/zcg/treasury-calculator", permanent: true },
+      { source: "/zcash10years", destination: "/ceremony/ten-years", permanent: true },
     ];
   },
   async headers() {
