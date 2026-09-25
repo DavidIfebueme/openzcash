@@ -1,0 +1,258 @@
+/* Where each slice went. Colours come from the workspace tokens only. */
+
+.section {
+  margin-top: 32px;
+}
+.eras {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.era {
+  display: grid;
+  grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+  gap: 28px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+}
+.era:last-child {
+  border-bottom: 0;
+}
+
+/* Era header: period, name, total, rule. */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.period {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.total {
+  margin-top: 6px;
+  color: var(--ink);
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums slashed-zero;
+  white-space: nowrap;
+}
+.rule {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.body {
+  min-width: 0;
+}
+.caption {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Proportional split of the era; one tint per slice, same tint on its row. */
+.split {
+  display: flex;
+  gap: 2px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+.split > span {
+  min-width: 2px;
+}
+.t1 {
+  background: var(--accent);
+}
+.t2 {
+  background: color-mix(in srgb, var(--accent) 70%, var(--surface));
+}
+.t3 {
+  background: color-mix(in srgb, var(--accent) 46%, var(--surface));
+}
+.t4 {
+  background: color-mix(in srgb, var(--accent) 28%, var(--surface));
+}
+
+.slices {
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.slice {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) 64px 150px;
+  grid-template-areas:
+    "sw name share amount"
+    ". note note note"
+    ". parts parts parts";
+  column-gap: 12px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.slice:first-child {
+  border-top: 0;
+}
+.swatch {
+  grid-area: sw;
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+.name {
+  grid-area: name;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+}
+.share {
+  grid-area: share;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.amount {
+  grid-area: amount;
+  color: var(--ink);
+  font-size: 13px;
+  text-align: right;
+  font-variant-numeric: tabular-nums slashed-zero;
+  white-space: nowrap;
+}
+.note {
+  grid-area: note;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+.note a,
+.facts a {
+  color: var(--accent-ink);
+}
+
+/* Where a slice split again: indented under its row, amounts aligned. */
+.parts {
+  grid-area: parts;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--line-strong);
+}
+.part {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  grid-template-areas:
+    "name amount"
+    "note note";
+  column-gap: 12px;
+  align-items: baseline;
+  padding: 5px 0 5px 14px;
+}
+.part[data-depth="2"] {
+  padding-left: 30px;
+}
+.part .name {
+  font-weight: 400;
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+.live::before {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pos);
+  content: "";
+}
+
+/* Short labelled facts under the slices, sources last. */
+.facts {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--line);
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: 84px minmax(0, 1fr);
+  column-gap: 12px;
+}
+.facts dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.75;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.facts dd {
+  margin: 0;
+  color: var(--ink);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+}
+
+@media (max-width: 900px) {
+  .era {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .era {
+    padding: 16px 14px;
+  }
+  .slice {
+    grid-template-columns: 10px minmax(0, 1fr) auto;
+    grid-template-areas:
+      "sw name amount"
+      ". share share"
+      ". note note"
+      ". parts parts";
+  }
+  .share {
+    text-align: left;
+  }
+  .part {
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding-left: 10px;
+  }
+  .part[data-depth="2"] {
+    padding-left: 22px;
+  }
+  .facts > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

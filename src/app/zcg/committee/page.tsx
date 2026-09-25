@@ -6,7 +6,7 @@ import {
 import { Card, PageHeader, Stat } from "@/components/ui";
 import { Synced } from "@/components/synced";
 import { formatUsdCents } from "@/lib/zcg/format";
-import { getElections, getMeetings } from "@/lib/zcg/governance-repo";
+import { getMeetings } from "@/lib/zcg/governance-repo";
 import { getStipendSummary } from "@/lib/zcg/stipends";
 import { getZcapMembers, ZCAP_SHEET_URL } from "@/lib/zcap/members";
 import { CurrentCommittee } from "../current-committee";
@@ -46,10 +46,9 @@ function formatDay(iso: string): string {
 export default async function CommitteePage() {
   // Each block degrades on its own: a source that is momentarily unreachable
   // hides its figure instead of the page.
-  const [stipends, meetings, elections, zcap] = await Promise.all([
+  const [stipends, meetings, zcap] = await Promise.all([
     getStipendSummary().catch(() => null),
     getMeetings().catch(() => []),
-    getElections().catch(() => []),
     getZcapMembers().catch(() => null),
   ]);
   const latestMinutes = meetings.slice(0, LATEST_MINUTES);
@@ -263,7 +262,7 @@ export default async function CommitteePage() {
 
       <SourceNote>
         Members, terms and roles: source-linked public facts on each card.
-        Elections: {elections.length} recorded. Stipends: the ZCG
+        Elections: the published results, linked on each card. Stipends: the ZCG
         monthly-payments tab. Minutes: the Zcash Community Forum. Electorate:
         the Foundation&apos;s{" "}
         <a

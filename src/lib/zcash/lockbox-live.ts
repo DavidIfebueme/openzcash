@@ -27,7 +27,7 @@ function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
 }
 
 /** Current Zcash chain tip, cached per instance (60s) to spare lightwalletd. */
-async function cachedChainTip(): Promise<number> {
+export async function cachedChainTip(): Promise<number> {
   const now = Date.now();
   if (tipCache.height > 0 && now - tipCache.at < TIP_TTL_MS) {
     return tipCache.height;

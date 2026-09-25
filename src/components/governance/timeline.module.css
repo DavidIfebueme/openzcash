@@ -1,0 +1,81 @@
+/* Dated lists of decisions (upgrades, rounds). Colours come from the workspace tokens only. */
+
+.timeline {
+  display: grid;
+  margin: 0 0 32px;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.timeline li {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  align-items: baseline;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.timeline li:last-child {
+  border-bottom: 0;
+}
+.timeline time {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.timeline strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.muted {
+  color: var(--muted);
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 2px 12px;
+  font-size: 12px;
+}
+.links a {
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+@media (max-width: 640px) {
+  .timeline li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .links {
+    justify-content: flex-start;
+  }
+}
+
+.status {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.status a {
+  margin-right: 10px;
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+
+.outcome {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+@media (max-width: 640px) {
+  .outcome {
+    justify-content: flex-start;
+  }
+}

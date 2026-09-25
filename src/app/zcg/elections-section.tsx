@@ -8,16 +8,40 @@ import {
 } from "@/lib/zcg/governance-repo";
 import { cn } from "@/lib/utils";
 import {
+  DecidedBy,
+  DecisionHomes,
+} from "@/components/governance/decision-homes";
+import {
+  electionRecord,
+  type ElectionEntry,
+  type RecordElection,
+} from "@/lib/governance/decisions";
+import record from "@/data/governance/record.json";
+import {
   type ElectionForm,
   ElectionControls,
   NewElectionButton,
 } from "./governance-admin";
+
+const RECORD_ELECTIONS = (record as unknown as { elections: RecordElection[] })
+  .elections;
 
 function fmt(iso?: string | null): string {
   if (!iso) return "·";
   return new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+}
+
+/** Results day, or its month when only the month is on record. */
+function when(e: ElectionEntry): string {
+  if (e.date) return fmt(e.date);
+  if (!e.month) return "·";
+  return new Date(`${e.month}-01T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "short",
     year: "numeric",
     timeZone: "UTC",
   });
@@ -82,15 +106,19 @@ export async function ElectionsSection() {
   ]);
   const current = currentElection(elections);
   const past = elections.filter((e) => isElectionClosed(e));
+  const entries = electionRecord(RECORD_ELECTIONS, past);
   const left = current ? daysLeft(current.votingCloses) : null;
 
   return (
-    <section className="mb-8">
-      <div className="mb-3 flex items-center justify-between">
+    <section id="elections" className="mb-8 scroll-mt-20">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-stone-700">
           Committee elections
         </h2>
-        {isAdmin ? <NewElectionButton /> : null}
+        <div className="flex flex-wrap items-center gap-3">
+          <DecidedBy who="ZCAP" how="Zcash Community Advisory Panel" />
+          {isAdmin ? <NewElectionButton /> : null}
+        </div>
       </div>
 
       {current ? (
@@ -186,58 +214,58 @@ export async function ElectionsSection() {
           <p className="text-[11px] font-semibold uppercase tracking-wider text-stone-600">
             Past elections
           </p>
-          {past.length > 0 ? (
+          {entries.length > 0 ? (
             <span className="tnum text-xs font-medium text-stone-600">
-              {past.length} closed
+              {entries.length} closed
             </span>
           ) : null}
         </div>
 
-        {past.length === 0 ? (
+        {entries.length === 0 ? (
           <Card className="border-dashed border-stone-200 px-4 py-10 text-center">
             <p className="text-sm text-stone-600">No past elections yet.</p>
           </Card>
         ) : (
           <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-            {past.map((e) => (
-              <li key={e.id}>
-                <Card className="flex h-full flex-col gap-2 border-stone-200/80 p-3.5 transition-colors hover:border-amber-300/70">
-                  {/* Year + seats */}
-                  <div className="flex items-center justify-between gap-2">
-                    <a
-                      href={e.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label={`Official results for ${e.title}`}
-                      className="group inline-flex min-w-0 items-center gap-1 text-[13px] font-semibold tracking-tight text-stone-900 hover:text-amber-700"
-                    >
-                      <span className="truncate">
-                        {e.title.replace(/ Election$/, "")}
+            {entries.map((e) => {
+              const fromDb = e.dbId
+                ? past.find((x) => x.id === e.dbId)
+                : undefined;
+              const href = e.sources[0]?.href;
+              return (
+                <li key={e.id}>
+                  <Card className="flex h-full flex-col gap-2 border-stone-200/80 p-3.5 transition-colors hover:border-amber-300/70">
+                    {/* Label + seats */}
+                    <div className="flex items-start justify-between gap-2">
+                      {href ? (
+                        <a
+                          href={href}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`Official results for ${e.label}`}
+                          className="group inline-flex min-w-0 items-start gap-1 text-[13px] font-semibold leading-snug tracking-tight text-stone-900 hover:text-amber-700"
+                        >
+                          <span>{e.label.replace(/ Election$/, "")}</span>
+                          <span
+                            aria-hidden
+                            className="shrink-0 text-amber-600/70"
+                          >
+                            ↗
+                          </span>
+                        </a>
+                      ) : (
+                        <span className="text-[13px] font-semibold leading-snug tracking-tight text-stone-900">
+                          {e.label.replace(/ Election$/, "")}
+                        </span>
+                      )}
+                      <span className="tnum shrink-0 rounded-full border border-amber-300/50 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                        {e.seats} {e.seats === 1 ? "seat" : "seats"}
                       </span>
-                      <svg
-                        viewBox="0 0 16 16"
-                        aria-hidden="true"
-                        className="h-3 w-3 shrink-0 text-amber-600/70 transition-transform group-hover:translate-x-0.5"
-                      >
-                        <path
-                          d="M3.5 8h8m0 0L8 4.5M11.5 8L8 11.5"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </a>
-                    <span className="tnum shrink-0 rounded-full border border-amber-300/50 bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                      {e.seats} {e.seats === 1 ? "seat" : "seats"}
-                    </span>
-                  </div>
+                    </div>
 
-                  {/* Elected pills */}
-                  {e.elected && e.elected.length > 0 ? (
+                    {/* Elected, with approvals when the tally is public */}
                     <ul className="flex flex-wrap gap-1">
-                      {e.elected.map((name, i) => (
+                      {e.elected.map((m, i) => (
                         <li
                           key={`${e.id}-${i}`}
                           className="inline-flex items-center gap-1 rounded-full border border-emerald-500/20 bg-emerald-500/10 py-0.5 pl-1.5 pr-2 text-[11px] font-medium text-emerald-800"
@@ -246,35 +274,54 @@ export async function ElectionsSection() {
                             aria-hidden="true"
                             className="h-1 w-1 shrink-0 rounded-full bg-emerald-500"
                           />
-                          <span className="leading-none">{name}</span>
+                          <span className="leading-none">
+                            {m.name}
+                            {m.approvals != null ? (
+                              <span className="tnum font-normal text-emerald-700/80">
+                                {" "}
+                                · {m.approvals}
+                              </span>
+                            ) : null}
+                          </span>
                         </li>
                       ))}
                     </ul>
-                  ) : (
-                    <p className="text-[11px] italic text-stone-600">
-                      Results pending.
+
+                    <p className="tnum mt-auto pt-0.5 text-[11px] text-stone-600">
+                      {when(e)}
+                      {e.ballots != null ? ` · ${e.ballots} ballots` : ""}
+                      {e.sources[1] ? (
+                        <>
+                          {" · "}
+                          <a
+                            href={e.sources[1].href}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hover:text-amber-700"
+                          >
+                            Thread ↗
+                          </a>
+                        </>
+                      ) : null}
                     </p>
-                  )}
 
-                  <p className="tnum mt-auto pt-0.5 text-[11px] text-stone-600">
-                    {e.resultsBy
-                      ? fmt(e.resultsBy)
-                      : e.votingCloses
-                        ? fmt(e.votingCloses)
-                        : "Closed"}
-                  </p>
-
-                  {isAdmin ? (
-                    <div className="border-t border-stone-100 pt-2">
-                      <ElectionControls id={e.id} initial={toForm(e)} />
-                    </div>
-                  ) : null}
-                </Card>
-              </li>
-            ))}
+                    {isAdmin && fromDb ? (
+                      <div className="border-t border-stone-100 pt-2">
+                        <ElectionControls
+                          id={fromDb.id}
+                          initial={toForm(fromDb)}
+                        />
+                      </div>
+                    ) : null}
+                  </Card>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
+
+      <DecisionHomes current="elections" />
     </section>
   );
 }

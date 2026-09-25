@@ -47,8 +47,8 @@ type Editable = {
 
 type CalculatorView = "company" | "community";
 const CALCULATOR_VIEWS = [
-  { id: "company", label: "Company", description: "Ownership & purchases", Icon: IconChart },
   { id: "community", label: "Community", description: "ZCG + Lockbox", Icon: IconWallet },
+  { id: "company", label: "Company", description: "Ownership & purchases", Icon: IconChart },
 ] as const;
 
 const money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
@@ -125,7 +125,7 @@ export function TreasuryCalculator({
   const [continueDevFund, setContinueDevFund] = useState(false);
   const [useReportedTreasury, setUseReportedTreasury] = useState(true);
   const [network, setNetwork] = useState({ height: NETWORK_SNAPSHOT_HEIGHT, snapshot: true });
-  const [activeView, setActiveView] = useState<CalculatorView>("company");
+  const [activeView, setActiveView] = useState<CalculatorView>("community");
   const calculatorTop = useRef<HTMLDivElement>(null);
   const viewTabs = useRef<Partial<Record<CalculatorView, HTMLButtonElement | null>>>({});
 
@@ -223,7 +223,7 @@ export function TreasuryCalculator({
     <div ref={calculatorTop} className="mx-auto max-w-[1280px] scroll-mt-20 text-stone-900">
       <PageHeader
         title="Treasury calculator"
-        subtitle="Compare company ownership and community funding using public Zcash data."
+        subtitle="Compare community funding and company ownership using public Zcash data."
         actions={activeView === "company" ? <label>
           <span className="sr-only">Treasury preset</span>
           <select value={preset} onChange={(event) => choosePreset(event.target.value)}>
@@ -241,8 +241,8 @@ export function TreasuryCalculator({
             tabIndex={activeView === id ? 0 : -1} onClick={() => selectView(id)}
             onKeyDown={(event) => {
               let next: CalculatorView;
-              if (event.key === "Home") next = "company";
-              else if (event.key === "End") next = "community";
+              if (event.key === "Home") next = CALCULATOR_VIEWS[0].id;
+              else if (event.key === "End") next = CALCULATOR_VIEWS[CALCULATOR_VIEWS.length - 1].id;
               else if (event.key === "ArrowLeft" || event.key === "ArrowRight") next = id === "company" ? "community" : "company";
               else return;
               event.preventDefault();

@@ -1,0 +1,135 @@
+/* Money since block zero. Colours come from the workspace tokens only. */
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.table th {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.table td {
+  padding: 10px 12px;
+  line-height: 1.45;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  vertical-align: top;
+}
+.table tr:last-child td {
+  border-bottom: 0;
+}
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums slashed-zero;
+  white-space: nowrap;
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 12px;
+}
+.wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.links a {
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+.bar {
+  position: relative;
+  height: 8px;
+  min-width: 96px;
+  border-radius: 999px;
+  background: var(--surface2);
+  overflow: hidden;
+}
+.bar > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 999px;
+  background: var(--accent);
+}
+.section {
+  margin-top: 32px;
+}
+.events {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.events li {
+  display: grid;
+  font-size: 13px;
+  line-height: 1.5;
+  grid-template-columns: 112px 1fr auto;
+  gap: 12px;
+  align-items: baseline;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+.events li:last-child {
+  border-bottom: 0;
+}
+.events time {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.events a {
+  color: var(--accent-ink);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.live {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent-muted);
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  font-size: 13px;
+}
+@media (max-width: 640px) {
+  .table th,
+  .table td {
+    padding: 8px 8px;
+  }
+  .table th {
+    white-space: normal;
+  }
+  .bar {
+    min-width: 48px;
+  }
+  .events li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .hideSm {
+    display: none;
+  }
+}

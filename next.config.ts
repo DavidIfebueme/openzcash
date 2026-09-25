@@ -50,6 +50,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/", destination: "/zcg", permanent: false },
       { source: "/cex-zec-dex", destination: "/zec-observatory", permanent: true },
+      { source: "/decisions", destination: "/zcg/decisions", permanent: true },
+      { source: "/treasury-calculator", destination: "/zcg/treasury-calculator", permanent: true },
     ];
   },
   async headers() {
