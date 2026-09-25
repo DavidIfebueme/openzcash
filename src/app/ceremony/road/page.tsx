@@ -8,7 +8,7 @@ import styles from "../ceremony.module.css";
 export const metadata = {
   title: "The road to the genesis block · Zcash Ceremony · OpenZcash",
   description:
-    "A short documentary of the forty years before the Zcash genesis block: Chaum's blind signatures, the cypherpunks, Hashcash and bit gold, Bitcoin, Zerocoin and Zerocash, and the 2016 ceremony.",
+    "A short documentary of the years from 1982 to the Zcash genesis block: Chaum's blind signatures, the cypherpunks, Hashcash and bit gold, Bitcoin, Zerocoin and Zerocash, and the 2016 ceremony.",
 };
 
 function ChapterQuote({ quote }: { quote: NonNullable<Chapter["quote"]> }) {
@@ -107,8 +107,8 @@ export default function RoadPage() {
           </article>
         ))}
         <p className={styles.dedication}>
-          In memory of Hal Finney (1956–2014), the first to run Bitcoin after
-          its creator.
+          In memory of Hal Finney (1956–2014), who received the first Bitcoin
+          transaction.
         </p>
       </section>
 

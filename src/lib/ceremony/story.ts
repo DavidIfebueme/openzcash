@@ -46,7 +46,7 @@ export const CHAPTERS: Chapter[] = [
     text: [
       "Long before blockchains, cryptographer David Chaum published “Blind Signatures for Untraceable Payments” (1982): a bank could sign a digital coin without seeing it, so the coin could later be spent without the bank linking it back to you. Digital cash that behaved like cash.",
       "Chaum founded DigiCash in 1989 to build it. Its eCash ran a real pilot at a US bank in 1995, but the company went bankrupt in 1998. The world was not ready, and the money still needed a bank at the center.",
-      "One detail matters for this story: among the young cryptographers who worked at DigiCash was Zooko Wilcox. The company failed; the apprenticeship did not.",
+      "One detail matters for this story: in 1996 a computer science student named Zooko Wilcox took a leave of absence to work as a junior coder at DigiCash. The company failed; the apprenticeship did not.",
     ],
   },
   {
@@ -56,7 +56,7 @@ export const CHAPTERS: Chapter[] = [
     who: "Hughes, May, Gilmore and a mailing list",
     text: [
       "In 1992 a mailing list formed around a simple position: privacy in the electronic age would have to be built with code, not requested from institutions. Eric Hughes opened his 1993 manifesto with the line “Privacy is necessary for an open society in the electronic age.”",
-      "The list became the proving ground for everything that followed: remailers, digital cash schemes, and the culture of shipping working cryptography instead of position papers. Zcash’s founding team traces directly to this milieu.",
+      "The list became the proving ground for everything that followed: remailers, digital cash schemes, and the culture of shipping working cryptography instead of position papers. Zooko Wilcox, who later brought Zcash to life, was posting to the list by 1997: an “original cypherpunk,” as Zcash’s own site puts it.",
     ],
   },
   {
@@ -67,7 +67,7 @@ export const CHAPTERS: Chapter[] = [
     text: [
       "Adam Back’s Hashcash (1997) made computation itself a scarce stamp. Wei Dai’s b-money and Nick Szabo’s bit gold (late 1990s) sketched money without a central issuer. Each solved a piece; none shipped as money.",
       "Hal Finney, veteran cypherpunk and PGP developer, also wrote working code for zero-knowledge proofs. At the rump session of the Crypto ’98 conference in Santa Barbara, on August 25, 1998, he gave a five-minute talk, “A zero-knowledge proof of possession of a pre-image of a SHA-1 hash”: a program that proves you know a message with a given SHA-1 hash without revealing the message, built on a proof system Ronald Cramer and Ivan Damgård presented at the same conference. It was a talk, not a paper, and the session was filmed.",
-      "In 2004 Finney built RPOW, reusable proofs of work: the closest thing to circulating digital scarcity before Bitcoin. When Bitcoin appeared, he was the first person besides its creator to run it, and the recipient of the first Bitcoin transaction ever sent (January 12, 2009).",
+      "In 2004 Finney built RPOW, reusable proofs of work: tokens minted from hashcash that could pass from person to person. The prototype ran on a central server and never took off. When Bitcoin appeared he was, by his own account, the first person besides its creator to run it, and he received the first Bitcoin transaction ever sent (January 12, 2009).",
       "Finney died in 2014. The problem he spent decades on, private electronic cash that needs no permission, is the problem Zcash exists to finish.",
     ],
     film: {
@@ -177,9 +177,9 @@ export const CHAPTERS: Chapter[] = [
     title: "The Ceremony",
     who: "Six witnesses, air-gapped machines, one secret guest",
     text: [
-      "Zcash’s original proving system required secret parameters that, if any single party kept them, could be used to counterfeit coins invisibly. So on October 22 and 23, 2016 the launch team ran a multi-party ceremony: six witnesses in separate places, air-gapped hardware, destroyed key material. If even one of them was honest, the parameters were safe.",
-      "The stations were paranoia made real. Peter Todd ran his from a moving vehicle, the “Cypherpunk Desert Bus.” At the Denver station, a phone behaved strangely enough mid-ceremony that the moment became a Radiolab story. And one witness, known only as “John Dobbertin,” stayed pseudonymous for six years: in April 2022, Zcash Media revealed he was Edward Snowden.",
-      "On October 28, 2016 the genesis block was mined. For a brief moment on launch week, one ZEC traded above the price of one Bitcoin. The experiment was live.",
+      "Zcash’s original proving system required secret parameters that, if any single party kept them, could be used to counterfeit coins invisibly. So on October 22 and 23, 2016 the launch team ran a multi-party ceremony: six witnesses in separate places, air-gapped hardware, destroyed key material. If even one of them was honest, the combined secret could never be rebuilt.",
+      "The stations were paranoia made real. Peter Todd ran his from a rented car on a drive through British Columbia, a trip he called the “Cypherpunk Desert Bus.” At the Denver station, a phone behaved strangely enough mid-ceremony that the moment became a Radiolab story. And one witness, known only as “John Dobbertin,” stayed pseudonymous for six years: in April 2022, Zcash Media revealed he was Edward Snowden.",
+      "On October 28, 2016 the genesis block was mined. That day, in a thin early market on the Poloniex exchange, one ZEC briefly reached roughly 3,300 BTC, and it still traded at 48 BTC later in the day, CoinDesk reported. The experiment was live.",
     ],
     links: [
       {
@@ -260,7 +260,7 @@ export const TIMELINE: Year[] = [
   },
   {
     year: "2022",
-    title: "NU5: the trusted setup ends",
+    title: "NU5: no more ceremonies",
     items: [
       {
         label: "May 31 · Orchard and Halo 2",
@@ -306,7 +306,7 @@ export const TIMELINE: Year[] = [
       },
       {
         label: "Jun 2–3 · The Orchard emergency",
-        text: "A soundness flaw in the Orchard circuit is closed by an emergency soft fork at block 3,363,426 and the NU6.2 hotfix at block 3,364,600 (ZIP 257).",
+        text: "A soundness flaw in the Orchard circuit leads to an emergency soft fork that disables Orchard at block 3,363,426; the NU6.2 network upgrade at block 3,364,600 re-enables it with a corrected circuit (ZIP 257).",
       },
       {
         label: "Jul 28 · Ironwood",
@@ -314,7 +314,7 @@ export const TIMELINE: Year[] = [
       },
       {
         label: "Sep 14 · NU7’s scope",
-        text: "Coinholders set the scope of NU7: keep the halvings, reissue from February 2031, retire v4 transactions and move to 25-second blocks. 2.4M ZEC took part in the first question.",
+        text: "Coinholders vote to keep the halvings, retire v4 transactions at NU7 and move to 25-second blocks; 2.4M ZEC took part in the first question. They also back reissuance from February 2031, but coinholder and community polls reach no shared majority on the date, and NU7 takes 2031 as the more conservative choice.",
       },
       {
         label: "Oct 28 · Ten years",
@@ -332,14 +332,14 @@ export const CORRECTIONS: { claim: string; fact: string }[] = [
   },
   {
     claim: "“Zerocash created zk-SNARKs”",
-    fact: "Zero-knowledge proofs date to 1985 and SNARK constructions to the early 2010s. Zerocash was the first full payment design built on them, hiding sender, receiver and amount; Zcash made it run in production.",
+    fact: "Zero-knowledge proofs date to 1985, and the first known SNARK construction, Micali’s CS proofs, to 1994; the zk-SNARKs Zerocash used come from the early 2010s. Zerocash was the first full payment design built on them, hiding sender, receiver and amount; Zcash made it run in production.",
   },
   {
     claim: "“Zcash is governed by a DAO”",
     fact: "There is no Zcash DAO. Decisions run through the ZIP process, ZCAP and coinholder polls, coinholder votes on the fund (ZIP 1016) and independent organizations. ZecHub runs a DAO, and it governs a community project, not the protocol.",
   },
   {
-    claim: "“The Major Grants Fund funds developers”",
-    fact: "That name is gone. The Major Grants slice was run by ZOMG, renamed Zcash Community Grants in February 2022; since NU6 in November 2024 its stream is paid to the Financial Privacy Foundation.",
+    claim: "“ZOMG runs the Major Grants”",
+    fact: "Not since February 2022, when Zcash Open Major Grants was renamed Zcash Community Grants. It still funds independent teams doing major ongoing development; since NU6 in November 2024 its stream is paid to the Financial Privacy Foundation.",
   },
 ];

@@ -6,16 +6,16 @@ import styles from "../ceremony.module.css";
 export const metadata = {
   title: "The record · Zcash Ceremony · OpenZcash",
   description:
-    "Everything the witnesses of the 2016 Zcash ceremony published, where it lives and under which licence: footage, transcript, keys, disc images, Radiolab and the short film.",
+    "What the 2016 Zcash ceremony left on the record, where it lives and under which licence: footage, transcript, keys, disc images, Radiolab and the short film.",
 };
 
 export default function RecordPage() {
   return (
     <div className={styles.page}>
       <PartHeader eyebrow={partEyebrow("record")} title="The record">
-        Everything the witnesses published, where it lives and the licence it
-        carries. The originals stay at their source; OpenZcash plays and links
-        them.
+        What the ceremony left on the record, where each piece lives and the
+        licence it carries. The originals stay at their source; OpenZcash plays
+        and links them.
       </PartHeader>
 
       <div className={`${styles.card} ${styles.wrap}`}>
@@ -58,9 +58,10 @@ export default function RecordPage() {
         </table>
       </div>
       <p className={styles.note}>
-        Sizes and lengths from the Internet Archive&apos;s item metadata,
-        checked September 25, 2026. &ldquo;Not stated&rdquo; means the item
-        carries no licence of its own.
+        Sizes from the Internet Archive&apos;s item metadata, counting the
+        original files only; lengths from the Internet Archive, YouTube and
+        Radiolab&apos;s podcast feed, checked September 25, 2026. &ldquo;Not
+        stated&rdquo; means the item carries no licence of its own.
       </p>
 
       <section className={styles.section} aria-labelledby="after">

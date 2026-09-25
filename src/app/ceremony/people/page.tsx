@@ -32,7 +32,8 @@ export default function PeoplePage() {
   return (
     <div className={styles.page}>
       <PartHeader eyebrow={partEyebrow("people")} title="The people">
-        Three witnesses were public from the start. Three ran under pseudonyms
+        Three witnesses were named to the other participants from the start and
+        to the public three days after the ceremony. Three ran under pseudonyms
         Zooko Wilcox invented so nobody could target them during the ceremony,
         and the last of those stayed hidden until 2022.
       </PartHeader>
@@ -90,7 +91,7 @@ export default function PeoplePage() {
             Zerocoin and Zerocash
           </h2>
           <span className={styles.note}>
-            2013 and 2014 · the papers Zcash implements
+            2013 and 2014 · Zerocoin, then Zerocash, which Zcash implements
           </span>
         </div>
         <div className={styles.grid}>
@@ -124,7 +125,7 @@ export default function PeoplePage() {
           <h2 id="lineage" className={styles.h2}>
             Before Zcash
           </h2>
-          <span className={styles.note}>1982 to 2009 · told in Part I</span>
+          <span className={styles.note}>1982 to 2016 · told in Part I</span>
         </div>
         <div className={styles.grid}>
           {LINEAGE.map((l) => (

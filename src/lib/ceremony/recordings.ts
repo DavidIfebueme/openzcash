@@ -2,7 +2,9 @@
  * The Denver station recording of the October 2016 Zcash parameter ceremony,
  * as Electric Coin Company published it on the Internet Archive in December
  * 2016 (item ThePhoneAnomalyDuringTheZcashCeremonyDenverStation, CC BY-NC 4.0).
- * Three cameras and three microphones ran together for 71:30. The files stay
+ * Three cameras and three microphones, synced by hand into one 71:30 editing
+ * timeline that starts two minutes before the phone anomaly; black space means
+ * a device was not recording. The files stay
  * at the Internet Archive; this site streams them and keeps only small frames.
  *
  * A fourth file, Vcam-long.mp4 in item ZcashCeremony_201612, is the same wide

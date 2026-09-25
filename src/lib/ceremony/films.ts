@@ -34,7 +34,7 @@ export const FILM_GROUPS: FilmGroup[] = [
   {
     id: "stations",
     title: "The other stations",
-    lede: "Two more witnesses filmed their air-gapped machines from purchase to destruction.",
+    lede: "Two more witnesses filmed their air-gapped machines from purchase to the end of the ceremony.",
     films: [
       {
         id: "orlando",
@@ -45,7 +45,7 @@ export const FILM_GROUPS: FilmGroup[] = [
         youtubeId: "RfFLvtkzau8",
         href: yt("RfFLvtkzau8"),
         source: "YouTube",
-        note: "Nearly 48 hours at his station in Florida, cut to seventy minutes: choosing a store by coin flip, buying the laptop, pulling its hard drive and wireless card, the rounds, and yanking the RAM at the end.",
+        note: "Nearly 48 hours at his station in Florida, cut to seventy minutes: choosing a store by coin flip, buying the desktop, pulling its hard drive and wireless card, the rounds, and yanking the RAM at the end.",
       },
       {
         id: "dc",
@@ -56,7 +56,7 @@ export const FILM_GROUPS: FilmGroup[] = [
         youtubeId: "K_dlc2ryiBI",
         href: yt("K_dlc2ryiBI"),
         source: "YouTube",
-        note: "A GoPro photo every ten seconds, from buying the compute node to the end of the ceremony. He cut both RAM sticks with tin snips on October 23.",
+        note: "A GoPro photo every ten seconds, from bringing the compute node home to the end of the ceremony. He cut both RAM sticks with tin snips on October 23.",
       },
       {
         id: "dc-album",
@@ -148,11 +148,11 @@ export const FILM_GROUPS: FilmGroup[] = [
         id: "tau-6",
         title: "Drilling the RAM",
         by: "Hudson Jameson and Steven Schroeder",
-        date: "2017-11-17",
+        date: "2017-11-16",
         lengthS: 13,
-        href: "https://imgur.com/a/2rUDz",
+        href: "https://imgur.com/vujhLby",
         source: "Imgur",
-        note: "Round 6: a foil Faraday cage in a windowless bathroom, then the RAM, drive and CPU destroyed with a drill and a hammer.",
+        note: "Round 6: a foil Faraday cage in a windowless bathroom, then the RAM, USB drive and CPU destroyed with a drill and a hammer.",
       },
     ],
   },
@@ -201,7 +201,7 @@ export const FILM_GROUPS: FilmGroup[] = [
         youtubeId: "3hK2CKEeIMU",
         href: yt("3hK2CKEeIMU"),
         source: "YouTube",
-        note: "On scaling zk-SNARK parameter generation, given while Powers of Tau was running.",
+        note: "An open-ended talk on how the Zcash Foundation could help set up zk-SNARK parameters, given at Devcon3 in Cancún days before Powers of Tau took its first contribution.",
       },
       {
         id: "devcon3-bowe",
@@ -255,7 +255,7 @@ export const FILM_GROUPS: FilmGroup[] = [
 
 /** Peter Todd kept his Desert Bus footage; his account says it is unreleased. */
 export const UNRELEASED = {
-  text: "Peter Todd’s cameras recorded the Cypherpunk Desert Bus continuously, but he has not released the footage; his repository only commits to the files by hash.",
+  text: "Peter Todd’s two GoPros recorded hours of the Cypherpunk Desert Bus, switched off while he typed his entropy, but he has not released the footage; his repository only commits to the files by hash.",
   links: [
     {
       label: "His account, Nov 14, 2016",

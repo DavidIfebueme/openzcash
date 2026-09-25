@@ -30,7 +30,7 @@ export const PARTS: CeremonyPart[] = [
     short: "I · The road",
     mark: "/logos/glyphs/road.png",
     summary:
-      "From Chaum's blind signatures and the cypherpunks to Zerocash: the forty years before the genesis block.",
+      "From Chaum's blind signatures and the cypherpunks to Zerocash: the thirty-four years before the genesis block.",
     meta: `1982 to 2016 · ${CHAPTERS.length} chapters`,
   },
   {
@@ -52,7 +52,7 @@ export const PARTS: CeremonyPart[] = [
     short: "III · Watch",
     mark: "/logos/glyphs/watch.png",
     summary:
-      "The Denver station in seven parts, the other stations' own films, the short film, Snowden's story and the talks.",
+      "The Denver station in seven parts, the Orlando and D.C. stations' own films, the short film, Snowden's story and the talks.",
     meta: `71 min · 3 cameras · ${allFilms().length} more films and talks`,
   },
   {
@@ -63,7 +63,7 @@ export const PARTS: CeremonyPart[] = [
     short: "IV · The record",
     mark: "/logos/glyphs/record.png",
     summary:
-      "Everything the witnesses published: footage, transcript, keys, disc images and the Radiolab story, each with licence and source.",
+      "What the ceremony left on the record: footage, transcript, keys, disc images and the Radiolab story, each with licence and source.",
     meta: `${RECORDS.length} records`,
   },
   {

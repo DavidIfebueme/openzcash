@@ -25,32 +25,42 @@ export const WITNESSES: Witness[] = [
     name: "Zooko Wilcox",
     knownAs: null,
     role: "Ran the Denver station",
-    public: "From the start",
+    public: "October 26, 2016",
     sources: [DESIGN_OF_THE_CEREMONY],
   },
   {
     name: "Andrew Miller",
     knownAs: null,
     role: "Computer scientist and Zcash technical advisor",
-    public: "From the start",
+    public: "October 26, 2016",
     sources: [DESIGN_OF_THE_CEREMONY],
   },
   {
     name: "Peter Van Valkenburgh",
     knownAs: null,
-    role: "Coin Center",
-    public: "From the start",
-    sources: [DESIGN_OF_THE_CEREMONY],
+    role: "Coin Center; ran the Washington, D.C. station",
+    public: "October 26, 2016",
+    sources: [
+      {
+        label: "His notes on the D.C. station",
+        href: "https://gist.github.com/valkenburgh/8cf1d1e0a93daff5f051def361d9722d",
+      },
+      DESIGN_OF_THE_CEREMONY,
+    ],
   },
   {
     name: "Peter Todd",
     knownAs: "Fabrice Renault",
-    role: "Bitcoin Core developer; ran his station on the Cypherpunk Desert Bus",
+    role: "Bitcoin Core developer; ran his station in a rented car on a drive through British Columbia, which he named the Cypherpunk Desert Bus",
     public: "October 2016, in his own post",
     sources: [
       {
         label: "Peter Todd's post, Oct 2016",
         href: "https://twitter.com/petertoddbtc/status/791495928108625921",
+      },
+      {
+        label: "The Cypherpunk Desert Bus, Nov 2016",
+        href: "https://petertodd.org/2016/cypherpunk-desert-bus-zcash-trusted-setup-ceremony",
       },
       DESIGN_OF_THE_CEREMONY,
     ],
@@ -58,7 +68,7 @@ export const WITNESSES: Witness[] = [
   {
     name: "Derek Hinch",
     knownAs: "Moses Spears",
-    role: "NCC Group, secretly hired as a compute node",
+    role: "NCC Group, secretly hired as a compute node operator",
     public: "October 23, 2016",
     sources: [DESIGN_OF_THE_CEREMONY],
   },
@@ -147,7 +157,7 @@ export const LINEAGE: { name: string; note: string; chapter: string }[] = [
   },
   {
     name: "Hal Finney",
-    note: "A zero-knowledge proof talk, 1998; RPOW, 2004; the first Bitcoin transaction",
+    note: "A zero-knowledge proof talk, 1998; RPOW, 2004; received the first Bitcoin transaction, 2009",
     chapter: "missing-pieces",
   },
   {
@@ -174,10 +184,9 @@ export function uniquePeople(): string[] {
   ];
 }
 
-export const initials = (name: string) =>
-  name
-    .split(/\s+/)
-    .filter((w) => /^[A-Z]/.test(w))
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("");
+/** First and last capitalised word, so "Aviel D. Rubin" reads "AR". */
+export const initials = (name: string) => {
+  const words = name.split(/\s+/).filter((w) => /^[A-Z]/.test(w));
+  if (words.length < 2) return words[0]?.[0] ?? "";
+  return words[0][0] + words[words.length - 1][0];
+};

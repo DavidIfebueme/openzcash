@@ -11,7 +11,14 @@ import {
   partAt,
   partsOf,
 } from "./recordings";
-import { LINEAGE, WITNESSES, OBSERVER, AUTHORS, uniquePeople } from "./people";
+import {
+  LINEAGE,
+  WITNESSES,
+  OBSERVER,
+  AUTHORS,
+  initials,
+  uniquePeople,
+} from "./people";
 import { RECORDS } from "./record";
 import { CHAPTERS, CORRECTIONS, TIMELINE, daysUntil } from "./story";
 
@@ -157,6 +164,46 @@ describe("the story", () => {
     expect(text).not.toMatch(
       /Satoshi (mentioned|cited|thanked) (Daira|Hopwood)/,
     );
+  });
+});
+
+describe("the audit of 2026-09-25", () => {
+  it("keeps the corrected wording", async () => {
+    const { FILM_GROUPS, UNRELEASED } = await import("./films");
+    const { AFTER } = await import("./record");
+    const all = JSON.stringify([
+      CHAPTERS,
+      TIMELINE,
+      CORRECTIONS,
+      WITNESSES,
+      LINEAGE,
+      FILM_GROUPS,
+      UNRELEASED,
+      RECORDS,
+      AFTER,
+    ]);
+    for (const wrong of [
+      /young cryptographers who worked at DigiCash/,
+      /closest thing to circulating digital scarcity/,
+      /founding team traces directly/,
+      /the NU6.2 hotfix/,
+      /Coinholders set the scope/,
+      /SNARK constructions to the early 2010s/,
+      /buying the laptop/,
+      /purchase to destruction/,
+      /recorded the Cypherpunk Desert Bus continuously/,
+      /given while Powers of Tau was running/,
+      /The trusted setup ends/,
+    ])
+      expect(all, String(wrong)).not.toMatch(wrong);
+    expect(
+      WITNESSES.filter((w) => w.public === "October 26, 2016"),
+    ).toHaveLength(3);
+  });
+
+  it("draws first-and-last initials", () => {
+    expect(initials("Aviel D. Rubin")).toBe("AR");
+    expect(initials("Zooko Wilcox")).toBe("ZW");
   });
 });
 

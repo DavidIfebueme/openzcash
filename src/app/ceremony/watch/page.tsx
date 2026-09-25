@@ -18,7 +18,7 @@ import styles from "../ceremony.module.css";
 export const metadata = {
   title: "Watch the ceremony · Zcash Ceremony · OpenZcash",
   description:
-    "The Denver station of the 2016 Zcash parameter ceremony, as three cameras and three microphones recorded it, in seven parts. Streams from the Internet Archive.",
+    "71 minutes of the Denver station of the 2016 Zcash parameter ceremony, as three cameras and three microphones recorded them, in seven parts. Streams from the Internet Archive.",
 };
 
 const PARTS_OF_RECORDING = partsOf(DURATION_S, 7);
@@ -33,8 +33,10 @@ export default function WatchPage() {
         title="Watch the ceremony"
       >
         Zooko Wilcox ran the Denver station while journalist Morgen Peck
-        observed. Three cameras and three microphones recorded the whole
-        computation together. Nothing loads until you press play.
+        observed. Three cameras and three microphones recorded 71 minutes of it
+        together on the first evening, starting two minutes before her phone
+        began echoing the station&apos;s Google Hangout. Nothing loads until you
+        press play.
       </PartHeader>
 
       <CeremonyPlayer
@@ -54,8 +56,8 @@ export default function WatchPage() {
 
       <p className={styles.note}>
         Cameras 1 and 2 go dark for a few minutes; Camera 3, the wide shot, runs
-        throughout. The recordings stream from the Internet Archive in their
-        original 720p.
+        throughout. The recordings stream from the Internet Archive as 720p
+        MP4s; the cameras recorded in 1080p.
       </p>
 
       <Films />

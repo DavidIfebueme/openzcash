@@ -22,12 +22,13 @@ export default function CeremonyOverviewPage() {
     <div className={styles.page}>
       <PartHeader
         eyebrow="Zcash Ceremony · October 22–23, 2016"
-        title="Six witnesses, six secrets, all destroyed."
+        title="Six witnesses, six secrets to destroy."
       >
         Before the genesis block, six people in separate places each generated
-        one shard of Zcash&apos;s parameters and destroyed their secret. If even
-        one of them was honest, nobody could counterfeit coins. Their story,
-        their footage and the record they left, in five parts.
+        one shard of Zcash&apos;s parameters and reported destroying their
+        secret. If even one of them was honest, the combined secret could never
+        be rebuilt. Their story, their footage and the record they left, in five
+        parts.
       </PartHeader>
 
       <Link href={watch.href} className={`${styles.card} ${styles.feature}`}>
@@ -59,9 +60,10 @@ export default function CeremonyOverviewPage() {
           <span className={styles.eyebrow}>Part {watch.numeral}</span>
           <span className={styles.featureTitle}>{watch.title}</span>
           <span className={styles.muted}>
-            The Denver station as three cameras and three microphones recorded
-            it, {clock(DURATION_S)} in seven parts. Switch cameras without
-            losing the moment, or just listen.
+            {clock(DURATION_S)} of the Denver station, from just before the
+            phone anomaly, as three cameras and three microphones recorded it,
+            in seven parts. Switch cameras without losing the moment, or just
+            listen.
           </span>
           <span className={styles.link}>Play from the start →</span>
         </span>
