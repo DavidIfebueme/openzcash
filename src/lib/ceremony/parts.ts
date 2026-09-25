@@ -2,6 +2,9 @@
  * The Zcash Ceremony app opens in five parts. One list feeds the sidebar,
  * the overview and the previous/next links at the foot of every part.
  */
+import { allFilms } from "./films";
+import { RECORDS } from "./record";
+
 export type CeremonyPart = {
   numeral: "I" | "II" | "III" | "IV" | "V";
   slug: string;
@@ -21,7 +24,7 @@ export const PARTS: CeremonyPart[] = [
     numeral: "I",
     slug: "road",
     href: "/ceremony/road",
-    title: "The road to Zcash",
+    title: "The road to the genesis block",
     short: "I · The road",
     mark: "/logos/glyphs/road.png",
     summary:
@@ -47,8 +50,8 @@ export const PARTS: CeremonyPart[] = [
     short: "III · Watch",
     mark: "/logos/glyphs/watch.png",
     summary:
-      "The Denver station in seven parts: three cameras and three microphones, kept in step, or just the sound.",
-    meta: "71 min · 3 cameras · 3 microphones",
+      "The Denver station in seven parts, the other stations' own films, the short film, Snowden's story and the talks.",
+    meta: `71 min · 3 cameras · ${allFilms().length} more films and talks`,
   },
   {
     numeral: "IV",
@@ -59,7 +62,7 @@ export const PARTS: CeremonyPart[] = [
     mark: "/logos/glyphs/record.png",
     summary:
       "Everything the witnesses published: footage, transcript, keys, disc images and the Radiolab story, each with licence and source.",
-    meta: "8 records",
+    meta: `${RECORDS.length} records`,
   },
   {
     numeral: "V",

@@ -38,11 +38,49 @@ export const RECORDS: RecordItem[] = [
   },
   {
     item: "Denver station, Vcam-long",
-    contents: "The same wide shot as Camera 3, in an item of its own",
+    contents: "An earlier upload of the wide shot; its uploader marks it superseded by the item above",
     bytes: 5_547_383_245,
     lengthS: 4292,
     licence: "Not stated",
     source: IA("ZcashCeremony_201612"),
+  },
+  {
+    item: "Denver station, disc images",
+    contents: "The station's DVDs: operating systems, disks A to F, test burns and a checksum script",
+    bytes: 2_639_306_098,
+    lengthS: null,
+    licence: "Not stated",
+    source: IA("zcash-denver-2016-10-22-images"),
+  },
+  {
+    item: "Orlando station, Andrew Miller",
+    contents: "Nearly 48 hours of his air-gapped station, cut to one video",
+    bytes: null,
+    lengthS: 4173,
+    licence: "YouTube licence",
+    source: { label: "YouTube", href: "https://www.youtube.com/watch?v=RfFLvtkzau8" },
+  },
+  {
+    item: "DC station, written account",
+    contents: "Peter Van Valkenburgh's notes, with his timelapse and photo album",
+    bytes: null,
+    lengthS: null,
+    licence: "Not stated",
+    source: {
+      label: "GitHub gist",
+      href: "https://gist.github.com/valkenburgh/8cf1d1e0a93daff5f051def361d9722d",
+    },
+  },
+  {
+    item: "Desert Bus, Peter Todd's account",
+    contents: "His story and photos of the car-mounted station; the footage is unreleased",
+    bytes: null,
+    lengthS: null,
+    licence: "Not stated",
+    source: {
+      label: "petertodd.org",
+      href: "https://petertodd.org/2016/cypherpunk-desert-bus-zcash-trusted-setup-ceremony",
+    },
   },
   {
     item: "Sprout MPC data",
@@ -72,7 +110,7 @@ export const RECORDS: RecordItem[] = [
     item: 'Radiolab, "The Ceremony"',
     contents: "Podcast episode, July 14, 2017",
     bytes: null,
-    lengthS: 2848,
+    lengthS: 2840,
     licence: "WNYC Studios, all rights reserved",
     source: {
       label: "Radiolab",
@@ -102,7 +140,7 @@ export const AFTER: { date: string; title: string; text: string }[] = [
   {
     date: "Mar 2018",
     title: "The quiet save",
-    text: "A flaw in the proving system is found and fixed in silence, then disclosed in February 2019. No exploitation was ever found.",
+    text: "A flaw in the proving system is found, fixed quietly by the Sapling upgrade in October 2018, then disclosed in February 2019. No exploitation was ever found.",
   },
   {
     date: "May 31, 2022",

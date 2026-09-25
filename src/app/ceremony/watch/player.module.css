@@ -59,21 +59,48 @@
 }
 .bar {
   display: flex;
-  gap: 3px;
-  height: 5px;
-  padding: 0 16px;
-  margin-top: 12px;
+  gap: 4px;
+  padding: 4px 12px 0;
 }
-.bar span {
+.segment {
+  display: flex;
   flex: 1 1 0;
+  min-width: 0;
+  height: 28px;
+  align-items: center;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.segment:hover .track,
+.segment:focus-visible .track {
+  height: 8px;
+}
+.segment:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+.track {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
   border-radius: 3px;
   background: var(--stage-line);
+  transition: height 0.12s ease;
 }
-.bar .done {
+.segment[aria-current="true"] .track {
+  height: 8px;
+  box-shadow: 0 0 0 1px var(--accent-muted);
+}
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 3px;
   background: var(--accent);
-}
-.bar .now {
-  background: color-mix(in srgb, var(--accent) 55%, var(--stage));
 }
 .status {
   display: flex;

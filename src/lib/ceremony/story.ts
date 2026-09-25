@@ -144,8 +144,8 @@ export const TIMELINE: Year[] = [
     title: "The quiet save, then Sapling",
     items: [
       {
-        label: "Mar · A flaw found and fixed",
-        text: "Ariel Gabizon finds a flaw in the proving system Sprout used that could have allowed invisible counterfeiting. It is fixed silently and disclosed in February 2019. No evidence of exploitation was ever found.",
+        label: "Mar 1 · A flaw found",
+        text: "Ariel Gabizon finds a flaw in the proving system Sprout used that could have allowed invisible counterfeiting. It is fixed quietly by the Sapling upgrade in October and disclosed in February 2019. No evidence of exploitation was ever found.",
       },
       {
         label: "Oct 28 · Sapling",
@@ -220,8 +220,8 @@ export const TIMELINE: Year[] = [
     title: "The Orchard emergency, then year ten",
     items: [
       {
-        label: "Mar 16 · The first veto",
-        text: "Two key-holders, the Zcash Foundation and Shielded Labs, veto the $2.67M Q4 2025 grant to Bootstrap (ECC). The check on coinholder votes is real.",
+        label: "Mar 16 · A veto",
+        text: "Two key-holders, the Zcash Foundation and Shielded Labs, announce a veto of the $2.67M Q4 2025 grant to Bootstrap (ECC), approved by coinholders months earlier.",
       },
       {
         label: "Jun 2–3 · The Orchard emergency",
@@ -251,11 +251,11 @@ export const CORRECTIONS: { claim: string; fact: string }[] = [
   },
   {
     claim: "“Zerocash created zk-SNARKs”",
-    fact: "Zero-knowledge proofs date to 1985 and SNARK constructions to the early 2010s. Zerocash was the first design to turn them into a payment system; Zcash made that run in production.",
+    fact: "Zero-knowledge proofs date to 1985 and SNARK constructions to the early 2010s. Zerocash was the first full payment design built on them, hiding sender, receiver and amount; Zcash made it run in production.",
   },
   {
     claim: "“Zcash is governed by a DAO”",
-    fact: "There is no Zcash DAO. Decisions run through the ZIP process, ZCAP and coinholder polls, coinholder votes on the fund (ZIP 1016) and independent organizations. The only actual DAO in the ecosystem is ZecHub’s, and it governs a community project, not the protocol.",
+    fact: "There is no Zcash DAO. Decisions run through the ZIP process, ZCAP and coinholder polls, coinholder votes on the fund (ZIP 1016) and independent organizations. ZecHub runs a DAO, and it governs a community project, not the protocol.",
   },
   {
     claim: "“The Major Grants Fund funds developers”",

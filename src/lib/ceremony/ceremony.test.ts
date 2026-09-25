@@ -120,3 +120,23 @@ describe("the story", () => {
     expect(text).toMatch(/February 2022/);
   });
 });
+
+describe("the films", () => {
+  it("lists every film once, with a working link and a well-formed YouTube id", async () => {
+    const { FILM_GROUPS, UNRELEASED, allFilms } = await import("./films");
+    const films = allFilms();
+    expect(new Set(films.map((f) => f.id)).size).toBe(films.length);
+    for (const g of FILM_GROUPS) expect(g.films.length, g.id).toBeGreaterThan(0);
+    for (const f of films) {
+      expect(f.href, f.id).toMatch(/^https:\/\//);
+      expect(f.date, f.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      if (f.youtubeId) {
+        expect(f.youtubeId, f.id).toMatch(/^[A-Za-z0-9_-]{11}$/);
+        expect(f.href, f.id).toContain(f.youtubeId);
+      }
+      if (f.lengthS !== null) expect(f.lengthS).toBeGreaterThan(0);
+    }
+    expect(films.find((f) => f.youtubeId === "D6dY-3x3teM")?.by).toBe("Electric Coin Company");
+    for (const l of UNRELEASED.links) expect(l.href).toMatch(/^https:\/\//);
+  });
+});

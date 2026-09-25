@@ -3,42 +3,47 @@ import { Pager, PartHeader, partEyebrow } from "../part-chrome";
 import styles from "../ceremony.module.css";
 
 export const metadata = {
-  title: "The road to Zcash · Zcash Ceremony · OpenZcash",
+  title: "The road to the genesis block · Zcash Ceremony · OpenZcash",
   description:
-    "The forty years before the Zcash genesis block: Chaum's blind signatures, the cypherpunks, Hashcash and bit gold, Bitcoin, Zerocoin and Zerocash, and the 2016 ceremony.",
+    "A short documentary of the forty years before the Zcash genesis block: Chaum's blind signatures, the cypherpunks, Hashcash and bit gold, Bitcoin, Zerocoin and Zerocash, and the 2016 ceremony.",
 };
 
 export default function RoadPage() {
   return (
     <div className={styles.page}>
       <PartHeader
-        eyebrow={partEyebrow("road", "1982 to 2016")}
-        title="The road to Zcash"
+        eyebrow={partEyebrow("road", "A mini documentary")}
+        title="The road to the genesis block"
       >
-        Private electronic cash is an old idea. It took four decades of
-        cryptography, a mailing list, a transparent Bitcoin and two papers
-        before six witnesses could launch it.
+        Zcash did not begin in 2016. It began in 1982, with a cryptographer who
+        thought money should not report on its owner, and passed through every
+        hand that tried to build it before the technology was ready.
       </PartHeader>
 
-      <div>
-        {CHAPTERS.map((c) => (
+      <section className={styles.film} aria-label="Six chapters">
+        {CHAPTERS.map((c, i) => (
           <article
             key={c.id}
             id={c.id}
-            className={styles.chapter}
+            className={styles.filmChapter}
             aria-labelledby={`${c.id}-title`}
           >
-            <div className={styles.era}>{c.era}</div>
-            <div className={styles.chapterBody}>
-              <h2 id={`${c.id}-title`} className={styles.h2}>
+            <div>
+              <div className={styles.chapterNo}>
+                Chapter {String(i + 1).padStart(2, "0")}
+              </div>
+              <div className={styles.filmEra}>{c.era}</div>
+              <div className={styles.filmWho}>{c.who}</div>
+            </div>
+            <div className={styles.filmBody}>
+              <h2 id={`${c.id}-title`} className={styles.filmTitle}>
                 {c.title}
               </h2>
-              <div className={styles.who}>{c.who}</div>
               {c.text.map((t) => (
                 <p key={t.slice(0, 32)}>{t}</p>
               ))}
               {c.links ? (
-                <div className={styles.links}>
+                <div className={styles.filmLinks}>
                   {c.links.map((l) => (
                     <a
                       key={l.href}
@@ -54,7 +59,10 @@ export default function RoadPage() {
             </div>
           </article>
         ))}
-      </div>
+        <p className={styles.dedication}>
+          In memory of Hal Finney (1956–2014), the first to run Bitcoin after its creator.
+        </p>
+      </section>
 
       <Pager slug="road" />
     </div>

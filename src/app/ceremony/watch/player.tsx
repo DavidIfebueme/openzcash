@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import { clock, partAt, type Part } from "@/lib/ceremony/recordings";
+import { createController, type PlayerController } from "./controller";
 import styles from "./player.module.css";
 
 type ViewInfo = {
@@ -13,8 +14,6 @@ type ViewInfo = {
   poster: string;
 };
 type MicInfo = { id: string; label: string; url: string };
-/** "camera": the chosen camera's own sound; otherwise a microphone id. */
-type Sound = "camera" | string;
 
 type Props = {
   views: ViewInfo[];
@@ -25,17 +24,21 @@ type Props = {
   audioMbPerMinute: number;
 };
 
-/** Drift between the muted video and a microphone track before we resync. */
-const MAX_DRIFT_S = 0.35;
-
 type Connection = { saveData?: boolean; effectiveType?: string };
 
 const noSubscription = () => () => {};
 
 function isSlowConnection(): boolean {
   const c = (navigator as Navigator & { connection?: Connection }).connection;
-  return Boolean(c && (c.saveData || ["slow-2g", "2g", "3g"].includes(c.effectiveType ?? "")));
+  return Boolean(
+    c &&
+    (c.saveData || ["slow-2g", "2g", "3g"].includes(c.effectiveType ?? "")),
+  );
 }
+
+/** How much of part `p` has played at time `t`, from 0 to 1. */
+const fillOf = (p: Part, t: number) =>
+  t >= p.end ? 1 : t <= p.start ? 0 : (t - p.start) / (p.end - p.start);
 
 export function CeremonyPlayer({
   views,
@@ -47,103 +50,49 @@ export function CeremonyPlayer({
 }: Props) {
   const video = useRef<HTMLVideoElement>(null);
   const audio = useRef<HTMLAudioElement>(null);
-  /** Where to land once a newly chosen source has loaded. */
-  const pending = useRef<{ t: number; play: boolean } | null>(null);
+  // The elements keep their first source in markup; later choices are made
+  // by the controller inside the click, so React never reloads them.
+  const [first] = useState(() => ({
+    view: views[views.length - 1],
+    mic: mics[0],
+  }));
+  // Created on first use, inside a handler, so refs are never read in render.
+  const ctlRef = useRef<PlayerController | null>(null);
+  const ctl = () => (ctlRef.current ??= createController({ video, audio }));
 
-  const [viewId, setViewId] = useState(views[views.length - 1].id);
-  const [sound, setSound] = useState<Sound>("camera");
+  const [viewId, setViewId] = useState(first.view.id);
+  const [micId, setMicId] = useState<string | null>(null);
   const [listenOnly, setListenOnly] = useState(false);
   const [time, setTime] = useState(0);
-
-  const view = views.find((v) => v.id === viewId) ?? views[0];
-  const micId = sound === "camera" ? mics[0].id : sound;
-  const mic = mics.find((m) => m.id === micId) ?? mics[0];
-  const current = partAt(parts, time);
-
-  // Read once on the client; the server renders without the hint.
-  const slow = useSyncExternalStore(noSubscription, isSlowConnection, () => false);
-
-  /** The element the listener hears right now. */
-  const media = useCallback(
-    () => (listenOnly ? audio.current : video.current),
-    [listenOnly],
+  const slow = useSyncExternalStore(
+    noSubscription,
+    isSlowConnection,
+    () => false,
   );
 
-  const land = useCallback((el: HTMLMediaElement | null) => {
-    const p = pending.current;
-    if (!el || !p) return;
-    pending.current = null;
-    el.currentTime = p.t;
-    if (p.play) void el.play().catch(() => {});
-  }, []);
+  const view = views.find((v) => v.id === viewId) ?? views[0];
+  const listening = mics.find((m) => m.id === micId) ?? first.mic;
+  const current = partAt(parts, time);
+  const end = parts[parts.length - 1].end;
 
-  /** Keep a microphone track in step with the muted video. */
-  const follow = () => {
-    const v = video.current;
-    const a = audio.current;
-    if (listenOnly || sound === "camera" || !v || !a) return;
-    if (Math.abs(a.currentTime - v.currentTime) > MAX_DRIFT_S)
-      a.currentTime = v.currentTime;
-    if (v.paused && !a.paused) a.pause();
-    if (!v.paused && a.paused) void a.play().catch(() => {});
+  const chooseView = (v: ViewInfo) => {
+    ctl().chooseView(v.url);
+    setViewId(v.id);
   };
-
-  const chooseView = (id: string) => {
-    if (id === viewId) return;
-    const v = video.current;
-    if (v && v.currentTime > 0)
-      pending.current = { t: v.currentTime, play: !v.paused };
-    setViewId(id);
+  const chooseMic = (m: MicInfo) => {
+    ctl().chooseMic(m.url);
+    setMicId(m.id);
   };
-
-  // A new camera source reloads the element; resume where the last one was.
-  useEffect(() => {
-    const v = video.current;
-    if (!v || listenOnly) return;
-    if (pending.current?.play) void v.play().catch(() => {});
-  }, [viewId, listenOnly]);
-
-  const chooseSound = (next: Sound) => {
-    setSound(next);
-    const v = video.current;
-    const a = audio.current;
-    if (!v) return;
-    v.muted = next !== "camera";
-    if (next === "camera") {
-      a?.pause();
-    } else if (a && !v.paused) {
-      a.currentTime = v.currentTime;
-      void a.play().catch(() => {});
-    }
+  const chooseCameraSound = () => {
+    ctl().chooseCameraSound();
+    setMicId(null);
   };
-
   const toggleListenOnly = () => {
-    const from = media();
-    const t = from?.currentTime ?? time;
-    const play = from ? !from.paused : false;
-    from?.pause();
-    pending.current = t > 0 || play ? { t, play } : null;
-    setListenOnly((x) => !x);
+    ctl().toggleListenOnly();
+    setListenOnly(ctl().listenOnly);
   };
-
-  // After switching modes, land the other element on the same moment.
-  useEffect(() => {
-    const el = media();
-    if (!el || !pending.current) return;
-    if (el.readyState >= 1) land(el);
-    else if (pending.current.play) void el.play().catch(() => {});
-  }, [listenOnly, media, land]);
-
   const seek = (t: number) => {
-    const el = media();
-    if (!el) return;
-    if (el.readyState >= 1) {
-      el.currentTime = t;
-      void el.play().catch(() => {});
-    } else {
-      pending.current = { t, play: true };
-      void el.play().catch(() => {});
-    }
+    ctl().seek(t);
     setTime(t);
   };
 
@@ -151,73 +100,75 @@ export function CeremonyPlayer({
     <div className={styles.player}>
       <div className={styles.main}>
         <div className={styles.stage}>
+          <video
+            ref={video}
+            className={listenOnly ? styles.hidden : styles.video}
+            src={first.view.url}
+            poster={view.poster}
+            preload="none"
+            playsInline
+            controls
+            onLoadedMetadata={() => ctl().loaded("video")}
+            onTimeUpdate={(e) => {
+              if (!ctl().listenOnly) setTime(e.currentTarget.currentTime);
+              ctl().follow();
+            }}
+            onPlay={() => ctl().follow()}
+            onPause={() => ctl().follow()}
+            onSeeked={() => ctl().follow()}
+            aria-label={`${view.label}, ${view.shot.toLowerCase()}, Denver station`}
+          />
           {listenOnly ? (
             <div className={styles.listen}>
               <p className={styles.listenTitle}>
-                Listening to {mic.label.toLowerCase()}
+                Listening to {listening.label.toLowerCase()}
               </p>
               <p className={styles.listenNote}>
                 No video is loaded in this mode.
               </p>
             </div>
-          ) : (
-            <video
-              ref={video}
-              key="video"
-              className={styles.video}
-              src={view.url}
-              poster={view.poster}
-              preload="none"
-              playsInline
-              controls
-              muted={sound !== "camera"}
-              onLoadedMetadata={(e) => land(e.currentTarget)}
-              onTimeUpdate={(e) => {
-                setTime(e.currentTarget.currentTime);
-                follow();
-              }}
-              onPlay={follow}
-              onPause={follow}
-              onSeeked={follow}
-              aria-label={`${view.label}, ${view.shot.toLowerCase()}, Denver station`}
-            />
-          )}
+          ) : null}
           <audio
             ref={audio}
-            src={mic.url}
+            src={first.mic.url}
             preload="none"
             controls={listenOnly}
             className={listenOnly ? styles.audio : styles.hidden}
-            onLoadedMetadata={(e) => {
-              if (listenOnly) land(e.currentTarget);
-            }}
+            onLoadedMetadata={() => ctl().loaded("audio")}
             onTimeUpdate={(e) => {
-              if (listenOnly) setTime(e.currentTarget.currentTime);
+              if (ctl().listenOnly) setTime(e.currentTarget.currentTime);
             }}
-            aria-label={mic.label}
+            aria-label={listening.label}
           />
         </div>
-        <div className={styles.bar} aria-hidden="true">
+
+        <div className={styles.bar} role="group" aria-label="Jump to a part">
           {parts.map((p) => (
-            <span
+            <button
               key={p.index}
-              className={
-                p.index < current
-                  ? styles.done
-                  : p.index === current
-                    ? styles.now
-                    : undefined
-              }
-            />
+              type="button"
+              className={styles.segment}
+              aria-current={p.index === current ? "true" : undefined}
+              aria-label={`Part ${p.index}, ${clock(p.start)} to ${clock(p.end)}`}
+              onClick={() => seek(p.start)}
+            >
+              <span className={styles.track}>
+                <span
+                  className={styles.fill}
+                  style={{ width: `${fillOf(p, time) * 100}%` }}
+                />
+              </span>
+            </button>
           ))}
         </div>
         <div className={styles.status}>
           <span>
-            Part {current} of {parts.length} · {clock(time)} /{" "}
-            {clock(parts[parts.length - 1].end)}
+            Part {current} of {parts.length} · {clock(time)} / {clock(end)}
           </span>
           <span>
-            {listenOnly ? "Listen only" : `${view.label} · ${view.shot}`}
+            {listenOnly
+              ? `Listen only · ${listening.label}`
+              : `${view.label} · ${view.shot}`}
           </span>
         </div>
       </div>
@@ -232,7 +183,7 @@ export function CeremonyPlayer({
                 type="button"
                 aria-pressed={!listenOnly && v.id === viewId}
                 disabled={listenOnly}
-                onClick={() => chooseView(v.id)}
+                onClick={() => chooseView(v)}
                 className={styles.choice}
               >
                 <span className={styles.thumb}>
@@ -252,8 +203,8 @@ export function CeremonyPlayer({
           {!listenOnly ? (
             <button
               type="button"
-              aria-pressed={sound === "camera"}
-              onClick={() => chooseSound("camera")}
+              aria-pressed={micId === null}
+              onClick={chooseCameraSound}
               className={styles.pill}
             >
               The camera&apos;s own sound
@@ -263,8 +214,8 @@ export function CeremonyPlayer({
             <button
               key={m.id}
               type="button"
-              aria-pressed={listenOnly ? m.id === micId : sound === m.id}
-              onClick={() => chooseSound(m.id)}
+              aria-pressed={listenOnly ? m.id === listening.id : m.id === micId}
+              onClick={() => chooseMic(m)}
               className={styles.pill}
             >
               {m.label}

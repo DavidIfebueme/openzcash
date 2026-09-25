@@ -12,6 +12,7 @@ import {
 } from "@/lib/ceremony/recordings";
 import { Pager, PartHeader, partEyebrow } from "../part-chrome";
 import { CeremonyPlayer } from "./player";
+import { Films } from "./films";
 import styles from "../ceremony.module.css";
 
 export const metadata = {
@@ -57,13 +58,16 @@ export default function WatchPage() {
         original 720p.
       </p>
 
+      <Films />
+
       <SourceNote href={DENVER_ITEM_URL} label="Internet Archive item">
-        Published by Electric Coin Company on the Internet Archive in December
-        2016 under{" "}
+        Denver footage recorded by Nathaniel Kramer and published by Electric
+        Coin Company on the Internet Archive in December 2016 under{" "}
         <a href={LICENCE.href} target="_blank" rel="noreferrer">
           {LICENCE.label}
         </a>
         . OpenZcash streams the files from there and keeps only still frames.
+        The other films play from their own platforms.
       </SourceNote>
 
       <Pager slug="watch" />

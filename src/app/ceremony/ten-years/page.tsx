@@ -110,7 +110,7 @@ export default async function TenYearsPage() {
         <div className={`${styles.card} ${styles.rows}`}>
           {CORRECTIONS.map((c) => (
             <div key={c.claim} className={styles.correction}>
-              <span className={styles.claim}>{c.claim}</span>
+              <span className={styles.claimStruck}>{c.claim}</span>
               <span className={styles.muted}>{c.fact}</span>
             </div>
           ))}
