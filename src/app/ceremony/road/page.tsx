@@ -1,4 +1,5 @@
-import { CHAPTERS } from "@/lib/ceremony/story";
+import { Fragment } from "react";
+import { CHAPTERS, type Chapter } from "@/lib/ceremony/story";
 import { Pager, PartHeader, partEyebrow } from "../part-chrome";
 import styles from "../ceremony.module.css";
 
@@ -7,6 +8,19 @@ export const metadata = {
   description:
     "A short documentary of the forty years before the Zcash genesis block: Chaum's blind signatures, the cypherpunks, Hashcash and bit gold, Bitcoin, Zerocoin and Zerocash, and the 2016 ceremony.",
 };
+
+function ChapterQuote({ quote }: { quote: NonNullable<Chapter["quote"]> }) {
+  return (
+    <figure className={styles.filmQuote}>
+      <blockquote cite={quote.href}>“{quote.text}”</blockquote>
+      <figcaption>
+        <a href={quote.href} target="_blank" rel="noreferrer">
+          {quote.by} ↗
+        </a>
+      </figcaption>
+    </figure>
+  );
+}
 
 export default function RoadPage() {
   return (
@@ -20,7 +34,10 @@ export default function RoadPage() {
         hand that tried to build it before the technology was ready.
       </PartHeader>
 
-      <section className={styles.film} aria-label="Six chapters">
+      <section
+        className={styles.film}
+        aria-label={`${CHAPTERS.length} chapters`}
+      >
         {CHAPTERS.map((c, i) => (
           <article
             key={c.id}
@@ -39,8 +56,13 @@ export default function RoadPage() {
               <h2 id={`${c.id}-title`} className={styles.filmTitle}>
                 {c.title}
               </h2>
-              {c.text.map((t) => (
-                <p key={t.slice(0, 32)}>{t}</p>
+              {c.text.map((t, n) => (
+                <Fragment key={t.slice(0, 32)}>
+                  <p>{t}</p>
+                  {c.quote && c.quote.after === n ? (
+                    <ChapterQuote quote={c.quote} />
+                  ) : null}
+                </Fragment>
               ))}
               {c.links ? (
                 <div className={styles.filmLinks}>
@@ -60,7 +82,8 @@ export default function RoadPage() {
           </article>
         ))}
         <p className={styles.dedication}>
-          In memory of Hal Finney (1956–2014), the first to run Bitcoin after its creator.
+          In memory of Hal Finney (1956–2014), the first to run Bitcoin after
+          its creator.
         </p>
       </section>
 

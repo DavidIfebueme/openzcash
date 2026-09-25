@@ -150,6 +150,16 @@ export const LINEAGE: { name: string; note: string; chapter: string }[] = [
     note: "RPOW, 2004; the first Bitcoin transaction",
     chapter: "missing-pieces",
   },
+  {
+    name: "Satoshi Nakamoto",
+    note: "Bitcoin, 2008; doubted zero-knowledge proofs could fit it, 2010",
+    chapter: "open-problem",
+  },
+  {
+    name: "Daira-Emma Hopwood",
+    note: "Tahoe-LAFS; first-named author of the Zcash protocol specification, 2016",
+    chapter: "open-problem",
+  },
 ];
 
 /** Everyone named on the people page, once. */

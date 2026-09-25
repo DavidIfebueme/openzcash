@@ -59,11 +59,12 @@ describe("the Denver recording", () => {
 
   it("ships a light poster per view and a frame for every part", () => {
     for (let i = 1; i <= 7; i++) {
-      expect(existsSync(path.join(PUBLIC, partFrame(i))), partFrame(i)).toBe(true);
+      expect(existsSync(path.join(PUBLIC, partFrame(i))), partFrame(i)).toBe(
+        true,
+      );
     }
     for (const v of VIEWS) {
       expect(existsSync(path.join(PUBLIC, v.poster)), v.poster).toBe(true);
-      
     }
   });
 
@@ -89,8 +90,8 @@ describe("the people and the record", () => {
   });
 
   it("counts every person once across the groups", () => {
-    expect(uniquePeople()).toHaveLength(23);
-    expect(AUTHORS.length + LINEAGE.length + WITNESSES.length + 1).toBe(23);
+    expect(uniquePeople()).toHaveLength(25);
+    expect(AUTHORS.length + LINEAGE.length + WITNESSES.length + 1).toBe(25);
   });
 
   it("links every record to its source and keeps the Denver camera sizes", () => {
@@ -110,14 +111,37 @@ describe("the story", () => {
     expect(daysUntil("2026-10-28", new Date("2026-11-02T08:00:00Z"))).toBe(0);
   });
 
-  it("keeps six chapters, a timeline in order and the corrected Major Grants history", () => {
-    expect(CHAPTERS).toHaveLength(6);
+  it("keeps seven chapters, a timeline in order and the corrected Major Grants history", () => {
+    expect(CHAPTERS).toHaveLength(7);
     const years = TIMELINE.map((y) => Number(y.year));
     expect(years).toEqual([...years].sort((a, b) => a - b));
     expect(CORRECTIONS).toHaveLength(4);
     const text = JSON.stringify([TIMELINE, CORRECTIONS]);
     expect(text).not.toMatch(/Community Grants in 2021|died in 2021/);
     expect(text).toMatch(/February 2022/);
+  });
+
+  it("points every lineage name at a chapter and keeps quotes short and sourced", () => {
+    const ids = new Set(CHAPTERS.map((c) => c.id));
+    for (const l of LINEAGE) expect(ids.has(l.chapter), l.name).toBe(true);
+    for (const c of CHAPTERS) {
+      if (!c.quote) continue;
+      expect(c.quote.text.split(/\s+/).length, c.id).toBeLessThan(15);
+      expect(c.quote.href, c.id).toMatch(/^https:\/\//);
+      expect(c.text[c.quote.after], c.id).toBeDefined();
+    }
+  });
+
+  it("says only what the 2010 record supports about Satoshi, Zooko and Hopwood", () => {
+    const open = CHAPTERS.find((c) => c.id === "open-problem")!;
+    const text = open.text.join(" ");
+    expect(open.quote?.href).toContain("topic=770.msg8637");
+    expect(text).toMatch(/one of the earliest known blog posts/);
+    expect(text).not.toMatch(/the first blog post about Bitcoin/i);
+    expect(text).toMatch(/named no author/);
+    expect(text).not.toMatch(
+      /Satoshi (mentioned|cited|thanked) (Daira|Hopwood)/,
+    );
   });
 });
 
@@ -126,7 +150,8 @@ describe("the films", () => {
     const { FILM_GROUPS, UNRELEASED, allFilms } = await import("./films");
     const films = allFilms();
     expect(new Set(films.map((f) => f.id)).size).toBe(films.length);
-    for (const g of FILM_GROUPS) expect(g.films.length, g.id).toBeGreaterThan(0);
+    for (const g of FILM_GROUPS)
+      expect(g.films.length, g.id).toBeGreaterThan(0);
     for (const f of films) {
       expect(f.href, f.id).toMatch(/^https:\/\//);
       expect(f.date, f.id).toMatch(/^\d{4}-\d{2}-\d{2}$/);
@@ -136,7 +161,9 @@ describe("the films", () => {
       }
       if (f.lengthS !== null) expect(f.lengthS).toBeGreaterThan(0);
     }
-    expect(films.find((f) => f.youtubeId === "D6dY-3x3teM")?.by).toBe("Electric Coin Company");
+    expect(films.find((f) => f.youtubeId === "D6dY-3x3teM")?.by).toBe(
+      "Electric Coin Company",
+    );
     for (const l of UNRELEASED.links) expect(l.href).toMatch(/^https:\/\//);
   });
 });

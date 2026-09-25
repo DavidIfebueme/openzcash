@@ -3,7 +3,9 @@
  * the overview and the previous/next links at the foot of every part.
  */
 import { allFilms } from "./films";
+import { uniquePeople } from "./people";
 import { RECORDS } from "./record";
+import { CHAPTERS } from "./story";
 
 export type CeremonyPart = {
   numeral: "I" | "II" | "III" | "IV" | "V";
@@ -29,7 +31,7 @@ export const PARTS: CeremonyPart[] = [
     mark: "/logos/glyphs/road.png",
     summary:
       "From Chaum's blind signatures and the cypherpunks to Zerocash: the forty years before the genesis block.",
-    meta: "1982 to 2016 · 6 chapters",
+    meta: `1982 to 2016 · ${CHAPTERS.length} chapters`,
   },
   {
     numeral: "II",
@@ -40,7 +42,7 @@ export const PARTS: CeremonyPart[] = [
     mark: "/logos/glyphs/people.png",
     summary:
       "The six witnesses and their pseudonyms, the authors of Zerocoin and Zerocash, and the lineage behind them.",
-    meta: "23 people",
+    meta: `${uniquePeople().length} people`,
   },
   {
     numeral: "III",

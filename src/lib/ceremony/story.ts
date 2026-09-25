@@ -24,6 +24,8 @@ export type Chapter = {
   title: string;
   who: string;
   text: string[];
+  /** A primary-source line, verbatim and short, shown after paragraph `after` (0-based). */
+  quote?: { text: string; by: string; href: string; after: number };
   links?: Link[];
 };
 
@@ -68,6 +70,54 @@ export const CHAPTERS: Chapter[] = [
     text: [
       "The Bitcoin whitepaper (October 31, 2008) and genesis block (January 3, 2009) solved decentralized consensus. Money finally worked without a bank.",
       "But it worked in public. Every amount, every counterparty, every balance, forever, on a ledger anyone can read. Bitcoin realized the cypherpunk dream of permissionless money while inverting its premise of privacy.",
+    ],
+  },
+  {
+    id: "open-problem",
+    era: "2009–2010",
+    title: "The problem Satoshi left open",
+    who: "Satoshi Nakamoto, Zooko Wilcox, Daira-Emma Hopwood",
+    text: [
+      "On January 26, 2009, eighteen days after Bitcoin’s first release, Zooko Wilcox wrote a short post on his own blog, Zooko’s Hack Log, about why digital cash had failed at DigiCash and where it might work next. It ends by pointing to bit gold, b-money and “BitCoin by Satoshi Nakamoto.” It is one of the earliest known blog posts to mention Bitcoin, and Zooko has called it the first. By March 2009, bitcoin.org listed “Zooko’s blog” among its related links, beside b-money and bit gold. The link led into Tahoe-LAFS, the decentralized storage system Zooko was building at allmydata: the blog lived on its test grid.",
+      "In August 2010 a BitcoinTalk thread asked whether Bitcoin could work without publishing every transaction, and another user suggested zero-knowledge proofs. Satoshi called the problem a very interesting one and said a solution would make a much better Bitcoin possible. He doubted the tool, though: to rule out a double-spend, a node seemed to need to know about every transaction.",
+      "Two days later, in the same thread, he floated “key blinding”, a fresh, unlinkable key for every payment, and pointed to an unfinished draft on recipient-hiding encryption. He named no author. The draft is widely attributed to Daira-Emma Hopwood, writing under a former name. By then Hopwood was also a Tahoe-LAFS developer alongside Zooko, and in 2016 was the first-named author of the Zcash protocol specification.",
+      "On August 21 Tahoe-LAFS began accepting bitcoin donations, and Zooko, signing as the project’s community organizer, opened a thread about building Bitcoin payments into it. Satoshi’s reply left the proposal aside. It opened with Zooko’s name and thanked him, in public, for blogging about Bitcoin back when it was announced on the Cryptography mailing list. His last forum post came that December. In 2022 Zooko pointed back to the August thread: four months later Satoshi was gone, and three years after that, a solution was found.",
+    ],
+    quote: {
+      text: "It's hard to think of how to apply zero-knowledge-proofs in this case.",
+      by: "Satoshi Nakamoto, BitcoinTalk, August 11, 2010",
+      href: "https://bitcointalk.org/index.php?topic=770.msg8637#msg8637",
+      after: 1,
+    },
+    links: [
+      {
+        label: "Zooko’s post, Jan 2009",
+        href: "https://tahoe-lafs.org/~warner/blog.html#%5B%5BDecentralized%20Money%5D%5D",
+      },
+      {
+        label: "bitcoin.org, Mar 2009",
+        href: "https://web.archive.org/web/20090303195936/http://bitcoin.org:80/",
+      },
+      {
+        label: "Satoshi on key blinding",
+        href: "https://bitcointalk.org/index.php?topic=770.msg9074#msg9074",
+      },
+      {
+        label: "Tahoe-LAFS takes bitcoin",
+        href: "https://bitcointalk.org/index.php?topic=30.msg10592#msg10592",
+      },
+      {
+        label: "Satoshi thanks Zooko",
+        href: "https://bitcointalk.org/index.php?topic=890.msg10723#msg10723",
+      },
+      {
+        label: "Zcash protocol specification, 2016",
+        href: "https://github.com/zcash/zips/blob/939cce45623fa4c27d638db4a7c61ed287ca17e9/protocol/protocol.pdf",
+      },
+      {
+        label: "Zooko, 2022",
+        href: "https://x.com/zooko/status/1499478874375163904",
+      },
     ],
   },
   {
