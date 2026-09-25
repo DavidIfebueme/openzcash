@@ -132,6 +132,21 @@ describe("the story", () => {
     }
   });
 
+  it("plays period films by a well-formed id and never calls Finney's 1998 talk a paper", () => {
+    for (const c of CHAPTERS) {
+      if (!c.film) continue;
+      expect(c.film.youtubeId, c.id).toMatch(/^[\w-]{11}$/);
+      expect(c.text[c.film.after], c.id).toBeDefined();
+      expect(c.film.lengthS, c.id).toBeGreaterThan(0);
+    }
+    const finney = CHAPTERS.find((c) => c.id === "missing-pieces")!;
+    const text = finney.text.join(" ");
+    expect(finney.film?.youtubeId).toBe("YjHVNstGLIQ");
+    expect(text).toMatch(/August 25, 1998/);
+    expect(text).toMatch(/a talk, not a paper/);
+    expect(text).not.toMatch(/Finney (wrote|published) a paper/);
+  });
+
   it("says only what the 2010 record supports about Satoshi, Zooko and Hopwood", () => {
     const open = CHAPTERS.find((c) => c.id === "open-problem")!;
     const text = open.text.join(" ");

@@ -147,7 +147,7 @@ export const LINEAGE: { name: string; note: string; chapter: string }[] = [
   },
   {
     name: "Hal Finney",
-    note: "RPOW, 2004; the first Bitcoin transaction",
+    note: "A zero-knowledge proof talk, 1998; RPOW, 2004; the first Bitcoin transaction",
     chapter: "missing-pieces",
   },
   {

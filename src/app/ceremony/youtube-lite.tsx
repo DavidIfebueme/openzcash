@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import styles from "./films.module.css";
+import styles from "./youtube-lite.module.css";
 
 /**
  * A YouTube film that costs one thumbnail until someone asks for it. The

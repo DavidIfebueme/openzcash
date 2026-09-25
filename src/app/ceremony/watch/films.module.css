@@ -42,50 +42,6 @@
   aspect-ratio: 16 / 9;
   background: var(--stage);
 }
-.lite {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: var(--stage);
-  cursor: pointer;
-}
-.lite img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.92;
-}
-.liteIcon {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.liteIcon svg {
-  box-sizing: content-box;
-  padding: 16px;
-  border: 1px solid var(--stage-line);
-  border-radius: 50%;
-  background: var(--stage-2);
-  color: var(--stage-ink);
-}
-.lite:hover .liteIcon svg,
-.lite:focus-visible .liteIcon svg {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.frame {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
 .external {
   position: absolute;
   inset: 0;

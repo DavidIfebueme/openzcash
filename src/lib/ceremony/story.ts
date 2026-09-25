@@ -26,6 +26,14 @@ export type Chapter = {
   text: string[];
   /** A primary-source line, verbatim and short, shown after paragraph `after` (0-based). */
   quote?: { text: string; by: string; href: string; after: number };
+  /** A period recording, played in a click-to-load embed after paragraph `after`. */
+  film?: {
+    youtubeId: string;
+    title: string;
+    caption: string;
+    lengthS: number;
+    after: number;
+  };
   links?: Link[];
 };
 
@@ -58,8 +66,31 @@ export const CHAPTERS: Chapter[] = [
     who: "Back, Dai, Szabo, Finney",
     text: [
       "Adam Back’s Hashcash (1997) made computation itself a scarce stamp. Wei Dai’s b-money and Nick Szabo’s bit gold (late 1990s) sketched money without a central issuer. Each solved a piece; none shipped as money.",
-      "Hal Finney, veteran cypherpunk and PGP developer, built RPOW (2004), reusable proofs of work: the closest thing to circulating digital scarcity before Bitcoin. When Bitcoin appeared, Finney was the first person besides its creator to run it, and the recipient of the first Bitcoin transaction ever sent (January 12, 2009).",
+      "Hal Finney, veteran cypherpunk and PGP developer, also wrote working code for zero-knowledge proofs. At the rump session of the Crypto ’98 conference in Santa Barbara, on August 25, 1998, he gave a five-minute talk, “A zero-knowledge proof of possession of a pre-image of a SHA-1 hash”: a program that proves you know a message with a given SHA-1 hash without revealing the message, built on a proof system Ronald Cramer and Ivan Damgård presented at the same conference. It was a talk, not a paper, and the session was filmed.",
+      "In 2004 Finney built RPOW, reusable proofs of work: the closest thing to circulating digital scarcity before Bitcoin. When Bitcoin appeared, he was the first person besides its creator to run it, and the recipient of the first Bitcoin transaction ever sent (January 12, 2009).",
       "Finney died in 2014. The problem he spent decades on, private electronic cash that needs no permission, is the problem Zcash exists to finish.",
+    ],
+    film: {
+      youtubeId: "YjHVNstGLIQ",
+      title: "Hal Finney at the Crypto ’98 rump session",
+      caption:
+        "Santa Barbara, August 25, 1998. Filmed by Takeshi Shimoyama, edited by Kevin McCurley.",
+      lengthS: 434,
+      after: 1,
+    },
+    links: [
+      {
+        label: "Crypto ’98 rump session program",
+        href: "https://www.iacr.org/conferences/crypto98/rump.html",
+      },
+      {
+        label: "Cramer and Damgård, Crypto ’98",
+        href: "https://doi.org/10.1007/BFb0055745",
+      },
+      {
+        label: "Crypto ’98 rump session videos",
+        href: "https://mccurley.org/video/rump.html",
+      },
     ],
   },
   {

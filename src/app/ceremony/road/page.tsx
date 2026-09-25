@@ -1,5 +1,7 @@
 import { Fragment } from "react";
+import { clock } from "@/lib/ceremony/recordings";
 import { CHAPTERS, type Chapter } from "@/lib/ceremony/story";
+import { YouTubeLite } from "../youtube-lite";
 import { Pager, PartHeader, partEyebrow } from "../part-chrome";
 import styles from "../ceremony.module.css";
 
@@ -16,6 +18,26 @@ function ChapterQuote({ quote }: { quote: NonNullable<Chapter["quote"]> }) {
       <figcaption>
         <a href={quote.href} target="_blank" rel="noreferrer">
           {quote.by} ↗
+        </a>
+      </figcaption>
+    </figure>
+  );
+}
+
+function ChapterFilm({ film }: { film: NonNullable<Chapter["film"]> }) {
+  return (
+    <figure className={styles.filmVideo}>
+      <div className={styles.filmVideoFrame}>
+        <YouTubeLite id={film.youtubeId} title={film.title} />
+      </div>
+      <figcaption>
+        <strong>{film.title}</strong> · {clock(film.lengthS)}. {film.caption}{" "}
+        <a
+          href={`https://www.youtube.com/watch?v=${film.youtubeId}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Watch on YouTube ↗
         </a>
       </figcaption>
     </figure>
@@ -61,6 +83,9 @@ export default function RoadPage() {
                   <p>{t}</p>
                   {c.quote && c.quote.after === n ? (
                     <ChapterQuote quote={c.quote} />
+                  ) : null}
+                  {c.film && c.film.after === n ? (
+                    <ChapterFilm film={c.film} />
                   ) : null}
                 </Fragment>
               ))}

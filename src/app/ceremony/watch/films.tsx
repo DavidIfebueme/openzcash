@@ -1,6 +1,6 @@
 import { FILM_GROUPS, UNRELEASED, type Film } from "@/lib/ceremony/films";
 import { clock } from "@/lib/ceremony/recordings";
-import { YouTubeLite } from "./youtube-lite";
+import { YouTubeLite } from "../youtube-lite";
 import styles from "./films.module.css";
 
 const monthYear = (iso: string) =>
