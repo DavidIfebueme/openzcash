@@ -1,6 +1,6 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import type { ZarvisEvent, ZarvisSource, ZarvisStatus } from "@/lib/zarvis/types";
+import type { ZarvisEvent, ZarvisExpression, ZarvisSource, ZarvisStatus } from "@/lib/zarvis/types";
 import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/validation";
 
 export type DisplayMessage = {
@@ -9,7 +9,7 @@ export type DisplayMessage = {
 };
 type ChatState = {
   messages: DisplayMessage[]; draft: string; setDraft: (value: string) => void;
-  busy: boolean; progress: string; error: string | null; status: ZarvisStatus | null;
+  busy: boolean; expression: ZarvisExpression; progress: string; error: string | null; status: ZarvisStatus | null;
   send: (question?: string, retry?: boolean) => void;
   stop: () => void; clear: () => void; checkStatus: (force?: boolean) => void;
 };
@@ -24,6 +24,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
+  const [replying, setReplying] = useState(false);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<ZarvisStatus | null>(null);
@@ -44,7 +45,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
 
   function clear() {
     active.current?.abort(); active.current = null;
-    setMessages([]); setDraft(""); setError(null); setBusy(false); setProgress("");
+    setMessages([]); setDraft(""); setError(null); setBusy(false); setReplying(false); setProgress("");
     statusChecked.current = false; checkStatus();
   }
   function stop() { active.current?.abort(); }
@@ -70,7 +71,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     const id = crypto.randomUUID();
     const controller = new AbortController(); active.current = controller;
     setMessages([...history, { id, role: "assistant", content: "", incomplete: true }]);
-    setDraft(""); setBusy(true); setError(null); setProgress("Reading your question…");
+    setDraft(""); setBusy(true); setReplying(false); setError(null); setProgress("Reading your question…");
     let completed = false;
     const update = (patch: Partial<DisplayMessage>) => setMessages((all) => all.map((m) => m.id === id ? { ...m, ...patch } : m));
     try {
@@ -89,8 +90,8 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
       const receive = (line: string) => {
         if (!line.trim()) return;
         const event: ZarvisEvent = JSON.parse(line);
-        if (event.type === "status") setProgress(event.message);
-        if (event.type === "delta") { text += event.text; update({ content: text }); }
+        if (event.type === "status") { setProgress(event.message); setReplying(false); }
+        if (event.type === "delta") { setReplying(true); setProgress("Writing an answer…"); text += event.text; update({ content: text }); }
         if (event.type === "replace") { text = event.text; update({ content: text }); }
         if (event.type === "error") throw new Error(event.message);
         if (event.type === "done") { completed = true; update({ sources: event.sources, incomplete: false }); }
@@ -114,5 +115,8 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
       if (active.current === controller) { active.current = null; setBusy(false); setProgress(""); }
     }
   }
-  return <Context.Provider value={{ messages, draft, setDraft, busy, progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
+  // Expressions follow actual chat events; completed answers are not verification badges.
+  const expression: ZarvisExpression = busy ? (replying ? "explaining" : "thinking")
+    : error ? "error" : draft.trim() ? "listening" : "idle";
+  return <Context.Provider value={{ messages, draft, setDraft, busy, expression, progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
 }

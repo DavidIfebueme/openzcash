@@ -7,3 +7,5 @@ export type ZarvisEvent =
   | { type: "done"; sources: ZarvisSource[] }
   | { type: "error"; message: string };
 export type ZarvisStatus = { available: boolean; provider: "OpenAI"; webSearch: boolean };
+
+export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error";

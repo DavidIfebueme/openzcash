@@ -29,13 +29,13 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
       const el = scroll.current!; follow.current = el.scrollHeight - el.scrollTop - el.clientHeight < 90;
     }} tabIndex={0} aria-label="Conversation history">
       {empty ? <div className="zarvis-welcome">
-        <ZarvisMark className="zarvis-hero-mark"/>
+        <ZarvisMark className="zarvis-hero-mark" expression={chat.expression}/>
         <h2>What would you like to know<br/>about Zcash?</h2>
         <div className="zarvis-starters">{STARTERS.map((starter) => <button key={starter.label} type="button" onClick={() => { chat.setDraft(starter.question); input.current?.focus(); }}>
           <span>{starter.label}</span>
         </button>)}</div>
       </div> : <div className="zarvis-thread">{chat.messages.map((message) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`}>
-        <div className="zarvis-message-label">{message.role === "assistant" ? <><ZarvisMark/> Zarvis</> : "You"}</div>
+        <div className="zarvis-message-label">{message.role === "assistant" ? <><ZarvisMark expression={message.incomplete ? (chat.busy ? chat.expression : "error") : "idle"}/> Zarvis</> : "You"}</div>
         {message.content ? <div className="zarvis-prose"><Markdown skipHtml allowedElements={["p", "a", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "blockquote", "code", "pre", "br", "hr"]} urlTransform={(url) => safeSourceUrl(url) ?? ""} components={{ a: ({ href, children }) => href ? <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> : <span>{children}</span> }}>{message.content}</Markdown></div> : null}
         {message.role === "assistant" && message.content && !chat.busy && message.incomplete ? <small className="zarvis-incomplete">Incomplete response</small> : null}
         {message.sources?.length ? <details className="zarvis-answer-sources"><summary>{message.sources.length} source{message.sources.length === 1 ? "" : "s"} used</summary><ol>{message.sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>{source.retrievedAt ? <small>Retrieved {new Date(source.retrievedAt).toLocaleString()}</small> : null}</li>)}</ol></details> : null}

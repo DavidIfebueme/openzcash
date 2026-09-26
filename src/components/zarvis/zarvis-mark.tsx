@@ -1,10 +1,25 @@
-export function ZarvisMark({ className = "" }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 48 48" fill="none" aria-hidden="true">
-    <path d="M24 3 41 10v13c0 10-7 17-17 22C14 40 7 33 7 23V10L24 3Z" fill="currentColor" opacity=".12"/>
-    <path d="M24 3 41 10v13c0 10-7 17-17 22C14 40 7 33 7 23V10L24 3Z" stroke="currentColor" strokeWidth="1.7"/>
-    <rect x="12" y="15" width="24" height="17" rx="7" fill="currentColor"/>
-    <path d="M18 21v3m12-3v3" stroke="var(--bg, #faf8f4)" strokeWidth="2.5" strokeLinecap="round"/>
-    <path d="M21 27h6" stroke="var(--bg, #faf8f4)" strokeWidth="1.5" strokeLinecap="round"/>
-    <path d="M24 11v4m-5 22 10-2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/>
+import { getImageProps } from "next/image";
+import type { ZarvisExpression } from "@/lib/zarvis/types";
+
+// Original user-supplied artwork. The SVG is a viewport over a raster reference,
+// not a vector redraw or an articulated character. Next optimizes the image.
+const { props: portrait } = getImageProps({
+  src: "/zarvis/ironwood-reference.png", alt: "", width: 606, height: 649,
+});
+const frames: Record<ZarvisExpression, string> = {
+  idle: "17 620 122 133",
+  listening: "147 620 124 133",
+  thinking: "281 620 124 133",
+  explaining: "542 620 124 133",
+  error: "281 620 124 133",
+};
+
+export function ZarvisMark({ className = "", expression = "idle" }: {
+  className?: string;
+  expression?: ZarvisExpression;
+}) {
+  return <svg className={`zarvis-mark ${className}`} data-expression={expression}
+    viewBox={frames[expression]} aria-hidden="true" focusable="false">
+    <image href={portrait.src} width="1212" height="1297"/>
   </svg>;
 }
