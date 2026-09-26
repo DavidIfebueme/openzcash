@@ -38,15 +38,14 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
         <div className="zarvis-starters">{STARTERS.map((starter) => <button key={starter.label} type="button" onClick={() => { chat.setDraft(starter.question); input.current?.focus(); }}>
           <span>{starter.label}</span>
         </button>)}</div>
-      </div> : <div className="zarvis-thread">{chat.messages.map((message, index) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`}>
+      </div> : <div className="zarvis-thread">{chat.messages.map((message, index) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`} aria-label={message.role === "assistant" ? "Zarvis response" : "Your message"}>
         {message.role === "assistant" ? <ZarvisFigure className="zarvis-answer-figure"
           expression={index === chat.messages.length - 1 && chat.expression !== "idle" ? chat.expression : "explaining"}
           animated={index === chat.messages.length - 1 && chat.expression !== "idle"} paused={chat.motionPaused}/> : null}
         <div className="zarvis-message-body">
-        <div className="zarvis-message-heading">
-          <div className="zarvis-message-label">{message.role === "assistant" ? "Zarvis" : "You"}</div>
-          {message.role === "assistant" && index === chat.messages.length - 1 && chat.busy ? <div className="zarvis-progress" role="status">{chat.progress || "Writing an answer…"}</div> : null}
-        </div>
+        {message.role === "assistant" && index === chat.messages.length - 1 && chat.busy ? <div className="zarvis-message-heading">
+          <div className="zarvis-progress" role="status">{chat.progress || "Writing an answer…"}</div>
+        </div> : null}
         {message.content ? <div className="zarvis-prose"><Markdown skipHtml allowedElements={["p", "a", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "blockquote", "code", "pre", "br", "hr"]} urlTransform={(url) => safeSourceUrl(url) ?? ""} components={{ a: ({ href, children }) => href ? <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> : <span>{children}</span> }}>{message.content}</Markdown></div> : null}
         {message.role === "assistant" && message.content && !chat.busy && message.incomplete ? <small className="zarvis-incomplete">Incomplete response</small> : null}
         {message.sources?.length ? <details className="zarvis-answer-sources"><summary>{message.sources.length} source{message.sources.length === 1 ? "" : "s"} consulted</summary><ol>{message.sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>{source.retrievedAt ? <small>Retrieved {new Date(source.retrievedAt).toLocaleString()}</small> : null}</li>)}</ol></details> : null}
