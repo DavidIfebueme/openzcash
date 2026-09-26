@@ -10,7 +10,9 @@ import type { ZarvisExpression } from "@/lib/zarvis/types";
 const states: { value: ZarvisExpression; label: string }[] = [
   { value: "idle", label: "Idle" }, { value: "greeting", label: "Wave" },
   { value: "listening", label: "Listening" }, { value: "thinking", label: "Thinking" },
-  { value: "explaining", label: "Replying" }, { value: "pleased", label: "Complete" },
+  { value: "explaining", label: "Replying" }, { value: "reading", label: "Reading" },
+  { value: "exploring", label: "Exploring" }, { value: "protecting", label: "Privacy" },
+  { value: "pleased", label: "Celebrate" },
   { value: "error", label: "Error" },
 ];
 
@@ -36,9 +38,9 @@ export function ZarvisIterations() {
       <article className="zarvis-iteration-card"><header><span>01</span><h2>Avatar</h2><small>Previous</small></header>
         <div className="zarvis-iteration-stage"><ZarvisMark key={take} className="zarvis-iteration-before" expression={expression} animated paused={chat.motionPaused}/></div>
         <p>Portrait inside a circular frame.</p></article>
-      <article className="zarvis-iteration-card zarvis-iteration-current"><header><span>02</span><h2>Free-standing</h2><small>Current</small></header>
-        <div className="zarvis-iteration-stage"><ZarvisFigure key={take} expression={expression} paused={chat.motionPaused}/></div>
-        <p>Full body, transparent backdrop, room to move.</p></article>
+      <article className="zarvis-iteration-card zarvis-iteration-current"><header><span>02</span><h2>Free-standing</h2><small>8 poses</small></header>
+        <div className="zarvis-iteration-stage"><ZarvisFigure expression={expression} paused={chat.motionPaused}/></div>
+        <p>Soft breathing, independent gestures, smooth transitions.</p></article>
     </section>
     <section className="zarvis-studio-live" aria-labelledby="zarvis-live-title">
       <header><div><p className="zarvis-studio-eyebrow">03 · REAL INTERACTION</p><h2 id="zarvis-live-title">Talk to Zarvis</h2></div><span>{chat.status ? (chat.status.available ? "OpenAI connected" : "Chat unavailable") : "Checking connection…"}</span></header>

@@ -1,11 +1,12 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ZarvisEvent, ZarvisExpression, ZarvisSource, ZarvisStatus } from "@/lib/zarvis/types";
+import { answerExpression, progressExpression } from "@/lib/zarvis/expression";
 import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/validation";
 
 export type DisplayMessage = {
   id: string; role: "user" | "assistant"; content: string;
-  sources?: ZarvisSource[]; incomplete?: boolean;
+  sources?: ZarvisSource[]; incomplete?: boolean; pose?: ZarvisExpression;
 };
 type ChatState = {
   messages: DisplayMessage[]; draft: string; setDraft: (value: string) => void;
@@ -85,7 +86,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     while (context[0]?.role === "assistant") context.shift();
     const id = crypto.randomUUID();
     const controller = new AbortController(); active.current = controller;
-    setMessages([...history, { id, role: "assistant", content: "", incomplete: true }]);
+    setMessages([...history, { id, role: "assistant", content: "", incomplete: true, pose: answerExpression(history.findLast((message) => message.role === "user")?.content ?? questionText) }]);
     if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
     setPleased(false); setDraft(""); setBusy(true); setReplying(false); setError(null); setProgress("Reading your question…");
     let completed = false;
@@ -136,7 +137,8 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     }
   }
   // Expressions follow actual chat events; completed answers are not verification badges.
-  const expression: ZarvisExpression = busy ? (replying ? "explaining" : "thinking")
+  const answerPose = messages.findLast((message) => message.role === "assistant")?.pose ?? "explaining";
+  const expression: ZarvisExpression = busy ? (replying ? answerPose : progressExpression(progress))
     : error ? "error" : draft.trim() ? "listening" : pleased ? "pleased" : "idle";
   return <Context.Provider value={{ messages, draft, setDraft, busy, expression, motionPaused: motionPaused || pageHidden, toggleMotion: () => setMotionPaused((paused) => !paused), progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
 }

@@ -40,8 +40,8 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
         </button>)}</div>
       </div> : <div className="zarvis-thread">{chat.messages.map((message, index) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`} aria-label={message.role === "assistant" ? "Zarvis response" : "Your message"}>
         {message.role === "assistant" ? <ZarvisFigure className="zarvis-answer-figure"
-          expression={index === chat.messages.length - 1 && chat.expression !== "idle" ? chat.expression : "explaining"}
-          animated={index === chat.messages.length - 1 && chat.expression !== "idle"} paused={chat.motionPaused}/> : null}
+          expression={index === chat.messages.length - 1 && chat.expression !== "idle" ? chat.expression : message.pose ?? "explaining"}
+          animated={index === chat.messages.length - 1} paused={chat.motionPaused}/> : null}
         <div className="zarvis-message-body">
         {message.role === "assistant" && index === chat.messages.length - 1 && chat.busy ? <div className="zarvis-message-heading">
           <div className="zarvis-progress" role="status">{chat.progress || "Writing an answer…"}</div>

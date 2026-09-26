@@ -20,6 +20,9 @@ const frames: Record<ZarvisExpression, Frame> = {
   error: thoughtful,
   greeting: { box: [25, 832, 136, 144], eyes: [[84, 900, 13, 10], [116, 908, 12, 10]] },
   pleased: happy,
+  reading: thoughtful,
+  exploring: thoughtful,
+  protecting: happy,
 };
 const wavingHand = "M 31 891 Q 42 880 54 888 L 64 909 L 77 927 L 64 942 L 38 923 Q 25 910 31 891 Z";
 

@@ -20,7 +20,7 @@
 .zarvis-toolbar-actions { display: flex; gap: 14px; align-items: center; }
 .zarvis-motion-toolbar { position: static; width: 24px; height: 24px; }
 .zarvis-motion svg { width: 13px; height: 13px; }
-.zarvis-mark[data-paused="true"] *, .zarvis-mark:not([data-animated="true"]) * { animation: none !important; transition: none !important; transform: none !important; }
+.zarvis-mark:not(.zarvis-figure)[data-paused="true"] *, .zarvis-mark:not(.zarvis-figure):not([data-animated="true"]) * { animation: none !important; transition: none !important; transform: none !important; }
 @keyframes zarvis-breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-3px) scale(1.025, 1.035); } }
 @keyframes zarvis-blink { 0%, 87%, 92%, 96%, 100% { transform: scaleY(1); } 89%, 90%, 98% { transform: scaleY(.08); } }
 @keyframes zarvis-arrive { 0% { transform: translateY(28px) scale(.8); } 65% { transform: translateY(-7px) scale(1.04); } 100% { transform: translateY(0) scale(1); } }
@@ -123,18 +123,35 @@
 @media (max-width: 600px) { .zarvis-chat { height: calc(100dvh - 215px); min-height: 410px; } .zarvis-chat-toolbar { padding: 0 0 8px; } .zarvis-chat-name { font-size: 17px; } .zarvis-welcome { padding: 20px 0; } .zarvis-welcome h2 { font-size: 26px; } .zarvis-hero-mark { width: 88px; height: 88px; margin: 0; } .zarvis-starters { gap: 7px; } .zarvis-starters button { padding: 9px 11px; font-size: 11px; } .rd-shell .zarvis-composer textarea { font-size: 16px; } .zarvis-compose-area { padding-top: 8px; } .zarvis-thread { padding: 6px 0 12px; } .zarvis-launcher { right: 14px; padding: 9px; } .zarvis-launcher span { display: none; } .zarvis-dock { inset: auto 8px 8px; width: calc(100vw - 16px); height: calc(100dvh - 16px); border-radius: 18px; padding-bottom: env(safe-area-inset-bottom); } .zarvis-dock .zarvis-chat { min-height: 0; height: auto; } }
 @media (prefers-reduced-motion: reduce) { .zarvis-mark, .zarvis-mark * { animation: none !important; transition: none !important; transform: none !important; } .zarvis-thinking { animation: none; } .zarvis-starters button { transition: none; } }
 
-/* Free-standing Ironwood: the same identity, with no avatar frame. */
+/* One grounded body, independent head and gestures, and blended pose changes. */
 .zarvis-figure { overflow: visible; border-radius: 0; background: transparent; box-shadow: none; }
-.zarvis-figure .zarvis-ground { fill: var(--ink); opacity: .08; }
-.zarvis-figure .zarvis-hand { transform-origin: 175px 404px; }
-.zarvis-figure[data-animated="true"] .zarvis-character { animation: zarvis-figure-breathe 4.8s ease-in-out infinite; }
-.zarvis-figure[data-expression="greeting"] .zarvis-character { animation: zarvis-figure-arrive .7s cubic-bezier(.2,.8,.3,1.2) both; }
-.zarvis-figure[data-expression="greeting"] .zarvis-hand { animation: zarvis-figure-wave .55s ease-in-out 4; }
-.zarvis-figure[data-expression="listening"] .zarvis-character { animation: zarvis-figure-listen 3.4s ease-in-out infinite; }
-.zarvis-figure[data-expression="thinking"] .zarvis-character { animation: zarvis-figure-ponder 2.8s ease-in-out infinite; }
-.zarvis-figure[data-expression="explaining"] .zarvis-character { animation: zarvis-figure-talk 1.5s ease-in-out infinite; }
-.zarvis-figure[data-expression="pleased"] .zarvis-character { animation: zarvis-figure-hop .75s ease-out 1; }
-.zarvis-figure[data-expression="error"] .zarvis-character { animation: zarvis-figure-shake .65s ease-in-out 1; }
+.zarvis-figure .zarvis-ground { fill: var(--ink); opacity: .065; }
+.zarvis-figure[data-animated="true"] .zarvis-rig { transform-origin: 50% 98%; animation: zarvis-soft-breathe 6.8s cubic-bezier(.45,0,.55,1) infinite; }
+.zarvis-figure .zarvis-pose { opacity: 0; visibility: hidden; transition: opacity .38s cubic-bezier(.22,.65,.3,1), visibility 0s .38s; }
+.zarvis-figure .zarvis-pose[data-visible="true"] { opacity: 1; visibility: visible; transition-delay: 0s; }
+.zarvis-figure .zarvis-rig-head { transform-origin: 320px 382px; animation: zarvis-soft-look 9.6s cubic-bezier(.45,0,.55,1) infinite; }
+.zarvis-figure .zarvis-rig-gaze { transform: translate(var(--zarvis-look-x, 0px), var(--zarvis-look-y, 0px)); transition: transform .6s cubic-bezier(.22,.65,.3,1); }
+.zarvis-figure[data-animated="true"] .zarvis-eye { animation: zarvis-soft-blink 13.7s linear infinite; animation-delay: var(--zarvis-blink-phase); }
+.zarvis-figure .zarvis-pose[data-pose="thinking"] .zarvis-rig-head,
+.zarvis-figure .zarvis-pose[data-pose="reading"] .zarvis-rig-head { animation-name: zarvis-soft-read; animation-duration: 8.8s; }
+.zarvis-figure .zarvis-pose[data-pose="explaining"] .zarvis-rig-head,
+.zarvis-figure .zarvis-pose[data-pose="protecting"] .zarvis-rig-head { animation-name: zarvis-soft-nod; animation-duration: 7.4s; }
+.zarvis-figure .zarvis-rig-arm { animation: zarvis-soft-gesture 7.4s cubic-bezier(.45,0,.55,1) infinite; }
+.zarvis-figure .zarvis-pose[data-pose="greeting"] .zarvis-rig-arm { animation-name: zarvis-soft-wave; animation-duration: 4.8s; }
+.zarvis-figure .zarvis-pose[data-pose="celebrating"] .zarvis-rig-arm { animation-name: zarvis-soft-cheer; animation-duration: 4s; }
+.zarvis-figure .zarvis-pose[data-visible="false"] * { animation-play-state: paused; }
+.zarvis-figure[data-paused="true"] * { animation-play-state: paused !important; transition: none !important; }
+.zarvis-figure[data-paused="true"] .zarvis-rig-gaze { transform: none; }
+.zarvis-figure:not([data-animated="true"]) * { animation: none !important; transition: none !important; transform: none !important; }
+@keyframes zarvis-soft-breathe { 0%, 100% { transform: scale(1); } 46% { transform: scale(1.003, 1.007); } }
+@keyframes zarvis-soft-look { 0%, 12%, 100% { transform: rotate(0); } 30%, 42% { transform: rotate(-1.6deg); } 65%, 76% { transform: rotate(.9deg); } }
+@keyframes zarvis-soft-read { 0%, 16%, 100% { transform: rotate(0) translateY(0); } 35%, 52% { transform: rotate(1.2deg) translateY(2px); } 75%, 84% { transform: rotate(-.7deg) translateY(0); } }
+@keyframes zarvis-soft-nod { 0%, 16%, 62%, 100% { transform: rotate(0) translateY(0); } 31% { transform: rotate(.9deg) translateY(3px); } 44% { transform: rotate(-.6deg) translateY(-1px); } 78%, 87% { transform: rotate(-1deg); } }
+@keyframes zarvis-soft-blink { 0%, 18%, 20%, 57%, 59%, 86%, 88%, 90%, 92%, 100% { transform: scaleY(1); } 19%, 58%, 87%, 91% { transform: scaleY(.06); } }
+@keyframes zarvis-soft-gesture { 0%, 12%, 65%, 100% { transform: rotate(0); } 30%, 39% { transform: rotate(-2.4deg); } 49% { transform: rotate(.8deg); } }
+@keyframes zarvis-soft-wave { 0%, 8%, 62%, 100% { transform: rotate(0); } 20%, 43% { transform: rotate(-4deg); } 31%, 52% { transform: rotate(4.5deg); } }
+@keyframes zarvis-soft-cheer { 0%, 10%, 80%, 100% { transform: rotate(0); } 34%, 48% { transform: rotate(3deg); } 62% { transform: rotate(-.6deg); } }
+
 .zarvis-hello { border-radius: 16px; }
 .zarvis-companion { margin-bottom: 14px; }
 .zarvis-hero-figure { width: 210px; height: 200px; }
@@ -148,15 +165,6 @@
 .zarvis-chat-compact .zarvis-message-assistant .zarvis-message-body > :not(.zarvis-message-heading) { grid-column: 1 / -1; }
 .zarvis-chat-compact .zarvis-answer-figure { width: 108px; height: 103px; }
 .zarvis-chat-compact .zarvis-hero-figure { width: 166px; height: 158px; }
-@keyframes zarvis-figure-breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-9px) scale(1.018, 1.025); } }
-@keyframes zarvis-figure-arrive { 0% { transform: translateY(60px) scale(.8); } 65% { transform: translateY(-24px) scale(1.025); } 100% { transform: translateY(0) scale(1); } }
-@keyframes zarvis-figure-wave { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(12deg); } }
-@keyframes zarvis-figure-listen { 0%, 100% { transform: rotate(-4deg) translateY(-7px); } 50% { transform: rotate(2deg) translateY(-18px) scale(1.015); } }
-@keyframes zarvis-figure-ponder { 0%, 100% { transform: rotate(-4deg) translateY(-4px); } 40% { transform: rotate(4deg) translateY(-17px); } 70% { transform: rotate(4deg) translateY(-7px); } }
-@keyframes zarvis-figure-talk { 0%, 55%, 100% { transform: translateY(0) rotate(-2deg); } 22% { transform: translateY(-22px) rotate(3deg) scale(1.015); } 75% { transform: translateY(-10px) rotate(1deg); } }
-@keyframes zarvis-figure-hop { 0%, 100% { transform: translateY(0) scale(1); } 18% { transform: scale(1.04, .95); } 50% { transform: translateY(-42px) rotate(-4deg); } 78% { transform: translateY(4px) scale(1.025, .975); } }
-@keyframes zarvis-figure-shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-17px) rotate(-3deg); } 50% { transform: translateX(17px) rotate(3deg); } }
-
 /* Local review surface. The regular chat remains uncluttered. */
 .zarvis-studio { max-width: 1040px; margin: 0 auto; color: var(--ink); padding-bottom: 24px; }
 .zarvis-studio-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 24px; }

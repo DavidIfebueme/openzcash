@@ -8,4 +8,4 @@ export type ZarvisEvent =
   | { type: "error"; message: string };
 export type ZarvisStatus = { available: boolean; provider: "OpenAI"; webSearch: boolean };
 
-export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error" | "greeting" | "pleased";
+export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error" | "greeting" | "pleased" | "reading" | "exploring" | "protecting";
