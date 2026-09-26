@@ -23,7 +23,7 @@ Pause works before and during a conversation and freezes the current gesture wit
 ## Review locally
 
 - `/zarvis`: the clean main chat.
-- `/zarvis/iterations`: previous/current comparison, ten state controls covering eight poses, pause/resume and the actual chat. “Follow the live conversation” binds the figures to real request events. Manual expression controls do not call the AI provider.
+- `/zarvis/iterations`: eight animated examples shown together, with the actual trigger for each pose. Four example-question buttons fill and focus the real chat without submitting. The previous/current comparison is expandable and retains its ten state controls. “Follow the live conversation” binds those comparison figures to real request events. Manual expression controls do not call the AI provider.
 - The comparison route is development-only (`notFound()` in production), omitted from navigation and marked noindex.
 
 ## Earlier verification — iteration 02, 2026-09-26
@@ -95,3 +95,9 @@ Use case: identity-preserve. Asset type: a transparent production sprite atlas e
 ## Exact original art prompt
 
 Use case: identity-preserve / background-extraction. Asset type: a production PNG sprite atlas for the Zarvis OpenZcash web chat. Use the supplied character sheet as the exact character identity reference. Create ONE square transparent sprite atlas with EXACTLY FOUR evenly sized cells in a precise 2 by 2 grid, no drawn grid. Preserve Zarvis Ironwood: small friendly robot, aged ivory/silver metal panels, warm gold trims, a black glass face with simple glowing gold eyes, leafy twisting wood crown, small Zcash Z emblem on forehead and chest. The proportions, materials and botanical identity must match the original, not a redesign. Each cell shows ONE COMPLETE FULL-BODY Zarvis from crown to feet, without cropping. Keep identical camera, scale, lighting, and ground baseline across all four cells, with comfortable transparent padding. Top-left: idle, standing relaxed, both arms down, happy curved gold eyes. Top-right: greeting, one raised hand in a friendly wave, happy eyes. Bottom-left: thinking, one hand under chin, curious focused gold eyes. Bottom-right: explaining, open palm presenting gently, friendly attentive eyes. Front three-quarter view, large head and compact body like the reference. Background: genuine alpha transparency everywhere outside each character, including between leaves and fingers. NO black or white backdrop, no floor, rock, landscape, circle, badge, box, halo, framing, background shadow, labels, text, decorative elements or extra characters. This must be a clean reusable sprite atlas with four independent transparent full-body poses, not a poster or mockup. Crisp cutout edges suitable for both light and dark UI.
+
+## Live gallery — 2026-09-26
+
+The local preview now opens with all eight pose examples, using the same `ZarvisFigure` component as the chat. Each card describes when it appears; actual conversations still display one pose at a time. Pause/resume controls all eight examples. The previous avatar comparison is collapsed initially to keep the gallery in view.
+
+Verified in Chrome: eight distinct selected pose layers; one pause sets all eight figures to paused; selecting the ZIP 316 example fills and focuses the composer with zero conversation messages (no automatic send). Mobile viewport 390 × 844 has equal body client/scroll widths of 375 px, accounting for the scrollbar. TypeScript, scoped ESLint and `git diff --check` passed. No model or API behavior changed.

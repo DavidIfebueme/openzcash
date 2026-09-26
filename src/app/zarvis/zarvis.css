@@ -199,6 +199,36 @@
 .zarvis-studio-live > header > span { font-size: 11px; color: var(--muted); }
 .zarvis-studio-live > p { font-size: 11px; line-height: 1.6; color: var(--dim); margin: 10px 0 18px; }
 .zarvis-studio-live > .zarvis-chat { height: 580px; min-height: 0; border: 1px solid var(--line); border-radius: 18px; padding-top: 12px; background: var(--surface); }
+.zarvis-gallery-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 14px; }
+.zarvis-gallery-toolbar p, .zarvis-gallery-note { margin: 0; color: var(--dim); font-size: 11px; line-height: 1.6; }
+.zarvis-gallery-toolbar button { border: 1px solid var(--line-strong); border-radius: 20px; padding: 7px 12px; color: var(--muted); background: transparent; font-size: 11px; cursor: pointer; white-space: nowrap; }
+.zarvis-gallery-toolbar button:hover { color: var(--ink); background: var(--surface2); }
+.zarvis-pose-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.zarvis-pose-card { min-width: 0; display: flex; flex-direction: column; padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.zarvis-pose-card header { display: flex; align-items: center; gap: 8px; }
+.zarvis-pose-card header > span { color: var(--dim); font-size: 10px; }
+.zarvis-pose-card h2 { margin: 0; font-size: 13px; font-weight: 600; }
+.zarvis-pose-stage { display: grid; place-items: center; height: 152px; margin: 8px 0; }
+.zarvis-pose-stage .zarvis-figure { width: 160px; max-width: 100%; height: auto; }
+.zarvis-pose-card > p { font-size: 11px; line-height: 1.6; margin: 0 0 10px; color: var(--muted); }
+.zarvis-pose-card > small, .zarvis-example-question { margin-top: auto; font-size: 10px; line-height: 1.6; color: var(--dim); }
+.zarvis-example-question { padding: 0; border: 0; background: transparent; color: var(--accent-ink); text-align: left; cursor: pointer; }
+.zarvis-example-question:hover { text-decoration: underline; text-underline-offset: 3px; }
+.zarvis-gallery-note { margin-top: 12px; }
+.zarvis-studio-comparison { margin-top: 26px; border-top: 1px solid var(--line); padding-top: 16px; }
+.zarvis-studio-comparison > summary { cursor: pointer; font-size: 12px; color: var(--muted); }
+.zarvis-studio-comparison[open] > summary { margin-bottom: 20px; }
+#zarvis-live-title { scroll-margin-top: 82px; }
+@media (max-width: 1100px) { .zarvis-pose-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .zarvis-gallery-toolbar { align-items: flex-start; }
+  .zarvis-pose-grid { gap: 10px; }
+  .zarvis-pose-card { padding: 12px; }
+  .zarvis-pose-stage { height: 124px; }
+  .zarvis-pose-stage .zarvis-figure { width: 130px; }
+  .zarvis-pose-card > p { font-size: 10px; }
+}
+
 .zarvis-studio :is(button, a, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 600px) {
   .zarvis-message-assistant { grid-template-columns: 108px minmax(0, 1fr); gap: 8px 12px; }
