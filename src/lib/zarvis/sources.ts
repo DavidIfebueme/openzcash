@@ -28,6 +28,11 @@ export const KNOWLEDGE: KnowledgeNote[] = [
     text: "Zcash supports transparent and shielded transfers. Shielded transfers use zero-knowledge proofs to validate encrypted transaction data. Privacy depends on which receivers and pools are used, the wallet, and the surrounding activity. Do not promise complete anonymity, invisible network traffic, or that every Zcash transaction is shielded. Transparent activity is public. Network metadata and exchanges can reveal information outside the chain.", reviewedOn,
   },
   {
+    id: "viewing-keys", title: "ZIP 310: Sapling viewing-key privacy properties", url: "https://zips.z.cash/zip-0310",
+    keywords: "viewing key ivk fvk ufvk uivk sender recipient spending chave visualizacao remetente destinatario",
+    text: "Viewing keys never grant spending authority. An incoming viewing key reveals received note amounts, recipient addresses and memos; it does not by itself identify the shielded sender or track whether those notes were spent. A full viewing key additionally lets a scanner detect spending of known notes and recover outgoing payment details when the sender uses the expected outgoing viewing key. Do not promise that any viewing key reveals every transaction or all counterparties. A memo can claim a sender identity, but that claim is not automatically authenticated. ZIP 310 documents Sapling properties; unified viewing keys bundle the supported components, as defined in ZIP 316. Explain the distinction between incoming and full keys when relevant, and cite the specification.", reviewedOn: "2026-09-26",
+  },
+  {
     id: "addresses", title: "ZIP 316: Unified Addresses and viewing keys", url: "https://zips.z.cash/zip-0316",
     keywords: "wallet address unified orchard sapling receiver viewing key carteira endereco chave",
     text: "Unified Addresses can bundle receivers for different transfer protocols. A Unified Address alone does not guarantee every payment will use a shielded receiver; sender support and the selected receiver matter. Viewing keys can reveal private transaction information without granting spending authority; never ask users to paste them or a seed phrase into chat. A spending key or recovery phrase controls funds.", reviewedOn,
