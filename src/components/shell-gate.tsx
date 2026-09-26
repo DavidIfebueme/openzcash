@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { AppShell } from "./app-shell";
+import { ZarvisProvider } from "./zarvis/zarvis-provider";
 
 /** Monthly owns its compact header so a complete PDF page fits the viewport. */
 function isBare(pathname: string): boolean {
@@ -34,8 +35,8 @@ export function ShellGate({
   const pathname = usePathname();
   if (isBare(pathname)) return <>{children}</>;
   return (
-    <AppShell isAdmin={isAdmin} isPreview={isPreview} footer={footer}>
+    <ZarvisProvider><AppShell isAdmin={isAdmin} isPreview={isPreview} footer={footer}>
       {children}
-    </AppShell>
+    </AppShell></ZarvisProvider>
   );
 }

@@ -3,6 +3,8 @@ import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ZarvisDock } from "./zarvis/zarvis-dock";
+import { ZarvisMark } from "./zarvis/zarvis-mark";
 import { LogoutButton } from "./logout-button";
 import { ScrollHints } from "./scroll-hints";
 import { APPS, backOf, placeOf, type AppDef } from "@/lib/design-routes";
@@ -37,6 +39,7 @@ type IconType = ComponentType<{ className?: string }>;
 
 /** Line icons by key (apps without a logo) and by route (inner pages). */
 const ICON_BY_KEY: Record<string, IconType> = {
+  zarvis: ZarvisMark,
   book: IconBook,
   calculator: IconCalculator,
   news: IconNews,
@@ -413,8 +416,8 @@ export function AppShell({
             <kbd>⌘K</kbd>
           </button>
           <div className="rd-topbar-actions">
-            <Link href="/zcg/copilot" className="rd-button rd-button-primary">
-              Ask Copilot
+            <Link href="/zarvis" className="rd-button rd-button-primary">
+              Ask Zarvis
             </Link>
             <button
               type="button"
@@ -440,6 +443,7 @@ export function AppShell({
         ) : null}
       </div>
 
+      <ZarvisDock />
       <dialog
         aria-labelledby="app-directory-title"
         className="ws-app-dialog"

@@ -558,3 +558,10 @@ export const zechubPayouts = pgTable("zechub_payouts", {
     .notNull()
     .defaultNow(),
 });
+
+/** Zarvis abuse counters only: no prompts, responses, raw IPs or identities. */
+export const zarvisUsage = pgTable("zarvis_usage", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+});

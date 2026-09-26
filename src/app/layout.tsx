@@ -6,6 +6,7 @@ import "./globals.css";
 import "./redesign.css";
 import "./workspace.css";
 import "./theme.css";
+import "./zarvis/zarvis.css";
 import { ShellGate } from "@/components/shell-gate";
 import { TapFeedback } from "@/components/tap-feedback";
 import { TreasuryBar } from "@/components/treasury-bar";

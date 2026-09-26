@@ -1,0 +1,88 @@
+.zarvis-page { width: 100%; max-width: 980px; margin: 0 auto; color: var(--ink); }
+.zarvis-chat { display: flex; flex-direction: column; min-width: 0; height: calc(100dvh - 210px); min-height: 450px; color: var(--ink); }
+.zarvis-chat-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 0 8px 12px; }
+.zarvis-chat-name { font-size: 18px; font-weight: 600; letter-spacing: -.025em; }
+.zarvis-text-button { background: none; border: none; color: var(--muted); padding: 5px 0; font-size: 12px; cursor: pointer; }
+.zarvis-text-button:hover { color: var(--ink); }
+.zarvis-text-button:disabled { opacity: .4; cursor: default; }
+.zarvis-messages { min-height: 0; flex: 1; overflow: auto; overscroll-behavior: contain; scroll-padding: 24px; scrollbar-width: thin; }
+.zarvis-messages:has(.zarvis-welcome) { display: flex; align-items: center; justify-content: center; }
+.zarvis-welcome { padding: 28px 18px; width: 100%; text-align: center; }
+.zarvis-hero-mark { color: var(--accent); width: 50px; height: 50px; margin: 0 auto 20px; }
+.zarvis-welcome h2 { font-size: clamp(25px, 2.8vw, 34px); line-height: 1.25; letter-spacing: -.04em; font-weight: 550; margin: 0 0 28px; }
+.zarvis-starters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.zarvis-starters button { color: var(--muted); background: transparent; border: 1px solid var(--line-strong); border-radius: 24px; padding: 10px 14px; text-align: center; font-size: 12px; cursor: pointer; transition: background .15s; }
+.zarvis-starters button:hover { color: var(--ink); background: var(--surface2); }
+.zarvis-compose-area { padding: 12px 0 0; max-width: 800px; width: 100%; margin: 0 auto; }
+.rd-shell .zarvis-composer { padding: 16px 18px 12px; border: 1px solid var(--line-strong); border-radius: 22px; background: var(--surface); box-shadow: 0 2px 12px #00000004; }
+.rd-shell .zarvis-composer:focus-within { border-color: var(--accent-muted); }
+.rd-shell .zarvis-composer textarea { width: 100%; display: block; resize: none; max-height: 140px; border: none; background: transparent; padding: 0; color: var(--ink); font: 15px/1.6 var(--font-geist), sans-serif; box-shadow: none; outline: none; border-radius: 0; }
+.zarvis-composer textarea::placeholder { color: var(--dim); }
+.zarvis-composer-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.zarvis-composer-bottom > span { font-size: 10px; color: var(--dim); }
+.zarvis-send { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 24px; cursor: pointer; }
+.zarvis-send:disabled { opacity: .2; cursor: default; }
+.zarvis-send:hover:not(:disabled) { background: var(--accent-ink); }
+.zarvis-privacy { display: flex; justify-content: center; align-items: start; gap: 14px; margin-top: 10px; font-size: 10px; color: var(--dim); }
+.zarvis-privacy details { max-width: 350px; text-align: right; }
+.zarvis-privacy summary { cursor: pointer; }
+.zarvis-privacy p { text-align: left; margin: 8px 0; line-height: 1.65; }
+.zarvis-privacy a { text-decoration: underline; text-underline-offset: 2px; color: var(--accent-ink); }
+.zarvis-thread { max-width: 800px; margin: 0 auto; padding: 8px 6px 24px; }
+.zarvis-message { padding: 18px 0; overflow-wrap: anywhere; }
+.zarvis-message-label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 600; margin-bottom: 10px; color: var(--ink); }
+.zarvis-message-label svg { width: 24px; height: 24px; color: var(--accent); }
+.zarvis-message-user { margin-left: auto; width: fit-content; max-width: 85%; }
+.zarvis-message-user .zarvis-message-label { display: none; }
+.zarvis-message-user .zarvis-prose { background: var(--surface2); padding: 12px 18px; border-radius: 20px; }
+.zarvis-prose { font-size: 14px; line-height: 1.8; color: var(--ink); }
+.zarvis-prose > :first-child { margin-top: 0; }
+.zarvis-prose > :last-child { margin-bottom: 0; }
+.zarvis-prose p, .zarvis-prose ul, .zarvis-prose ol { margin: 0 0 12px; }
+.zarvis-prose ul, .zarvis-prose ol { padding-left: 22px; }
+.zarvis-prose ul { list-style: disc; }
+.zarvis-prose ol { list-style: decimal; }
+.zarvis-prose h1, .zarvis-prose h2, .zarvis-prose h3, .zarvis-prose h4 { margin: 18px 0 8px; font-size: 16px; font-weight: 650; }
+.zarvis-prose a { text-decoration: underline; text-underline-offset: 3px; color: var(--accent-ink); }
+.zarvis-prose pre { max-width: 100%; overflow: auto; padding: 12px; background: var(--surface2); border-radius: 8px; }
+.zarvis-prose code { font-size: 12px; font-family: var(--font-geist-mono), monospace; }
+.zarvis-prose blockquote { padding-left: 12px; border-left: 2px solid var(--accent); color: var(--muted); }
+.zarvis-answer-sources { font-size: 11px; color: var(--muted); margin-top: 12px; }
+.zarvis-answer-sources summary { cursor: pointer; color: var(--muted); }
+.zarvis-answer-sources ol { padding: 8px 0; list-style: none; display: grid; gap: 8px; }
+.zarvis-answer-sources li { background: var(--surface2); padding: 8px 10px; border-radius: 8px; }
+.zarvis-answer-sources a { color: var(--ink); }
+.zarvis-answer-sources small { display: block; font-size: 9px; color: var(--dim); margin-top: 3px; }
+.zarvis-copy { margin-top: 8px; font-size: 10px; }
+.zarvis-progress { max-width: 800px; margin: 0 auto; padding: 8px 6px 18px; font-size: 12px; color: var(--muted); display: flex; gap: 9px; align-items: center; }
+.zarvis-thinking { height: 6px; width: 6px; border-radius: 50%; background: var(--accent); animation: zarvis-pulse 1.5s ease-in-out infinite; }
+@keyframes zarvis-pulse { 50% { opacity: .3; } }
+.zarvis-notice { color: var(--muted); font-size: 12px; line-height: 1.5; margin: 0 8px 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.zarvis-notice button { font-weight: 600; text-decoration: underline; }
+.zarvis-incomplete { color: var(--dim); font-size: 10px; }
+.zarvis-launcher { position: fixed; right: 24px; bottom: calc(var(--zarvis-footer-height, 90px) + 16px); z-index: 24; display: flex; align-items: center; gap: 8px; border: 1px solid var(--line-strong); border-radius: 30px; background: var(--surface); color: var(--ink); box-shadow: 0 4px 18px #00000012; padding: 9px 17px 9px 11px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.zarvis-launcher svg { width: 27px; height: 27px; color: var(--accent); }
+.zarvis-launcher:hover { background: var(--surface2); }
+.rd-shell[data-nav="open"] .zarvis-launcher { visibility: hidden; }
+.zarvis-dock { position: fixed; inset: auto 22px 22px auto; margin: 0; width: min(450px, calc(100vw - 32px)); height: min(740px, calc(100dvh - 44px)); max-height: none; max-width: none; padding: 0; border: 1px solid var(--line-strong); border-radius: 20px; color: var(--ink); background: var(--bg); box-shadow: 0 20px 80px #0003; overflow: hidden; }
+.zarvis-dock[open] { display: flex; flex-direction: column; }
+.zarvis-dock::backdrop { background: #0003; }
+.zarvis-dock-heading { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px 8px; }
+.zarvis-dock-heading > div { display: flex; align-items: center; gap: 9px; }
+.zarvis-dock-heading svg { height: 32px; width: 32px; color: var(--accent); }
+.zarvis-dock-heading strong { font-size: 15px; font-weight: 600; }
+.zarvis-dock-heading small { display: none; }
+.zarvis-dock-heading nav { display: flex; align-items: center; gap: 6px; }
+.zarvis-dock-heading nav > * { display: grid; place-items: center; width: 30px; height: 30px; border: 0; background: none; border-radius: 7px; color: var(--muted); cursor: pointer; font-size: 20px; }
+.zarvis-chat-compact { flex: 1; min-height: 0; height: auto; }
+.zarvis-chat-compact .zarvis-chat-toolbar { padding: 0 20px; justify-content: flex-end; }
+.zarvis-chat-compact .zarvis-chat-name { display: none; }
+.zarvis-chat-compact .zarvis-welcome { padding: 20px; }
+.zarvis-chat-compact .zarvis-hero-mark { width: 42px; height: 42px; margin-bottom: 18px; }
+.zarvis-chat-compact .zarvis-welcome h2 { font-size: 25px; }
+.zarvis-chat-compact .zarvis-starters button { padding: 9px 12px; font-size: 11px; }
+.zarvis-chat-compact .zarvis-compose-area { padding: 10px 16px 16px; }
+.zarvis-chat-compact .zarvis-thread { padding-left: 20px; padding-right: 20px; }
+.zarvis-page button:focus-visible, .zarvis-dock button:focus-visible, .zarvis-page a:focus-visible, .zarvis-dock a:focus-visible, .zarvis-launcher:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 600px) { .zarvis-chat { height: calc(100dvh - 215px); min-height: 410px; } .zarvis-chat-toolbar { padding: 0 0 8px; } .zarvis-chat-name { font-size: 17px; } .zarvis-welcome { padding: 20px 0; } .zarvis-welcome h2 { font-size: 26px; } .zarvis-hero-mark { width: 42px; height: 42px; margin-bottom: 16px; } .zarvis-starters { gap: 7px; } .zarvis-starters button { padding: 9px 11px; font-size: 11px; } .rd-shell .zarvis-composer textarea { font-size: 16px; } .zarvis-compose-area { padding-top: 8px; } .zarvis-thread { padding: 6px 0 12px; } .zarvis-launcher { right: 14px; padding: 9px; } .zarvis-launcher span { display: none; } .zarvis-dock { inset: auto 8px 8px; width: calc(100vw - 16px); height: calc(100dvh - 16px); border-radius: 18px; padding-bottom: env(safe-area-inset-bottom); } .zarvis-dock .zarvis-chat { min-height: 0; height: auto; } }
+@media (prefers-reduced-motion: reduce) { .zarvis-thinking { animation: none; } .zarvis-starters button { transition: none; } }
