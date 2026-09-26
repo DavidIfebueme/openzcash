@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useZarvis } from "./zarvis-provider";
-import { ZarvisMark } from "./zarvis-mark";
+import { ZarvisFigure } from "./zarvis-figure";
 
 export function ZarvisCompanion() {
   const { expression, motionPaused } = useZarvis();
@@ -25,7 +25,7 @@ export function ZarvisCompanion() {
         event.currentTarget.style.setProperty("--zarvis-look-x", "0px");
         event.currentTarget.style.setProperty("--zarvis-look-y", "0px");
       }}>
-      <ZarvisMark key={greetingId} className="zarvis-hero-mark"
+      <ZarvisFigure key={greetingId} className="zarvis-hero-figure"
         expression={greeting ? "greeting" : expression}
         animated paused={motionPaused}/>
     </button>

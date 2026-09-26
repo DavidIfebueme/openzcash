@@ -120,3 +120,84 @@
 .zarvis-page button:focus-visible, .zarvis-dock button:focus-visible, .zarvis-page a:focus-visible, .zarvis-dock a:focus-visible, .zarvis-launcher:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 @media (max-width: 600px) { .zarvis-chat { height: calc(100dvh - 215px); min-height: 410px; } .zarvis-chat-toolbar { padding: 0 0 8px; } .zarvis-chat-name { font-size: 17px; } .zarvis-welcome { padding: 20px 0; } .zarvis-welcome h2 { font-size: 26px; } .zarvis-hero-mark { width: 88px; height: 88px; margin: 0; } .zarvis-starters { gap: 7px; } .zarvis-starters button { padding: 9px 11px; font-size: 11px; } .rd-shell .zarvis-composer textarea { font-size: 16px; } .zarvis-compose-area { padding-top: 8px; } .zarvis-thread { padding: 6px 0 12px; } .zarvis-launcher { right: 14px; padding: 9px; } .zarvis-launcher span { display: none; } .zarvis-dock { inset: auto 8px 8px; width: calc(100vw - 16px); height: calc(100dvh - 16px); border-radius: 18px; padding-bottom: env(safe-area-inset-bottom); } .zarvis-dock .zarvis-chat { min-height: 0; height: auto; } }
 @media (prefers-reduced-motion: reduce) { .zarvis-mark, .zarvis-mark * { animation: none !important; transition: none !important; transform: none !important; } .zarvis-thinking { animation: none; } .zarvis-starters button { transition: none; } }
+
+/* Free-standing Ironwood: the same identity, with no avatar frame. */
+.zarvis-figure { overflow: visible; border-radius: 0; background: transparent; box-shadow: none; }
+.zarvis-figure .zarvis-ground { fill: var(--ink); opacity: .08; }
+.zarvis-figure .zarvis-hand { transform-origin: 175px 404px; }
+.zarvis-figure[data-animated="true"] .zarvis-character { animation: zarvis-figure-breathe 4.8s ease-in-out infinite; }
+.zarvis-figure[data-expression="greeting"] .zarvis-character { animation: zarvis-figure-arrive .7s cubic-bezier(.2,.8,.3,1.2) both; }
+.zarvis-figure[data-expression="greeting"] .zarvis-hand { animation: zarvis-figure-wave .55s ease-in-out 4; }
+.zarvis-figure[data-expression="listening"] .zarvis-character { animation: zarvis-figure-listen 3.4s ease-in-out infinite; }
+.zarvis-figure[data-expression="thinking"] .zarvis-character { animation: zarvis-figure-ponder 2.8s ease-in-out infinite; }
+.zarvis-figure[data-expression="explaining"] .zarvis-character { animation: zarvis-figure-talk 1.5s ease-in-out infinite; }
+.zarvis-figure[data-expression="pleased"] .zarvis-character { animation: zarvis-figure-hop .75s ease-out 1; }
+.zarvis-figure[data-expression="error"] .zarvis-character { animation: zarvis-figure-shake .65s ease-in-out 1; }
+.zarvis-hello { border-radius: 16px; }
+.zarvis-companion { margin-bottom: 14px; }
+.zarvis-hero-figure { width: 210px; height: 200px; }
+.zarvis-companion .zarvis-motion { right: 5px; bottom: 8px; }
+.zarvis-welcome { padding-top: 18px; padding-bottom: 18px; }
+.zarvis-welcome h2 { margin-bottom: 22px; }
+.zarvis-message-label .zarvis-figure { width: 36px; height: 34px; margin: -5px -4px -5px -6px; }
+.zarvis-progress .zarvis-figure { width: 68px; height: 65px; }
+.zarvis-chat-compact .zarvis-hero-figure { width: 166px; height: 158px; }
+@keyframes zarvis-figure-breathe { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-9px) scale(1.018, 1.025); } }
+@keyframes zarvis-figure-arrive { 0% { transform: translateY(60px) scale(.8); } 65% { transform: translateY(-24px) scale(1.025); } 100% { transform: translateY(0) scale(1); } }
+@keyframes zarvis-figure-wave { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(12deg); } }
+@keyframes zarvis-figure-listen { 0%, 100% { transform: rotate(-4deg) translateY(-7px); } 50% { transform: rotate(2deg) translateY(-18px) scale(1.015); } }
+@keyframes zarvis-figure-ponder { 0%, 100% { transform: rotate(-4deg) translateY(-4px); } 40% { transform: rotate(4deg) translateY(-17px); } 70% { transform: rotate(4deg) translateY(-7px); } }
+@keyframes zarvis-figure-talk { 0%, 55%, 100% { transform: translateY(0) rotate(-2deg); } 22% { transform: translateY(-22px) rotate(3deg) scale(1.015); } 75% { transform: translateY(-10px) rotate(1deg); } }
+@keyframes zarvis-figure-hop { 0%, 100% { transform: translateY(0) scale(1); } 18% { transform: scale(1.04, .95); } 50% { transform: translateY(-42px) rotate(-4deg); } 78% { transform: translateY(4px) scale(1.025, .975); } }
+@keyframes zarvis-figure-shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-17px) rotate(-3deg); } 50% { transform: translateX(17px) rotate(3deg); } }
+
+/* Local review surface. The regular chat remains uncluttered. */
+.zarvis-studio { max-width: 1040px; margin: 0 auto; color: var(--ink); padding-bottom: 24px; }
+.zarvis-studio-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 24px; }
+.zarvis-studio-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .12em; color: var(--dim); margin: 0 0 8px; }
+.zarvis-studio-header h1 { margin: 0; font-size: clamp(27px, 3vw, 36px); letter-spacing: -.045em; line-height: 1.15; font-weight: 550; }
+.zarvis-studio-header p:not(.zarvis-studio-eyebrow) { margin: 10px 0 0; font-size: 13px; color: var(--muted); line-height: 1.65; }
+.zarvis-studio-header > a { font-size: 12px; color: var(--muted); padding-top: 6px; white-space: nowrap; }
+.zarvis-studio-controls { margin-bottom: 22px; }
+.zarvis-studio-controls [role="group"] { display: flex; flex-wrap: wrap; gap: 6px; }
+.zarvis-studio-controls button { border: 1px solid var(--line-strong); border-radius: 20px; padding: 8px 14px; background: transparent; color: var(--muted); font-size: 12px; cursor: pointer; }
+.zarvis-studio-controls button:hover { background: var(--surface2); color: var(--ink); }
+.zarvis-studio-controls button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.zarvis-studio-options { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; }
+.zarvis-studio-options label { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); cursor: pointer; }
+.zarvis-studio-options input { accent-color: var(--accent-ink); width: 15px; height: 15px; }
+.zarvis-studio-options button { border: 0; padding: 4px 0; text-decoration: underline; text-underline-offset: 4px; }
+.zarvis-studio-controls > p { margin: 10px 0 0; color: var(--dim); font-size: 11px; }
+.zarvis-iteration-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.zarvis-iteration-card { min-width: 0; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); overflow: hidden; }
+.zarvis-iteration-card > header { display: flex; align-items: center; gap: 10px; padding: 18px 20px 0; }
+.zarvis-iteration-card header > span { font-size: 11px; color: var(--dim); }
+.zarvis-iteration-card h2 { font-size: 14px; font-weight: 600; margin: 0; }
+.zarvis-iteration-card small { margin-left: auto; font-size: 10px; color: var(--dim); }
+.zarvis-iteration-current small { color: var(--accent-ink); }
+.zarvis-iteration-stage { display: flex; align-items: center; justify-content: center; height: 282px; }
+.zarvis-iteration-stage .zarvis-figure { width: 280px; height: 266px; }
+.zarvis-iteration-before { width: 148px; height: 148px; box-shadow: 0 0 0 5px var(--surface), 0 0 0 6px var(--line-strong); }
+.zarvis-iteration-card > p { font-size: 11px; color: var(--muted); margin: 0; padding: 0 20px 18px; }
+.zarvis-studio-live { margin-top: 32px; }
+.zarvis-studio-live > header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.zarvis-studio-live h2 { font-size: 23px; letter-spacing: -.03em; margin: 0; font-weight: 550; }
+.zarvis-studio-live > header > span { font-size: 11px; color: var(--muted); }
+.zarvis-studio-live > p { font-size: 11px; line-height: 1.6; color: var(--dim); margin: 10px 0 18px; }
+.zarvis-studio-live > .zarvis-chat { height: 580px; min-height: 0; border: 1px solid var(--line); border-radius: 18px; padding-top: 12px; background: var(--surface); }
+.zarvis-studio :is(button, a, input):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .zarvis-hero-figure { width: 166px; height: 158px; }
+  .zarvis-companion { margin-bottom: 10px; }
+  .zarvis-welcome h2 { margin-bottom: 18px; }
+  .zarvis-studio-header { flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .zarvis-iteration-grid { gap: 10px; }
+  .zarvis-iteration-card > header { padding: 13px 12px 0; flex-wrap: wrap; gap: 6px; }
+  .zarvis-iteration-card h2 { font-size: 12px; }
+  .zarvis-iteration-card small { width: 100%; margin: 0 0 0 20px; }
+  .zarvis-iteration-stage { height: 184px; }
+  .zarvis-iteration-stage .zarvis-figure { width: 100%; max-width: 184px; height: auto; }
+  .zarvis-iteration-before { width: 82px; height: 82px; }
+  .zarvis-iteration-card > p { padding: 0 12px 13px; font-size: 10px; line-height: 1.5; }
+  .zarvis-studio-live > .zarvis-chat { height: 540px; }
+}
