@@ -1,4 +1,4 @@
-# Zarvis Ironwood — iteration 02
+# Zarvis Ironwood — iterations
 
 ## Artwork and rendering
 
@@ -54,6 +54,14 @@ The first answer incorrectly generalized viewing-key visibility to senders/recei
 - An official ZIP 316 search completed in 8.45 seconds with its source link.
 - Treasury answers used public ZCG sheets imported into an isolated local database and separated a block-accrual Lockbox estimate from a reporting date.
 - Local credentials are passed to the process in memory. This work does not enable production or resolve the separate credential-rotation follow-up.
+
+## Response layout — iteration 03, 2026-09-26
+
+User review found two small figures stacked during a request: the placeholder assistant label and the separate progress indicator. These are now one response component with one figure. The status appears beside the same figure and disappears when the response finishes. Completed responses retain the explaining pose, without continuous movement.
+
+The figure is 144 × 137 px on desktop (previous message icon: 36 × 34 px). On mobile and compact chat surfaces it is 108 × 103 px, beside the name/status; the response text then uses the full available width below. This avoids a narrow text column on phones.
+
+Browser verification used real requests: an official ZIP 316 lookup on desktop and a beginner privacy explanation on mobile. In both cases the conversation contained exactly one figure while waiting and after completion; the progress block count dropped from one to zero. Desktop and 390 × 844 light/dark views were inspected. TypeScript, scoped lint and `git diff --check` passed. The existing AI pipeline was unchanged in this iteration.
 
 ## Exact art prompt
 
