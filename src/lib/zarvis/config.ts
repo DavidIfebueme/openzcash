@@ -5,6 +5,16 @@ function limit(name: string, fallback: number, max: number): number {
   const n = Number(raw);
   return Number.isInteger(n) && n > 0 ? Math.min(n, max) : fallback;
 }
+/** Explicit opt-in for a local development listener; ignored in production. */
+function unlimitedLocalTesting(): boolean {
+  if (process.env.NODE_ENV !== "development" || process.env.ZARVIS_LOCAL_UNLIMITED !== "true") return false;
+  try {
+    const origin = new URL(process.env.ZARVIS_ORIGIN ?? "");
+    return origin.protocol === "http:" && ["127.0.0.1", "localhost", "[::1]"].includes(origin.hostname)
+      && !origin.username && !origin.password && origin.pathname === "/" && !origin.search && !origin.hash;
+  } catch { return false; }
+}
+
 export function zarvisConfig() {
   const apiKey = process.env.OPENAI_API_KEY?.trim() ?? "";
   return {
@@ -12,6 +22,7 @@ export function zarvisConfig() {
     enabled: process.env.ZARVIS_ENABLED === "true" && Boolean(apiKey && process.env.DATABASE_URL),
     model: process.env.ZARVIS_MODEL?.trim() || "gpt-5-mini",
     webSearch: process.env.ZARVIS_WEB_SEARCH !== "false",
+    unlimitedLocalTesting: unlimitedLocalTesting(),
     dailyLimit: limit("ZARVIS_DAILY_REQUEST_LIMIT", 100, 10_000),
     hourlyLimit: limit("ZARVIS_HOURLY_REQUEST_LIMIT", 30, 1_000),
   };

@@ -51,3 +51,11 @@ Added a dedicated `price` topic and `/api/zec-price`, backed by the site's exist
 Live local endpoint check on September 26: HTTP 200 in 1.4 seconds, USD 1,532.81 per ZEC, provider quote time 04:34:50 UTC, retrieved at 04:36:39 UTC, `stale: false`. This is a recorded test quote, not a continuing current-price claim. The 46 focused pricing, conversation and route tests passed. The original five-question allowance was exhausted. The user then explicitly authorized one more local question; only that additional network-day reservation was released, and global counters were retained.
 
 The final paid test went through `/api/zarvis` on the Astra preview: “Qual é o preço atual do Zcash em dólares? Informe a fonte e o horário da cotação.” It completed in **6.3 seconds**, used the public-data lookup, and returned **US$ 1.532,81 per ZEC**, **CoinGecko via OpenZcash**, and **September 26, 2026 at 04:34:50 UTC**. These matched the independently checked quote; the answer retained the fresh/stale distinction and cited `/api/zec-price`. The stream completed with sources and no error. The extra authorized question was consumed; no further paid test was made. Type checking, scoped lint and diff checks also passed.
+
+## Unlimited local test mode
+
+The user subsequently asked to remove the quantity limits while testing. Added the explicit `ZARVIS_LOCAL_UNLIMITED` development setting, guarded by both `NODE_ENV=development` and a configured HTTP loopback origin. Enabled it in the ignored local environment and local launcher. No counter reset or production configuration change was needed.
+
+The running preview required a restart to load the new environment setting: before restart the same local request returned HTTP 429; after restart it completed through `/api/zarvis` with HTTP 200, sources, and no error in 8.2 seconds. It used the dedicated price lookup and returned a dated quote. This validates the actual chat path after the existing daily quota was exhausted.
+
+Thirty focused quota, request-boundary and API tests passed, including repeated local reservations without database access and normal quota enforcement for production, missing opt-in and non-local origins. Type checking, scoped lint and diff checks also passed. The per-answer input/output budgets, deadline and cancellation remain independent of the removed local question-count limits.

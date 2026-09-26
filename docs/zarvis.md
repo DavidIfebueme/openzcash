@@ -10,6 +10,12 @@ Zarvis is the OpenZcash AI guide: `/zarvis`, the navigation entry, and a floatin
 4. Test a basic privacy explanation, a current treasury query, an external protocol question, and a Portuguese follow-up. Check citations, reporting dates, source failures, light/dark modes and mobile. A rendered UI or configured key is not proof that a billed model call succeeded.
 5. Set a project budget alert and appropriate billing controls in OpenAI. **App request limits are not a dollar billing cap.** Inspect actual usage before raising them.
 
+## Local testing without request quotas
+
+Set `ZARVIS_LOCAL_UNLIMITED=true` in the local development environment when deliberately testing without hourly, daily or per-network question limits. This setting only takes effect with `NODE_ENV=development` and an explicit HTTP loopback `ZARVIS_ORIGIN` (`127.0.0.1`, `localhost` or `::1`). Production always uses the normal quota path even if this flag is accidentally set. The flag is false by default.
+
+This mode does not read, increment or reset the quota counters, so an exhausted test counter no longer blocks the preview. Disable the flag to resume ordinary quotas. The origin checks, input limits, per-answer output budget, deadline and stop/cancel behavior still apply. Calls continue to use the configured OpenAI model and incur normal API costs.
+
 ## Cost reference (checked 2026-09-25)
 
 GPT-5 mini: $0.25 / million input tokens, $0.025 / million cached input tokens, and $2.00 / million output tokens (including reasoning). Example: 10,000 input + 2,000 output tokens = $0.0065 before tools. Web search adds $0.01 per tool call plus search-content tokens. A question can use two model requests, because retrieved records need a final synthesis. History, instructions and retrieved sources all count as input; visible answer length is not total token usage.
