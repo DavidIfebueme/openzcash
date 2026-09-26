@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import type { Response as OpenAIResponse, ResponseInputItem, ResponseCreateParamsStreaming, Tool } from "openai/resources/responses/responses";
 import { zarvisConfig } from "./config";
 import { systemPrompt } from "./prompt";
+import { conversationKnowledge } from "./context";
 import { lookupPublicData, lookupTool } from "./data";
 import { SEARCH_DOMAINS, selectKnowledge } from "./sources";
 import { citedSources, renderResponse } from "./answer";
@@ -11,7 +12,7 @@ import type { ChatMessage, ZarvisEvent, ZarvisSource } from "./types";
 export async function generateAnswer(messages: ChatMessage[], signal: AbortSignal, emit: (event: ZarvisEvent) => void) {
   const config = zarvisConfig();
   const client = new OpenAI({ apiKey: config.apiKey, maxRetries: 0, timeout: 50_000 });
-  const question = messages.filter((m) => m.role === "user").slice(-3).map((m) => m.content).join("\n");
+  const question = conversationKnowledge(messages);
   const input: ResponseInputItem[] = messages.map(({ role, content }) => ({ role, content }));
   const candidates: ZarvisSource[] = selectKnowledge(question).map(({ title, url }) => ({ title, url }));
   let webUsed = false;
@@ -26,7 +27,8 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
       instructions: systemPrompt(question),
       input,
       tools,
-      max_tool_calls: 1,
+      // Request room for a search and source check; model rounds are also bounded below.
+      max_tool_calls: 2,
       parallel_tool_calls: true,
       max_output_tokens: 3_000,
       reasoning: { effort: "low" },

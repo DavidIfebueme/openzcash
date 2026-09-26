@@ -11,7 +11,7 @@ export const lookupSchema = z.object({
 }).strict();
 export const lookupTool = {
   type: "function" as const, name: "lookup_openzcash",
-  description: "Read current public OpenZcash records with source dates. Use for amounts, balances, grants, recipients, proposals, prices, news and the ecosystem. query: optional short project/person name to narrow records, or empty for overview. Results may be partial. Does not access wallets, private records, user pages or arbitrary URLs.",
+  description: "Read current public OpenZcash records with source dates. Use for amounts, balances, ZCG grants, recipients, ZCG grant applications, prices, news and the ecosystem. The proposals topic contains funding applications to ZCG, NOT Zcash Improvement Proposals (ZIPs). For ZIP documents or protocol status use official-source web search. query: optional short project/person name to narrow records, or empty for overview. Results may be partial. Does not access wallets, private records, user pages or arbitrary URLs.",
   strict: true,
   parameters: {
     type: "object", properties: {

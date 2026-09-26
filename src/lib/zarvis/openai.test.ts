@@ -15,6 +15,17 @@ const answer = (text: string) => ({ type: "message", role: "assistant", content:
 const call = (id: string, args = '{"topic":"treasuries","query":""}') => ({ type: "function_call", name: "lookup_openzcash", call_id: id, arguments: args });
 beforeEach(() => { vi.clearAllMocks(); });
 describe("Zarvis OpenAI orchestration", () => {
+  it("passes the earlier offer and a short confirmation to the model in order", async () => {
+    const history = [
+      { role: "user" as const, content: "whats the last zip?" },
+      { role: "assistant" as const, content: "Do you mean the most recently published ZIP? If so I can look it up now." },
+      { role: "user" as const, content: "yes" },
+    ];
+    mocks.create.mockResolvedValueOnce(events([answer("Here is the dated source I found.")]));
+    await generateAnswer(history, new AbortController().signal, () => {});
+    expect(mocks.create.mock.calls[0][0].input).toEqual(history);
+    expect(mocks.create.mock.calls[0][0].store).toBe(false);
+  });
   it("fetches public evidence, passes provenance back and completes with citations", async () => {
     const url = "https://openzcash.org/zcg/treasury-calculator";
     mocks.create.mockResolvedValueOnce(events([call("lookup-1")])).mockResolvedValueOnce(events([answer(`The reported balance is dated. [Treasury](${url})`)]));
@@ -24,7 +35,7 @@ describe("Zarvis OpenAI orchestration", () => {
     expect(mocks.create).toHaveBeenCalledTimes(2);
     expect(mocks.lookup).toHaveBeenCalledTimes(1);
     for (const [params, options] of mocks.create.mock.calls) {
-      expect(params.store).toBe(false); expect(params.max_output_tokens).toBe(3000); expect(params.max_tool_calls).toBe(1);
+      expect(params.store).toBe(false); expect(params.max_output_tokens).toBe(3000); expect(params.max_tool_calls).toBe(2);
       expect(options.signal).toBeInstanceOf(AbortSignal);
       expect(params).not.toHaveProperty("previous_response_id");
     }

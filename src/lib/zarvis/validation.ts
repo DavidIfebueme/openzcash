@@ -1,17 +1,17 @@
 import { z } from "zod";
 
-export const MAX_BODY_BYTES = 32_768;
-export const MAX_QUESTION_LENGTH = 2_000;
+import { MAX_BODY_BYTES, MAX_QUESTION_LENGTH, MAX_HISTORY_MESSAGES, MAX_HISTORY_CHARACTERS, MAX_MESSAGE_LENGTH } from "./context";
+export { MAX_BODY_BYTES, MAX_QUESTION_LENGTH } from "./context";
 export const chatRequestSchema = z.object({
   messages: z.array(z.object({
     role: z.enum(["user", "assistant"]),
-    content: z.string().trim().min(1).max(8_000),
-  }).strict()).min(1).max(12),
+    content: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),
+  }).strict()).min(1).max(MAX_HISTORY_MESSAGES),
 }).strict().superRefine(({ messages }, ctx) => {
   const last = messages.at(-1)!;
   if (last.role !== "user" || last.content.length > MAX_QUESTION_LENGTH)
     ctx.addIssue({ code: "custom", message: "End with a question of up to 2,000 characters." });
-  if (messages.reduce((n, m) => n + m.content.length, 0) > 18_000)
+  if (messages.reduce((n, m) => n + m.content.length, 0) > MAX_HISTORY_CHARACTERS)
     ctx.addIssue({ code: "custom", message: "Start a new conversation to continue." });
 });
 

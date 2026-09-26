@@ -2,7 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ZarvisEvent, ZarvisExpression, ZarvisSource, ZarvisStatus } from "@/lib/zarvis/types";
 import { answerExpression, progressExpression } from "@/lib/zarvis/expression";
-import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/validation";
+import { conversationContext, MAX_QUESTION_LENGTH } from "@/lib/zarvis/context";
 
 export type DisplayMessage = {
   id: string; role: "user" | "assistant"; content: string;
@@ -69,21 +69,15 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     if (active.current || !status?.available) return;
     const questionText = (question ?? draft).trim();
     if (!retry && (!questionText || questionText.length > MAX_QUESTION_LENGTH)) return;
-    let history = messages.filter((m) => !m.incomplete);
+    let history = messages.filter((m) => m.content.trim());
     if (retry) {
       const lastUser = messages.findLastIndex((m) => m.role === "user");
       if (lastUser < 0) return;
-      history = messages.slice(0, lastUser + 1).filter((m) => !m.incomplete);
+      history = messages.slice(0, lastUser + 1).filter((m) => m.content.trim());
     } else {
       history = [...history, { id: crypto.randomUUID(), role: "user", content: questionText }];
     }
-    // Keep complete recent turns within the server's context budget.
-    let budget = 0;
-    const context = history.slice(-12).map((m) => ({ ...m, content: m.content.slice(0, 8_000) })).reverse().filter((m) => {
-      budget += m.content.length;
-      return budget <= 18_000;
-    }).reverse();
-    while (context[0]?.role === "assistant") context.shift();
+    const context = conversationContext(history);
     const id = crypto.randomUUID();
     const controller = new AbortController(); active.current = controller;
     setMessages([...history, { id, role: "assistant", content: "", incomplete: true, pose: answerExpression(history.findLast((message) => message.role === "user")?.content ?? questionText) }]);
