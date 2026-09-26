@@ -5,6 +5,7 @@ import { safeSourceUrl, STARTERS } from "@/lib/zarvis/sources";
 import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/validation";
 import { useZarvis } from "./zarvis-provider";
 import { ZarvisMark } from "./zarvis-mark";
+import { ZarvisCompanion, ZarvisMotionToggle } from "./zarvis-companion";
 
 export function ZarvisChat({ compact = false }: { compact?: boolean }) {
   const chat = useZarvis();
@@ -23,27 +24,30 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
   return <section className={`zarvis-chat ${compact ? "zarvis-chat-compact" : ""}`} aria-label="Conversation with Zarvis">
     <div className="zarvis-chat-toolbar">
       <span className="zarvis-chat-name">Zarvis</span>
+      <div className="zarvis-toolbar-actions">
+      {!empty ? <ZarvisMotionToggle className="zarvis-motion zarvis-motion-toolbar"/> : null}
       <button type="button" onClick={() => { chat.clear(); input.current?.focus(); }} disabled={empty && !chat.draft} className="zarvis-text-button">＋ New chat</button>
+      </div>
     </div>
     <div className="zarvis-messages" ref={scroll} onScroll={() => {
       const el = scroll.current!; follow.current = el.scrollHeight - el.scrollTop - el.clientHeight < 90;
     }} tabIndex={0} aria-label="Conversation history">
       {empty ? <div className="zarvis-welcome">
-        <ZarvisMark className="zarvis-hero-mark" expression={chat.expression}/>
+        <ZarvisCompanion/>
         <h2>What would you like to know<br/>about Zcash?</h2>
         <div className="zarvis-starters">{STARTERS.map((starter) => <button key={starter.label} type="button" onClick={() => { chat.setDraft(starter.question); input.current?.focus(); }}>
           <span>{starter.label}</span>
         </button>)}</div>
-      </div> : <div className="zarvis-thread">{chat.messages.map((message) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`}>
-        <div className="zarvis-message-label">{message.role === "assistant" ? <><ZarvisMark expression={message.incomplete ? (chat.busy ? chat.expression : "error") : "idle"}/> Zarvis</> : "You"}</div>
+      </div> : <div className="zarvis-thread">{chat.messages.map((message, index) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`}>
+        <div className="zarvis-message-label">{message.role === "assistant" ? <><ZarvisMark expression={index === chat.messages.length - 1 ? chat.expression : "idle"} animated={index === chat.messages.length - 1} paused={chat.motionPaused}/> Zarvis</> : "You"}</div>
         {message.content ? <div className="zarvis-prose"><Markdown skipHtml allowedElements={["p", "a", "strong", "em", "ul", "ol", "li", "h1", "h2", "h3", "h4", "blockquote", "code", "pre", "br", "hr"]} urlTransform={(url) => safeSourceUrl(url) ?? ""} components={{ a: ({ href, children }) => href ? <a href={href} target="_blank" rel="noopener noreferrer">{children}</a> : <span>{children}</span> }}>{message.content}</Markdown></div> : null}
         {message.role === "assistant" && message.content && !chat.busy && message.incomplete ? <small className="zarvis-incomplete">Incomplete response</small> : null}
-        {message.sources?.length ? <details className="zarvis-answer-sources"><summary>{message.sources.length} source{message.sources.length === 1 ? "" : "s"} used</summary><ol>{message.sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>{source.retrievedAt ? <small>Retrieved {new Date(source.retrievedAt).toLocaleString()}</small> : null}</li>)}</ol></details> : null}
+        {message.sources?.length ? <details className="zarvis-answer-sources"><summary>{message.sources.length} source{message.sources.length === 1 ? "" : "s"} consulted</summary><ol>{message.sources.map((source) => <li key={source.url}><a href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>{source.retrievedAt ? <small>Retrieved {new Date(source.retrievedAt).toLocaleString()}</small> : null}</li>)}</ol></details> : null}
         {message.role === "assistant" && message.content && !message.incomplete ? <button className="zarvis-text-button zarvis-copy" type="button" onClick={async () => {
           try { await navigator.clipboard.writeText(message.content); setCopied(message.id); } catch { setCopied(null); }
         }}>{copied === message.id ? "Copied" : "Copy answer"}</button> : null}
       </article>)}</div>}
-      {chat.busy ? <div className="zarvis-progress" role="status"><span className="zarvis-thinking"/>{chat.progress || "Writing an answer…"}</div> : null}
+      {chat.busy ? <div className="zarvis-progress" role="status"><ZarvisMark expression={chat.expression} animated paused={chat.motionPaused}/>{chat.progress || "Writing an answer…"}</div> : null}
     </div>
     <div className="zarvis-compose-area">
       {chat.status && !chat.status.available ? <div className="zarvis-notice" role="status">Chat is not connected yet.<button type="button" className="zarvis-text-button" onClick={() => chat.checkStatus(true)}>Retry</button></div> : null}

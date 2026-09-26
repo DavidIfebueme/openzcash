@@ -30,6 +30,7 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
       parallel_tool_calls: true,
       max_output_tokens: 3_000,
       reasoning: { effort: "low" },
+      text: { verbosity: "low" },
       store: false,
       include: ["reasoning.encrypted_content"],
       stream: true,
@@ -54,7 +55,8 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
     if (!calls.length) {
       if (!text.trim()) throw new Error("EMPTY_RESPONSE");
       emit({ type: "replace", text });
-      emit({ type: "done", sources: citedSources(text, candidates) });
+      const consulted = [...citedSources(text, candidates), ...candidates.filter((source) => source.retrievedAt)];
+      emit({ type: "done", sources: [...new Map(consulted.map((source) => [source.url, source])).values()].slice(0, 20) });
       return;
     }
     if (round === 1) throw new Error("TOOL_LIMIT");

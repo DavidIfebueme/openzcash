@@ -8,7 +8,7 @@ import { useZarvis } from "./zarvis-provider";
 
 export function ZarvisDock() {
   const pathname = usePathname();
-  const { expression } = useZarvis();
+  const { expression, motionPaused } = useZarvis();
   const dialog = useRef<HTMLDialogElement>(null);
   const launcher = useRef<HTMLButtonElement>(null);
   const [opened, setOpened] = useState(false);
@@ -22,9 +22,9 @@ export function ZarvisDock() {
     return () => observer.disconnect();
   }, [pathname]);
   if (pathname === "/zarvis" || /^\/(login|onboarding|invites|projects|viewing-keys)(\/|$)/.test(pathname)) return null;
-  return <><button ref={launcher} type="button" className="zarvis-launcher" aria-label="Ask Zarvis" aria-haspopup="dialog" onClick={() => { setOpened(true); dialog.current?.showModal(); }}><ZarvisMark expression={expression}/><span>Ask Zarvis</span></button>
+  return <><button ref={launcher} type="button" className="zarvis-launcher" aria-label="Ask Zarvis" aria-haspopup="dialog" onClick={() => { setOpened(true); dialog.current?.showModal(); }}><ZarvisMark expression={expression} animated paused={motionPaused}/><span>Ask Zarvis</span></button>
     <dialog className="zarvis-dock" ref={dialog} aria-label="Zarvis, your Zcash guide" onClick={(e) => { if (e.target === dialog.current) dialog.current.close(); }}>
-      <header className="zarvis-dock-heading"><div><ZarvisMark expression={expression}/><span><strong>Zarvis</strong><small>Your Zcash guide</small></span></div><nav aria-label="Chat controls"><Link href="/zarvis" onClick={() => dialog.current?.close()} aria-label="Open full Zarvis page">↗</Link><button type="button" aria-label="Close Zarvis" onClick={() => dialog.current?.close()}>×</button></nav></header>
+      <header className="zarvis-dock-heading"><div><ZarvisMark expression={expression} animated paused={motionPaused}/><span><strong>Zarvis</strong><small>Your Zcash guide</small></span></div><nav aria-label="Chat controls"><Link href="/zarvis" onClick={() => dialog.current?.close()} aria-label="Open full Zarvis page">↗</Link><button type="button" aria-label="Close Zarvis" onClick={() => dialog.current?.close()}>×</button></nav></header>
       {opened ? <ZarvisChat compact/> : null}
     </dialog>
   </>;

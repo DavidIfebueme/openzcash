@@ -9,6 +9,7 @@ export type DisplayMessage = {
 };
 type ChatState = {
   messages: DisplayMessage[]; draft: string; setDraft: (value: string) => void;
+  motionPaused: boolean; toggleMotion: () => void;
   busy: boolean; expression: ZarvisExpression; progress: string; error: string | null; status: ZarvisStatus | null;
   send: (question?: string, retry?: boolean) => void;
   stop: () => void; clear: () => void; checkStatus: (force?: boolean) => void;
@@ -25,6 +26,10 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [replying, setReplying] = useState(false);
+  const [pleased, setPleased] = useState(false);
+  const [motionPaused, setMotionPaused] = useState(false);
+  const [pageHidden, setPageHidden] = useState(false);
+  const pleasedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<ZarvisStatus | null>(null);
@@ -41,11 +46,21 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
       setError("Zarvis is temporarily unavailable. Please try again shortly.");
     });
   }, []);
-  useEffect(() => () => active.current?.abort(), []);
+  useEffect(() => {
+    const visibility = () => setPageHidden(document.hidden);
+    visibility();
+    document.addEventListener("visibilitychange", visibility);
+    return () => {
+      document.removeEventListener("visibilitychange", visibility);
+      active.current?.abort();
+      if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
+    };
+  }, []);
 
   function clear() {
     active.current?.abort(); active.current = null;
-    setMessages([]); setDraft(""); setError(null); setBusy(false); setReplying(false); setProgress("");
+    setMessages([]); setDraft(""); setError(null); setBusy(false); setReplying(false); setPleased(false); setProgress("");
+    if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
     statusChecked.current = false; checkStatus();
   }
   function stop() { active.current?.abort(); }
@@ -71,7 +86,8 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     const id = crypto.randomUUID();
     const controller = new AbortController(); active.current = controller;
     setMessages([...history, { id, role: "assistant", content: "", incomplete: true }]);
-    setDraft(""); setBusy(true); setReplying(false); setError(null); setProgress("Reading your question…");
+    if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
+    setPleased(false); setDraft(""); setBusy(true); setReplying(false); setError(null); setProgress("Reading your question…");
     let completed = false;
     const update = (patch: Partial<DisplayMessage>) => setMessages((all) => all.map((m) => m.id === id ? { ...m, ...patch } : m));
     try {
@@ -94,7 +110,11 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
         if (event.type === "delta") { setReplying(true); setProgress("Writing an answer…"); text += event.text; update({ content: text }); }
         if (event.type === "replace") { text = event.text; update({ content: text }); }
         if (event.type === "error") throw new Error(event.message);
-        if (event.type === "done") { completed = true; update({ sources: event.sources, incomplete: false }); }
+        if (event.type === "done") {
+          completed = true; update({ sources: event.sources, incomplete: false });
+          setPleased(true);
+          pleasedTimer.current = setTimeout(() => setPleased(false), 1800);
+        }
       };
       try {
         while (true) {
@@ -117,6 +137,6 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
   }
   // Expressions follow actual chat events; completed answers are not verification badges.
   const expression: ZarvisExpression = busy ? (replying ? "explaining" : "thinking")
-    : error ? "error" : draft.trim() ? "listening" : "idle";
-  return <Context.Provider value={{ messages, draft, setDraft, busy, expression, progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
+    : error ? "error" : draft.trim() ? "listening" : pleased ? "pleased" : "idle";
+  return <Context.Provider value={{ messages, draft, setDraft, busy, expression, motionPaused: motionPaused || pageHidden, toggleMotion: () => setMotionPaused((paused) => !paused), progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
 }

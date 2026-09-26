@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 import { chatRequestSchema, MAX_BODY_BYTES, readChatRequest, sameOrigin } from "./validation";
 import { KNOWLEDGE, publicSiteGuide, safeSourceUrl, selectKnowledge } from "./sources";
-import { compactData, lookupPublicData } from "./data";
+import { compactData, lookupPublicData, treasuryContext } from "./data";
 import { blockedBucket, usageBuckets } from "./limits";
 import { citedSources, renderResponse } from "./answer";
 import type { Response as OpenAIResponse } from "openai/resources/responses/responses";
@@ -31,6 +31,16 @@ describe("Zarvis request boundary", () => {
       expect(sameOrigin(new Request("http://0.0.0.0:8080/api/zarvis", { headers: { origin: "https://openzcash.org" } }))).toBe(true);
       expect(sameOrigin(new Request("https://evil.example/api/zarvis", { headers: { origin: "https://evil.example", "x-forwarded-host": "evil.example" } }))).toBe(false);
       expect(sameOrigin(new Request("http://0.0.0.0:8080/api/zarvis", { headers: { origin: "https://openzcash.org", "sec-fetch-site": "cross-site" } }))).toBe(false);
+    } finally { vi.unstubAllEnvs(); }
+  });
+  it("uses an explicit local origin when Next exposes a different listener hostname", () => {
+    vi.stubEnv("NODE_ENV", "development");
+    vi.stubEnv("ZARVIS_ORIGIN", "http://127.0.0.1:3100");
+    try {
+      const internal = "http://localhost:3100/api/zarvis";
+      expect(sameOrigin(new Request(internal, { headers: { origin: "http://127.0.0.1:3100" } }))).toBe(true);
+      expect(sameOrigin(new Request(internal, { headers: { origin: "http://127.0.0.1:3000" } }))).toBe(false);
+      expect(sameOrigin(new Request(internal, { headers: { origin: "https://evil.example", "x-forwarded-host": "127.0.0.1:3100" } }))).toBe(false);
     } finally { vi.unstubAllEnvs(); }
   });
   it("accepts a valid UTF-8 question and rejects cross-origin callers", async () => {
@@ -72,6 +82,12 @@ describe("Zarvis knowledge and data boundary", () => {
     expect(content.data.totals.repositories).toBeGreaterThan(16);
     expect(content.data.projects.shown[0].name).toMatch(/Zebra/i);
   });
+  it("does not label block-accrued Lockbox coins as holdings at the report date", () => {
+    const data = treasuryContext({ zcg: null, lockbox: { zec: 143811.4125, height: 3496415, baselineHeight: 3493796, snapshotAt: "2026-09-23T20:16:00Z", importedAt: "2026-09-26T03:00:00Z", updatesRequired: false, sourceUrl: "https://openzcash.org/lockbox" } });
+    expect(data.lockbox).toMatchObject({ estimatedZec: 143811.4125, estimateThroughBlock: 3496415, sourceAnchorBlock: 3493796, sourceAnchorDate: "2026-09-23T20:16:00Z" });
+    expect(data.lockbox).not.toHaveProperty("snapshotAt");
+    expect(data.lockbox?.interpretation).toContain("NOT a balance reported");
+  });
   it("rejects arbitrary URLs and unsupported lookup topics without fetching", async () => {
     const fetcher = vi.spyOn(globalThis, "fetch");
     const result = await lookupPublicData({ topic: "https://127.0.0.1/secrets", query: "" }, new AbortController().signal);
@@ -102,6 +118,14 @@ describe("Zarvis shared usage budgets", () => {
 });
 
 describe("Zarvis citations", () => {
+  it("keeps a provided source when the model emits its URL as plain text", () => {
+    const source = { title: "Zcash", url: "https://z.cash/learn/how-to-use-zcash/" };
+    expect(citedSources(`Primary source: ${source.url}.`, [source])).toEqual([source]);
+    expect(citedSources(`See <${source.url}> and [Zcash](${source.url})`, [source])).toEqual([source]);
+    expect(citedSources("https://z.cash/other-page/", [source])).toEqual([]);
+    expect(citedSources("https://evil.example/", [source])).toEqual([]);
+  });
+
   it("renders provider annotations and only lists sources cited in the answer", () => {
     const response = { output: [{ type: "message", content: [{ type: "output_text", text: "Privacy [1]", annotations: [{ type: "url_citation", start_index: 8, end_index: 11, title: "Zcash", url: "https://z.cash/learn/how-to-use-zcash/" }] }] }] } as OpenAIResponse;
     const result = renderResponse(response);

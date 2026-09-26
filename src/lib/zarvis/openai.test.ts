@@ -31,6 +31,14 @@ describe("Zarvis OpenAI orchestration", () => {
     expect(JSON.stringify(mocks.create.mock.calls[1][0].input)).toContain("2026-09-16");
     expect(emitted.at(-1)).toMatchObject({ type: "done", sources: [{ title: "Treasury", url }] });
   });
+  it("retains consulted public sources even if the model omits the inline link", async () => {
+    const source = { title: "Public treasury data", url: "https://openzcash.org/zcg/treasury-calculator", retrievedAt: "2026-09-26T03:00:00Z" };
+    mocks.create.mockResolvedValueOnce(events([call("lookup")])).mockResolvedValueOnce(events([answer("The reported balance has a dated source.")]));
+    mocks.lookup.mockResolvedValue({ content: '{"zec":10}', source });
+    const emitted: ZarvisEvent[] = [];
+    await generateAnswer([{ role: "user", content: "What does ZCG hold?" }], new AbortController().signal, (event) => emitted.push(event));
+    expect(emitted.at(-1)).toEqual({ type: "done", sources: [source] });
+  });
   it("never executes more than three local lookups or a second tool round", async () => {
     mocks.create.mockResolvedValueOnce(events([call("a"), call("b"), call("c"), call("d")])).mockResolvedValueOnce(events([call("again")]));
     mocks.lookup.mockResolvedValue({ content: "{}" });

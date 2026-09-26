@@ -28,6 +28,6 @@ export function renderResponse(response: OpenAIResponse): { text: string; source
 }
 
 export function citedSources(text: string, candidates: ZarvisSource[]) {
-  const cited = new Set(Array.from(text.matchAll(/\]\((https:\/\/[^\s)]+)\)/g), (m) => safeSourceUrl(m[1])).filter(Boolean));
+  const cited = new Set(Array.from(text.matchAll(/https:\/\/[^\s<>"\])]+/g), (m) => safeSourceUrl(m[0].replace(/[.,;!?]+$/, ""))).filter(Boolean));
   return [...new Map(candidates.filter((source) => cited.has(source.url)).map((source) => [source.url, source])).values()].slice(0, 20);
 }

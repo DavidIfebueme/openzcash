@@ -48,9 +48,9 @@ export function sameOrigin(request: Request): boolean {
     const incoming = new URL(origin);
     // Next can expose its internal listener URL behind Railway's TLS proxy.
     // Pin the production origin instead of trusting forwarded host headers.
-    const target = new URL(process.env.NODE_ENV === "production"
-      ? process.env.ZARVIS_ORIGIN || "https://openzcash.org"
-      : request.url);
+    const target = new URL(process.env.ZARVIS_ORIGIN || (process.env.NODE_ENV === "production"
+      ? "https://openzcash.org"
+      : request.url));
     return origin === incoming.origin && incoming.origin === target.origin &&
       request.headers.get("sec-fetch-site") !== "cross-site";
   } catch { return false; }

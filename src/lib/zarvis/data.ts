@@ -3,6 +3,7 @@ import { z } from "zod";
 import { terms } from "./sources";
 import type { ZarvisSource } from "./types";
 import type { Catalog } from "@/lib/ecosystem/types";
+import type { DevFundReportedData } from "@/lib/treasury/dev-fund";
 
 export const lookupSchema = z.object({
   topic: z.enum(["treasuries", "markets", "grants", "recipients", "disbursements", "proposals", "coinholder", "zechub", "ecosystem", "news", "funding_history"]),
@@ -83,6 +84,27 @@ export function ecosystemContext({ registry, snapshot }: Catalog) {
   };
 }
 
+/** Keep a block-accrued estimate separate from the date of its source anchor. */
+export function treasuryContext(funds: DevFundReportedData) {
+  const lockbox = funds.lockbox;
+  return {
+    zcg: funds.zcg ? {
+      ...funds.zcg,
+      interpretation: "zec and cashUsd are reported holdings at snapshotAt. cashUsd is USD cash, not grant spending and not a converted ZEC value. paidMilestonesUsd is cumulative historical spending, not available cash.",
+    } : null,
+    lockbox: lockbox ? {
+      estimatedZec: lockbox.zec,
+      estimateThroughBlock: lockbox.height,
+      sourceAnchorBlock: lockbox.baselineHeight,
+      sourceAnchorDate: lockbox.snapshotAt,
+      importedAt: lockbox.importedAt,
+      updatesRequired: lockbox.updatesRequired,
+      sourceUrl: lockbox.sourceUrl,
+      interpretation: "estimatedZec adds scheduled block accruals since the source anchor. It is an estimate through estimateThroughBlock, NOT a balance reported at sourceAnchorDate. This is not a fresh wallet-balance reading; later outflows may require reconciliation.",
+    } : null,
+  };
+}
+
 async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], query: string): Promise<unknown> {
   // Explicit handlers only: no tool-controlled imports, hostnames, SQL or paths.
   const request = new Request(`https://openzcash.org${links[topic]}${query ? `?search=${encodeURIComponent(query)}` : ""}`);
@@ -92,7 +114,7 @@ async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], quer
         import("@/lib/treasury/dev-fund-data"), import("@/lib/pricing/live-price"), import("@/lib/pricing/circulating-supply"),
       ]);
       const [funds, price, supply] = await Promise.all([reportedDevFundData(), currentZecUsdQuote(), currentZecCirculatingSupply()]);
-      return { funds, price, supply, units: "funds: ZEC and USD; price.cents: USD cents per ZEC; supply.zec: ZEC", note: "Do not claim these are today's balances: preserve snapshotAt, importedAt, updatesRequired, quote time and stale flags. ZCG and Lockbox have separate spending restrictions." };
+      return { funds: treasuryContext(funds), price, supply, units: "funds: ZEC and USD; price.cents: USD cents per ZEC; supply.zec: ZEC", note: "The market quote is separate from the source report: do not call it the report price. Preserve reporting dates, estimate block, quote time and stale flags. ZCG and Lockbox have separate spending restrictions." };
     }
     case "markets": return (await (await import("@/app/api/markets/route")).GET()).json();
     case "grants": return (await (await import("@/app/api/zcg/data/grants/route")).GET(request)).json();
