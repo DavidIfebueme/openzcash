@@ -6,12 +6,12 @@ import type { Catalog } from "@/lib/ecosystem/types";
 import type { DevFundReportedData } from "@/lib/treasury/dev-fund";
 
 export const lookupSchema = z.object({
-  topic: z.enum(["treasuries", "markets", "grants", "recipients", "disbursements", "proposals", "coinholder", "zechub", "ecosystem", "news", "funding_history"]),
+  topic: z.enum(["price", "treasuries", "markets", "grants", "recipients", "disbursements", "proposals", "coinholder", "zechub", "ecosystem", "news", "funding_history"]),
   query: z.string().max(120),
 }).strict();
 export const lookupTool = {
   type: "function" as const, name: "lookup_openzcash",
-  description: "Read current public OpenZcash records with source dates. Use for amounts, balances, ZCG grants, recipients, ZCG grant applications, prices, news and the ecosystem. The proposals topic contains funding applications to ZCG, NOT Zcash Improvement Proposals (ZIPs). For ZIP documents or protocol status use official-source web search. query: optional short project/person name to narrow records, or empty for overview. Results may be partial. Does not access wallets, private records, user pages or arbitrary URLs.",
+  description: "Read current public OpenZcash records with source dates. Use price for the current ZEC/USD quote, including its timestamp and freshness. Use markets for market volumes, trading venues, supply and public holdings, not the simple ZEC price. Other topics cover treasury balances, ZCG grants, recipients, grant applications, news and the ecosystem. The proposals topic contains funding applications to ZCG, NOT Zcash Improvement Proposals (ZIPs). For ZIP documents or protocol status use official-source web search. query: optional short project/person name to narrow records, or empty for overview. Results may be partial. Does not access wallets, private records, user pages or arbitrary URLs.",
   strict: true,
   parameters: {
     type: "object", properties: {
@@ -21,7 +21,7 @@ export const lookupTool = {
   },
 };
 const links: Record<z.infer<typeof lookupSchema>["topic"], string> = {
-  treasuries: "/zcg/treasury-calculator", markets: "/zec-observatory",
+  price: "/api/zec-price", treasuries: "/zcg/treasury-calculator", markets: "/zec-observatory",
   grants: "/api/zcg/data/grants", recipients: "/api/zcg/data/recipients",
   disbursements: "/api/zcg/data/disbursements", proposals: "/api/zcg/office",
   coinholder: "/api/zcg/coinholder/round", zechub: "/api/zechub/treasury",
@@ -109,6 +109,7 @@ async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], quer
   // Explicit handlers only: no tool-controlled imports, hostnames, SQL or paths.
   const request = new Request(`https://openzcash.org${links[topic]}${query ? `?search=${encodeURIComponent(query)}` : ""}`);
   switch (topic) {
+    case "price": return (await (await import("@/app/api/zec-price/route")).GET()).json();
     case "treasuries": {
       const [{ reportedDevFundData }, { currentZecUsdQuote }, { currentZecCirculatingSupply }] = await Promise.all([
         import("@/lib/treasury/dev-fund-data"), import("@/lib/pricing/live-price"), import("@/lib/pricing/circulating-supply"),

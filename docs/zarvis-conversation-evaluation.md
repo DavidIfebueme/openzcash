@@ -41,3 +41,13 @@ One response contained three hosted web-search items even though the requested b
 ## Automated verification
 
 All 30 focused tests across the Zarvis libraries and API route passed. They exercise complete-turn retention, UTF-8 request size, message limits, interrupted answers, assistant-introduced subjects, ordered conversation delivery, source provenance, cancellation and incomplete provider responses. Type checking and scoped lint also pass. The retained conversation remains bounded: older turns can be omitted at the context limits.
+
+## Price lookup follow-up
+
+The user's subsequent current-price question used the fifth additional local question and exposed a separate integration problem. The `markets` tool called the entire Observatory dashboard, whose collector assembles volumes, venue information, supply and holdings rather than returning a simple ZEC/USD quote. That collection also shares the tool's 12-second deadline with many external feeds.
+
+Added a dedicated `price` topic and `/api/zec-price`, backed by the site's existing five-second CoinGecko quote reader. It returns USD per ZEC, provider time, retrieval time and the original stale flag. A genuine outage with no saved price returns a null quote and HTTP 503, never zero. The market dashboard is no longer required for price requests.
+
+Live local endpoint check on September 26: HTTP 200 in 1.4 seconds, USD 1,532.81 per ZEC, provider quote time 04:34:50 UTC, retrieved at 04:36:39 UTC, `stale: false`. This is a recorded test quote, not a continuing current-price claim. The 46 focused pricing, conversation and route tests passed. The original five-question allowance was exhausted. The user then explicitly authorized one more local question; only that additional network-day reservation was released, and global counters were retained.
+
+The final paid test went through `/api/zarvis` on the Astra preview: “Qual é o preço atual do Zcash em dólares? Informe a fonte e o horário da cotação.” It completed in **6.3 seconds**, used the public-data lookup, and returned **US$ 1.532,81 per ZEC**, **CoinGecko via OpenZcash**, and **September 26, 2026 at 04:34:50 UTC**. These matched the independently checked quote; the answer retained the fresh/stale distinction and cited `/api/zec-price`. The stream completed with sources and no error. The extra authorized question was consumed; no further paid test was made. Type checking, scoped lint and diff checks also passed.
