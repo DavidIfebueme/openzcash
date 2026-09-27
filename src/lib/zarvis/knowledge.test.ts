@@ -12,7 +12,7 @@ describe("Local knowledge coverage and size", () => {
     expect(knowledgeCoverage.sourceFiles).toBeGreaterThan(45);
     const docs = searchKnowledge("Zcash funding governance methodology ceremony grants treasury");
     expect(docs.length).toBeLessThanOrEqual(4);
-    expect(docs.reduce((n, d) => n + d.text.length + d.title.length + d.url.length + 100, 0)).toBeLessThanOrEqual(5000);
+    expect(JSON.stringify(docs).length).toBeLessThanOrEqual(5000);
     expect(docs.every((d) => !/\/(?:admin|viewing-keys|login|invites)(?:\/|$)/.test(d.url))).toBe(true);
   });
   it("does not inject the full navigation or a changing clock into the system prefix", () => {
