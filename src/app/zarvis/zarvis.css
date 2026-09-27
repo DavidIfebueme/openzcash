@@ -250,3 +250,5 @@
   .zarvis-iteration-card > p { padding: 0 12px 13px; font-size: 10px; line-height: 1.5; }
   .zarvis-studio-live > .zarvis-chat { height: 540px; }
 }
+
+.zarvis-feedback { display: inline-flex; align-items: center; gap: .75rem; margin-inline-start: .75rem; color: var(--muted); font-size: .7rem; }

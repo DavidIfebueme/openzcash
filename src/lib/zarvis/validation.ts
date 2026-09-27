@@ -1,8 +1,10 @@
 import { z } from "zod";
+import { sessionSchema } from "./session";
 
 import { MAX_BODY_BYTES, MAX_QUESTION_LENGTH, MAX_HISTORY_MESSAGES, MAX_HISTORY_CHARACTERS, MAX_MESSAGE_LENGTH } from "./context";
 export { MAX_BODY_BYTES, MAX_QUESTION_LENGTH } from "./context";
 export const chatRequestSchema = z.object({
+  session: sessionSchema.optional(),
   messages: z.array(z.object({
     role: z.enum(["user", "assistant"]),
     content: z.string().trim().min(1).max(MAX_MESSAGE_LENGTH),

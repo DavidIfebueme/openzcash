@@ -15,3 +15,18 @@ test("extracts visible copy without executing code, importing modules or copying
   assert.match(output, /Public title/); assert.match(output, /Public text & sources/);
   assert.doesNotMatch(output, /secret-sentinel|private|apiKey|password|import/);
 });
+
+test("the indexed PDF snapshots still match the published files", async () => {
+  const { createHash } = await import("node:crypto");
+  const corpus = JSON.parse(fs.readFileSync(new URL("../src/lib/zarvis/reference-content.json", import.meta.url), "utf8"));
+  assert.ok(corpus.sources.length >= 14);
+  for (const source of corpus.sources) {
+    assert.ok(source.retrievedAt); assert.ok(source.note); assert.ok(source.sha256);
+    assert.match(source.url, /^https:\/\/(zips.z.cash|openzcash.org)\//);
+    if (source.localPath) {
+      assert.match(source.localPath, /^public\/monthly\/editions\/[a-zA-Z0-9_./-]+\.pdf$/);
+      const binary = fs.readFileSync(new URL("../" + source.localPath, import.meta.url));
+      assert.equal(createHash("sha256").update(binary).digest("hex"), source.sha256, "Run knowledge:sync when a public report changes");
+    }
+  }
+});

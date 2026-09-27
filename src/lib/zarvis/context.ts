@@ -1,6 +1,7 @@
 import type { ChatMessage } from "./types";
 
 export const MAX_BODY_BYTES = 32_768;
+const SESSION_BYTE_RESERVE = 2048;
 export const MAX_QUESTION_LENGTH = 2_000;
 export const MAX_HISTORY_MESSAGES = 40;
 export const MAX_HISTORY_CHARACTERS = 18_000;
@@ -25,7 +26,7 @@ export function conversationContext(history: (ChatMessage & { incomplete?: boole
     const candidate = [...turns[i], ...context];
     if (candidate.length > MAX_HISTORY_MESSAGES ||
       candidate.reduce((size, message) => size + message.content.length, 0) > MAX_HISTORY_CHARACTERS ||
-      encoder.encode(JSON.stringify({ messages: candidate })).byteLength > MAX_BODY_BYTES) break;
+      encoder.encode(JSON.stringify({ messages: candidate })).byteLength > MAX_BODY_BYTES - SESSION_BYTE_RESERVE) break;
     context = candidate;
   }
   return context;

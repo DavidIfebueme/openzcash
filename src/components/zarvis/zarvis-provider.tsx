@@ -1,12 +1,13 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ZarvisEvent, ZarvisExpression, ZarvisSource, ZarvisStatus } from "@/lib/zarvis/types";
+import { sessionPreferences, type ZarvisSession } from "@/lib/zarvis/session";
 import { answerExpression, progressExpression } from "@/lib/zarvis/expression";
 import { conversationContext, MAX_QUESTION_LENGTH } from "@/lib/zarvis/context";
 
 export type DisplayMessage = {
   id: string; role: "user" | "assistant"; content: string;
-  sources?: ZarvisSource[]; incomplete?: boolean; pose?: ZarvisExpression;
+  feedbackToken?: string; session?: ZarvisSession; sources?: ZarvisSource[]; incomplete?: boolean; pose?: ZarvisExpression;
 };
 type ChatState = {
   messages: DisplayMessage[]; draft: string; setDraft: (value: string) => void;
@@ -78,6 +79,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
       history = [...history, { id: crypto.randomUUID(), role: "user", content: questionText }];
     }
     const context = conversationContext(history);
+    const session = sessionPreferences(history.findLast((message) => message.session)?.session ?? {}, history);
     const id = crypto.randomUUID();
     const controller = new AbortController(); active.current = controller;
     setMessages([...history, { id, role: "assistant", content: "", incomplete: true, pose: answerExpression(history.findLast((message) => message.role === "user")?.content ?? questionText) }]);
@@ -88,7 +90,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     try {
       const response = await fetch("/api/zarvis", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: context.map(({ role, content }) => ({ role, content })) }),
+        body: JSON.stringify({ messages: context.map(({ role, content }) => ({ role, content })), session }),
         signal: controller.signal,
       });
       if (!response.ok) {
@@ -103,10 +105,11 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
         const event: ZarvisEvent = JSON.parse(line);
         if (event.type === "status") { setProgress(event.message); setReplying(false); }
         if (event.type === "delta") { setReplying(true); setProgress("Writing an answer…"); text += event.text; update({ content: text }); }
-        if (event.type === "replace") { text = event.text; update({ content: text }); }
+        if (event.type === "session") update({ session: event.session });
+        if (event.type === "replace") { setReplying(true); text = event.text; update({ content: text }); }
         if (event.type === "error") throw new Error(event.message);
         if (event.type === "done") {
-          completed = true; update({ sources: event.sources, incomplete: false });
+          completed = true; update({ sources: event.sources, feedbackToken: event.feedbackToken, incomplete: false });
           setPleased(true);
           pleasedTimer.current = setTimeout(() => setPleased(false), 1800);
         }

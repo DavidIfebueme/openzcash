@@ -1,0 +1,34 @@
+name: Zarvis quality
+on:
+  pull_request:
+    paths:
+      - 'src/lib/zarvis/**'
+      - 'src/components/zarvis/**'
+      - 'src/app/api/zarvis/**'
+      - 'src/app/**'
+      - 'src/lib/treasury/**'
+      - 'src/app/zcg/treasury-calculator/**'
+      - 'src/lib/monthly/reading-sets.json'
+      - 'public/monthly/editions/**'
+      - 'scripts/*zarvis*'
+      - 'package*.json'
+      - '.github/workflows/zarvis-quality.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  internal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run knowledge:check
+      - run: npx next typegen
+      - run: npm run typecheck
+      - run: npm test
+      - run: npx eslint src/lib/zarvis src/components/zarvis src/app/api/zarvis src/lib/treasury/scenario-link.ts src/app/zcg/treasury-calculator/treasury-calculator.tsx

@@ -31,7 +31,8 @@ describe("Precise local answers", () => {
   });
   it.each([{ usd: 0, stale: false }, { usd: 100, stale: true }, null])("does not present an unavailable/stale quote as current: %j", async (quote) => {
     mocks.lookup.mockResolvedValue({ content: JSON.stringify({ data: { quote } }) });
-    expect((await prepareLocal([user("ZEC price")], signal())).direct).toBeUndefined();
+    const text = (await prepareLocal([user("ZEC price")], signal())).direct;
+    expect(text).toBeTruthy(); expect(text).not.toContain("1 ZEC =");
   });
   it("keeps scope across a year follow-up and stops doing so after a topic change", () => {
     const history = [user("Quanto o ZCG pagou em grants em 2024?"), answer("A dated total."), user("e em 2025?")];
@@ -47,7 +48,7 @@ describe("Precise local answers", () => {
   it("does not turn a failed ledger read into zero", async () => {
     mocks.ledger.mockRejectedValue(new Error("Database unavailable"));
     const result = await prepareLocal([user("Quanto o ZCG pagou em grants em 2025?")], signal());
-    expect(result.direct).toBeUndefined(); expect(result.evidence[0].content).toContain("Do not report a zero");
+    expect(result.direct).toContain("indisponível"); expect(result.evidence[0].content).toContain("Do not report a zero");
   });
   it("validates program/year/search before any aggregate read", async () => {
     for (const filters of [{ scope: "private_wallet", year: 2025, search: "" }, { scope: "zcg_grants", year: "2025 OR 1=1", search: "" }, { scope: "zcg_grants", year: null, search: "", sql: "drop table" }]) {

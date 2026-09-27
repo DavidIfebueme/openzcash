@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
-const mocks = vi.hoisted(() => ({ create: vi.fn(), lookup: vi.fn(), prepare: vi.fn(), ledger: vi.fn(), config: vi.fn() }));
+const mocks = vi.hoisted(() => ({ create: vi.fn(), lookup: vi.fn(), prepare: vi.fn(), ledger: vi.fn(), config: vi.fn(), scenario: vi.fn() }));
 vi.mock("openai", () => ({ default: class { responses = { create: mocks.create }; } }));
 vi.mock("./config", () => ({ zarvisConfig: mocks.config }));
 vi.mock("./data", async (original) => ({ ...await original<object>(), lookupPublicData: mocks.lookup }));
-vi.mock("./local", () => ({ prepareLocal: mocks.prepare, lookupLedger: mocks.ledger }));
+vi.mock("./local", async (original) => ({ ...await original<object>(), prepareLocal: mocks.prepare, lookupLedger: mocks.ledger }));
+vi.mock("./scenario", async (original) => ({ ...await original<object>(), lookupScenario: mocks.scenario }));
+import { computeScenario } from "./scenario";
 import { generateAnswer } from "./openai";
 import type { ZarvisEvent } from "./types";
 async function* events(output: unknown[], text?: string) {
@@ -106,4 +108,31 @@ describe("Zarvis local-first orchestration", () => {
     await expect(generateAnswer(question, new AbortController().signal, (e) => emitted.push(e))).rejects.toThrow("INCOMPLETE_RESPONSE");
     expect(emitted.some((e) => e.type === "done")).toBe(false);
   });
+  it("calculates with the shared engine, preserves the scenario and uses no synthesis call afterwards", async () => {
+    const scenario = computeScenario({ years: 40 }, { years: 30, priceMultiple: 20, continueDevFundAfterHalving: true }, { price: { usd: 100, stale: false, quotedAt: "2026-09-27T12:00:00Z" }, supply: { zec: 16945106, stale: false, quotedAt: "2026-09-27T12:00:00Z" }, chain: { height: 3492985 }, funds: { zcg: null, lockbox: null } });
+    mocks.scenario.mockResolvedValue({ content: JSON.stringify({ data: scenario }), scenario });
+    mocks.create.mockResolvedValueOnce(events([call("scenario", '{"years":40}', "calculate_openzcash_treasury")]));
+    const emitted: ZarvisEvent[] = [];
+    await generateAnswer([{ role: "user", content: "E em 40 anos?" }], new AbortController().signal, (e) => emitted.push(e), { scenario: { years: 30, priceMultiple: 20, continueDevFundAfterHalving: true } });
+    expect(mocks.create).toHaveBeenCalledTimes(1);
+    expect(mocks.scenario.mock.calls[0][1]).toMatchObject({ years: 30, priceMultiple: 20 });
+    expect(emitted.find((e) => e.type === "session")).toMatchObject({ session: { scenario: { years: 40, priceMultiple: 20, continueDevFundAfterHalving: true } } });
+    expect(emitted.find((e) => e.type === "replace")).toMatchObject({ text: expect.stringContaining("compra única") });
+  });
+  it("never exposes an unsupported financial figure in streamed deltas", async () => {
+    mocks.prepare.mockResolvedValue({ documents: [], evidence: [{ content: JSON.stringify({ data: { quote: { usd: 100 } } }) }], external: false });
+    mocks.create.mockResolvedValueOnce(events([answer("ZEC is $999 billion.")], "ZEC is $999 billion."));
+    const emitted: ZarvisEvent[] = [];
+    const metrics = await generateAnswer(question, new AbortController().signal, (e) => emitted.push(e));
+    expect(JSON.stringify(emitted)).not.toContain("999 billion");
+    expect(metrics.groundingFallbacks).toBe(1);
+    expect(emitted.at(-1)?.type).toBe("done");
+  });
+  it("carries session preferences as data when old messages are no longer present", async () => {
+    mocks.create.mockResolvedValueOnce(events([answer("A resposta em português.")]));
+    await generateAnswer(question, new AbortController().signal, () => {}, { language: "pt", scenario: { years: 30, priceMultiple: 20 } });
+    expect(mocks.create.mock.calls[0][0].input[0].content).toContain('"language":"pt"');
+    expect(mocks.create.mock.calls[0][0].input[0].content).toContain('"years":30');
+  });
+
 });

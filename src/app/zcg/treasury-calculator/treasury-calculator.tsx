@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { IconChart, IconWallet } from "@/components/icons";
+import { readScenarioLink } from "@/lib/treasury/scenario-link";
 import styles from "./treasury-calculator.module.css";
 import { PageHeader } from "@/components/ui";
 import { calculateDevFundBudget, valueReportedDevFund, type DevFundReportedData } from "@/lib/treasury/dev-fund";
@@ -126,7 +127,8 @@ export function TreasuryCalculator({
   const [multiple, setMultiple] = useState<number | null>(DEFAULT_PRICE_MULTIPLE);
   const [continueDevFund, setContinueDevFund] = useState(false);
   const [useReportedTreasury, setUseReportedTreasury] = useState(true);
-  const [network, setNetwork] = useState({ height: NETWORK_SNAPSHOT_HEIGHT, snapshot: true });
+  const [network, setNetwork] = useState<{ height: number; snapshot: boolean; shared?: boolean }>({ height: NETWORK_SNAPSHOT_HEIGHT, snapshot: true });
+  const [sharedObservation, setSharedObservation] = useState<number | undefined>();
   const [activeView, setActiveView] = useState<CalculatorView>("community");
   const calculatorTop = useRef<HTMLDivElement>(null);
   const viewTabs = useRef<Partial<Record<CalculatorView, HTMLButtonElement | null>>>({});
@@ -138,6 +140,20 @@ export function TreasuryCalculator({
   }
 
   useEffect(() => {
+    const linked = readScenarioLink(new URLSearchParams(window.location.search));
+    if (linked) {
+      // Hydrate only validated, explicitly linked assumptions; keep the saved network height.
+      queueMicrotask(() => {
+        setValues((current) => ({ ...current, years: String(linked.years), target: String(linked.target), priceNow: String(linked.priceNow), customFuturePrice: String(linked.futurePrice), holdings: String(linked.holdings), mining: String(linked.mining), supply: String(linked.supply), fundAllocation: String(linked.fundAllocation), minerSales: String(linked.minerSales), spendingFromZecSales: String(linked.spendingFromZecSales),
+          ...(linked.annualSpending !== undefined ? { historicalSpend: String(linked.annualSpending), historicalYears: "1", fundZec: String(linked.fundZec), fundCash: String(linked.fundCash) } : {}),
+        }));
+        setBasis(linked.basis); setMultiple(null); setActiveView(linked.view === "both" ? "company" : linked.view);
+        setContinueDevFund(linked.continueFunding === "true");
+        setNetwork({ height: linked.height, snapshot: false, shared: true }); setSharedObservation(linked.observation);
+        if (linked.annualSpending !== undefined) setUseReportedTreasury(false);
+      });
+      return;
+    }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 9_000);
     fetch("/api/chain-tip", { signal: controller.signal })
@@ -157,6 +173,7 @@ export function TreasuryCalculator({
   }
   function choosePreset(value: string) {
     setPreset(value);
+    setSharedObservation(undefined);
     setValues(value === "cypherpunk" ? defaults : { ...defaults, company: "Custom treasury", holdings: "0", mining: "0" });
     setBasis("circulating");
     setMultiple(DEFAULT_PRICE_MULTIPLE);
@@ -199,7 +216,7 @@ export function TreasuryCalculator({
   const scenario = calculateTreasuryScenario({
     holdingsZec: toNumber(values.holdings), circulatingSupplyZec: toNumber(values.supply),
     targetPercent: toNumber(values.target), minedPer14DaysZec: toNumber(values.mining),
-    miningObservationHeight: preset === "cypherpunk" && toNumber(values.mining) === CYPHERPUNK_MINED_ZEC ? CYPHERPUNK_MINING_REFERENCE_HEIGHT : network.height,
+    miningObservationHeight: sharedObservation ?? (preset === "cypherpunk" && toNumber(values.mining) === CYPHERPUNK_MINED_ZEC ? CYPHERPUNK_MINING_REFERENCE_HEIGHT : network.height),
     blockHeight: network.height, months: years * 12, currentPriceUsd: currentPrice,
     futurePriceUsd: futurePrice, supplyBasis: basis,
     otherMinerSalePercent: toNumber(values.minerSales),
@@ -223,6 +240,7 @@ export function TreasuryCalculator({
 
   return (
     <div ref={calculatorTop} className="mx-auto max-w-[1280px] scroll-mt-20 text-stone-900">
+      {network.shared && <p className="mb-3 text-xs text-stone-500" role="status">Saved Zarvis scenario · Prices, balances and network height use the assumptions in this link.</p>}
       <PageHeader
         title="Treasury calculator"
         subtitle="Compare community funding and company ownership using public Zcash data."
@@ -584,7 +602,7 @@ export function TreasuryCalculator({
           </div>
           <div className="space-y-2.5">
             <p><strong className="font-medium text-stone-700">Purchase need</strong> = max(0, target % × supply − holdings − projected mining) × ZEC price. Each scenario uses its own price and projected supply. Mining starts from the reported balance; no undisclosed mining is added.</p>
-            <p><SourceLink href={SOURCES.schedule}>Halving schedule</SourceLink> · output steps down every 1,680,000 blocks. The next halving is at block 4,406,400. Network height used: {whole.format(network.height)} ({network.snapshot ? `company dashboard snapshot, ${NETWORK_SNAPSHOT_DATE}` : "node reading via lightwalletd"}). Block times are estimates.</p>
+            <p><SourceLink href={SOURCES.schedule}>Halving schedule</SourceLink> · output steps down every 1,680,000 blocks. The next halving is at block 4,406,400. Network height used: {whole.format(network.height)} ({network.shared ? "saved scenario assumption" : network.snapshot ? `company dashboard snapshot, ${NETWORK_SNAPSHOT_DATE}` : "node reading via lightwalletd"}). Block times are estimates.</p>
             {scenario && <p>
               {scenario.simpleYearsToMineTodayGap === null ? "Without mining output, purchases are needed to close the gap." : scenario.simpleYearsToMineTodayGap === 0 ? "The treasury already meets today’s target." : <><strong className="font-medium text-stone-700">Constant-output benchmark: {number.format(scenario.simpleYearsToMineTodayGap)} years</strong> to mine today’s gap at {number.format(scenario.miningPerDayZec)} ZEC/day. This simplified comparison freezes both supply and mining output. The main mining result follows the full halving schedule.</>}
             </p>}

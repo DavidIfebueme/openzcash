@@ -1,0 +1,262 @@
+[
+  {
+    "question": "Can someone spend using a viewing key?",
+    "sourceContains": "zip-0310"
+  },
+  {
+    "question": "Can an incoming viewer identify the shielded sender?",
+    "sourceContains": "zip-0310"
+  },
+  {
+    "question": "What is the difference between IVK and FVK?",
+    "sourceContains": "zip-0310"
+  },
+  {
+    "question": "A chave de visualização permite gastar?",
+    "sourceContains": "zip-0310"
+  },
+  {
+    "question": "Uma IVK mostra se a nota já foi gasta?",
+    "sourceContains": "zip-0310"
+  },
+  {
+    "question": "Quem lê uma chave consegue ver o remetente?",
+    "sourceContains": "zip-0310"
+  },
+  {
+    "question": "What receivers can a Unified Address contain?",
+    "sourceContains": "zip-0316"
+  },
+  {
+    "question": "Does a unified address guarantee a shielded payment?",
+    "sourceContains": "zip-0316"
+  },
+  {
+    "question": "How do unified viewing keys work?",
+    "sourceContains": "zip-0316"
+  },
+  {
+    "question": "Um endereço unificado sempre recebe blindado?",
+    "sourceContains": "zip-0316"
+  },
+  {
+    "question": "Explique UIVK e UFVK",
+    "sourceContains": "zip-0316"
+  },
+  {
+    "question": "ZIP 316 receiver selection",
+    "sourceContains": "zip-0316"
+  },
+  {
+    "question": "ZIP 208 block target spacing",
+    "sourceContains": "zip-0208"
+  },
+  {
+    "question": "Why did Blossom reduce block time?",
+    "sourceContains": "zip-0208"
+  },
+  {
+    "question": "How many seconds between blocks after Blossom?",
+    "sourceContains": "zip-0208"
+  },
+  {
+    "question": "Qual o intervalo dos blocos depois de Blossom?",
+    "sourceContains": "zip-0208"
+  },
+  {
+    "question": "ZIP 208 halving intervals",
+    "sourceContains": "zip-0208"
+  },
+  {
+    "question": "BlossomPoWTargetSpacingRatio",
+    "sourceContains": "zip-0208"
+  },
+  {
+    "question": "How is the dev fund subsidy allocated?",
+    "sourceContains": "zip-0214"
+  },
+  {
+    "question": "Why does removing a 20% dev fund increase miner subsidy by 25%?",
+    "sourceContains": "zip-0214"
+  },
+  {
+    "question": "Qual a divisão do fundo de desenvolvimento?",
+    "sourceContains": "zip-0214"
+  },
+  {
+    "question": "Dev Fund ending height in ZIP 214",
+    "sourceContains": "zip-0214"
+  },
+  {
+    "question": "What is FS_FPF_ZCG?",
+    "sourceContains": "zip-0214"
+  },
+  {
+    "question": "ZIP 214 revision 2 funding streams",
+    "sourceContains": "zip-0214"
+  },
+  {
+    "question": "ZIP 224 Orchard protocol",
+    "sourceContains": "zip-0224"
+  },
+  {
+    "question": "What is Orchard action bundling in ZIP 224?",
+    "sourceContains": "zip-0224"
+  },
+  {
+    "question": "Explique o protocolo Orchard ZIP 224",
+    "sourceContains": "zip-0224"
+  },
+  {
+    "question": "ZIP 244 transaction identifier",
+    "sourceContains": "zip-0244"
+  },
+  {
+    "question": "Explain non-malleability in ZIP 244",
+    "sourceContains": "zip-0244"
+  },
+  {
+    "question": "Como o ZIP 244 identifica transações?",
+    "sourceContains": "zip-0244"
+  },
+  {
+    "question": "How does ZIP 302 encode memo text?",
+    "sourceContains": "zip-0302"
+  },
+  {
+    "question": "Zcash standardized memo field format",
+    "sourceContains": "zip-0302"
+  },
+  {
+    "question": "Formato de memo ZIP 302",
+    "sourceContains": "zip-0302"
+  },
+  {
+    "question": "How does ZIP 308 migrate Sprout funds?",
+    "sourceContains": "zip-0308"
+  },
+  {
+    "question": "Sprout to Sapling migration",
+    "sourceContains": "zip-0308"
+  },
+  {
+    "question": "Migração Sprout Sapling ZIP 308",
+    "sourceContains": "zip-0308"
+  },
+  {
+    "question": "ZIP 317 proportional transfer fees",
+    "sourceContains": "zip-0317"
+  },
+  {
+    "question": "What are logical actions in ZIP 317?",
+    "sourceContains": "zip-0317"
+  },
+  {
+    "question": "Mecanismo de taxas proporcionais ZIP 317",
+    "sourceContains": "zip-0317"
+  },
+  {
+    "question": "How are paid grant milestones interpreted?",
+    "sourceContains": "/zcg/methodology"
+  },
+  {
+    "question": "Does a paid milestone prove project delivery?",
+    "sourceContains": "/zcg/methodology"
+  },
+  {
+    "question": "Import date versus payment date",
+    "sourceContains": "/zcg/methodology"
+  },
+  {
+    "question": "Qual a metodologia dos pagamentos?",
+    "sourceContains": "/zcg/methodology"
+  },
+  {
+    "question": "Valor orçado é igual a liquidação bancária?",
+    "sourceContains": "/zcg/methodology"
+  },
+  {
+    "question": "Dados importados são a data do pagamento?",
+    "sourceContains": "/zcg/methodology"
+  },
+  {
+    "question": "Is mine then buy an annual purchase?",
+    "sourceContains": "treasury-calculator"
+  },
+  {
+    "question": "Cypherpunk target of circulating versus maximum supply",
+    "sourceContains": "treasury-calculator"
+  },
+  {
+    "question": "Por que a meta em ZEC aumenta?",
+    "sourceContains": "treasury-calculator"
+  },
+  {
+    "question": "Does mining alone mean the company can never reach 5%?",
+    "sourceContains": "treasury-calculator"
+  },
+  {
+    "question": "Simule Cypherpunk com ZEC 20x",
+    "sourceContains": "treasury-calculator"
+  },
+  {
+    "question": "Cobertura do orçamento fixo dos tesouros ZCG Lockbox",
+    "sourceContains": "treasury-calculator"
+  },
+  {
+    "question": "Does a forum poll activate a consensus upgrade?",
+    "sourceContains": "/governance"
+  },
+  {
+    "question": "Where are Zcash governance decisions recorded?",
+    "sourceContains": "/governance"
+  },
+  {
+    "question": "Enquete de sentimento equivale a consenso?",
+    "sourceContains": "/governance"
+  },
+  {
+    "question": "A proposal is not an activated network rule",
+    "sourceContains": "/governance"
+  },
+  {
+    "question": "Who participated in the Zcash ceremony?",
+    "sourceContains": "/ceremony"
+  },
+  {
+    "question": "Qual foi a cerimônia original do Zcash?",
+    "sourceContains": "/ceremony"
+  },
+  {
+    "question": "Zcash ceremony history participants",
+    "sourceContains": "/ceremony"
+  },
+  {
+    "question": "Where do I find the ecosystem directory?",
+    "sourceContains": "/ecosystem"
+  },
+  {
+    "question": "Onde encontro projetos do ecossistema?",
+    "sourceContains": "/ecosystem"
+  },
+  {
+    "question": "Is directory inclusion a security audit?",
+    "sourceContains": "/ecosystem"
+  },
+  {
+    "question": "What is OpenZcash Monthly?",
+    "sourceContains": "/monthly"
+  },
+  {
+    "question": "Operations report September 1-10 partial period",
+    "sourceContains": "/monthly"
+  },
+  {
+    "question": "Zebra near-tip sync restart loop September monthly",
+    "sourceContains": "/monthly"
+  },
+  {
+    "question": "Quais relatórios mensais existem?",
+    "sourceContains": "/monthly"
+  }
+]

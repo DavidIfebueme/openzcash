@@ -37,7 +37,7 @@ export function retrievalQuestion(messages: ChatMessage[]): string {
   }
   return latest;
 }
-function portuguese(messages: ChatMessage[]): boolean {
+export function portuguese(messages: ChatMessage[]): boolean {
   const last = normalizeQuestion(messages.at(-1)?.content ?? "");
   if (/\b(?:qual|quanto|preco|cotacao|hoje|agora|em|e|sim|explique|pagou)\b/.test(last)) return true;
   if (/\b(?:what|how|price|today|and|yes|in|for)\b/.test(last)) return false;
@@ -52,18 +52,24 @@ function portuguese(messages: ChatMessage[]): boolean {
 function date(value: string, pt: boolean): string {
   return new Intl.DateTimeFormat(pt ? "pt-BR" : "en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
 }
-function priceAnswer(evidence: Evidence, pt: boolean): string | undefined {
+function priceAnswer(evidence: Evidence, pt: boolean): string {
+  const unavailable = pt
+    ? "Não foi possível consultar a cotação em USD agora. [Abrir o Observatório ZEC](https://openzcash.org/zec-observatory)."
+    : "The USD price feed is unavailable right now. [Open the ZEC Observatory](https://openzcash.org/zec-observatory).";
   try {
-    const parsed = JSON.parse(evidence.content);
-    const quote = parsed.data?.quote;
-    if (!quote || !(quote.usd > 0) || !Number.isFinite(quote.usd) || quote.stale || !Number.isFinite(Date.parse(quote.quotedAt))) return;
+    const quote = JSON.parse(evidence.content).data?.quote;
+    const at = Date.parse(quote?.quotedAt);
+    if (!quote || !(quote.usd > 0) || !Number.isFinite(quote.usd) || !Number.isFinite(at) || at > Date.now() + 60000) return unavailable;
     const usd = new Intl.NumberFormat(pt ? "pt-BR" : "en-US", { style: "currency", currency: "USD" }).format(quote.usd);
+    if (quote.stale || Date.now() - at >= 10 * 60000) return pt
+      ? `Não consegui confirmar a cotação atual. Última referência: **${usd} por ZEC**, de ${date(quote.quotedAt, pt)}; é uma cotação em cache. [Cotação do OpenZcash](https://openzcash.org/api/zec-price).`
+      : `I could not confirm the current price. Last saved quote: **${usd} per ZEC**, from ${date(quote.quotedAt, pt)}; this is a cached reference. [OpenZcash price feed](https://openzcash.org/api/zec-price).`;
     return pt
       ? `1 ZEC = **${usd}**. Cotação de ${date(quote.quotedAt, pt)}. [Cotação do OpenZcash](https://openzcash.org/api/zec-price).`
       : `1 ZEC = **${usd}**. Quoted ${date(quote.quotedAt, pt)}. [OpenZcash price feed](https://openzcash.org/api/zec-price).`;
-  } catch { return; }
+  } catch { return unavailable; }
 }
-function ledgerAnswer(data: LedgerSummary, pt: boolean): string | undefined {
+export function ledgerAnswer(data: LedgerSummary, pt: boolean): string | undefined {
   if (data.filters.scope !== "zcg_grants" || data.filters.search || data.filters.year === null || !data.importedAt) return;
   const value = Number(data.budgetedUsdOfPaidEntries);
   if (!Number.isFinite(value) || Math.abs(value) > Number.MAX_SAFE_INTEGER / 100) return;
@@ -118,9 +124,10 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal)
   if (intent?.type === "ledger") {
     const result = await lookupLedger(intent.filters, signal);
     const data = JSON.parse(result.content).data as LedgerSummary | undefined;
-    return { query, documents, evidence: [result], direct: data ? ledgerAnswer(data, pt) : undefined, external: false };
+    return { query, documents, evidence: [result], direct: data ? ledgerAnswer(data, pt) : (pt ? "O registro de pagamentos está indisponível agora. Isso não significa que o total seja zero. [Pagamentos do ZCG](https://openzcash.org/zcg/disbursements)." : "The payment ledger is unavailable right now. This does not mean the total is zero. [ZCG payments](https://openzcash.org/zcg/disbursements)."), external: false };
   }
-  const topics = intent?.type === "price" ? ["price" as const] : relevantTopics(query);
+  const scenarioQuestion = /(?:simul|scenario|cenario|\b[0-9]+\s*[x×]\b)/i.test(query) && /treasur|tesour|cypherpunk|cipherpunk|lockbox|zcg/i.test(query);
+  const topics = scenarioQuestion ? [] : intent?.type === "price" ? ["price" as const] : relevantTopics(query);
   const evidence = await Promise.all(topics.map((topic) => lookupPublicData({ topic, query: "" }, signal)));
   signal.throwIfAborted();
   const q = normalizeQuestion(query);
@@ -128,4 +135,18 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal)
   const external = /\b(?:latest|newest|current|ultimo|ultima|atual|today|hoje|recent\w*)\b/.test(q)
     && /\b(?:zips?|nu\d+|upgrade|release|protocol|protocolo|versao)\b/.test(q);
   return { query, documents, evidence, direct: intent?.type === "price" ? priceAnswer(evidence[0], pt) : undefined, external };
+}
+
+export function ledgerFactsAnswer(data: LedgerSummary, pt: boolean): string | undefined {
+  if (!data.importedAt || !data.filters || !Number.isFinite(Number(data.budgetedUsdOfPaidEntries))) return;
+  const names = { zcg_grants: "ZCG grants", coinholder_grants: "Coinholder grants", ic_payments: "IC payments", discretionary: "Discretionary spending", monthly: "Monthly operations" };
+  const scope = names[data.filters.scope]; if (!scope) return;
+  const usd = new Intl.NumberFormat(pt ? "pt-BR" : "en-US", { style: "currency", currency: "USD" }).format(Number(data.budgetedUsdOfPaidEntries));
+  const zec = new Intl.NumberFormat(pt ? "pt-BR" : "en-US", { maximumFractionDigits: 8 }).format(Number(data.recordedZecPaid));
+  const project = data.filters.search.replace(/[\[\]()*_`<>\n\r]/g, " ");
+  const title = `${scope}${project ? ` · ${project}` : ""} · ${data.filters.year ?? (pt ? "todos os anos" : "all years")}`;
+  const missing = data.paidEntriesMissingUsd || data.paidEntriesMissingZec;
+  return pt
+    ? `**${title}**: **${usd}** em valores orçados de **${data.paidEntries} registros marcados como pagos**; **${zec} ZEC** registrados como desembolsados.${missing ? " Alguns registros não têm valor em USD ou ZEC; os totais dessas colunas são parciais." : ""}\n\nValores históricos do registro, não cotação atual nem confirmação bancária. ${data.filters.year !== null ? "O ano usa a data de pagamento e exclui linhas sem data. " : "Inclui registros sem data. "}Programas e planilhas operacionais são separados. Importado em ${date(data.importedAt, pt)}. [Registro de pagamentos](https://openzcash.org/zcg/disbursements).`
+    : `**${title}**: **${usd}** in budgeted values for **${data.paidEntries} entries marked paid**; **${zec} ZEC** recorded as disbursed.${missing ? " Some entries lack USD or ZEC values; totals for those columns are incomplete." : ""}\n\nHistorical ledger values, not current valuation or bank settlement. ${data.filters.year !== null ? "The year uses payment dates and excludes undated rows. " : "Undated entries are included. "}Programs and operations worksheets are separate. Imported ${date(data.importedAt, pt)}. [Payment ledger](https://openzcash.org/zcg/disbursements).`;
 }

@@ -25,7 +25,9 @@
     "db:migrate": "drizzle-kit migrate",
     "knowledge:build": "node scripts/build-zarvis-knowledge.mjs",
     "knowledge:check": "node scripts/build-zarvis-knowledge.mjs --check",
-    "test:knowledge": "node --test scripts/build-zarvis-knowledge.test.mjs"
+    "test:knowledge": "node --test scripts/build-zarvis-knowledge.test.mjs",
+    "knowledge:sync": "python3 scripts/sync-zarvis-references.py",
+    "eval:zarvis": "vitest run src/lib/zarvis/evaluation.test.ts"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.4",

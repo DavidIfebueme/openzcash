@@ -86,7 +86,7 @@ export function publicSiteGuide(): string {
   ).join("\n");
 }
 
-const STOP = new Set("the a an of on to and or is are how what which with for does do can would about em de da do dos das os as que como qual quais para por um uma no na e o a eu me my it this zcash zec openzcash".split(" "));
+const STOP = new Set("the a an of on in at from into then than when where why to and or is are how what which with for does do can would about em de da do dos das os as que como qual quais para por um uma no na e o a eu me my it this zcash zec openzcash".split(" "));
 export function terms(value: string): string[] {
   return [...new Set(value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().match(/[\p{L}\p{N}]{2,}/gu) ?? [])].filter((t) => !STOP.has(t));
 }
