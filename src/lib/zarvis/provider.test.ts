@@ -15,6 +15,7 @@ describe("Explicit provider configuration", () => {
     expect(providerSearchTool(config)).toMatchObject({ filters: { allowed_domains: expect.any(Array) } });
     expect(JSON.stringify(providerOptions(config))).not.toContain("verbosity");
     expect(providerOptions(config)).toMatchObject({ max_turns: 2 });
+    expect(providerOptions({ ...config, model: "grok-4.3" })).toMatchObject({ include: ["reasoning.encrypted_content"], reasoning: { effort: "low" } });
     expect(providerOptions(config)).not.toHaveProperty("max_tool_calls");
     expect((providerSearchTool(config) as { filters: { allowed_domains: string[] } }).filters.allowed_domains).toHaveLength(5);
   });

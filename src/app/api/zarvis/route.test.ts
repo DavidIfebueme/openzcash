@@ -43,4 +43,15 @@ describe("Zarvis API", () => {
     const failure = await (await POST(request())).text();
     expect(failure).toContain('"type":"error"'); expect(failure).not.toContain("provider-secret");
   });
+  it("ends an incomplete upload before reserving quota or calling the model", async () => {
+    vi.useFakeTimers();
+    try {
+      const body = new ReadableStream<Uint8Array>({ start(out) { out.enqueue(new TextEncoder().encode("{")); } });
+      const pending = POST(new Request("https://openzcash.org/api/zarvis", { method: "POST", headers: { origin: "https://openzcash.org", "content-type": "application/json" }, body, duplex: "half" } as RequestInit));
+      await vi.advanceTimersByTimeAsync(5000);
+      expect((await pending).status).toBe(400);
+      expect(mocks.reserve).not.toHaveBeenCalled(); expect(mocks.answer).not.toHaveBeenCalled();
+    } finally { vi.useRealTimers(); }
+  });
+
 });

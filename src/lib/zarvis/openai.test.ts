@@ -135,4 +135,13 @@ describe("Zarvis local-first orchestration", () => {
     expect(mocks.create.mock.calls[0][0].input[0].content).toContain('"years":30');
   });
 
+  it.each([true, false])("does not price partial provider usage (first response reports usage: %s)", async (firstReportsUsage) => {
+    const unreported = async function* (output: unknown[]) { yield { type: "response.completed", response: { status: "completed", output } }; };
+    mocks.create.mockResolvedValueOnce(firstReportsUsage ? events([call("lookup-usage")]) : unreported([call("lookup-usage")]))
+      .mockResolvedValueOnce(firstReportsUsage ? unreported([answer("A dated result.")]) : events([answer("A dated result.")]));
+    const metrics = await generateAnswer(question, new AbortController().signal, () => {});
+    expect(metrics.modelCalls).toBe(2);
+    expect(metrics.usageReported).toBe(false);
+  });
+
 });

@@ -45,6 +45,7 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
   let allowWeb = config.webSearch && local.external;
   let webUsed = false;
   let lookups = 0;
+  let usageReports = 0;
   let text = "";
   // Usually one synthesis call. At most two additional rounds for missing data/research.
   for (let round = 0; round < 3; round++) {
@@ -71,11 +72,12 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
     }
     if (!result || result.status !== "completed") throw new Error("INCOMPLETE_RESPONSE");
     if (result.usage) {
-      metrics.usageReported = true;
+      usageReports++;
       metrics.inputTokens += result.usage.input_tokens;
       metrics.cachedInputTokens += result.usage.input_tokens_details?.cached_tokens ?? 0;
       metrics.outputTokens += result.usage.output_tokens;
     }
+    metrics.usageReported = usageReports === metrics.modelCalls;
     const rendered = renderResponse(result);
     if (rendered.text) text += `${text ? "\n\n" : ""}${rendered.text}`;
     candidates.push(...rendered.sources);

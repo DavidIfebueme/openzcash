@@ -1,3 +1,5 @@
+import { fromMarkdown } from "mdast-util-from-markdown";
+import type { Nodes } from "mdast";
 import type { Evidence } from "./local";
 
 export type NumericFact = { value: number; unit: "USD" | "ZEC" | "%" };
@@ -26,9 +28,16 @@ function decimal(raw: string) {
   const normalized = separator ? token.slice(0, token.lastIndexOf(separator)).replace(/[.,]/g, "") + "." + token.slice(token.lastIndexOf(separator) + 1) : token.replace(/[.,]/g, "");
   return { value: Number(normalized), decimals: separator ? token.length - token.lastIndexOf(separator) - 1 : 0 };
 }
+/** Check visible Markdown text, including link labels, escapes and decoded entities. */
+function visibleText(node: Nodes): string {
+  if (["html", "definition", "image", "imageReference"].includes(node.type)) return "";
+  if (node.type === "break") return "\n";
+  if ("children" in node) return node.children.map(visibleText).join("") + (["paragraph", "heading", "listItem"].includes(node.type) ? "\n" : "");
+  return "value" in node ? node.value : "";
+}
 export function unsupportedAmounts(answer: string, evidence: Evidence[]): string[] {
   const facts = numericFacts(evidence);
-  const clean = answer.replace(/\[[^\]]*\]\([^)]*\)/g, "").replace(/\*|`/g, "");
+  const clean = visibleText(fromMarkdown(answer)).replace(/\u2212/g, "-");
   const claims = clean.matchAll(/(?:(US\$|R\$|\$|USD|BRL)\s*)?(-?\d[\d.,]*)(?:\s*(billion|bilhoes|bilhões|million|milhoes|milhões|thousand|mil|[kmb])(?![a-z]))?(?:\s*(USD|BRL|ZEC|%))?/gi);
   const unsupported: string[] = [];
   for (const match of claims) {

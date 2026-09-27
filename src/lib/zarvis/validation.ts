@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { sessionSchema } from "./session";
+import { readBoundedJson } from "./request-body";
 
 import { MAX_BODY_BYTES, MAX_QUESTION_LENGTH, MAX_HISTORY_MESSAGES, MAX_HISTORY_CHARACTERS, MAX_MESSAGE_LENGTH } from "./context";
 export { MAX_BODY_BYTES, MAX_QUESTION_LENGTH } from "./context";
@@ -17,30 +18,9 @@ export const chatRequestSchema = z.object({
     ctx.addIssue({ code: "custom", message: "Start a new conversation to continue." });
 });
 
-/** Enforce the byte limit while reading, including requests without Content-Length. */
+/** Enforce byte and read-time limits before validating chat roles and history. */
 export async function readChatRequest(request: Request) {
-  if (!request.headers.get("content-type")?.startsWith("application/json"))
-    throw new Error("INVALID_REQUEST");
-  if (Number(request.headers.get("content-length")) > MAX_BODY_BYTES)
-    throw new Error("BODY_TOO_LARGE");
-  const reader = request.body?.getReader();
-  if (!reader) throw new Error("INVALID_REQUEST");
-  let size = 0;
-  let text = "";
-  const decoder = new TextDecoder();
-  try {
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      size += value.byteLength;
-      if (size > MAX_BODY_BYTES) {
-        await reader.cancel();
-        throw new Error("BODY_TOO_LARGE");
-      }
-      text += decoder.decode(value, { stream: true });
-    }
-    return chatRequestSchema.parse(JSON.parse(text + decoder.decode()));
-  } finally { reader.releaseLock(); }
+  return chatRequestSchema.parse(await readBoundedJson(request, MAX_BODY_BYTES));
 }
 
 export function sameOrigin(request: Request): boolean {

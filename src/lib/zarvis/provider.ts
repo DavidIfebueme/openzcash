@@ -18,7 +18,8 @@ export function providerOptions(config: Config): Partial<ResponseCreateParamsStr
   return {
     reasoning: { effort: "low" },
     ...(config.provider === "xai" ? { max_turns: 2 } : { max_tool_calls: 2 }),
-    ...(config.provider === "openai" ? { text: { verbosity: "low" as const }, include: ["reasoning.encrypted_content" as const] } : {}),
+    include: ["reasoning.encrypted_content"],
+    ...(config.provider === "openai" ? { text: { verbosity: "low" as const } } : {}),
     prompt_cache_key: "openzcash-zarvis-v2",
   };
 }

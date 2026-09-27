@@ -2,7 +2,7 @@ import { createHmac } from "node:crypto";
 export type UsageBucket = { key: string; limit: number; expiresAt: Date };
 export function usageBuckets(network: string, secret: string, now: number, limits: { dailyLimit: number; hourlyLimit: number }): UsageBucket[] {
   const day = Math.floor(now / 86_400_000);
-  // A daily keyed digest, never a raw IP. Counters cannot identify a person.
+  // A daily keyed digest, never a raw IP. This is a pseudonymous abuse counter.
   const digest = createHmac("sha256", secret).update(`zarvis:${day}:${network}`).digest("hex").slice(0, 32);
   const bucket = (label: string, period: number, limit: number): UsageBucket => ({
     key: `${label}:${Math.floor(now / period)}`, limit,

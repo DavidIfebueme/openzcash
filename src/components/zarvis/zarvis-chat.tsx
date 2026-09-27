@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { safeSourceUrl, STARTERS } from "@/lib/zarvis/sources";
-import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/validation";
+import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/context";
 import { useZarvis } from "./zarvis-provider";
 import { ZarvisFigure } from "./zarvis-figure";
 import { ZarvisCompanion, ZarvisMotionToggle } from "./zarvis-companion";
