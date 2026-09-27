@@ -9,13 +9,13 @@ function request(body: unknown = { messages: [{ role: "user", content: "Explain 
   return new Request("https://openzcash.org/api/zarvis", { method: "POST", headers: { origin, "content-type": "application/json" }, body: JSON.stringify(body) });
 }
 beforeEach(() => {
-  vi.clearAllMocks(); mocks.config.mockReturnValue({ enabled: true, webSearch: true });
+  vi.clearAllMocks(); mocks.config.mockReturnValue({ enabled: true, providerLabel: "OpenAI", webSearch: true });
   mocks.reserve.mockResolvedValue({ allowed: true });
   mocks.answer.mockImplementation(async (_messages, _signal, emit) => { emit({ type: "delta", text: "A grounded answer." }); emit({ type: "done", sources: [] }); });
 });
 describe("Zarvis API", () => {
   it("only exposes public readiness, never configuration or keys", async () => {
-    mocks.config.mockReturnValue({ enabled: false, apiKey: "secret-sentinel", webSearch: true });
+    mocks.config.mockReturnValue({ enabled: false, apiKey: "secret-sentinel", providerLabel: "OpenAI", webSearch: true });
     const response = GET();
     expect(await response.json()).toEqual({ available: false, provider: "OpenAI", webSearch: true });
     expect(response.headers.get("cache-control")).toBe("no-store");

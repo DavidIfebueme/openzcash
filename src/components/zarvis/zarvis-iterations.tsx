@@ -69,8 +69,8 @@ export function ZarvisIterations() {
       </section>
     </details>
     <section className="zarvis-studio-live" aria-labelledby="zarvis-live-title">
-      <header><div><p className="zarvis-studio-eyebrow">REAL INTERACTION</p><h2 id="zarvis-live-title">Talk to Zarvis</h2></div><span>{chat.status ? (chat.status.available ? "OpenAI connected" : "Chat unavailable") : "Checking connection…"}</span></header>
-      <p>This is the real chat. Messages are sent to OpenAI and use the configured request limits.</p>
+      <header><div><p className="zarvis-studio-eyebrow">REAL INTERACTION</p><h2 id="zarvis-live-title">Talk to Zarvis</h2></div><span>{chat.status ? (chat.status.available ? `${chat.status.provider} connected` : "Chat unavailable") : "Checking connection…"}</span></header>
+      <p>This is the real chat. Model-assisted answers use {chat.status?.provider ?? "the configured AI provider"}. Request limits apply.</p>
       <ZarvisChat compact/>
     </section>
   </div>;

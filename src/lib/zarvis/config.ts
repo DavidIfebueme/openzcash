@@ -16,11 +16,16 @@ function unlimitedLocalTesting(): boolean {
 }
 
 export function zarvisConfig() {
-  const apiKey = process.env.OPENAI_API_KEY?.trim() ?? "";
+  const requestedProvider = process.env.ZARVIS_PROVIDER?.trim() || "openai";
+  const provider = requestedProvider === "xai" ? "xai" : "openai";
+  const validProvider = requestedProvider === "openai" || requestedProvider === "xai";
+  const apiKey = (provider === "xai" ? process.env.XAI_API_KEY : process.env.OPENAI_API_KEY)?.trim() ?? "";
   return {
     apiKey,
-    enabled: process.env.ZARVIS_ENABLED === "true" && Boolean(apiKey && process.env.DATABASE_URL),
-    model: process.env.ZARVIS_MODEL?.trim() || "gpt-5-mini",
+    provider,
+    providerLabel: provider === "xai" ? "xAI (Grok)" as const : "OpenAI" as const,
+    enabled: process.env.ZARVIS_ENABLED === "true" && Boolean(validProvider && apiKey && process.env.DATABASE_URL),
+    model: process.env.ZARVIS_MODEL?.trim() || (provider === "xai" ? "grok-4.7" : "gpt-5-mini"),
     webSearch: process.env.ZARVIS_WEB_SEARCH !== "false",
     unlimitedLocalTesting: unlimitedLocalTesting(),
     dailyLimit: limit("ZARVIS_DAILY_REQUEST_LIMIT", 100, 10_000),

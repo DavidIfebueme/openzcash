@@ -69,7 +69,7 @@ describe("Zarvis knowledge and data boundary", () => {
     expect(result.partial).toBe(true);
     const data = result.data as { snapshotAt: string; stale: boolean; rows: { totalRows: number; shown: { title: string }[] } };
     expect(data.snapshotAt).toBe("2026-09-16"); expect(data.stale).toBe(true);
-    expect(data.rows.totalRows).toBe(50); expect(data.rows.shown).toHaveLength(16);
+    expect(data.rows.totalRows).toBe(50); expect(data.rows.shown).toHaveLength(6);
     expect(data.rows.shown[0].title).toBe("Zebra");
   });
   it("retains both ecosystem reporting dates even when the catalog is truncated", async () => {

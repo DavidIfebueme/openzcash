@@ -1,0 +1,661 @@
+{
+  "version": 1,
+  "sourceRevision": "edba09fbbf3401c9",
+  "sourceFiles": 54,
+  "documents": [
+    {
+      "id": "src/app/zcg/page.tsx:0",
+      "url": "https://openzcash.org/zcg",
+      "title": "zcg",
+      "text": "ZCG · OpenZcash\nTotals\nGrants\nDisbursements\nRecipients\nProposals\nCommittee\nInsights\nInvestments\nStipends\nBudget\nCoinholder\nReconciliation\nMeetings\nMethodology\nZCG Copilot\nZcash Community Grants\nPublic accounting for Zcash Community Grants, imported from the official spreadsheet. An off-chain disbursement ledger that can be cross-referenced with the on-chain Lockbox/ZCG outflows.\nUSD paid to date\nZEC paid (ledger)\nLive · a community vote is happening right now\n·\nseats\n→\nScheduled payments\nOpen schedule →\n.\napproved future payments\nUnpaid milestones with an estimated date, summed from the ledger. A different population from open commitments, which count every unpaid milestone. View totals by month and category.\nNext ·\nThe schedule is temporarily unavailable.\nChanged this week\nSubscribe to changes via RSS\nRSS ↗\nmoved\nNew proposal ·\nNo changes recorded in the last seven days.\nAutomatic diff between daily imports of the official spreadsheet: new proposals, verdict changes, and newly recorded payments.\nCurrent committee ·\nseats · from\n· source-linked roles, terms, elections, stipends and minutes\nCommittee →\nStep into the ZCG office\nA living 3D room where every proposal under review walks the floor as a zebra, in front of the committee."
+    },
+    {
+      "id": "src/app/zcg/methodology/page.tsx:0",
+      "url": "https://openzcash.org/zcg/methodology",
+      "title": "zcg · methodology",
+      "text": "How we compute this · OpenZcash\nZCG public spreadsheet\nThe disbursements ledger, recipient and classification pivots, and ZCG and Coinholder proposal history. Collection is scheduled every six hours. A successful collection does not mean the source was recently edited.\nGitHub issue tracker\nLive grant applications (ZcashCommunityGrants/zcashcommunitygrants), read straight from open issues labelled “Grant Application / Ready For Review”. This is the first-hand stage, before anything reaches the spreadsheet.\nZcash Community Forum\nZCG meeting minutes, imported from the Discourse #grants category.\nOn-chain (lightwalletd)\nThe Lockbox / ZIP-1016 ZEC balance. Market prices, grant approvals and milestone delivery are not facts supplied by this chain balance.\nCoinGecko\nThe current ZEC/USD market price, cached for approximately ten minutes. If the feed is unavailable, the last cached price or the spreadsheet's recorded rate may be used. This price is not read from the Zcash chain.\nHow we compute this\nOpenZcash is a read-only mirror: it never holds spend keys and moves no funds. Every figure comes from public sources. Here is how.\nWhere the data comes from\n:\nHow each classification is tagged\nOn the\ntotals\npage every classification is labelled by its\nnature\n, so a reader can tell a grant apart from ZCG spending on itself:\nGrant\n: funding paid to an external project or contributor."
+    },
+    {
+      "id": "src/app/zcg/methodology/page.tsx:1",
+      "url": "https://openzcash.org/zcg/methodology",
+      "title": "zcg · methodology",
+      "text": "ZCG operations\n: the committee's own budget (travel, conferences, tooling); the\nZCG Discretionary Budget\nbucket.\nCommittee stipends\n: salaries paid to ZCG members; see\nstipends\n.\nSecurity · audits\n: third-party security audits and bug bounties (the\nAudits\nclassification). Bounties also appear as milestones inside individual grants.\nWhy the two “discretionary” figures differ\nThe discretionary budget appears two ways, and the two numbers differ on purpose:\nThe\nfigure on the totals split (~$1.8M) comes from the\ntotals pivot\n: the cumulative classification total published in the spreadsheet.\nThe discretionary\nbudget tab\n($1M annual cap, ~$1.27M spent) is a separate annual worksheet.\nTwo readings of the same programme at different scopes (cumulative pivot vs. annual budget). That is why the\npage shows a live ledger-vs-published cross-check instead of asserting they match.\nUSD vs ZEC\nBudgeted USD includes paid and unpaid entries, including amounts recorded for cancelled grants. USD paid in the ledger-based views sums the budgeted value of entries marked paid, not their current market value. ZEC paid is the quantity recorded by the spreadsheet. USD and ZEC must not be added together. Treasury USD valuations use the available market price; historical entries retain their recorded rate."
+    },
+    {
+      "id": "src/app/zcg/methodology/page.tsx:2",
+      "url": "https://openzcash.org/zcg/methodology",
+      "title": "zcg · methodology",
+      "text": "An approval is not a payment, and a recorded payment does not independently verify delivery or impact. Unpaid entries are not necessarily outstanding commitments: check their grant status and the original source.\nReproduce it yourself\nEvery number here is queryable. The read-only API exposes the same ledger, recipients and grant milestones this site renders. See\n/api/zcg\n(JSON, or CSV via\n?format=csv\n)."
+    },
+    {
+      "id": "src/app/zcg/grants/page.tsx:0",
+      "url": "https://openzcash.org/zcg/grants",
+      "title": "zcg · grants",
+      "text": "Grants ZCG · OpenZcash\nGrants\nEach grant is an approved project that aggregates its milestones. A single grantee can hold several grants (for example, Zcash Brazil has 7). Click a grant to view its payments.\nCommitted\nPaid\nOpen\nOne project per row. Paid values use the ledger’s budgeted USD amounts; open commitments exclude cancelled grants. Payment records do not independently establish delivery."
+    },
+    {
+      "id": "src/app/zcg/disbursements/page.tsx:0",
+      "url": "https://openzcash.org/zcg/disbursements",
+      "title": "zcg · disbursements",
+      "text": "ZCG Disbursements · OpenZcash\nAll\nGrants\nContractors\nCoinholder\nDiscretionary\nMonthly\nDisbursements\nZCG off-chain ledger: each row is a milestone or payment (grant, contractor, bounty or monthly transfer) with budgeted USD, disbursed ZEC and the day's rate.\nRecords\nPaid entries\nUSD paid\nZEC paid\nMilestones for grant\nAll grants\nDisbursements classified as\nTotals →\nPayments of type\nInsights →\nDisbursements paid in\nnavigation\n·\nfrom spreadsheet\n= mirrored from the ZCG public sheet;\nadmin entry\n/\nadmin-edited\n= added or corrected in this back-office\nAmounts, exchange rates, classifications and source-row links remain attached to each record. Use the table filters to inspect a recipient, payment status or date."
+    },
+    {
+      "id": "src/app/zcg/recipients/page.tsx:0",
+      "url": "https://openzcash.org/zcg/recipients",
+      "title": "zcg · recipients",
+      "text": "Recipients ZCG · OpenZcash\nRecipients\nRecorded payments to organizations and individuals across the ZCG and Coinholder ledgers. USD paid is the budgeted value of settled entries, not a current market valuation. Budgets are shown separately; committee stipends and internal operating costs are excluded.\nUSD paid to date\nTop recipient\nZEC paid\nBudgeted USD includes all recorded entries, including unpaid or cancelled milestones. It is not money received or an outstanding commitment. Paid amounts remain counted if a grant was later cancelled; delivery and impact are not independently verified here.\nUSD paid is the budgeted value of settled entries, not a current market valuation. Committee stipends and internal operating costs are excluded from this ranking.\nCommittee compensation\nView the separate stipend ledger and follow each member's payment history.\nView stipends"
+    },
+    {
+      "id": "src/app/zcg/proposals/page.tsx:0",
+      "url": "https://openzcash.org/zcg/proposals",
+      "title": "zcg · proposals",
+      "text": "ZCG Proposals · OpenZcash\nunder_review\nProposals\nZCG and Coinholder proposal history. Status changes are published the next day (Brasília time). Approval is not evidence of payment or delivery.\nSubmit a proposal ↗\nApproved\nAvg decision\nReady for review\nShowing\nApplication pipeline\nExplore the published status of each proposal. Select a verdict to narrow the records.\nAll proposals\nstatus\nmedian\nd\nin review\nrequested across\nwith an amount\npast the\nd average\nClear ✕\nRows tagged\nGitHub live\ninclude application details or decisions read from the\nZCG issue tracker ↗\n. The rest are mirrored from the spreadsheet.\nDiligence signals cover under-review applications only and use public data: GitHub account history, prior ZCG applications, a same-handle forum profile, and a title search across GitHub. Signals inform, reviewers decide.\nunder-review\nfrom the spreadsheet\nnot listed: the linked GitHub application was deleted, so there is no verifiable proposal behind\n.\nfrom the spreadsheet already\na committee decision on GitHub (issue closed and labelled). They show the GitHub verdict until the spreadsheet catches up.\nAsk the ZCG Copilot\nExplore funded, under-review and declined proposals with links to the public evidence.\nOpen Copilot"
+    },
+    {
+      "id": "src/app/zcg/schedule/page.tsx:0",
+      "url": "https://openzcash.org/zcg/schedule",
+      "title": "zcg · schedule",
+      "text": "Scheduled payments · OpenZcash\nScheduled payments\nApproved commitments with a future payment estimate. Plan by month and project.\nScheduled value\nPayments\nWithout a date\nPast estimate\nFrom\nfrom\nTo\nto\nCategory\ncategory\nAll categories\nApply filters\nReset\nUpcoming payments\nEstimated dates, budgeted USD and the source of each approved milestone.\nNo approved future payments match these filters.\nDates are estimates, not payment confirmations. Cancelled, vetoed, returned, test and internal entries are excluded.\ndated entries have an unknown amount;\nhave a non-positive amount. Neither is counted as a future payment. Undated and past estimates remain available in each grant’s original milestone table. Day boundary: Brasília time."
+    },
+    {
+      "id": "src/app/zcg/committee/page.tsx:0",
+      "url": "https://openzcash.org/zcg/committee",
+      "title": "zcg · committee",
+      "text": "ZCG Committee · OpenZcash\nThe ZCG committee\nWho decides, for how long, and paid how. Seats and roles come from source-linked public facts; stipends from the ZCG monthly-payments sheet; minutes from the community forum; the electorate from the Foundation's public ZCAP roster.\nSeats\nZCAP voters\nStipends paid\nMeeting minutes\nTerms by cohort\nSeats are filled in two half-yearly elections. Term end dates come from each member's public record; the elections that filled them are listed below.\n· elected in the\n· term to\n↗\nCompensation\nAll stipends →\npayments\nLatest meeting minutes\nThe most recent committee minutes, straight from the community forum.\nAll meetings →\nZcash Community Grants committee\nNo meeting minutes recorded yet.\nDiscretionary budget\nThe committee's own annual operating budget, fixed in ZEC and shown in both units.\nFull budget →\nMembers, terms and roles: source-linked public facts on each card. Elections: the published results, linked on each card. Stipends: the ZCG monthly-payments tab. Minutes: the Zcash Community Forum. Electorate: the Foundation's\npublic ZCAP roster ↗\n, whose full membership lives on the Zcash Foundation page."
+    },
+    {
+      "id": "src/app/zcg/meetings/page.tsx:0",
+      "url": "https://openzcash.org/zcg/meetings",
+      "title": "zcg · meetings",
+      "text": "Meetings · OpenZcash\nGovernance & meetings\nThe latest Zcash Community Grants committee meeting minutes, straight from the community forum. New grant proposals are opened on GitHub.\nSubmit a proposal\nCommunity forum\nCommunity Grants Updates\nFull archive of meeting minutes and announcements.\nGitHub\nZcashCommunityGrants / proposals\nWhere ZCG grant applications are tracked and discussed.\nLatest meeting minutes\nnewest\nSubscribe in your calendar app: updates as new minutes are published\nCalendar (ICS) ↗\nNo meeting minutes recorded yet.\nZcash Community Grants committee\n›\nConfig links\nadmin · used across the site"
+    },
+    {
+      "id": "src/app/zcg/office/page.tsx:0",
+      "url": "https://openzcash.org/zcg/office",
+      "title": "zcg · office",
+      "text": "ZCG Office · OpenZcash\nA living 3D office where every ZCG proposal under review walks the floor as a zebra, in front of the committee.\nZCG Office\n3D · beta\nEach zebra is a grant proposal under review. Status changes appear the next day (Brasília time), based on GitHub and the official spreadsheet. Click a proposal to see its summary and application date. Drag to orbit, scroll to zoom. Credits: 3D model\n“Cartoon Zebra with 7 animations”\nby\nJungle Jim\n, licensed\nCC-BY 4.0\n(modified: compressed, re-scaled, instanced). Low-poly furniture by Kenney (CC0) via the open-source Claw3D project (MIT)."
+    },
+    {
+      "id": "src/app/zcg/decisions/page.tsx:0",
+      "url": "https://openzcash.org/zcg/decisions",
+      "title": "zcg · decisions",
+      "text": "Decisions · ZCG · OpenZcash\nEvery verdict the Zcash Community Grants committee has taken on a grant proposal, dated, with the minutes of that day and the grant it created.\nDecisions\nEvery verdict the ZCG committee has taken on a grant proposal, dated by the ZCG sheet under the site's D-1 publication rule, with the minutes of that day and the grant it created.\nVerdicts\nApproved\nRejected\nLatest verdict\nEvery verdict\nFilter by outcome or search a proposal; export the view as CSV.\nVerdicts and dates come from the official ZCG sheet. Minutes are linked when a committee meeting falls on the decision day. A verdict links to the grant it created when the titles match."
+    },
+    {
+      "id": "src/app/zcg/totals/page.tsx:0",
+      "url": "https://openzcash.org/zcg/totals",
+      "title": "zcg · totals",
+      "text": "Totals ZCG · OpenZcash\nGrants to the ecosystem\nZCG operations\nCommittee stipends\nTotals & integrity check\nOfficial aggregates from the ZCG spreadsheet (paid amounts by recipient and by classification), tagged by what each line is. They cross-check the ledger, since the spreadsheet only sums payments that actually settled.\nTotal paid\nFuture pipeline\nCategories\nRecipients\nWhere the money goes\nclick a card to drill in ↓\n%\nOf the grants,\nwent to third-party security\naudits & bug bounties\n(the\nAudits\nclassification). The\nbudget above is the discretionary tab\n. Security bounty payouts and bounty matches sit there, not in the grants; the pool has no standalone &ldquo;travel&rdquo; line.\nFunding breakdown\nFilter classifications and recipients, then follow each line into the underlying ledger.\nGrants ledger cross-check\nPublished grants total\nPaid grants ledger\nDifference\n(\n%)\nThe published grants total (the pivot minus ZCG's own operations & stipends) vs. the paid grant + contractor ledger, compared live. The two internal buckets are excluded here because the pivot counts them at a broader scope than their tabs. They are reconciled on their own pages. See\nhow we compute this\n.\nApproved future payments\nKeep historical totals separate from dated upcoming commitments.\nView schedule"
+    },
+    {
+      "id": "src/app/zcg/analytics/page.tsx:0",
+      "url": "https://openzcash.org/zcg/analytics",
+      "title": "zcg · analytics",
+      "text": "Insights ZCG · OpenZcash\nInsights\nTrends derived entirely from the disbursement ledger and totals we already import. No new data.\nSpend over time\nPaid to date\nAvg monthly burn\nBusiest month\nMonthly paid disbursements · last 24 months\nHow concentrated is the funding?\nTop recipient\nTop 10\nTop 25\nGrant payment progress\nGrants\nFully paid\nPayments remaining\nPayment progress follows the ledger. A paid milestone is not independent verification of a deliverable or its impact.\nWhere the money flows now\nPaid last 12 months\nHeating up\nCooling down\nPaid in the last 12 months by category. The ▲▼ delta compares each category's share of the last 12 months with its all-time share, in percentage points.\nBounties paid\nbounty payments\ntotal"
+    },
+    {
+      "id": "src/app/zcg/reconciliation/page.tsx:0",
+      "url": "https://openzcash.org/zcg/reconciliation",
+      "title": "zcg · reconciliation",
+      "text": "Reconciliation ZCG · OpenZcash\nReconciliation\nCross-check between ZCG's on-chain treasury flow and what the spreadsheet records as distributed. Individual grantee payments leave the shielded pool · only the aggregate flow is visible on-chain.\n01 · Protocol\nLockbox\nTransparent treasury inflow\n→\n02 · Operating treasury\nZCG\nBalance and aggregate outflow\n03 · Shielded payments\nPublic ledger\nIndividual entries from the spreadsheet\nTreasury flow ·\n(on-chain)\nIn · from Lockbox\nOut · to shielded pool\nCurrent balance\nBalance check:\n−\n=\nin − out = balance\nresidual\nTransparent outputs detected\nsent to the shielded pool\nDistribution per the spreadsheet (historical cumulative)\nZEC paid to grantees\nUSD paid\nPayments\nWhy there is no 1:1 match per payment\nThe ZCG transparent treasury only reveals the aggregate flow: it receives from the Lockbox and moves blocks of ZEC into the shielded pool. The\nindividual grantee payments leave the Orchard (shielded) pool or historical addresses · private by design. Auditing each per-grantee payment would require the\nZCG shielded UFVK\n. The reconciliation possible today is the\ntreasury flow\n(above) plus the spreadsheet\nintegrity-check\n."
+    },
+    {
+      "id": "src/app/zcg/budget/page.tsx:0",
+      "url": "https://openzcash.org/zcg/budget",
+      "title": "zcg · budget",
+      "text": "Discretionary budget · OpenZcash\nDiscretionary budget\nZCG's annual discretionary budget: fixed in ZEC and drawn down over the year. Shown in USD and ZEC, which is why the two figures diverge as the price moves.\nAnnual allocation & drawdown\nCompare the ZEC budget, spending and remaining balance in their original units."
+    },
+    {
+      "id": "src/app/zcg/stipends/page.tsx:0",
+      "url": "https://openzcash.org/zcg/stipends",
+      "title": "zcg · stipends",
+      "text": "Committee stipends · OpenZcash\nCommittee stipends\nMonthly stipends paid to each ZCG committee member. This is the committee's own compensation, not a grant. Mirrored from the ZCG monthly-payments sheet.\nPaid in this tab\nAll-time stipends\nMembers paid\nPayments\nWhere the difference is\nCumulative classification, every cohort\ntotals tab ↗\nItemised in the monthly-payments tab ·\n·\npayments\n−\nevery payment →\nPaid before the tab begins. The spreadsheet only carries this part as a total, so it cannot be opened payment by payment or by member.\nCurrent committee\nSeated members, summed from the monthly-payments tab. Open a line to inspect every dated payment and its source.\nFormer members\nMembers whose seat ended within the tab's range. Earlier cohorts are not in this tab; their stipends only exist in the all-time classification above.\nMember\nPaid\nPeriod\n→\nNo monthly stipend rows are present in the ledger yet.\nCommittee salaries\nThese are internal ZCG payments, excluded from the external recipient tables. The per-member figures sum the monthly-payments tab, which starts in\n; the\n&ldquo;Committee stipends&rdquo;\nclassification on the totals page is the cumulative figure for every cohort since the programme began. Two scopes of the same programme (see\nmethodology\n).\nThe people behind ZCG\nSee current terms, source-linked roles and the committee's election history.\nMeet the committee"
+    },
+    {
+      "id": "src/app/zcg/investments/page.tsx:0",
+      "url": "https://openzcash.org/zcg/investments",
+      "title": "zcg · investments",
+      "text": "ZCG Investments · OpenZcash\n↗\nNative swaps\nNative ZEC ↔ CACAO\nTrade assets\nTrading balances within Maya\nSynthetic assets\nSynth minting and redemption\nOriginal contribution\nLP position now\nIf ZEC had been held\nInvestments\nThe liquidity ZCG supports. The activity it enables. The position the treasury holds.\nExplore the ZCG position\n↓\nNative ZEC liquidity\nMaya Protocol\nExplore ZEC pool\nAll-time ZEC pool volume\nSwapped through the entire ZEC pool\n.\nIncludes native, trade and synth swaps. This is pool activity, not ZCG revenue.\nReported swaps\nProtocol operations · all time\nZEC in the pool\nZCG pool share\nShare of liquidity-provider units\nSource data\nPool activity\nZEC volume over time\nVolume history is temporarily unavailable. Other pool data remains available above.\nBehind the total\nWhat makes up the volume\n%\nVolume breakdown unavailable.\nLast 30 days\nMidgard reports no swaps in this window.\nTreasury performance\nThe ZCG position\nZCG and FPF seeded this position. Pool usage and the treasury’s financial result answer different questions.\nZEC / CACAO\nvs. contribution\nLP position is\nvs. holding\nA common USD scale\nProviding liquidity vs. holding ZEC\nA current position valuation, ZEC price and contribution record are needed for this comparison."
+    },
+    {
+      "id": "src/app/zcg/investments/page.tsx:1",
+      "url": "https://openzcash.org/zcg/investments",
+      "title": "zcg · investments",
+      "text": "Half of the initial ZEC was exchanged for CACAO to form the pair. The pool rebalances as the relative prices change. This comparison includes accrued earnings and excludes any withdrawn assets.\n·\nInside the position\nCurrent allocation\nZEC\nCACAO\nPercentages by USD value. ZEC at\n; CACAO at\n(\n).\nThe live allocation is temporarily unavailable.\nZCG’s estimated share\nEarnings over time\nAccrued in the pool\nMonthly earnings are temporarily unavailable.\nEarnings are already included in the position value. They are not an additional treasury payout. Estimates use the member’s current units and each month’s closing pool units; they are not an audited fee statement.\nFor ZEC holders\nRead usage and returns together.\nVolume shows demand for trading through the pool. Liquidity shows how much ZEC is available to support those swaps.\nThe treasury comparison shows the cost of providing that liquidity relative to simply holding the contributed ZEC.\nPool liquidity · Maya’s USD quote\nBoth sides of the pool at Maya’s own exchange rate. This can differ from the external prices used for the ZCG position.\nCompare ZEC liquidity across venues\n→\nTransfers & custody\n2-of-3 multisig\nZCG and FPF contributions recorded in the liquidity spreadsheet\nTransfer\nDate\nUSD\nZEC/USD\nContribution records are temporarily unavailable.\n2-of-3 · Vultisig"
+    },
+    {
+      "id": "src/app/zcg/investments/page.tsx:2",
+      "url": "https://openzcash.org/zcg/investments",
+      "title": "zcg · investments",
+      "text": "Jason (ZCG), Aaluxx (Maya Protocol) and Alex (FPF) hold the keys. Any two signers can move the position. The stated fee beneficiary is the ZCG treasury.\nZCG announcement\nVerify the position\nMaya member\nZEC address\nLiquidity spreadsheet\nHow these numbers are calculated\nSources & methodology\nScope.\nVolume and swap counts cover the entire ZEC.ZEC pool, including activity before ZCG joined. They do not measure the volume caused by ZCG’s contribution, unique traders or a return on the grant.\nHistorical volume.\nMidgard’s USD cents are converted to dollars without applying today’s prices. The total includes native, trade-asset and synthetic-asset swaps; the breakdown reconciles to that total.\nPrices.\nThe ZCG position values ZEC at the site’s oracle and CACAO at CoinGecko (or a clearly labelled pool-implied fallback). Maya’s internal USD quote can differ.\nEarnings.\nNet pool earnings and gross fees are different measures. The monthly estimate assumes today’s member units were held throughout each included month. Deposits, withdrawals or changes in units can change that estimate. The sheet’s fee-revenue cell is not used as a zero.\nFreshness.\nMaya requests are cached for five minutes. Failed requests retain a dated, labelled snapshot when one exists; missing data is shown as unavailable. Zero means the source returned zero. The latest month is incomplete.\nSwap data\nMaya API documentation"
+    },
+    {
+      "id": "src/app/zcg/investments/page.tsx:3",
+      "url": "https://openzcash.org/zcg/investments",
+      "title": "zcg · investments",
+      "text": "OpenZcash methodology →"
+    },
+    {
+      "id": "src/app/zcg/fpf/page.tsx:0",
+      "url": "https://openzcash.org/zcg/fpf",
+      "title": "zcg · fpf",
+      "text": "FPF · Coinholder Grants · OpenZcash\nFinancial Privacy Foundation\nSubmit a proposal\nSubmit a milestone\nGrants\nTotal paid\nProposals\nCoinholder grants\ngrants · one approved project per row · amounts in USD with ZEC equivalents tracked in the ledger.\nCoinholder proposals\nproposals · the pipeline upstream of the grants above · only approved proposals become paid grants."
+    },
+    {
+      "id": "src/app/zcg/coinholder/page.tsx:0",
+      "url": "https://openzcash.org/zcg/coinholder",
+      "title": "zcg · coinholder",
+      "text": "Coinholder Grants · OpenZcash\nCoinholder Grants\nThe FPF-run retroactive grants round: the proposals under review, what each one asks for, and the ballot coinholders vote on. The pool that pays them has its own page.\n· in review\nProposals\nRequested\nReview closes\nCoinholder poll opens\nProposals under review\nEvery proposal in the round with its organisation, size band and requested amount. Curated from the FPF announcement, which runs ahead of the public sheet while submissions are still being logged.\nBallot options:\n. Both reject options tally as “no” votes; the lower-amount option only signals that the requested amount was the blocker. Grants already paid from the pool are on the pool page, not in this round."
+    },
+    {
+      "id": "src/app/zcg/coinholder/votes/page.tsx:0",
+      "url": "https://openzcash.org/zcg/coinholder/votes",
+      "title": "zcg · coinholder · votes",
+      "text": "Coinholder votes · FPF · OpenZcash\nHow Zcash coinholders direct the coinholder fund: the poll that set up the grants program, each quarterly round, and the verdict on every proposal, with the key-holders' veto.\nCoinholder votes\nHow coinholders direct the fund that received the lockbox at NU6.1: the poll that set up the grants program, each quarterly round, and the verdict on every proposal. A proposal passes when at least 420,000 ZEC vote and a simple majority approves; the key-holders sign the payouts and can veto them (ZIP 1016).\nRounds decided\nApproved\nRejected\nVetoed\nPolls\nThe program's ratification and every quarterly round, newest first.\nCurrent round →\nVoting until\n.\n↗\nEvery proposal\nThe verdict on each proposal put to coinholders. Filter by outcome or decider; export the view as CSV.\nThe fund →\nProposal verdicts come from the official Coinholder sheet; polls from their published results and the program's forum threads. Voting rules from ZIP 1016."
+    },
+    {
+      "id": "src/app/zcg/coinholder/pool/page.tsx:0",
+      "url": "https://openzcash.org/zcg/coinholder/pool",
+      "title": "zcg · coinholder · pool",
+      "text": "Coinholder pool · OpenZcash\nCoinholder pool\nThe ZIP-1016 Lockbox pool that funds Coinholder Grants: live balance, its value, what has been paid out and what is still owed to the pool. Balances and totals mirror the ZCG public spreadsheet; the ZCG committee pool is accounted separately.\nCurrent ZEC balance\nUSD value of holdings\nUSD paid out to date\nZEC receivables\nFunding history\nOfficial paid amounts by classification and recipient, from the Coinholder Grants sheet.\nPaid values are the ledger's budgeted USD amounts. Recorded payment does not independently verify delivery."
+    },
+    {
+      "id": "src/app/zcg/treasury-calculator/page.tsx:0",
+      "url": "https://openzcash.org/zcg/treasury-calculator",
+      "title": "zcg · treasury calculator",
+      "text": "ZEC treasury calculator · OpenZcash\nExplore how ZEC price, mining, and circulating supply change the cost of reaching a treasury target."
+    },
+    {
+      "id": "src/app/funding-history/page.tsx:0",
+      "url": "https://openzcash.org/funding-history",
+      "title": "funding history",
+      "text": "Zcash's Since block zero · OpenZcash\nEvery ZEC the Zcash protocol has allocated outside mining since the genesis block, computed block by block from the consensus rules and valued at the close of the day it was paid.\nZcash's Since block zero\nEvery ZEC the protocol has paid outside mining since the genesis block, computed block by block from the consensus rules and valued at the ZEC/USD close of the day it was paid. Heights by day from Blockchair; daily closes from Bitfinex.\nAllocated outside mining\nUSD at receipt\nSame ZEC at today's price\nIn-protocol lockbox\nBy recipient\nWho each consensus rule paid, for how long, and what that ZEC was worth on the days it arrived.\nRecipient\nPeriod\nShare\nZEC\nAvg. price\nFollow the money\nto\n→\n↗\nSince\n(block\n),\nmore blocks have paid\nto ZCG and added\nto the lockbox. The daily series closes at the last complete UTC day.\nYear by year\nZEC allocated outside mining each calendar year. The halvings and Blossom show as steps; the price at receipt does the rest.\nYear\nFounders' Reward\nDev Fund 2020\nZCG\nLockbox\nTotal ZEC\nimg\nMilestones\nThe heights where the rules changed. Each links to its block on CipherScan.\nGenesis. The Founders' Reward starts at 20% of each block, on a slow-start ramp.\nThe slow start ends: 12.5 ZEC per block, 2.5 ZEC of it Founders' Reward.\nBlossom: 75-second blocks. The per-block subsidy halves; daily issuance does not."
+    },
+    {
+      "id": "src/app/funding-history/page.tsx:1",
+      "url": "https://openzcash.org/funding-history",
+      "title": "funding history",
+      "text": "First halving. The Founders' Reward ends and the Dev Fund starts: 7% ECC, 5% ZF, 8% Major Grants.\nNU6, second halving. 8% to Zcash Community Grants, 12% accrues in the in-protocol lockbox.\nBlock\nest. 2028\nThird halving at block\n: every stream in the ZIPs in force today ends there, unless a new upgrade changes it.\nHow this is checked\nThe rules are code; these real blocks and balances pin them down. The same checks run in the test suite.\n. The coinbase matches the rules.\nlive\nThe node reports\nin the lockbox at block\n; the rules give\n.\nValue pools ↗\nData as JSON or CSV\nConsensus rules from the Zcash protocol specification and ZIPs 207, 214, 1015 and 2001. A day runs from its first block to the block before the next day's first block. USD at receipt uses the Bitfinex ZEC/USD daily close; the genesis day has no close, so its\ncarry no dollar value. Series through\n, generated"
+    },
+    {
+      "id": "src/app/governance/page.tsx:0",
+      "url": "https://openzcash.org/governance",
+      "title": "governance",
+      "text": "Zcash governance · OpenZcash\nDecisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nZcash governance\nDecisions that bind the whole network: every upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open. Grant decisions live with the bodies that take them.\nNetwork upgrades\nCoinholder polls\nStill being decided\nLargest poll\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nProtocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked."
+    },
+    {
+      "id": "src/app/zec-observatory/page.tsx:0",
+      "url": "https://openzcash.org/zec-observatory",
+      "title": "zec observatory",
+      "text": "ZEC Observatory · OpenZcash\nZcash markets, supply and public holdings. Compare CEX and DEX spot volume, track intent activity separately, and inspect on-chain balances and institutional disclosures."
+    },
+    {
+      "id": "src/app/ecosystem/page.tsx:0",
+      "url": "https://openzcash.org/ecosystem",
+      "title": "ecosystem",
+      "text": "Ecosystem · OpenZcash\nExplore Zcash projects, maintainers, public code and source-linked funding history."
+    },
+    {
+      "id": "src/app/wallets/page.tsx:0",
+      "url": "https://openzcash.org/wallets",
+      "title": "wallets",
+      "text": "Zcash Wallets · OpenZcash"
+    },
+    {
+      "id": "src/app/development/page.tsx:0",
+      "url": "https://openzcash.org/development",
+      "title": "development",
+      "text": "Development · OpenZcash\nPublic Zcash repository inventory with real default-branch activity, releases, purpose tags and historical funding sources."
+    },
+    {
+      "id": "src/app/defi/page.tsx:0",
+      "url": "https://openzcash.org/defi",
+      "title": "defi",
+      "text": "ZEC DeFi liquidity · OpenZcash\nZEC DeFi liquidity\nNative ZEC pool depth, value locked and yield from public Midgard APIs (Maya Protocol, THORChain), refreshed every few minutes.\nZCG&rsquo;s own position on Maya, its value and the fees it earns, is on\nInvestments →\n.\nCompare trading activity and public exchange balances on\nZEC Observatory →\nNative ZEC liquidity\nPool depth, value locked and yield across the venues that hold native ZEC, from their public APIs.\nPools live\nZEC in pools\nTotal value locked\nNo pool data right now. The venues&rsquo; APIs may be briefly unreachable. This refreshes automatically.\npool\nZEC depth\nTVL\nZEC price\nData: Maya & THORChain (Midgard v2) and NEAR / Rhea Finance (GeckoTerminal). NEAR Intents holds further large cross-chain ZEC liquidity across many bridged pairs, not summed here to avoid double-counting their shared vault."
+    },
+    {
+      "id": "src/app/z3/page.tsx:0",
+      "url": "https://openzcash.org/z3",
+      "title": "z3",
+      "text": "Z3 stack · OpenZcash\nZebra\nConsensus full node (zebrad): an independent Rust implementation of the Zcash protocol, replacing zcashd's consensus.\nProduction\nZaino\nIndexing & lightwallet service: the gRPC/JSON-RPC layer that serves wallets, taking over the role lightwalletd played for zcashd.\nFeature-complete\nZallet\nFull-node wallet: the daemon and RPCs that replace zcashd's built-in wallet, paired with Zebra + Zaino.\nAlpha\nZ3 · the zcashd successor\nzcashd is deprecated. The Z3 stack (Zebra, Zaino, Zallet) is its modular Rust replacement: a validating node, an indexing/lightwallet service and a wallet, run together. Much of the Dev Fund and ZCG spend is building toward it.\nZ3 updates on the forum ↗\nThree components. One connected system.\nConsensus, indexing and wallet operations each have a dedicated role in the Rust successor to zcashd.\n0\n·\nOfficial\nzcashd deprecation & migration guide\nWhy zcashd is being retired and how the ecosystem moves to the Z3 stack.\nThe stack\n· GitHub ↗"
+    },
+    {
+      "id": "src/app/news/page.tsx:0",
+      "url": "https://openzcash.org/news",
+      "title": "news",
+      "text": "News · OpenZcash\nForum\nGitHub\nSpreadsheet\nProposal\nZecHub DAO\nApplication\nNews\nThe last seven days across the Zcash ecosystem: community forum, core GitHub releases, ZecHub DAO proposals, grant applications and new ledger entries. Refreshed hourly.\nnew\nAll sources\nsearch\nq\nsource\nSearch\nClear\n·\nnew in 48 hours · last 7 days\n. Older entries stay on their own pages."
+    },
+    {
+      "id": "src/app/monthly/page.tsx:0",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "Monthly · OpenZcash\nRead OpenZcash Monthly and Operations: teams, wallets, funding, communities and decisions, with original sources."
+    },
+    {
+      "id": "src/app/lockbox/page.tsx:0",
+      "url": "https://openzcash.org/lockbox",
+      "title": "lockbox",
+      "text": "Lockbox · live funding · OpenZcash\nLockbox · live funding\nReal-time view of the Zcash deferred Dev Fund. Every block mined adds 0.1875 ZEC (12% of the block subsidy) to the in-protocol Lockbox. This is the protocol funding stream read straight from the chain tip, not viewing-key data."
+    },
+    {
+      "id": "src/app/zf/page.tsx:0",
+      "url": "https://openzcash.org/zf",
+      "title": "zf",
+      "text": "Zcash Foundation · OpenZcash\nQ2 2026 Report\n2026-08-06\nQ1 2026 Report\n2026-05-19\nQ4 2025 Report\n2026-02-27\n2025 Year in Review\n2026-01-21\nQ3 2025 Report\n2025-11-17\nQ2 2025 Report\n2025-08-28\nQ1 2025 Report\n2025-05-06\nQ4 2024 Report\n2025-04-01\nQ2 and Q3 2024 Quarterly Reports\n2025-01-20\nQ1 2024 Report\n2024-09-09\nQ2 2023 Quarterly Report\n2023-09-14\nZcon7\nZcon VI\nZcon V\nZcon IV\nZcon3\nZcon2Lite\nZcon1\nZcon0\nLatest from the Foundation\nZcash Foundation\nzfnd.org\nFoundation on the forum\nGitHub · ZcashFoundation\nTransparency reports\nZCAP members\nLatest report\nProjects\nLoading the latest Foundation updates...\nCommunity forum\nZcash Foundation category\nFull archive of Foundation reports, updates and announcements.\nnewest\nZcon conferences\nnext · Zcon7 · Cancún\nUpcoming\nCommunity Advisory Panel (ZCAP)\nmembers\nThe volunteer panel that advises the Foundation and votes in ZCG elections.\nPublic roster ↗\nRoster temporarily unavailable. The public sheet may be unreachable; it refreshes automatically."
+    },
+    {
+      "id": "src/app/zodl/page.tsx:0",
+      "url": "https://openzcash.org/zodl",
+      "title": "zodl",
+      "text": "ZODL · OpenZcash"
+    },
+    {
+      "id": "src/app/shielded-labs/page.tsx:0",
+      "url": "https://openzcash.org/shielded-labs",
+      "title": "shielded labs",
+      "text": "Shielded Labs · OpenZcash\nBurning\nIssuance Smoothing\nFee Burning\nLatest from Shielded Labs\nShielded Labs\nshieldedlabs.net\nRoadmap & milestones\nGitHub · ShieldedLabs\nNSM overview\nFunding\nFocus\nEfforts\nProjects\nCrosslink\nHybrid Proof-of-Work + Proof-of-Stake with BFT finality\nGives Zcash the combined security of PoW and PoS and lets people get paid to hold ZEC. PoW and BFT finality are integrated; staking & tokenomics are in development, with hardening and productionization (final ZIPs + audits) slated for 2026.\nMilestone 4\nNetwork Sustainability Mechanism (NSM)\nThree proposed changes to ZEC supply economics.\nOverview ↗\nRoadmap\nmilestones ↗\nGitHub\nShieldedLabs ↗\nLoading the latest posts..."
+    },
+    {
+      "id": "src/app/zakura/page.tsx:0",
+      "url": "https://openzcash.org/zakura",
+      "title": "zakura",
+      "text": "Zakura · OpenZcash"
+    },
+    {
+      "id": "src/app/tachyon/page.tsx:0",
+      "url": "https://openzcash.org/tachyon",
+      "title": "tachyon",
+      "text": "Tachyon · OpenZcash"
+    },
+    {
+      "id": "src/app/zechub/page.tsx:0",
+      "url": "https://openzcash.org/zechub",
+      "title": "zechub",
+      "text": "ZecHub DAO · OpenZcash\nimg\n%\nfunded ·\npaid\nyes\n·\nno\nDonations\nFPF program fund\nZecHub Inc\nZecHub DAO\ndaodao.zone\nTreasury sheet\nGitHub · ZecHub\nTreasury overview\nAllocations & payouts\nGovernance\nResearch with Copilot ↗\nTotal treasury · 3 funds\nDonations treasury\nAvailable in source snapshot\nPaid out to date\nZEC price used\nFPF allocation by category\nSince\n: FPF\n, donations\n.\nGrants: paid vs committed\nChanged this week\nSubscribe to new ZecHub treasury payouts via RSS\nRSS ↗\nNew payouts recorded on the treasury dashboard between imports.\nRecent proposals\nOpen now\nPassed / executed\nLatest proposals\nProposals are temporarily unavailable: the DAO DAO indexer did not respond. Try again shortly, or open\nthe DAO on daodao.zone ↗\nZecHub Copilot\nAsk your own agent why a vote passed or failed. It computes both tests a proposal has to clear (67% of yes+no and 40% turnout), names every voter, and reads the treasury without mistaking the headline total for spendable money.\nGet the skill\nTreasury balances and payout records mirror the\nZecHub DAO Treasury Dashboard ↗\nmaintained by the DAO\n, re-imported every 6 hours. Indicative USD values apply the separately dated market quote to those recorded balances; they do not establish current holdings or available funds. Proposals are read live from the DAO DAO indexer. The\nfunded\nchip links a proposal to its payout line by title match."
+    },
+    {
+      "id": "src/app/arborist/page.tsx:0",
+      "url": "https://openzcash.org/arborist",
+      "title": "arborist",
+      "text": "Arborist Calls · OpenZcash\nEvery Zcash Arborist Call: dates, agendas, moderators, notes and recordings, read live from the notes repository and official video feed.\nThe notes repository did not respond. Try again shortly, or browse it directly on\nGitHub ↗\n.\nCalls listed\nWith recording\nRunning since\nLatest meeting\nScheduling news\nlast six weeks\nZcash Foundation forum\nArborist Calls\nThe Zcash protocol's standing engineering call: agendas, moderators, notes and recordings, reconciled from the community notes and official video feed.\nLoading the call archive…\nSource:\nZcashCommunityGrants/arboretum-notes ↗\n, the community-maintained record of every call, and the\nofficial Zcash Foundation YouTube feed ↗\n. New recordings appear with notes pending; once the matching GitHub note is published, it replaces the provisional entry automatically. Calls 1–29 are preserved from the repository's historical agenda archive; later calls use the full notes. Dates, durations and participants are parsed from those source records."
+    },
+    {
+      "id": "src/app/communities/page.tsx:0",
+      "url": "https://openzcash.org/communities",
+      "title": "communities",
+      "text": "Global Communities · OpenZcash\nThe global Zcash community groups: who they are, where to find them, which ones ZCG funds (with audited numbers), and what each one has been up to on the forum.\nGlobal Communities\nThe regional groups building Zcash adoption worldwide: who is active now, who ZCG and the ZecHub DAO fund, and where to find them. Activity is live from the community forum and YouTube; X and Instagram profiles are linked.\nLoading live forum activity…\nFunding figures mirror the official ZCG spreadsheet (budgeted USD, not paid; see the methodology). Communities with no ledger rows are marked accordingly; some are funded through other channels (ZecHub DAO ambassador program, direct donations), noted per card. Links seeded from ZecHub's community directory and verified individually."
+    },
+    {
+      "id": "src/app/ceremony/page.tsx:0",
+      "url": "https://openzcash.org/ceremony",
+      "title": "ceremony",
+      "text": "Zcash Ceremony · OpenZcash\nHow Zcash was born: the six witnesses of the October 2016 parameter ceremony, the Denver station footage, the record they left and ten years since.\nSix witnesses, six secrets to destroy.\nBefore the genesis block, six people in separate places each generated one shard of Zcash's parameters and reported destroying their secret. If even one of them was honest, the combined secret could never be rebuilt. Their story, their footage and the record they left, in five parts.\nPart\nof the Denver station, from just before the phone anomaly, as three cameras and three microphones recorded it, in seven parts. Switch cameras without losing the moment, or just listen.\nPlay from the start →"
+    },
+    {
+      "id": "src/app/ceremony/people/page.tsx:0",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people",
+      "text": "The people · Zcash Ceremony · OpenZcash\nThe six witnesses of the 2016 Zcash ceremony and their pseudonyms, the authors of Zerocoin and Zerocash, and the cypherpunk lineage behind them.\n↗\nThe people\nThree witnesses were named to the other participants from the start and to the public three days after the ceremony. Three ran under pseudonyms Zooko Wilcox invented so nobody could target them during the ceremony, and the last of those stayed hidden until 2022.\nThe six witnesses\nOctober 22–23, 2016\nWitness\nKnown then as\nRole\nPublic since\nSources\n.\nZerocoin and Zerocash\n2013 and 2014 · Zerocoin, then Zerocash, which Zcash implements\nBefore Zcash\n1982 to 2016 · told in Part I"
+    },
+    {
+      "id": "src/app/ceremony/road/page.tsx:0",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "The road to the genesis block · Zcash Ceremony · OpenZcash\nA short documentary of the years from 1982 to the Zcash genesis block: Chaum's blind signatures, the cypherpunks, Hashcash and bit gold, Bitcoin, Zerocoin and Zerocash, and the 2016 ceremony.\n“\n”\n↗\n·\n.\nWatch on YouTube ↗\nThe road to the genesis block\nZcash did not begin in 2016. It began in 1982, with a cryptographer who thought money should not report on its owner, and passed through every hand that tried to build it before the technology was ready.\nChapter\nIn memory of Hal Finney (1956–2014), who received the first Bitcoin transaction."
+    },
+    {
+      "id": "src/app/ceremony/record/page.tsx:0",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record",
+      "text": "The record · Zcash Ceremony · OpenZcash\nWhat the 2016 Zcash ceremony left on the record, where it lives and under which licence: footage, transcript, keys, disc images, Radiolab and the short film.\nThe record\nWhat the ceremony left on the record, where each piece lives and the licence it carries. The originals stay at their source; OpenZcash plays and links them.\nItem\nContents\nSize\nLength\nLicence\nSource\n↗\nSizes from the Internet Archive's item metadata, counting the original files only; lengths from the Internet Archive, YouTube and Radiolab's podcast feed, checked September 25, 2026. &ldquo;Not stated&rdquo; means the item carries no licence of its own.\nWhat came after"
+    },
+    {
+      "id": "src/app/ceremony/ten-years/page.tsx:0",
+      "url": "https://openzcash.org/ceremony/ten-years",
+      "title": "ceremony · ten years",
+      "text": "Ten years · Zcash Ceremony · OpenZcash\nTen years of Zcash since the genesis block of October 28, 2016: every generation of shielded pools, the end of the trusted setup, the halvings, and the claims that keep circulating.\nTen years\nFrom the genesis block to NU5, which ended the need for any ceremony, through two halvings and an emergency, to the tenth anniversary. Upgrades and votes follow the ZIPs and this site's own records.\nSince the genesis block\ndays\nTo the tenth anniversary\nIn Ironwood now\nEvery activation height and how it was decided is on\nZcash governance\n; every ZEC paid outside mining on\nZcash's Since block zero\n.\nOften misstated"
+    },
+    {
+      "id": "src/app/ceremony/watch/page.tsx:0",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch",
+      "text": "Watch the ceremony · Zcash Ceremony · OpenZcash\n71 minutes of the Denver station of the 2016 Zcash parameter ceremony, as three cameras and three microphones recorded them, in seven parts. Streams from the Internet Archive.\nWatch the ceremony\nZooko Wilcox ran the Denver station while journalist Morgen Peck observed. Three cameras and three microphones recorded 71 minutes of it together on the first evening, starting two minutes before her phone began echoing the station's Google Hangout. Nothing loads until you press play.\nCameras 1 and 2 go dark for a few minutes; Camera 3, the wide shot, runs throughout. The recordings stream from the Internet Archive as 720p MP4s; the cameras recorded in 1080p.\nInternet Archive item\nDenver footage recorded by Nathaniel Kramer and published by Electric Coin Company on the Internet Archive in December 2016 under\n. OpenZcash streams the files from there and keeps only still frames. The other films play from their own platforms."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:0",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "The idea of untraceable money\nLong before blockchains, cryptographer David Chaum published “Blind Signatures for Untraceable Payments” (1982): a bank could sign a digital coin without seeing it, so the coin could later be spent without the bank linking it back to you. Digital cash that behaved like cash.\nChaum founded DigiCash in 1989 to build it. Its eCash ran a real pilot at a US bank in 1995, but the company went bankrupt in 1998. The world was not ready, and the money still needed a bank at the center.\nOne detail matters for this story: in 1996 a computer science student named Zooko Wilcox took a leave of absence to work as a junior coder at DigiCash. The company failed; the apprenticeship did not.\nThe cypherpunks\nIn 1992 a mailing list formed around a simple position: privacy in the electronic age would have to be built with code, not requested from institutions. Eric Hughes opened his 1993 manifesto with the line “Privacy is necessary for an open society in the electronic age.”\nThe list became the proving ground for everything that followed: remailers, digital cash schemes, and the culture of shipping working cryptography instead of position papers. Zooko Wilcox, who later brought Zcash to life, was posting to the list by 1997: an “original cypherpunk,” as Zcash’s own site puts it.\nThe missing pieces"
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:1",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "Adam Back’s Hashcash (1997) made computation itself a scarce stamp. Wei Dai’s b-money and Nick Szabo’s bit gold (late 1990s) sketched money without a central issuer. Each solved a piece; none shipped as money.\nHal Finney, veteran cypherpunk and PGP developer, also wrote working code for zero-knowledge proofs. At the rump session of the Crypto ’98 conference in Santa Barbara, on August 25, 1998, he gave a five-minute talk, “A zero-knowledge proof of possession of a pre-image of a SHA-1 hash”: a program that proves you know a message with a given SHA-1 hash without revealing the message, built on a proof system Ronald Cramer and Ivan Damgård presented at the same conference. It was a talk, not a paper, and the session was filmed.\nIn 2004 Finney built RPOW, reusable proofs of work: tokens minted from hashcash that could pass from person to person. The prototype ran on a central server and never took off. When Bitcoin appeared he was, by his own account, the first person besides its creator to run it, and he received the first Bitcoin transaction ever sent (January 12, 2009).\nFinney died in 2014. The problem he spent decades on, private electronic cash that needs no permission, is the problem Zcash exists to finish.\nHal Finney at the Crypto ’98 rump session\nCrypto ’98 rump session program\nCramer and Damgård, Crypto ’98\nCrypto ’98 rump session videos"
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:2",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "Bitcoin ships, and exposes everything\nThe Bitcoin whitepaper (October 31, 2008) and genesis block (January 3, 2009) solved decentralized consensus. Money finally worked without a bank.\nBut it worked in public. Every amount, every counterparty, every balance, forever, on a ledger anyone can read. Bitcoin realized the cypherpunk dream of permissionless money while inverting its premise of privacy.\nThe problem Satoshi left open\nOn January 26, 2009, eighteen days after Bitcoin’s first release, Zooko Wilcox wrote a short post on his own blog, Zooko’s Hack Log, about why digital cash had failed at DigiCash and where it might work next. It ends by pointing to bit gold, b-money and “BitCoin by Satoshi Nakamoto.” It is one of the earliest known blog posts to mention Bitcoin, and Zooko has called it the first. By March 2009, bitcoin.org listed “Zooko’s blog” among its related links, beside b-money and bit gold. The link led into Tahoe-LAFS, the decentralized storage system Zooko was building at allmydata: the blog lived on its test grid."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:3",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "In August 2010 a BitcoinTalk thread asked whether Bitcoin could work without publishing every transaction, and another user suggested zero-knowledge proofs. Satoshi called the problem a very interesting one and said a solution would make a much better Bitcoin possible. He doubted the tool, though: to rule out a double-spend, a node seemed to need to know about every transaction.\nTwo days later, in the same thread, he floated “key blinding”, a fresh, unlinkable key for every payment, and pointed to an unfinished draft on recipient-hiding encryption. He named no author. The draft is widely attributed to Daira-Emma Hopwood, writing under a former name. By then Hopwood was also a Tahoe-LAFS developer alongside Zooko, and in 2016 was the first-named author of the Zcash protocol specification.\nOn August 21 Tahoe-LAFS began accepting bitcoin donations, and Zooko, signing as the project’s community organizer, opened a thread about building Bitcoin payments into it. Satoshi’s reply left the proposal aside. It opened with Zooko’s name and thanked him, in public, for blogging about Bitcoin back when it was announced on the Cryptography mailing list. His last forum post came that December. In 2022 Zooko pointed back to the August thread: four months later Satoshi was gone, and three years after that, a solution was found."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:4",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "It's hard to think of how to apply zero-knowledge-proofs in this case.\nZooko’s post, Jan 2009\nbitcoin.org, Mar 2009\nSatoshi on key blinding\nTahoe-LAFS takes bitcoin\nSatoshi thanks Zooko\nZcash protocol specification, 2016\nZooko, 2022\nZerocoin, then Zerocash\nZerocoin (2013, Miers, Garman, Green and Rubin at Johns Hopkins) proposed a cryptographic washing machine bolted onto Bitcoin. Zerocash (2014, Ben-Sasson, Chiesa, Garman, Green, Miers, Tromer and Virza) went further: a full currency where sender, receiver and amount are hidden, yet every transaction is verified.\nThe tool that made it possible was the zk-SNARK, a succinct proof that a statement is true without revealing why. The proofs predate these papers; Zerocash was the moment they became a payment system on paper. It needed a team willing to make it real.\nZerocoin, IEEE S&P 2013\nZerocash, IEEE S&P 2014\nThe Ceremony\nZcash’s original proving system required secret parameters that, if any single party kept them, could be used to counterfeit coins invisibly. So on October 22 and 23, 2016 the launch team ran a multi-party ceremony: six witnesses in separate places, air-gapped hardware, destroyed key material. If even one of them was honest, the combined secret could never be rebuilt."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:5",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "The stations were paranoia made real. Peter Todd ran his from a rented car on a drive through British Columbia, a trip he called the “Cypherpunk Desert Bus.” At the Denver station, a phone behaved strangely enough mid-ceremony that the moment became a Radiolab story. And one witness, known only as “John Dobbertin,” stayed pseudonymous for six years: in April 2022, Zcash Media revealed he was Edward Snowden.\nOn October 28, 2016 the genesis block was mined. That day, in a thin early market on the Poloniex exchange, one ZEC briefly reached roughly 3,300 BTC, and it still traded at 48 BTC later in the day, CoinDesk reported. The experiment was live.\nThe Design of the Ceremony\nDenver footage\nCeremony data\nDesert Bus\nRadiolab\nLaunch\nOct 28 · Genesis\nMainnet launches with Sprout shielded transactions, a 21M cap, 2.5-minute blocks and a 12.5 ZEC subsidy, ramped in over a 34-day slow start. The Founders’ Reward directs 20% of the subsidy to the founding team, investors and the Zcash Foundation for the first four years, 10% of total supply.\nThe quiet save, then Sapling\nMar 1 · A flaw found\nAriel Gabizon finds a flaw in the proving system Sprout used that could have allowed invisible counterfeiting. It is fixed quietly by the Sapling upgrade in October and disclosed in February 2019. No evidence of exploitation was ever found.\nOct 28 · Sapling"
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:6",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "A redesign of shielded transactions cuts proving time and memory sharply, making shielded payments practical on phones. It ships on the network’s second birthday, on parameters from a new, larger ceremony.\nBlossom\nDec 11 · 75-second blocks\nBlock time drops from 150 to 75 seconds and the per-block subsidy from 12.5 to 6.25 ZEC, keeping issuance per hour unchanged. It is why the first halving lands on 3.125, not 6.25.\nFirst halving and the Dev Fund\nJul · Heartwood\nShielded coinbase: miners can receive block rewards directly into shielded addresses.\nNov 18 · Canopy, the first halving\nThe subsidy halves to 3.125 ZEC. The Founders’ Reward ends and ZIP 1014’s Dev Fund begins: 7% to Bootstrap (ECC), 5% to the Zcash Foundation and 8% to Major Grants, run by ZOMG and renamed Zcash Community Grants in February 2022.\nNU5: no more ceremonies\nMay 31 · Orchard and Halo 2\nThe Halo 2 proving system removes the trusted setup for the new Orchard pool, and Unified Addresses bundle transparent, Sapling and Orchard receivers into one address.\nJun · Sandblasting\nA sustained spam attack bloats the chain and exposes wallet sync pain. It forces the fee overhaul of ZIP 317 and a generation of faster sync work.\nSecond halving and the lockbox\n2023–2024 · New stewards"
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:7",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "Zooko steps back from ECC leadership, Zashi ships as ECC’s mobile wallet, and Zebra, the Foundation’s Rust node, reaches production alongside zcashd.\nNov 23 · NU6, the second halving\nThe subsidy halves to 1.5625 ZEC. 8% goes to Zcash Community Grants, paid to the Financial Privacy Foundation, and 12%, 0.1875 ZEC per block, accrues in an in-protocol lockbox.\nCoinholders take the wheel\nNov 24 · NU6.1\nThe lockbox pays its 78,750 ZEC to a coinholder-controlled fund, and the 8% and 12% streams continue to the third halving (ZIP 271, ZIP 1016). Coinholders now vote on grants from the fund; key-holders sign the payouts.\nThe Orchard emergency, then year ten\nMar 16 · A veto\nTwo key-holders, the Zcash Foundation and Shielded Labs, announce a veto of the $2.67M Q4 2025 grant to Bootstrap (ECC), approved by coinholders months earlier.\nJun 2–3 · The Orchard emergency\nA soundness flaw in the Orchard circuit leads to an emergency soft fork that disables Orchard at block 3,363,426; the NU6.2 network upgrade at block 3,364,600 re-enables it with a corrected circuit (ZIP 257).\nJul 28 · Ironwood\nNU6.3 activates at block 3,428,143 with a new shielded pool, Ironwood (ZIP 258). Orchard stops taking new funds, and balances move out into Ironwood.\nSep 14 · NU7’s scope"
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:8",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road",
+      "text": "Coinholders vote to keep the halvings, retire v4 transactions at NU7 and move to 25-second blocks; 2.4M ZEC took part in the first question. They also back reissuance from February 2031, but coinholder and community polls reach no shared majority on the date, and NU7 takes 2031 as the more conservative choice.\nOct 28 · Ten years\nTen years since the genesis block."
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:0",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people",
+      "text": "The Design of the Ceremony, Oct 26, 2016\nZooko Wilcox\nRan the Denver station\nAndrew Miller\nComputer scientist and Zcash technical advisor\nPeter Van Valkenburgh\nCoin Center; ran the Washington, D.C. station\nHis notes on the D.C. station\nPeter Todd\nBitcoin Core developer; ran his station in a rented car on a drive through British Columbia, which he named the Cypherpunk Desert Bus\nPeter Todd's post, Oct 2016\nThe Cypherpunk Desert Bus, Nov 2016\nDerek Hinch\nNCC Group, secretly hired as a compute node operator\nEdward Snowden\nWhistleblower and privacy advocate, pseudonymous until 2022\nCommunity forum, April 2022\nForbes, Apr 27, 2022\nMorgen Peck\nJournalist invited to observe the Denver station\nIEEE Spectrum, the inside story\nZerocoin, IEEE S&P 2013\nZerocash, IEEE S&P 2014\nEli Ben-Sasson\nZerocash\nAlessandro Chiesa\nChristina Garman\nZerocoin\nMatthew Green\nIan Miers\nAviel D. Rubin\nEran Tromer\nMadars Virza\nDavid Chaum\nBlind signatures, 1982; DigiCash\nEric Hughes\nA Cypherpunk's Manifesto, 1993\nTim May\nThe cypherpunks mailing list, 1992\nJohn Gilmore\nAdam Back\nHashcash, 1997\nWei Dai\nb-money, late 1990s\nNick Szabo\nBit gold, late 1990s\nHal Finney\nA zero-knowledge proof talk, 1998; RPOW, 2004; received the first Bitcoin transaction, 2009\nSatoshi Nakamoto\nBitcoin, 2008; doubted zero-knowledge proofs could fit it, 2010\nDaira-Emma Hopwood"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:1",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people",
+      "text": "Tahoe-LAFS; first-named author of the Zcash protocol specification, 2016"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:0",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record",
+      "text": "720p MP4s rendered from the 1080p footage (size shown), light OGV copies\nCC BY-NC 4.0\nWAV originals (size shown), FLAC and MP3 copies\nAn earlier upload of the wide shot; its uploader marks it superseded by the item above\nNot stated\nThe station's DVDs: operating systems, disks A to F, test burns and a checksum script\nNearly 48 hours of his air-gapped station, cut to one video\nYouTube licence\nYouTube\nPeter Van Valkenburgh's notes, with his timelapse and photo album\nGitHub gist\nHis story and photos of the car-mounted station; the footage is unreleased. He later added notes: he came to doubt the setup should be called a multi-party computation, then restored the post\npetertodd.org\nTranscript, proving key, R1CS, OS images and checksums\nDisc images and Tails\nCC BY 3.0, except the software on the disc images\nDisc images\nPodcast episode, July 14, 2017\nWNYC Studios, all rights reserved\nRadiolab\nVideo by Electric Coin Company, 2017\nElectric Coin Company, YouTube licence\nOct 28, 2016\nGenesis block\nMainnet launches on the parameters the ceremony produced.\nMar 2018\nThe quiet save\nA flaw in the proving system is found, fixed quietly by the Sapling upgrade in October 2018, then disclosed in February 2019. No exploitation was ever found.\nMay 31, 2022\nNo more ceremonies"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:1",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record",
+      "text": "NU5 brings Orchard and Halo 2, a proving system that needs no ceremony at all. Sapling still uses the parameters from its own 2018 ceremony."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:0",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch",
+      "text": "The other stations\nOrlando Station Report\n2016-10-27\nNearly 48 hours at his station in Florida, cut to seventy minutes: choosing a store by coin flip, buying the desktop, pulling its hard drive and wireless card, the rounds, and yanking the RAM at the end.\nTimestamped photos of the DC station\n2016-11-02\nA GoPro photo every ten seconds, from bringing the compute node home to the end of the ceremony. He cut both RAM sticks with tin snips on October 23.\nFinal run, Zcash parameter generation\n2016-10-21\nHis phone photos and video clips from October 21 to 24, linked from his written account of the DC station.\nThe short film\nZcash Ceremony\n2017-01-04\nThe story of the ceremony, with images and video by Peter Todd, Andrew Miller, Peter Van Valkenburgh, NCC Group, Nathaniel Kramer and Zcash.\nWho was John Dobbertin\nWhy Snowden Helped Launch Zcash\n2022-04-27\nFirst released as “The End of Zcash’s Trusted Setup: Who is John Dobbertin?”, with Edward Snowden, Sean Bowe and Zooko Wilcox.\nEdward Snowden on why he took part\n2024-12-05\nA short excerpt of the same interview.\nThe next ceremonies\nPowers of Tau, round 41\n2018-01-23\nA contribution computed in a private airplane, with radioactive waste from Chernobyl as the entropy source.\nThe Greatest Secret\n2018-03-17\nRound 85 in New York: street recordings from dice-chosen cameras, cut into chunks and fed to the air-gapped laptop as entropy."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:1",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch",
+      "text": "Drilling the RAM\n2017-11-16\nRound 6: a foil Faraday cage in a windowless bathroom, then the RAM, USB drive and CPU destroyed with a drill and a hammer.\nTalks and podcasts\nZcash Review, episode 2: Design of the Ceremony\n2016-11-20\nRecorded four weeks after the ceremony, on its design and execution.\nPeter Todd and Zcash\n2017-01-31\nThe Desert Bus witness on his experience of the trusted setup.\nThe Ceremony\n2017-07-14\nMorgen Peck tells Molly Webster the story of the ceremony, from inside the Denver station.\nParameter Generation\n2017-11-26\nAn open-ended talk on how the Zcash Foundation could help set up zk-SNARK parameters, given at Devcon3 in Cancún days before Powers of Tau took its first contribution.\nDemocratizing zk-SNARKs\nThe multi-party computation protocol behind Powers of Tau, among the next generation of zk-SNARKs.\nCultivating Sapling\n2018-07-02\nStarts at 9:00, where Powers of Tau and the Sapling MPC are covered.\nCryptographic Hocus-Pocus Meaning Nothing\n2019-05-01\nA witness on the trusted setup he took part in.\nSean Bowe on SNARKs, Trusted Setups and Elliptic Curve Cryptography\n2019-05-08\nThe author of the Sprout and Sapling setups on the story of Zcash and Powers of Tau.\nPeter Todd’s two GoPros recorded hours of the Cypherpunk Desert Bus, switched off while he typed his entropy, but he has not released the footage; his repository only commits to the files by hash."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:2",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch",
+      "text": "His account, Nov 14, 2016\nEvidence archive"
+    },
+    {
+      "id": "src/data/governance/record.json:0",
+      "url": "https://openzcash.org/governance",
+      "title": "governance",
+      "text": "note: Compiled from public sources on 2026-09-24; each entry keeps its source links.\nlabel: Inaugural Major Grants Review Committee (pre-2021 context)\ndate: 2020-09-18\nname: Shawn (@Shawn)\nname: Holmes Wilson\nname: Sarah Jamie Lewis\nname: Hudson Jameson\nname: Chris Burniske\nlabel: ZOMG election (postponed 90 days from Sept 2021)\ndate: 2022-01-01\nname: Aditya Bharadwaj (aiyadt)\nname: Hudson Jameson\nname: Michael Harms (Brunchtime)\nname: Jason McGee (aquietinvestor)\nname: Brian (Wobbzz)\nlabel: ZCG election June 2022 (Hudson Jameson's seat; began staggering)\ndate: 2022-07-01\nname: Cody Burns (dontpanicburns)\nlabel: ZCG election December 2022\ndate: 2023-01-01\nname: Jason McGee\nname: Wobbzz\nname: Michael Harms\nname: Amber O'Hearn (ambimorph)\nlabel: ZCG election June 2023\ndate: 2023-07-01\nname: GGuy\nname: Wobbzz (resigned and re-ran)\nlabel: ZCG election December 2023\ndate: 2024-01-01\nname: Jason McGee\nname: Michael Harms\nname: Amber O'Hearn\nlabel: ZCG election June 2024\ndate: 2024-07-01\nname: GGuy\nname: Wobbzz\nlabel: ZCG election December 2024\nname: Jason McGee\nname: Zerodartz\nname: Artkor\nlabel: ZCG election June 2025\ndate: 2025-06-30\nname: Decentralistdan\nname: GGuy\nlabel: ZCG election December 2025\ndate: 2025-12-18\nname: Zerodartz\nname: Artkor\nname: Hanh\nlabel: ZCG election June 2026\ndate: 2026-06-29\nname: GGuy\nname: Paul Brigner\nname: First Coin Holder's Straw Poll (NU3 codename)"
+    },
+    {
+      "id": "src/data/governance/record.json:1",
+      "url": "https://openzcash.org/governance",
+      "title": "governance",
+      "text": "status: closed_no_official_tally\ndate: 2019-08-02\noutcome: NU3 was later named Heartwood; the thread does not document how the poll was used.\nname: Staked Poll on Zcash Dev Fund Debate (coin-weighted petition)\nstatus: closed_final_tally_not_preserved\ndate: 2019-12-02\noutcome: Unofficial; ZF said it was not an official input. ZIP 1014 came from ZF's separate sentiment collection.\nname: ECC coin-holder poll: post-NU5 priorities and ZIP 1014 amendments\nstatus: closed\ndate: 2021-10-01\noutcome: Non-binding input to ECC roadmap research.\nname: Coinholder test poll: block reward allocation (YWallet Coin Voting v1)\nstatus: closed\ndate: 2024-07-06\noutcome: Test only; non-binding.\nname: Coinholder Dev Fund proposal polls #1 and #2 (YWallet)\nstatus: closed\ndate: 2024-07-15\noutcome: Hybrid Deferred led; top two (Hybrid Deferred, Lockbox 20%) went to a runoff.\nname: Coinholder Dev Fund runoff poll (YWallet)\nstatus: closed\ndate: 2024-07-28\noutcome: Hybrid Deferred won here and in ZCAP/other runoffs; became ZIP 1015, activated in NU6 (2024-11-23).\nname: Coinholder Poll: include NSM in NU7?\nstatus: closed\ndate: 2024-12-08\noutcome: All weight Yes; some No ballots carried zero weight; a participant reported a lost No vote. Non-binding.\nname: Coin Voting 2.0 test poll (favorite mobile wallet)\nstatus: closed\ndate: 2025-04-05\noutcome: Test of tooling only."
+    },
+    {
+      "id": "src/data/governance/record.json:2",
+      "url": "https://openzcash.org/governance",
+      "title": "governance",
+      "text": "name: Coinholder poll on funding-model ZIPs (Dev Fund 2025)\nstatus: closed\ndate: 2025-05-01\noutcome: C&C favored (also top in ZCAP and ZAC Helios polls); became ZIP 1016, activated with NU6.1 on 2025-11-24.\nname: Coinholder poll to ratify the Retroactive Grants Program (NU6.1 CDRGP)\nstatus: closed\ndate: 2025-09-03\noutcome: Program ratified as retroactive-only, partial funding allowed, structure approved.\nname: Coinholder-Directed Retroactive Grants Program, Q4 2025 round (first grants poll)\nstatus: closed\ndate: 2025-11-25\noutcome: 5 of 9 approved; the ECC grant was later vetoed by key-holders.\nname: Coinholder: Protocol Feature Sentiment Poll (NU7 sentiment, 11 questions)\nstatus: closed\ndate: 2026-02-20\noutcome: Advisory. ZF summary: consensus on Tachyon, quantum recoverability, explicit fees, fee burning; ZSAs and others contested.\nname: Coinholder-Directed Grants Program, Q1 2026 round\nstatus: closed\ndate: 2026-04-01\noutcome: Only Maya approved.\nname: NU7 sentiment poll via Zodl (planned)\nstatus: paused_before_voting\ndate: 2026-06-07\noutcome: Paused on 2026-06-07 after the Ironwood (NU6.3) decision; no votes tallied. Questions reused in the Aug-Sep vote.\nname: Coinholder-Directed Retroactive Grants Program, Q2 2026 poll\nstatus: postponed_merged_into_q3\ndate: 2026-06-11"
+    },
+    {
+      "id": "src/data/governance/record.json:3",
+      "url": "https://openzcash.org/governance",
+      "title": "governance",
+      "text": "outcome: Poll postponed 2026-06-11 by FPF with Valar Group because of the Orchard vulnerability; submissions carried to Q3.\nname: NU7 Scope coinholder vote\nstatus: closed_results_published\ndate: 2026-09-14\noutcome: Preserve halvings; reissuance Feb 2031; v4 off at NU7; 25s blocks; ship by deadline.\nname: Coinholder-Directed Retroactive Grants Program, Q3 2026 round (37 proposals)\nstatus: open\ndate: 2026-09-29\nname: Overwinter\nname: Sapling\nname: Blossom\nname: Heartwood\nname: Canopy\nname: NU5\nname: NU6\nname: NU6.1\nname: Orchard temporary vulnerability mitigation (soft fork)\nname: NU6.2\nname: NU6.3 (Ironwood)\nname: NU7"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:0",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "label: Sep 1-10\nlabel: Sep 1-10\nname: OpenZcash paid-grant ledger\ndetail: openzcash.org\nname: ZCG disbursements · original sheet\ndetail: docs.google.com\nname: OpenZcash Q3 proposal rows\ndetail: openzcash.org\nname: FPF · Q3 review schedule and register\ndetail: forum.zcashcommunity.com\nname: FPF · proposal status records\ndetail: github.com\nname: ZecHub · treasury API capture\ndetail: openzcash.org\nname: ZecHub · balance source sheet\ndetail: docs.google.com\nname: CoinGecko · dated ZEC/USD quote\ndetail: api.coingecko.com\nname: OpenZcash · community directory\ndetail: openzcash.org\nname: OpenZcash · ecosystem directory\ndetail: openzcash.org\nname: ZF engineering · published Sep 9\ndetail: forum.zcashcommunity.com\nname: Crosslink · community indexer Sep 6\ndetail: forum.zcashcommunity.com\nname: Nozy · Crosslink testing Sep 7–8\ndetail: forum.zcashcommunity.com\nname: Nym light-wallet transport · Sep updates\ndetail: forum.zcashcommunity.com\nname: ZSA testnet · Sep 1 clarification\ndetail: forum.zcashcommunity.com\nname: Hito · milestone 3 report Sep 1\ndetail: forum.zcashcommunity.com\nname: OneKey · progress report Sep 1\ndetail: forum.zcashcommunity.com\nname: ELLIPAL · progress report Sep 7\ndetail: forum.zcashcommunity.com\nname: Vizor · Ledger signing demo Sep 1\ndetail: forum.zcashcommunity.com\nname: Zecboat · desktop beta Sep 6\ndetail: forum.zcashcommunity.com"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:1",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: 0xramp · v1 announcement Sep 1\ndetail: forum.zcashcommunity.com\nname: red·bridge · website launch Sep 9\ndetail: forum.zcashcommunity.com\nname: ZecGuard · launch and update\ndetail: forum.zcashcommunity.com\nname: Zpay.cash · announcement Sep 9\ndetail: forum.zcashcommunity.com\nname: Konclave · report published Sep 7\ndetail: forum.zcashcommunity.com\nname: Ballast · pre-beta announcement Sep 10\ndetail: forum.zcashcommunity.com\nname: Gleyo · milestone announcement Sep 10\ndetail: forum.zcashcommunity.com\nname: ZCG · Aug 31 minutes published Sep 2\ndetail: forum.zcashcommunity.com\nname: Privacy Developers Residency · Sep updates\ndetail: forum.zcashcommunity.com\nname: Ghana · September update Sep 8\ndetail: forum.zcashcommunity.com\nname: ZecHub · August report published Sep 1\ndetail: forum.zcashcommunity.com\nname: Nigeria · August report published Sep 1\ndetail: forum.zcashcommunity.com\nname: Español · August report published Sep 2\ndetail: forum.zcashcommunity.com\nname: Arabia · August report published Sep 2\ndetail: forum.zcashcommunity.com\nname: Elzz · August report published Sep 2\ndetail: forum.zcashcommunity.com\nname: Engage · August report published Sep 4\ndetail: forum.zcashcommunity.com\nname: ZECsy · Amsterdam report Sep 10\ndetail: forum.zcashcommunity.com\nname: Barcelona · collaboration announced Sep 8\ndetail: forum.zcashcommunity.com"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:2",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: Querétaro · Aug 30 meetup report Sep 3\ndetail: forum.zcashcommunity.com\nname: Zcast · new episode Sep 1\ndetail: forum.zcashcommunity.com\nname: South Africa · campaign update Sep 4\ndetail: forum.zcashcommunity.com\nname: The Zcash Daily · Sep 1–10 posts\ndetail: forum.zcashcommunity.com\nname: ZCAP · NU7 advisory poll\ndetail: forum.zcashcommunity.com\nname: Coinholders · NU7 advisory poll\ndetail: forum.zcashcommunity.com\nname: ZF · Zcon7 program announced Sep 10\ndetail: forum.zcashcommunity.com\nname: Colosseum · Zcash track proposal Sep 3\ndetail: forum.zcashcommunity.com\nname: East Africa · festival proposal discussion\ndetail: forum.zcashcommunity.com\nname: Zcon7 · official event page\ndetail: zfnd.org\nname: Arborist Call 131 · Sep 3 notes\ndetail: github.com\nname: Project Tachyon · September commits\ndetail: github.com\nname: Ragu · September commits\ndetail: github.com\nname: Project Tachyon · official site\ndetail: tachyon.z.cash\nname: Release 3.11.0 (2653)\ndetail: github.com\nname: v0.0.54\ndetail: github.com\nname: v0.0.55-rc.0\ndetail: github.com\nname: v1.4.0\ndetail: github.com\nname: Zcash Brazil · checked source\ndetail: forum.zcashcommunity.com\nname: ZK AV Club · checked source\ndetail: forum.zcashcommunity.com\nname: Türkiye · checked source\ndetail: forum.zcashcommunity.com\nname: Club Caracas · checked source\ndetail: forum.zcashcommunity.com\nname: CodeRaiz México · checked source"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:3",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: forum.zcashcommunity.com\nname: Pesa Ya Siri / Tanzania · checked source\ndetail: forum.zcashcommunity.com\nname: ruZcash · checked source\ndetail: forum.zcashcommunity.com\nname: Boston Zcash · checked source\ndetail: forum.zcashcommunity.com\nname: China · checked source\ndetail: forum.zcashcommunity.com\nname: France · checked source\ndetail: forum.zcashcommunity.com\nname: Germany · checked source\ndetail: forum.zcashcommunity.com\nname: India · checked source\ndetail: forum.zcashcommunity.com\nname: Indonesia · checked source\ndetail: forum.zcashcommunity.com\nname: Japan · checked source\ndetail: forum.zcashcommunity.com\nname: Korea · checked source\ndetail: forum.zcashcommunity.com\nname: Ukraine · checked source\ndetail: forum.zcashcommunity.com\nname: Belgium · additional · checked source\ndetail: forum.zcashcommunity.com\nname: Zingo Mobile · 2.0.23, Sep 9\ndetail: github.com\nname: Zkool · 6.29.0, Sep 1\ndetail: github.com\nname: Zkool · 6.30.0-rc.6, Sep 5\ndetail: github.com\nname: OpenZcash Wallets · directory and repositories\ndetail: openzcash.org\nname: ZCG #408: 0xramp\ndetail: Original grant application\nname: ZCG #420: 24 Videos @zkMarketer\ndetail: Original grant application\nname: ZCG #412: Coin Wallet integration\ndetail: Original grant application\nname: ZCG #414: Colosseum: Crypto World's Fair\ndetail: Original grant application\nname: ZCG #415: East Africa: Blockchain Festival"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:4",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Original grant application\nname: ZCG #421: Kestrel + ZecAuth\ndetail: Original grant application\nname: ZCG #404: Privacy Literacy Lab Canada\ndetail: Original grant application\nname: ZCG #403: Recoverify\ndetail: Original grant application\nname: ZCG #401: Taking Zcash to the Streets\ndetail: Original grant application\nname: ZCG #407: Zaino security audit\ndetail: Original grant application\nname: ZCG #417: Zcash awareness campaign\ndetail: Original grant application\nname: ZCG #419: Zcash Flutter Wallet SDK\ndetail: Original grant application\nname: ZCG #411: Zcash SeedSigner\ndetail: Original grant application\nname: ZCG #405: Zcash World, Mumbai\ndetail: Original grant application\nname: ZCG #413: zcashlib\ndetail: Original grant application\nname: ZCG #418: ZecScope\ndetail: Original grant application\nname: ZCG #342: Constant-time hardening\ndetail: Original grant application\nname: ZCG #391: WalletConnect integration\ndetail: Original grant application\nname: ZCG #402: ZECsy community building\ndetail: Original grant application\nname: ZCG #395: BTCPayServer GraphQL client\ndetail: Original grant application\nname: ZCG #396: Pretty Good Policy for Zcash\ndetail: Original grant application\nname: ZCG #398: Hack-to-Dark, Mumbai\ndetail: Original grant application\nname: ZCG #400: Zcash Arabia\ndetail: Original grant application\nname: ZCG #389: Zebra test-effectiveness audit"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:5",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Original grant application\nname: ZCG #390: Rvess Pay mobile-money integration\ndetail: Original grant application\nname: ZCG #392: Halo2 verifier testing infrastructure\ndetail: Original grant application\nname: ZCG #394: SHPH network layer\ndetail: Original grant application\nname: ZCG #409: ZecBit: NFT infrastructure\ndetail: Original grant application\nname: ZCG #410: ZEC Invoice Preflight\ndetail: Original grant application\nname: ZCG proposal status sheet\ndetail: Official proposal and decision register\nname: ZecHub\ndetail: August report · Sep 1 | Prior-month bounties, education and DAO disclosure\nname: Zcash Brazil\ndetail: No new report found | Sep 1 reply; August report was posted Aug 31. September payments are included.\nname: ZK AV Club\ndetail: No in-window report found | Latest checked monthly report predates Sep 1.\nname: Zcash en Español\ndetail: August report · Sep 2 | Prior-month channel metrics and educational output.\nname: Türkiye\ndetail: No in-window report found | Earlier education and Zecmap report retained as context.\nname: Nigeria\ndetail: August report · Sep 1 | Prior-month merchant onboarding and outreach.\nname: Ghana\ndetail: September update · Sep 8 | AMA, residency and upcoming Sep 12 meetup.\nname: Arabia\ndetail: August report · Sep 2 | Prior-month education and local activity.\nname: Club Caracas"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:6",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Linked coverage | Regional channel coverage; no standalone in-window report located.\nname: Club Barcelona\ndetail: Announcement · Sep 8 | JTX / JET Europa collaboration; event outcomes pending.\nname: CodeRaiz México\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: Pesa Ya Siri / Tanzania\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: ruZcash\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: Boston Zcash\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: China\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: Querétaro\ndetail: Published Sep 3 · event Aug 30 | Nym collaboration; event falls before this activity window.\nname: East Africa\ndetail: Proposal update · Sep 7 | Festival proposal clarifications; no approval inferred.\nname: France\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: Germany\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: India\ndetail: Linked coverage | ZecHub disclosure covers earlier DAO approval; no new standalone report found.\nname: Indonesia\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: Japan"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:7",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: No in-window report found | Linked source and September forum search reviewed.\nname: Korea\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: Elzz\ndetail: August report · Sep 2 | Prior-month Proof of Privacy education campaign.\nname: Ukraine\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: South Africa\ndetail: Campaign update · Sep 4 | Donation campaign closing stage; proceeds unavailable.\nname: Zcast\ndetail: Episode update · Sep 1 | Spanish-language interview with Ethereum Spain.\nname: ZECsy\ndetail: Sep 1–5 report · Sep 10 | Amsterdam events, walking tours and payment demos.\nname: Belgium\ndetail: No in-window report found | Linked source and September forum search reviewed.\nname: PGPZ\ndetail: Decision published Sep 2 | Aug 31 approval minutes; no new weekly memo located.\nname: Engage\ndetail: August report · Sep 4 | Prior-month rewarded engagement analytics.\nname: The Zcash Daily\ndetail: Posts · Sep 1–10 | Community editorial coverage.\nname: Zcash Grants Hub\ndetail: Daniel Goh\nname: ShieldedScan\ndetail: ShieldedScan\nname: ZecKit Post-M3 Stabilization and Developer Adoption\ndetail: Dapps over Apps\nname: zcashtocash via ZcashLabs\ndetail: ZcashLabs\nname: zec-ironwood-reconcile\ndetail: Steven Hert\nname: Gleyo\ndetail: Gleyo\nname: Self-Sovereign Zcash Testnet Faucet\ndetail: Jino Labs"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:8",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: CyphZec.com\ndetail: Thomas Zarebczan\nname: ZecLedger\ndetail: ZecLedger\nname: lightwalletd-rs\ndetail: jpgonzalezra\nname: Blindvault\ndetail: TIDJANI Walid\nname: Zallet RPC Parity Harness\ndetail: Creativesonchain\nname: Zecmap\ndetail: Batuhan\nname: Connaugh Zcash Videos\ndetail: Connaugh\nname: ZAP1 Attestation Protocol and Verification Tooling\ndetail: Frontier Compute\nname: ZecBooks\ndetail: SaneApps\nname: CipherPay\ndetail: Atmosphere Labs (Kenbak)\nname: Zafu Browser Extension\ndetail: Rotko Networks OU\nname: Zapp\ndetail: Renee Chiu\nname: Open-Source Zcash Hardware-Wallet SDK\ndetail: wh00hw\nname: Nozy Wallet\ndetail: Leonine DAO\nname: THORSwap / Metro\ndetail: THORSwap Labs\nname: Expanding Zcash In Unstoppable Wallet\ndetail: Horizontal Systems\nname: ZcashNames\ndetail: ZcashMe, Inc.\nname: Frontier Compute Zcash Security Research and Remediation Pack\ndetail: Frontier Compute LLC\nname: Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)\ndetail: robustfengbin\nname: Bonus Grant — Ironwood zk-SNARK Formal Verification\ndetail: Jason McGee\nname: CipherScan\ndetail: Kenbak\nname: Temporary Detectable Unlimited Mint and Sell Exploit\ndetail: Alex Sol\nname: Five Critical Zebra Consensus Divergence Vulnerabilities\ndetail: sangsoo-osec\nname: Zec.rocks (16 months of uptime)\ndetail: Zec.rocks\nname: Ironwood external audit reimbursement\ndetail: ValarGroup"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:9",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: Ironwood zk-SNARK Formal Verification (Project Tachyon)\ndetail: Tachyon Foundation\nname: Orchard Counterfeiting Vulnerability Bug Bounty\ndetail: Taylor Hornby\nname: Bonus Grant — Orchard Counterfeiting Bug Bounty\ndetail: Jason McGee\nname: ValarGroup Ironwood Work\ndetail: ValarGroup\nname: ZODL Q1 & Q2 2026 Core Protocol Development\ndetail: ZODL\nname: 0xramp\ndetail: Under review | Non-custodial ZEC and local-currency payment rails.\nname: 24 Videos @zkMarketer\ndetail: Under review | 24 documentary-style films over 12 weeks.\nname: Coin Wallet integration\ndetail: Under review | Shielded ZEC support across web, desktop and mobile.\nname: Colosseum: Crypto World's Fair\ndetail: Under review | A Zcash track in the multi-chain developer competition.\nname: East Africa: Blockchain Festival\ndetail: Under review | Nairobi booth, merchant spending and follow-up onboarding.\nname: Kestrel + ZecAuth\ndetail: Under review | Wallet connectivity, a mobile wallet and African fiat integration.\nname: Privacy Literacy Lab Canada\ndetail: Under review | Interactive privacy scenarios and a dated regulatory source map.\nname: Recoverify\ndetail: Under review | Verify wallet backups while the original wallet is still available.\nname: Taking Zcash to the Streets\ndetail: Under review | A Turkish video series and Istanbul street interviews.\nname: Zaino security audit"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:10",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Under review | Independent audit; the final budget depends on scoping.\nname: Zcash awareness campaign\ndetail: Under review | Education and community content on X and Binance Square.\nname: Zcash Flutter Wallet SDK\ndetail: Under review | Dart bindings for the official iOS and Android wallet SDKs.\nname: Zcash SeedSigner\ndetail: Under review | An open-source, air-gapped signing device built from generic parts.\nname: Zcash World, Mumbai\ndetail: Under review | Public event and merchant onboarding around Devcon 8.\nname: zcashlib\ndetail: Under review | Pure-JavaScript support for transparent and shielded Zcash.\nname: ZecScope\ndetail: Under review | Track ZIPs, network upgrades and wallet readiness.\nname: Constant-time hardening\ndetail: Approved | Async approval; broader scope and the initial milestone discussed.\nname: WalletConnect integration\ndetail: Approved | Reusable Zcash integration requested beyond the Noir wallet.\nname: ZECsy community building\ndetail: Approved | Nine-month milestones only; Hanh voted against.\nname: BTCPayServer GraphQL client\ndetail: Approved | Multi-store support and migration to the Zkool GraphQL API.\nname: Pretty Good Policy for Zcash\ndetail: Approved | Policy work approved; Paul recused from the discussion.\nname: Hack-to-Dark, Mumbai\ndetail: Approved | Developer event proposed for November 3-4.\nname: Zcash Arabia"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:11",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Approved | August-December programme; Artkor and Zerodartz voted against.\nname: Zebra test-effectiveness audit\ndetail: Declined | Committee cited limited usefulness and false-positive concerns.\nname: Rvess Pay mobile-money integration\ndetail: Declined | Committee asked for more reuse of existing payment components.\nname: Halo2 verifier testing infrastructure\ndetail: Declined | Need and ability to detect circuit logic defects were not established.\nname: SHPH network layer\ndetail: Declined | Committee raised scope, track-record and differentiation concerns.\nname: ZecBit: NFT infrastructure\ndetail: Declined | Proposed ZSA metadata, indexing and shielded payment infrastructure.\nname: ZEC Invoice Preflight\ndetail: Declined | Proposed ZIP-321 request validation before merchants share a QR code.\nevidenceCutoff: 2026-09-10\nreviewedAt: 2026-09-11\nname: Zebra 6.3.0\ndetail: Activity: 2026-08-10 to 2026-08-10. Published: 2026-08-10. released.\nname: Direct wallet serving\ndetail: Activity: 2026-08-10 to 2026-08-23. Published: 2026-08-25. merged.\nname: Operator migration\ndetail: Activity: 2026-08-10 to 2026-08-23. Published: 2026-08-25. reported.\nname: FROST\ndetail: Activity: 2026-08-10 to 2026-08-23. Published: 2026-08-25. merged.\nname: Zero-indexer"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:12",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-18 to 2026-08-18. Published: 2026-08-18. integration. Not a claim of audited production availability. Zec.rocks described its deployment as an unsafe testbed.\nname: Crosslink workshop\ndetail: Activity: 2026-08-26 to 2026-08-26. Published: 2026-08-19. feature-network. Workshop occurrence corroborated by recording shared Aug 28 in post 84. Mainnet activation not claimed.\nname: Community dashboard\ndetail: Activity: 2026-08-29 to 2026-08-29. Published: 2026-08-29. community experiment. One node view; not a comprehensive index or official Shielded Labs product.\nname: Common adoption\ndetail: Activity: 2026-08-29 to 2026-08-29. Published: 2026-08-29. development. Use this August development fact; do not re-date July 28 Ironwood formal-verification completion as an August achievement.\nname: Protocol status\ndetail: Activity: Context / no August delivery date. Published: Date not established. context. Evergreen status, not a distinct August release or activation.\nname: Zakura 1.3.0\ndetail: Activity: 2026-08-31 to 2026-08-31. Published: 2026-08-31. released.\nname: Experimental consensus\ndetail: Activity: 2026-08-31 to 2026-08-31. Published: 2026-08-31. experimental.\nname: Zakura Common"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:13",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-29 to 2026-08-29. Published: 2026-08-29. released. Avoid duplicating this whole text across Tachyon and Zakura pages; benchmark multipliers are team hardware results, not guaranteed user outcomes.\nname: ZODL\ndetail: Activity: 2026-08-28 to 2026-08-28. Published: 2026-08-28. stable. GitHub published Aug 28; changelog header Aug 27. No claim about iOS version or store availability.\nname: Zingo\ndetail: Activity: 2026-08-17 to 2026-08-17. Published: 2026-08-17. stable. Latest captured August mobile build is prerelease 2.0.23-327 Aug 27. Do not label that mobile build stable.\nname: Vizor\ndetail: Activity: 2026-08-29 to 2026-08-29. Published: 2026-08-29. stable.\nname: Zkool\ndetail: Activity: 2026-08-27 to 2026-08-27. Published: 2026-08-27. released. GitHub release; app-store availability may lag.\nname: Hito\ndetail: Activity: 2026-08-31 to 2026-08-31. Published: 2026-08-31. team-reported mainnet test. More testing and stabilization remained. Do not import the broader September 1 milestone 3 completion claim.\nname: ELLIPAL\ndetail: Activity: 2026-08-17 to 2026-08-17. Published: 2026-08-17. grant approved. Funding approval is not shipped wallet support. Sep 7 implementation progress is excluded.\nname: Vizor + Keystone\ndetail: Activity: 2026-08-25 to 2026-08-25. Published: 2026-08-25. released.\nname: OneKey"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:14",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-27 to 2026-08-27. Published: 2026-08-27. update requested. Optional source-register entry, not necessary slide filler. Exclude Sept 1 near-completion status.\nname: ZODL Slipstream\ndetail: Activity: 2026-08-08 to 2026-08-08. Published: 2026-08-12. shipped.\nname: Zaino\ndetail: Activity: 2026-08-05 to 2026-08-29. Published: 2026-08-29. released.\nname: ZSA testnet\ndetail: Activity: 2026-08-02 to 2026-08-02. Published: 2026-08-02. test network. Launched by hanh using zcash-shielded-assets repositories, not a QEDIT product release. No mainnet asset availability.\nname: Zinder\ndetail: Activity: 2026-08-19 to 2026-08-19. Published: 2026-08-19. alpha.\nname: 0xramp\ndetail: Activity: 2026-08-27 to 2026-08-27. Published: 2026-08-27. introduction. Avoid calling this the v 1 launch; that announcement is September 1. Do not import September volume/traction figures.\nname: Konclave\ndetail: Activity: 2026-08-27 to 2026-08-27. Published: 2026-08-27. beta. Do not use Sep 7 v 0.3.0/112 PR update or characterize beta as audited production custody.\nname: Free2Z\ndetail: Activity: 2026-08-25 to 2026-08-25. Published: 2026-08-25. development / testflight. Post 21 is the actual Free 2 Z update inside a Spanish-account topic; link to post 21, not topicroot.\nname: RadioZec + GameHub\ndetail: Activity: 2026-08-01 to 2026-08-31. Published: 2026-08-31. team-reported.\nname: Gleyo"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:15",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-12 to 2026-08-12. Published: 2026-08-12. funding request. Place request in Operations; do not label mainnet launch an August release or bring Sep 10 milestone into August.\nname: ZecHub\ndetail: Activity: 2026-08-01 to 2026-08-31. Published: 2026-09-01. retrospective team report. 79 completed/reviewed bounties; approval for payment is not proof of disbursement. 18.506 ZEC towards bounties is separately reported, not grant-ledger USD.\nname: Brazil\ndetail: Activity: 2026-08-12 to 2026-08-13. Published: 2026-08-31. organizer report.\nname: Nigeria\ndetail: Activity: 2026-08-01 to 2026-08-31. Published: 2026-09-01. retrospective organizer report.\nname: East Africa\ndetail: Activity: 2026-08-01 to 2026-08-28. Published: 2026-08-28. organizer report. Published Aug 28; do not imply full-month closing metrics.\nname: India\ndetail: Activity: 2026-08-01 to 2026-08-26. Published: 2026-08-26. organizer report. Attendee and wallet-creation figures are self-reported, not independently deduplicated users.\nname: Arabia\ndetail: Activity: 2026-08-01 to 2026-08-01. Published: 2026-09-02. retrospective organizer report. Exclude the July 31 Noir AMA even though it appears in the August report.\nname: Elzz"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:16",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-31 to 2026-08-31. Published: 2026-09-02. retrospective organizer report. 112 registrations, >70 quest participants and 116 opening-class attendees are distinct self-reported counts; never sum as unique people.\nname: Engage\ndetail: Activity: 2026-08-01 to 2026-08-31. Published: 2026-09-04. retrospective team analytics. Actions are not unique people or adoption. Avoid using this-week 11 active participants as August monthly active users.\nname: ZK AV Club\ndetail: Activity: 2026-08-01 to 2026-08-28. Published: 2026-08-28. organizer report. Archivist starts in September and later uploads are planned, not completed Augustwork.\nname: Z-Aid / Español\ndetail: Activity: 2026-08-24 to 2026-08-24. Published: 2026-08-24. organizer report. Do not equate the target reached with $10,000 newlydonated or paidout.\nname: Querétaro\ndetail: Activity: 2026-08-02 to 2026-08-30. Published: 2026-09-03. retrospective organizer report. The August 30 report records 10 attendees; self-reported event participation, not unique ecosystem users.\nname: NU7 ZCAP\ndetail: Activity: 2026-08-27 to 2026-08-27. Published: 2026-08-27. open at August close. September 14 19:00 UTC is a future deadline announced in August, not September activity. Advisory poll, not automatic network activation.\nname: NU7 Coinholders"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:17",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-25 to 2026-08-25. Published: 2026-08-25. open at August close. Use disabling v4 transactions, not deprecating Sprout. The original post was corrected August 16. September 30 is an implementation-readiness checkpoint, not a network activation date.\nname: Q3 retroactive review\ndetail: Activity: 2026-08-14 to 2026-08-14. Published: 2026-08-14. under review. The source table was corrected Aug 15, before cutoff. Requests are not approved funding. Preserve all 37 proposal rows and amounts, use the financial auditor reconciliation.\nname: Zcon7\ndetail: Activity: Context / no August delivery date. Published: 2026-06-12. upcoming context. OptionalAugust-end calendar context, not an August event or programlaunch. Liveprimarysourceverifiedthisaudit.\nname: Zcash en Español\ndetail: Activity: 2026-08-01 to 2026-08-31. Published: 2026-09-02. organizer report. The source mixes calendar-month and rolling 31-day channel statistics; avoid labeling every metric August-only.\nname: Ghana\ndetail: Activity: 2026-08-01 to 2026-08-03. Published: 2026-08-05. organizer report. This is an early-August event report, not a complete month-end report. Keep it instead of the September 8 update.\nname: Türkiye"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:18",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Activity: 2026-08-01 to 2026-08-19. Published: 2026-08-19. organizer report. The report spans July 19–August 19; omit its 74-post total and cumulative web analytics from August metrics. Rlay event dates are August 15–22; August 19 report documents activity already underway.\nname: South Africa\ndetail: Activity: 2026-08-01 to 2026-08-21. Published: 2026-08-21. organizer report. A fundraising announcement, not proof of event delivery, funds received or a grant approval.\nname: Zcast\ndetail: Activity: 2026-08-01 to 2026-08-24. Published: 2026-08-24. organizer report. Use as announced media programming; do not imply the European event occurred during August.\nname: PGPZ\ndetail: Activity: 2026-08-01 to 2026-08-31. Published: 2026-08-31. organizer report. The August 31 post summarizes the week of August 24. Funding approval belongs in the decision register; this is delivered reporting.\nname: Paid grant ledger\ndetail: Payment dates August 1–31. Original sheet rows reconcile. Comparison: July 1–31.\nname: ZCG decisions register\ndetail: Decision-date filter: August 1–31. 8 approvals,18 rejections,1 separate FPF screening outcome.\nname: ZecHub treasury snapshot\ndetail: Source holdings: August 5. 514.134 ZEC / $267,863.81 at source quote $521. No verified August31 balance or flows.\nname: Historical open-queue coverage"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:19",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Seven identified requests; the complete August31 pending queue is not established. Zaino August budget unavailable.\nname: Retrospective source policy\ndetail: September-published retrospectives may evidence August activities. September releases, payments and event outcomes are excluded.\nname: Threshold (FROST) custody for shielded ZEC\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Legitimacy Beyond Transparency: Zcash, Privacy, and Trust in Islamic Digital Finance\ndetail: Filtered by FPF / Outside of Scope / Guidelines Not Met / decision 2026-08-03. FPF screening outcome, not a ZCG committee approval or rejection.\nname: Zebra Mempool Adversarial Resilience Suite\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: ZIP-229 Conformance Suite: Cleanroom Testing for the Ironwood v6 Transaction Format\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: VibeQuest: Learn, Build, Prove\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Zcash UK & Ireland Community Initiative\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Ironwood Sentinel\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Zcash Belgium Chapter"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:20",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Rejected / decision 2026-08-07. Original source provides the decision record.\nname: Apple Silicon Zero-Knowledge Proving: Mobile Halo2 and Tachyon Acceleration on M-Series and A-Series Chips\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Zk-ComsmwasmVm + Community-Led Audit & Design Space Hackathon\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: ELLIPAL Zcash Ironwood Shielded Transaction Support\ndetail: Approved / decision 2026-08-17. Ironwood shielded support for TITAN hardware wallet and companion app; approved Aug17.\nname: Open Light Nodes\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Shielded Compliance Bridge\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Zcash Arabia (August to December 2026)\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Shielded ZEC Privacy and Trust Architecture Framework\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: independent Zcash light-client infrastructure from South Asia (Zebra + Zaino, Singapore) — starter grant\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record."
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:21",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: Constant-Time Hardening and Explicit Timing Semantics for Zcash Rust Cryptography\ndetail: Approved / decision 2026-08-21. Async approval; broader scope and the initial milestone discussed.\nname: Test-Effectiveness Audit for Zebra: an independent regression witness for consensus-critical code\ndetail: Rejected / decision 2026-08-31. Committee cited limited usefulness and false-positive concerns.\nname: Rvess Pay ZEC to Mobile Money Integration\ndetail: Rejected / decision 2026-08-31. Committee asked for more reuse of existing payment components.\nname: Zcash WalletConnect Integration\ndetail: Approved / decision 2026-08-31. Reusable Zcash integration requested beyond the Noir wallet.\nname: Reusable Halo2 Verifier Security Testing Infrastructure (ZKCG Reference Implementation)\ndetail: Rejected / decision 2026-08-31. Need and ability to detect circuit logic defects were not established.\nname: SHPH (Post-Quantum Censorship-Resistant Network Layer)\ndetail: Rejected / decision 2026-08-31. Committee raised scope, track-record and differentiation concerns.\nname: BTCPayServer Multi-Store GraphQL Client\ndetail: Approved / decision 2026-08-31. Multi-store support and migration to the Zkool GraphQL API.\nname: Pretty Good Policy for Zcash\ndetail: Approved / decision 2026-08-31. Policy work approved; Paul recused from the discussion.\nname: Zcash Hack-to-Dark At Devcon 8, Mumbai"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:22",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Approved / decision 2026-08-31. Developer event proposed for November 3-4.\nname: Zcash Arabia (August to December 2026\ndetail: Approved / decision 2026-08-31. August-December programme; Artkor and Zerodartz voted against.\nname: ZECsy Community Building: 12 Months of Zcash on the Ground [Revised]\ndetail: Approved / decision 2026-08-31. Nine-month milestones only; Hanh voted against.\nname: 0xramp\ndetail: Known pending at August 31 / submitted 2026-08-31. Non-custodial ZEC and local-currency payment rails.\nname: Privacy Literacy Lab Canada\ndetail: Known pending at August 31 / submitted 2026-08-30. Interactive privacy scenarios and a dated regulatory source map.\nname: Recoverify\ndetail: Known pending at August 31 / submitted 2026-08-27. Verify wallet backups while the original wallet is still available.\nname: Taking Zcash to the Streets\ndetail: Known pending at August 31 / submitted 2026-08-25. A Turkish video series and Istanbul street interviews.\nname: Zaino security audit\ndetail: Known pending at August 31 / submitted 2026-08-31. Independent audit; the final budget depends on scoping. August budget not verified.\nname: Zcash World, Mumbai\ndetail: Known pending at August 31 / submitted 2026-08-30. Public event and merchant onboarding around Devcon 8.\nname: ZecBit: NFT infrastructure"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:23",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Known pending at August 31 / submitted 2026-08-31. Proposed ZSA metadata, indexing and shielded payment infrastructure.\nname: Zcash Grants Hub\ndetail: Daniel Goh / Requested, unawarded at August 31\nname: ShieldedScan\ndetail: ShieldedScan / Requested, unawarded at August 31\nname: ZecKit Post-M3 Stabilization and Developer Adoption\ndetail: Dapps over Apps / Requested, unawarded at August 31\nname: zcashtocash via ZcashLabs\ndetail: ZcashLabs / Requested, unawarded at August 31\nname: zec-ironwood-reconcile\ndetail: Steven Hert / Requested, unawarded at August 31\nname: Gleyo\ndetail: Gleyo / Requested, unawarded at August 31\nname: Self-Sovereign Zcash Testnet Faucet\ndetail: Jino Labs / Requested, unawarded at August 31\nname: CyphZec.com\ndetail: Thomas Zarebczan / Requested, unawarded at August 31\nname: ZecLedger\ndetail: ZecLedger / Requested, unawarded at August 31\nname: lightwalletd-rs\ndetail: jpgonzalezra / Requested, unawarded at August 31\nname: Blindvault\ndetail: TIDJANI Walid / Requested, unawarded at August 31\nname: Zallet RPC Parity Harness\ndetail: Creativesonchain / Requested, unawarded at August 31\nname: Zecmap\ndetail: Batuhan / Requested, unawarded at August 31\nname: Connaugh Zcash Videos\ndetail: Connaugh / Requested, unawarded at August 31\nname: ZAP1 Attestation Protocol and Verification Tooling\ndetail: Frontier Compute / Requested, unawarded at August 31"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:24",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: ZecBooks\ndetail: SaneApps / Requested, unawarded at August 31\nname: CipherPay\ndetail: Atmosphere Labs (Kenbak) / Requested, unawarded at August 31\nname: Zafu Browser Extension\ndetail: Rotko Networks OU / Requested, unawarded at August 31\nname: Zapp\ndetail: Renee Chiu / Requested, unawarded at August 31\nname: Open-Source Zcash Hardware-Wallet SDK\ndetail: wh00hw / Requested, unawarded at August 31\nname: Nozy Wallet\ndetail: Leonine DAO / Requested, unawarded at August 31\nname: THORSwap / Metro\ndetail: THORSwap Labs / Requested, unawarded at August 31\nname: Expanding Zcash In Unstoppable Wallet\ndetail: Horizontal Systems / Requested, unawarded at August 31\nname: ZcashNames\ndetail: ZcashMe, Inc. / Requested, unawarded at August 31\nname: Frontier Compute Zcash Security Research and Remediation Pack\ndetail: Frontier Compute LLC / Requested, unawarded at August 31\nname: Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)\ndetail: robustfengbin / Requested, unawarded at August 31\nname: Bonus Grant — Ironwood zk-SNARK Formal Verification\ndetail: Jason McGee / Requested, unawarded at August 31\nname: CipherScan\ndetail: Kenbak / Requested, unawarded at August 31\nname: Temporary Detectable Unlimited Mint and Sell Exploit\ndetail: Alex Sol / Requested, unawarded at August 31\nname: Five Critical Zebra Consensus Divergence Vulnerabilities"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:25",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: sangsoo-osec / Requested, unawarded at August 31\nname: Zec.rocks (16 months of uptime)\ndetail: Zec.rocks / Requested, unawarded at August 31\nname: Ironwood external audit reimbursement\ndetail: ValarGroup / Requested, unawarded at August 31\nname: Ironwood zk-SNARK Formal Verification (Project Tachyon)\ndetail: Tachyon Foundation / Requested, unawarded at August 31\nname: Orchard Counterfeiting Vulnerability Bug Bounty\ndetail: Taylor Hornby / Requested, unawarded at August 31\nname: Bonus Grant — Orchard Counterfeiting Bug Bounty\ndetail: Jason McGee / Requested, unawarded at August 31\nname: ValarGroup Ironwood Work\ndetail: ValarGroup / Requested, unawarded at August 31\nname: ZODL Q1 & Q2 2026 core protocol development\ndetail: ZODL / Requested, unawarded at August 31\nname: Querétaro / August 2 meetup\ndetail: Original organizer report for the first August meetup.\nname: Crosslink workshop recording\ndetail: Recording shared August28 corroborates the August26 workshop.\nname: Zingo PC 2.0.24\ndetail: August10 release: dynamic server list. Supports the preceding-release statement.\nname: Zaino 0.7.0\ndetail: Released August5.\nname: Zaino 0.8.0\ndetail: Released August19.\nname: ZecHub original treasury sheet\ndetail: Original source behind the August5 treasury snapshot; source quote $521 per ZEC.\nname: ZecHub"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:26",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: August activity / published 2026-09-01. August: 79 completed bounties and 25 contributors; the team also launched bounty teams and improved wiki discovery.\nname: Zcash Brazil\ndetail: August activity / published 2026-08-31. Blockchain.RIO on August 12–13 combined privacy education, wallet onboarding and hands-on trivia.\nname: ZK AV Club\ndetail: August activity / published 2026-08-28. August work included the Top 25 Zcon video collection, archive preparation and announcement of the tenth-birthday short-film festival.\nname: Zcash en Español\ndetail: August activity / published 2026-09-02. The August report covers Spanish educational content, translations and a replacement X account.\nname: Türkiye\ndetail: August activity / published 2026-08-19. The team reported Zcash outreach at Rlay Blockchain Week and work on Zecmap during August.\nname: Nigeria\ndetail: August activity / published 2026-09-01. The August report records four businesses onboarded to accept ZEC, Web3 Lagos participation and Yoruba educational content.\nname: Ghana\ndetail: August activity / published 2026-08-05. The team held an August 3 financial-privacy meetup at the College of Health and Wellbeing in Kintampo.\nname: Arabia\ndetail: August activity / published 2026-09-02. The team held its first Algeria pilot meetup on August 1 and reported Arabic localization and education.\nname: Club Caracas"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:27",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Included via August Z-Aid reports; no standalone August monthly report verified.\nname: Club Barcelona\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: CodeRaiz México\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Pesa Ya Siri / Tanzania\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: ruZcash\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Boston Zcash\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: China\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Querétaro\ndetail: August activity / published 2026-09-03. The club held meetups on August 2 and August 30; the latter featured a NYM privacy workshop with Diana HR.\nname: East Africa\ndetail: August activity / published 2026-08-28. The August report documents local education, translation, events and community outreach.\nname: France\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Germany"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:28",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: India\ndetail: August activity / published 2026-08-26. The August update reports Surat and Ahmedabad outreach, a developer workshop and a Hindi localization contribution for ZODL.\nname: Indonesia\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Japan\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Korea\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Elzz\ndetail: August activity / published 2026-09-02. Proof of Privacy / #ZcashClass26 began its live education phase on August 31.\nname: Ukraine\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: South Africa\ndetail: August activity / published 2026-08-21. The team opened a public donation campaign on August 21 for community operations and future events.\nname: Zcast\ndetail: August activity / published 2026-08-24. August live-session announcements covered ambassadorship, European Blockchain Convention preparation and cypherpunk values.\nname: ZECsy · additional\ndetail: Nine-month grant milestones approved August31. Later mixed-period field report excluded."
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:29",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: Belgium · additional\ndetail: Application rejected August 7; distinct from community delivery.\nname: PGPZ · additional\ndetail: August activity / published 2026-08-31. August policy memos tracked public-policy developments relevant to Zcash and community advocacy.\nname: Engage · additional\ndetail: August activity / published 2026-09-04. The August analytics report records 458 engagement actions and 47 registered leaderboard users.\nname: The Zcash Daily · additional\ndetail: No dated August-only update verified in the reviewed sources. This does not establish inactivity.\nname: Zcash Grants Hub\ndetail: Daniel Goh / Requested, unawarded at August 31\nname: ShieldedScan\ndetail: ShieldedScan / Requested, unawarded at August 31\nname: ZecKit Post-M3 Stabilization and Developer Adoption\ndetail: Dapps over Apps / Requested, unawarded at August 31\nname: zcashtocash via ZcashLabs\ndetail: ZcashLabs / Requested, unawarded at August 31\nname: zec-ironwood-reconcile\ndetail: Steven Hert / Requested, unawarded at August 31\nname: Gleyo\ndetail: Gleyo / Requested, unawarded at August 31\nname: Self-Sovereign Zcash Testnet Faucet\ndetail: Jino Labs / Requested, unawarded at August 31\nname: CyphZec.com\ndetail: Thomas Zarebczan / Requested, unawarded at August 31\nname: ZecLedger\ndetail: ZecLedger / Requested, unawarded at August 31\nname: lightwalletd-rs"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:30",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: jpgonzalezra / Requested, unawarded at August 31\nname: Blindvault\ndetail: TIDJANI Walid / Requested, unawarded at August 31\nname: Zallet RPC Parity Harness\ndetail: Creativesonchain / Requested, unawarded at August 31\nname: Zecmap\ndetail: Batuhan / Requested, unawarded at August 31\nname: Connaugh Zcash Videos\ndetail: Connaugh / Requested, unawarded at August 31\nname: ZAP1 Attestation Protocol and Verification Tooling\ndetail: Frontier Compute / Requested, unawarded at August 31\nname: ZecBooks\ndetail: SaneApps / Requested, unawarded at August 31\nname: CipherPay\ndetail: Atmosphere Labs (Kenbak) / Requested, unawarded at August 31\nname: Zafu Browser Extension\ndetail: Rotko Networks OU / Requested, unawarded at August 31\nname: Zapp\ndetail: Renee Chiu / Requested, unawarded at August 31\nname: Open-Source Zcash Hardware-Wallet SDK\ndetail: wh00hw / Requested, unawarded at August 31\nname: Nozy Wallet\ndetail: Leonine DAO / Requested, unawarded at August 31\nname: THORSwap / Metro\ndetail: THORSwap Labs / Requested, unawarded at August 31\nname: Expanding Zcash In Unstoppable Wallet\ndetail: Horizontal Systems / Requested, unawarded at August 31\nname: ZcashNames\ndetail: ZcashMe, Inc. / Requested, unawarded at August 31\nname: Frontier Compute Zcash Security Research and Remediation Pack\ndetail: Frontier Compute LLC / Requested, unawarded at August 31"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:31",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)\ndetail: robustfengbin / Requested, unawarded at August 31\nname: Bonus Grant — Ironwood zk-SNARK Formal Verification\ndetail: Jason McGee / Requested, unawarded at August 31\nname: CipherScan\ndetail: Kenbak / Requested, unawarded at August 31\nname: Temporary Detectable Unlimited Mint and Sell Exploit\ndetail: Alex Sol / Requested, unawarded at August 31\nname: Five Critical Zebra Consensus Divergence Vulnerabilities\ndetail: sangsoo-osec / Requested, unawarded at August 31\nname: Zec.rocks (16 months of uptime)\ndetail: Zec.rocks / Requested, unawarded at August 31\nname: Ironwood external audit reimbursement\ndetail: ValarGroup / Requested, unawarded at August 31\nname: Ironwood zk-SNARK Formal Verification (Project Tachyon)\ndetail: Tachyon Foundation / Requested, unawarded at August 31\nname: Orchard Counterfeiting Vulnerability Bug Bounty\ndetail: Taylor Hornby / Requested, unawarded at August 31\nname: Bonus Grant — Orchard Counterfeiting Bug Bounty\ndetail: Jason McGee / Requested, unawarded at August 31\nname: ValarGroup Ironwood Work\ndetail: ValarGroup / Requested, unawarded at August 31\nname: ZODL Q1 & Q2 2026 core protocol development\ndetail: ZODL / Requested, unawarded at August 31\nname: Threshold (FROST) custody for shielded ZEC\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record."
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:32",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: Legitimacy Beyond Transparency: Zcash, Privacy, and Trust in Islamic Digital Finance\ndetail: Filtered by FPF / Outside of Scope / Guidelines Not Met / decision 2026-08-03. FPF screening outcome, not a ZCG committee approval or rejection.\nname: Zebra Mempool Adversarial Resilience Suite\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: ZIP-229 Conformance Suite: Cleanroom Testing for the Ironwood v6 Transaction Format\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: VibeQuest: Learn, Build, Prove\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Zcash UK & Ireland Community Initiative\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Ironwood Sentinel\ndetail: Rejected / decision 2026-08-03. Original source provides the decision record.\nname: Zcash Belgium Chapter\ndetail: Rejected / decision 2026-08-07. Original source provides the decision record.\nname: Apple Silicon Zero-Knowledge Proving: Mobile Halo2 and Tachyon Acceleration on M-Series and A-Series Chips\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Zk-ComsmwasmVm + Community-Led Audit & Design Space Hackathon\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record."
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:33",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "name: ELLIPAL Zcash Ironwood Shielded Transaction Support\ndetail: Approved / decision 2026-08-17. Ironwood shielded support for TITAN hardware wallet and companion app; approved Aug17.\nname: Open Light Nodes\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Shielded Compliance Bridge\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Zcash Arabia (August to December 2026)\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Shielded ZEC Privacy and Trust Architecture Framework\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: independent Zcash light-client infrastructure from South Asia (Zebra + Zaino, Singapore) — starter grant\ndetail: Rejected / decision 2026-08-17. Original source provides the decision record.\nname: Constant-Time Hardening and Explicit Timing Semantics for Zcash Rust Cryptography\ndetail: Approved / decision 2026-08-21. Async approval; broader scope and the initial milestone discussed.\nname: Test-Effectiveness Audit for Zebra: an independent regression witness for consensus-critical code\ndetail: Rejected / decision 2026-08-31. Committee cited limited usefulness and false-positive concerns.\nname: Rvess Pay ZEC to Mobile Money Integration"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:34",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Rejected / decision 2026-08-31. Committee asked for more reuse of existing payment components.\nname: Zcash WalletConnect Integration\ndetail: Approved / decision 2026-08-31. Reusable Zcash integration requested beyond the Noir wallet.\nname: Reusable Halo2 Verifier Security Testing Infrastructure (ZKCG Reference Implementation)\ndetail: Rejected / decision 2026-08-31. Need and ability to detect circuit logic defects were not established.\nname: SHPH (Post-Quantum Censorship-Resistant Network Layer)\ndetail: Rejected / decision 2026-08-31. Committee raised scope, track-record and differentiation concerns.\nname: BTCPayServer Multi-Store GraphQL Client\ndetail: Approved / decision 2026-08-31. Multi-store support and migration to the Zkool GraphQL API.\nname: Pretty Good Policy for Zcash\ndetail: Approved / decision 2026-08-31. Policy work approved; Paul recused from the discussion.\nname: Zcash Hack-to-Dark At Devcon 8, Mumbai\ndetail: Approved / decision 2026-08-31. Developer event proposed for November 3-4.\nname: Zcash Arabia (August to December 2026\ndetail: Approved / decision 2026-08-31. August-December programme; Artkor and Zerodartz voted against.\nname: ZECsy Community Building: 12 Months of Zcash on the Ground [Revised]\ndetail: Approved / decision 2026-08-31. Nine-month milestones only; Hanh voted against.\nname: 0xramp"
+    },
+    {
+      "id": "src/lib/monthly/reading-sets.json:35",
+      "url": "https://openzcash.org/monthly",
+      "title": "monthly",
+      "text": "detail: Known pending at August 31 / submitted 2026-08-31. Non-custodial ZEC and local-currency payment rails.\nname: Privacy Literacy Lab Canada\ndetail: Known pending at August 31 / submitted 2026-08-30. Interactive privacy scenarios and a dated regulatory source map.\nname: Recoverify\ndetail: Known pending at August 31 / submitted 2026-08-27. Verify wallet backups while the original wallet is still available.\nname: Taking Zcash to the Streets\ndetail: Known pending at August 31 / submitted 2026-08-25. A Turkish video series and Istanbul street interviews.\nname: Zaino security audit\ndetail: Known pending at August 31 / submitted 2026-08-31. Independent audit; the final budget depends on scoping. August budget not verified.\nname: Zcash World, Mumbai\ndetail: Known pending at August 31 / submitted 2026-08-30. Public event and merchant onboarding around Devcon 8.\nname: ZecBit: NFT infrastructure\ndetail: Known pending at August 31 / submitted 2026-08-31. Proposed ZSA metadata, indexing and shielded payment infrastructure.\nevidenceCutoff: 2026-08-31\nreviewedAt: 2026-09-11\nlabel: August 1–31\nlabel: August 1–31"
+    }
+  ]
+}

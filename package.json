@@ -6,14 +6,14 @@
     "node": ">=20.9.0"
   },
   "scripts": {
-    "predev": "node scripts/publish-copilot.mjs",
+    "predev": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/publish-copilot.mjs",
+    "prebuild": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run && node --test scripts/build-zarvis-knowledge.test.mjs",
     "test:watch": "vitest",
     "test:copilot": "node --test scripts/publish-copilot.test.mjs && python3 -B -m unittest discover -s skills/zcg-copilot/tests",
     "probe": "tsx scripts/probe-node.ts",
@@ -22,7 +22,10 @@
     "sync-ecosystem": "node scripts/sync-ecosystem.mjs",
     "test:ecosystem-sync": "node --test scripts/lib/ecosystem-collection.test.mjs",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate"
+    "db:migrate": "drizzle-kit migrate",
+    "knowledge:build": "node scripts/build-zarvis-knowledge.mjs",
+    "knowledge:check": "node scripts/build-zarvis-knowledge.mjs --check",
+    "test:knowledge": "node --test scripts/build-zarvis-knowledge.test.mjs"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.4",

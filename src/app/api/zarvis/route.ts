@@ -12,7 +12,7 @@ const fail = (error: string, status: number, extra = {}) => Response.json({ erro
 
 export function GET() {
   const config = zarvisConfig();
-  return Response.json({ available: config.enabled, provider: "OpenAI", webSearch: config.webSearch }, { headers });
+  return Response.json({ available: config.enabled, provider: config.providerLabel, webSearch: config.webSearch }, { headers });
 }
 
 export async function POST(request: Request) {
@@ -35,7 +35,9 @@ export async function POST(request: Request) {
       const emit = (event: ZarvisEvent) => { if (!controller.signal.aborted) out.enqueue(encoder.encode(`${JSON.stringify(event)}\n`)); };
       try {
         emit({ type: "status", message: "Finding the right sources…" });
-        await generateAnswer(input.messages, controller.signal, emit);
+        const metrics = await generateAnswer(input.messages, controller.signal, emit);
+        // Opt-in local diagnostics: counts only, never questions, answers, IDs or credentials.
+        if (process.env.NODE_ENV === "development" && process.env.ZARVIS_DIAGNOSTICS === "true") console.info("Zarvis metrics", JSON.stringify(metrics));
       } catch {
         // Never send provider errors, credentials, prompts or stack traces to the client/logs.
         if (!request.signal.aborted) {

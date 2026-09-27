@@ -6,6 +6,6 @@ export type ZarvisEvent =
   | { type: "replace"; text: string }
   | { type: "done"; sources: ZarvisSource[] }
   | { type: "error"; message: string };
-export type ZarvisStatus = { available: boolean; provider: "OpenAI"; webSearch: boolean };
+export type ZarvisStatus = { available: boolean; provider: "OpenAI" | "xAI (Grok)"; webSearch: boolean };
 
 export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error" | "greeting" | "pleased" | "reading" | "exploring" | "protecting";
