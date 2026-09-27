@@ -62,3 +62,9 @@ Economic calculations retain the website's existing [ZIP 208 halving/spacing mod
 - A first quote load check exposed a stale-feed path that unnecessarily invoked model synthesis (16/20 direct replies; observed p95 27.462s). This was fixed: narrow quote/annual-ledger queries now return a deterministic, dated cached-data or unavailable response during an outage. They do not invent a current value or send the simple failure to a model.
 - Final repeat: **20/20 completed**, four concurrent callers, **20/20 deterministic local replies**; sample median 0.033s, sample p95 0.212s, maximum 0.235s. This is a small local-development quote-route sample, not production/model capacity evidence.
 - After that fix, 158 focused checks passed (local handling, orchestration and the 119-case internal evaluation).
+
+## Remote CI status
+
+The workflow definition parses as valid YAML locally. GitHub Actions is enabled, but the first run for commit `8089d11` failed before job creation: empty workflow name, synthetic `BuildFailed` path, `startup_failure`, zero jobs and no logs. GitHub also rejected the one retry request as non-retryable. The API exposed no further cause, so remote CI is **not verified**; the local gates above are the available execution evidence. No repository security or billing settings were changed.
+
+Recorded run: [GitHub Actions 36346465902](https://github.com/Michae2xl/openzcash/actions/runs/36346465902).
