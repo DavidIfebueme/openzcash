@@ -127,7 +127,7 @@
 .zarvis-figure { overflow: visible; border-radius: 0; background: transparent; box-shadow: none; }
 .zarvis-figure .zarvis-ground { fill: var(--ink); opacity: .065; }
 .zarvis-figure[data-animated="true"] .zarvis-rig { transform-origin: 50% 98%; animation: zarvis-soft-breathe 6.8s cubic-bezier(.45,0,.55,1) infinite; }
-.zarvis-figure .zarvis-pose { opacity: 0; visibility: hidden; transition: opacity .38s cubic-bezier(.22,.65,.3,1), visibility 0s .38s; }
+.zarvis-figure .zarvis-pose { opacity: 0; visibility: hidden; transition: opacity .58s cubic-bezier(.22,.65,.3,1), visibility 0s .58s; }
 .zarvis-figure .zarvis-pose[data-visible="true"] { opacity: 1; visibility: visible; transition-delay: 0s; }
 .zarvis-figure .zarvis-rig-head { transform-origin: 320px 382px; animation: zarvis-soft-look 9.6s cubic-bezier(.45,0,.55,1) infinite; }
 .zarvis-figure .zarvis-rig-gaze { transform: translate(var(--zarvis-look-x, 0px), var(--zarvis-look-y, 0px)); transition: transform .6s cubic-bezier(.22,.65,.3,1); }
@@ -252,3 +252,28 @@
 }
 
 .zarvis-feedback { display: inline-flex; align-items: center; gap: .75rem; margin-inline-start: .75rem; color: var(--muted); font-size: .7rem; }
+
+/* Conversational motion: a prepared gesture, a soft settle, then quiet reading. */
+.zarvis-depth-control { display: flex; align-items: center; gap: 12px; }
+.zarvis-depth-control select { font: inherit; font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; max-width: 150px; cursor: pointer; }
+.zarvis-depth-control select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.zarvis-depth-control select:disabled { opacity: .6; cursor: default; }
+.zarvis-figure .zarvis-pose { transition-duration: .58s, 0s; }
+.zarvis-figure .zarvis-rig-head { animation-timing-function: cubic-bezier(.37,0,.23,1); }
+.zarvis-figure .zarvis-rig-arm { animation-name: zarvis-intent-gesture; animation-duration: 10.7s; }
+.zarvis-figure[data-expression="comparing"] .zarvis-pose .zarvis-rig-head { animation-name: zarvis-compare; animation-duration: 7.9s; }
+.zarvis-figure[data-expression="comparing"] .zarvis-pose .zarvis-rig-arm { animation-delay: .18s; }
+.zarvis-figure[data-expression="uncertain"] .zarvis-pose .zarvis-rig-head,
+.zarvis-figure[data-expression="clarifying"] .zarvis-pose .zarvis-rig-head { animation-name: zarvis-attentive; animation-duration: 9.3s; }
+.zarvis-figure[data-settled="true"] .zarvis-pose .zarvis-rig-head { animation: zarvis-arrive 2.6s cubic-bezier(.25,.1,.25,1) 1 both; }
+.zarvis-figure[data-settled="true"] .zarvis-pose .zarvis-rig-arm { animation: zarvis-arrive-hand 2.8s cubic-bezier(.25,.1,.25,1) 1 both; }
+.zarvis-figure[data-settled="true"] .zarvis-rig { animation-duration: 8.9s; }
+.zarvis-figure[data-settled="true"] .zarvis-eye { animation-duration: 17.3s; }
+.zarvis-figure[data-settled="true"][data-expression="uncertain"] .zarvis-pose .zarvis-rig-head,
+.zarvis-figure[data-settled="true"][data-expression="clarifying"] .zarvis-pose .zarvis-rig-head { animation-name: zarvis-attentive-arrival; }
+@keyframes zarvis-intent-gesture { 0%, 7%, 54%, 100% { transform: rotate(0); } 13% { transform: rotate(1.2deg); } 25%, 31% { transform: rotate(-3.4deg); } 42% { transform: rotate(.45deg); } }
+@keyframes zarvis-compare { 0%, 8%, 86%, 100% { transform: rotate(0); } 22%, 33% { transform: rotate(-2.8deg) translateY(1px); } 53%, 63% { transform: rotate(2.1deg); } 76% { transform: rotate(-.5deg); } }
+@keyframes zarvis-attentive { 0%, 16%, 90%, 100% { transform: rotate(0); } 35%, 60% { transform: rotate(2.5deg) translateY(-1px); } 76% { transform: rotate(-.4deg); } }
+@keyframes zarvis-arrive { 0%, 100% { transform: rotate(0) translateY(0); } 14% { transform: rotate(-1.2deg) translateY(-1px); } 39% { transform: rotate(.8deg) translateY(3px); } 68% { transform: rotate(-.35deg) translateY(-.5px); } }
+@keyframes zarvis-arrive-hand { 0%, 100% { transform: rotate(0); } 14% { transform: rotate(1deg); } 39%, 53% { transform: rotate(-3.8deg); } 78% { transform: rotate(.45deg); } }
+@keyframes zarvis-attentive-arrival { 0%, 100% { transform: rotate(0); } 25%, 58% { transform: rotate(2.6deg) translateY(-1px); } 78% { transform: rotate(-.3deg); } }

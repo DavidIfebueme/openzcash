@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
 import { safeSourceUrl, STARTERS } from "@/lib/zarvis/sources";
+import type { ResponseDepth } from "@/lib/zarvis/depth";
 import { MAX_QUESTION_LENGTH } from "@/lib/zarvis/context";
 import { useZarvis } from "./zarvis-provider";
 import { ZarvisFigure } from "./zarvis-figure";
@@ -47,7 +48,7 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
       </div> : <div className="zarvis-thread">{chat.messages.map((message, index) => <article key={message.id} className={`zarvis-message zarvis-message-${message.role}`} aria-label={message.role === "assistant" ? "Zarvis response" : "Your message"}>
         {message.role === "assistant" ? <ZarvisFigure className="zarvis-answer-figure"
           expression={index === chat.messages.length - 1 && chat.expression !== "idle" ? chat.expression : message.pose ?? "explaining"}
-          animated={index === chat.messages.length - 1} paused={chat.motionPaused}/> : null}
+          animated={index === chat.messages.length - 1} paused={chat.motionPaused} settled={!chat.busy && !message.incomplete}/> : null}
         <div className="zarvis-message-body">
         {message.role === "assistant" && index === chat.messages.length - 1 && chat.busy ? <div className="zarvis-message-heading">
           <div className="zarvis-progress" role="status">{chat.progress || "Writing an answer…"}</div>
@@ -80,7 +81,11 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
       <form className="zarvis-composer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
         <label className="sr-only" htmlFor={compact ? "zarvis-dock-question" : "zarvis-question"}>Your question</label>
         <textarea ref={input} id={compact ? "zarvis-dock-question" : "zarvis-question"} value={chat.draft} onChange={(e) => chat.setDraft(e.target.value)} maxLength={MAX_QUESTION_LENGTH} rows={2} placeholder="Ask Zarvis about Zcash…" onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); if (!chat.busy) submit(); } }}/>
-        <div className="zarvis-composer-bottom"><span>{chat.draft.length > 1_600 ? `${chat.draft.length} / ${MAX_QUESTION_LENGTH}` : ""}</span>
+        <div className="zarvis-composer-bottom"><div className="zarvis-depth-control">
+          <label className="sr-only" htmlFor={compact ? "zarvis-dock-depth" : "zarvis-depth"}>Response depth</label>
+          <select id={compact ? "zarvis-dock-depth" : "zarvis-depth"} value={chat.depth} disabled={chat.busy} onChange={(e) => chat.setDepth(e.target.value as ResponseDepth)} title="Auto adjusts to your question. Deep analysis allows more reasoning and may take longer.">
+            <option value="auto">Auto</option><option value="quick">Quick</option><option value="deep">Deep analysis</option>
+          </select><span>{chat.draft.length > 1_600 ? `${chat.draft.length} / ${MAX_QUESTION_LENGTH}` : ""}</span></div>
           {chat.busy ? <button type="button" className="zarvis-send" onClick={chat.stop} aria-label="Stop response">■</button> : <button type="submit" className="zarvis-send" disabled={!chat.status?.available || !chat.draft.trim()} aria-label="Send question">↑</button>}
         </div>
       </form>

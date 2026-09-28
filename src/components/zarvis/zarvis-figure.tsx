@@ -26,16 +26,16 @@ type PoseName = keyof typeof poses;
 const selectedPose: Record<ZarvisExpression, PoseName> = {
   idle: "resting", listening: "resting", greeting: "greeting", thinking: "thinking",
   explaining: "explaining", reading: "reading", exploring: "exploring", protecting: "protecting",
-  pleased: "celebrating", error: "thinking",
+  pleased: "celebrating", error: "thinking", comparing: "explaining", uncertain: "thinking", clarifying: "exploring",
 };
 
 /** Stable layers preserve motion and blend poses without remounting the character. */
-export const ZarvisFigure = memo(function ZarvisFigure({ className = "", expression = "idle", animated = true, paused = false }: {
-  className?: string; expression?: ZarvisExpression; animated?: boolean; paused?: boolean;
+export const ZarvisFigure = memo(function ZarvisFigure({ className = "", expression = "idle", animated = true, paused = false, settled = false }: {
+  className?: string; expression?: ZarvisExpression; animated?: boolean; paused?: boolean; settled?: boolean;
 }) {
   const id = useId().replaceAll(":", "");
   return <svg className={`zarvis-mark zarvis-figure ${className}`} viewBox="-60 -36 747 710"
-    data-expression={expression} data-animated={animated} data-paused={paused} aria-hidden="true" focusable="false">
+    data-expression={expression} data-animated={animated} data-paused={paused} data-settled={settled} aria-hidden="true" focusable="false">
     <defs>{Object.entries(poses).map(([name, definition]) => {
       const pose: Pose = definition;
       const prefix = `zarvis-${id}-${name}`;

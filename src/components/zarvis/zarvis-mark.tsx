@@ -12,7 +12,7 @@ type Eye = [x: number, y: number, rx: number, ry: number];
 type Frame = { box: [number, number, number, number]; eyes: [Eye, Eye] };
 const happy: Frame = { box: [17, 620, 122, 133], eyes: [[56, 700, 14, 11], [94, 708, 13, 10]] };
 const thoughtful: Frame = { box: [281, 620, 124, 133], eyes: [[329, 704, 14, 10], [366, 699, 12, 11]] };
-const frames: Record<ZarvisExpression, Frame> = {
+const frames: Record<Exclude<ZarvisExpression, "comparing" | "uncertain" | "clarifying">, Frame> = {
   idle: happy,
   listening: { box: [147, 620, 124, 133], eyes: [[195, 699, 13, 15], [236, 706, 13, 15]] },
   thinking: thoughtful,
@@ -33,7 +33,7 @@ export function ZarvisMark({ className = "", expression = "idle", animated = fal
   paused?: boolean;
 }) {
   const id = useId().replaceAll(":", "");
-  const frame = frames[expression];
+  const frame = frames[expression === "comparing" ? "explaining" : expression === "uncertain" ? "thinking" : expression === "clarifying" ? "listening" : expression];
   const [x, y, width, height] = frame.box;
   const pattern = `zarvis-art-${id}`;
   const mask = `zarvis-hand-${id}`;

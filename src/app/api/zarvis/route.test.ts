@@ -43,6 +43,23 @@ describe("Zarvis API", () => {
     const failure = await (await POST(request())).text();
     expect(failure).toContain('"type":"error"'); expect(failure).not.toContain("provider-secret");
   });
+  it("passes depth to generation and enforces the longer deadline without trusting client timeouts", async () => {
+    vi.useFakeTimers();
+    try {
+      mocks.answer.mockImplementation(async (_messages, signal) => new Promise((_resolve, reject) => {
+        signal.addEventListener("abort", () => reject(new Error("aborted")), { once: true });
+      }));
+      const response = await POST(request({ messages: [{ role: "user", content: "Explain ZIP 310" }], depth: "deep" }));
+      const body = response.text();
+      expect(mocks.answer.mock.calls[0][4]).toBe("deep");
+      const signal = mocks.answer.mock.calls[0][1] as AbortSignal;
+      await vi.advanceTimersByTimeAsync(55000);
+      expect(signal.aborted).toBe(false);
+      await vi.advanceTimersByTimeAsync(55000);
+      expect(signal.aborted).toBe(true);
+      expect(await body).toContain("time limit");
+    } finally { vi.useRealTimers(); }
+  });
   it("ends an incomplete upload before reserving quota or calling the model", async () => {
     vi.useFakeTimers();
     try {

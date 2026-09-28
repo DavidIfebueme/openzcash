@@ -1,3 +1,4 @@
+import { answerPlan } from "@/lib/zarvis/depth";
 import { zarvisConfig } from "@/lib/zarvis/config";
 import { readChatRequest, sameOrigin } from "@/lib/zarvis/validation";
 import { reserveZarvisRequest } from "@/lib/zarvis/usage";
@@ -7,7 +8,7 @@ import type { ZarvisEvent } from "@/lib/zarvis/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 120;
 const headers = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
 const fail = (error: string, status: number, extra = {}) => Response.json({ error }, { status, headers: { ...headers, ...extra } });
 
@@ -33,14 +34,15 @@ export async function POST(request: Request) {
   const abort = () => controller.abort();
   request.signal.addEventListener("abort", abort, { once: true });
   if (request.signal.aborted) controller.abort();
-  const timeout = setTimeout(abort, 55_000);
+  const plan = answerPlan(input.messages, input.depth);
+  const timeout = setTimeout(abort, plan.timeoutMs);
   const encoder = new TextEncoder();
   const stream = new ReadableStream<Uint8Array>({
     async start(out) {
       const emit = (event: ZarvisEvent) => { if (!controller.signal.aborted) out.enqueue(encoder.encode(`${JSON.stringify(event.type === "done" ? { ...event, feedbackToken: feedbackTicket() } : event)}\n`)); };
       try {
         emit({ type: "status", message: "Finding the right sources…" });
-        const metrics = await generateAnswer(input.messages, controller.signal, emit, input.session);
+        const metrics = await generateAnswer(input.messages, controller.signal, emit, input.session, input.depth);
         recordGeneration("completed", performance.now() - started, metrics);
         // Opt-in local diagnostics: counts only, never questions, answers, IDs or credentials.
         if (process.env.NODE_ENV === "development" && process.env.ZARVIS_DIAGNOSTICS === "true") console.info("Zarvis metrics", JSON.stringify(metrics));
@@ -48,7 +50,7 @@ export async function POST(request: Request) {
         recordGeneration(request.signal.aborted ? "aborted" : "failed", performance.now() - started);
         // Never send provider errors, credentials, prompts or stack traces to the client/logs.
         if (!request.signal.aborted) {
-          try { out.enqueue(encoder.encode(`${JSON.stringify({ type: "error", message: controller.signal.aborted ? "This answer took too long. Please try a shorter question." : "Zarvis could not finish this answer. Please retry in a moment." })}\n`)); } catch { /* disconnected */ }
+          try { out.enqueue(encoder.encode(`${JSON.stringify({ type: "error", message: controller.signal.aborted ? (plan.depth === "deep" ? "This analysis reached its time limit. Try a narrower question." : "This answer reached its time limit. Try a narrower question or choose Deep analysis.") : "Zarvis could not finish this answer. Please retry in a moment." })}\n`)); } catch { /* disconnected */ }
         }
       } finally {
         release();

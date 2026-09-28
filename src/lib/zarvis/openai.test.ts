@@ -101,6 +101,15 @@ describe("Zarvis local-first orchestration", () => {
     await expect(generateAnswer(question, new AbortController().signal, () => {})).rejects.toThrow("TOOL_LIMIT");
     expect(mocks.lookup).toHaveBeenCalledTimes(3); expect(mocks.create).toHaveBeenCalledTimes(3);
   });
+  it("reserves the final round for a real answer, with no remaining tools", async () => {
+    mocks.create.mockResolvedValueOnce(events([call("a")]))
+      .mockResolvedValueOnce(events([call("research-final", '{"reason":"missing_local_evidence"}', "request_external_research")]))
+      .mockResolvedValueOnce(events([answer("The available evidence establishes this scoped fact.")]));
+    await generateAnswer(question, new AbortController().signal, () => {});
+    const final = mocks.create.mock.calls[2][0];
+    expect(final.tools).toEqual([]);
+    expect(JSON.stringify(final.input)).toContain("Final synthesis round");
+  });
   it("removes web search after use and preserves encrypted reasoning in subsequent rounds", async () => {
     mocks.prepare.mockResolvedValue({ documents: [], evidence: [], external: true });
     const reasoning = { type: "reasoning", id: "r1", encrypted_content: "opaque", summary: [] };
@@ -136,6 +145,24 @@ describe("Zarvis local-first orchestration", () => {
     expect(mocks.scenario.mock.calls[0][1]).toMatchObject({ years: 30, priceMultiple: 20 });
     expect(emitted.find((e) => e.type === "session")).toMatchObject({ session: { scenario: { years: 40, priceMultiple: 20, continueDevFundAfterHalving: true } } });
     expect(emitted.find((e) => e.type === "replace")).toMatchObject({ text: expect.stringContaining("compra única") });
+  });
+  it.each([false, true])("preserves scenario facts AND requested analysis, with numeric safety (unsupported: %s)", async (unsupported) => {
+    const scenario = computeScenario({ years: 20, priceMultiple: 20 }, {}, { price: { usd: 100, stale: false, quotedAt: "2026-09-27T12:00:00Z" }, supply: { zec: 16945106, stale: false, quotedAt: "2026-09-27T12:00:00Z" }, chain: { height: 3492985 }, funds: { zcg: null, lockbox: null } });
+    mocks.scenario.mockResolvedValue({ content: JSON.stringify({ data: scenario }), scenario });
+    const analysis = unsupported ? "The treasury has $999 billion ready to spend." : "Valuation is not spendable cash. Separate authority, liquidity and expense growth limit this hypothesis. For sensitivity, vary the annual budget while holding the price fixed.";
+    mocks.create.mockResolvedValueOnce(events([call("scenario-analysis", '{"years":20}', "calculate_openzcash_treasury")], "A premature $999 billion guess."))
+      .mockResolvedValueOnce(events([answer(analysis)]));
+    const emitted: ZarvisEvent[] = [];
+    const metrics = await generateAnswer([{ role: "user", content: "Analyze a treasury scenario and its limitations. Suggest a sensitivity test." }], new AbortController().signal, (e) => emitted.push(e));
+    expect(mocks.create).toHaveBeenCalledTimes(2);
+    expect(mocks.create.mock.calls[0][0].reasoning).toEqual({ effort: "medium" });
+    expect(mocks.create.mock.calls[1][0].input).toContainEqual(expect.objectContaining({ type: "function_call_output", call_id: "scenario-analysis" }));
+    const result = emitted.find((e) => e.type === "replace");
+    expect(result).toMatchObject({ text: expect.stringContaining("one purchase at the end") });
+    expect(JSON.stringify(emitted)).not.toContain("999 billion");
+    if (!unsupported) expect(result).toMatchObject({ text: expect.stringContaining("For sensitivity") });
+    else expect(metrics.groundingFallbacks).toBe(1);
+    expect(emitted.filter(e => e.type === "done")).toHaveLength(1);
   });
   it("never exposes an unsupported financial figure in streamed deltas", async () => {
     mocks.prepare.mockResolvedValue({ documents: [], evidence: [{ content: JSON.stringify({ data: { quote: { usd: 100 } } }) }], external: false });

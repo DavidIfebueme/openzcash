@@ -15,7 +15,7 @@ The new atlas is `public/zarvis/ironwood-poses-v2.png` (1254 × 1254 RGBA, 1,690
 - Draft entered: resting pose with gentle attention and breathing.
 - Request: thinking; actual source lookup events can switch to exploring or reading.
 - Answer text streaming: explaining, reading, exploring or protecting, based on the question topic.
-- Completion: a brief celebration, then the answer retains its topic pose and gentle motion. This acknowledges response completion, not factual verification. Older answers are still.
+- Completion: the answer retains a topic-appropriate pose, or an uncertainty/clarification reaction when the text calls for it. There is no automatic celebration. A short gesture settles into slow breathing; older answers are still.
 - Error or interrupted response: a thoughtful pose; the textual error stays visible.
 
 Pause works before and during a conversation and freezes the current gesture without resetting it. Motion stops when the tab is hidden or `prefers-reduced-motion` is enabled. No sound, extra model calls, telemetry or fake network progress were added for animation. The interface remains English; responses follow the question language.
@@ -23,7 +23,7 @@ Pause works before and during a conversation and freezes the current gesture wit
 ## Review locally
 
 - `/zarvis`: the clean main chat.
-- `/zarvis/iterations`: eight animated examples shown together, with the actual trigger for each pose. Four example-question buttons fill and focus the real chat without submitting. The previous/current comparison is expandable and retains its ten state controls. “Follow the live conversation” binds those comparison figures to real request events. Manual expression controls do not call the AI provider.
+- `/zarvis/iterations`: ten reaction examples shown together, with the actual trigger for each pose. Four example-question buttons fill and focus the real chat without submitting. The previous/current comparison is expandable and retains its thirteen state controls. “Follow the live conversation” binds those comparison figures to real request events. Manual expression controls do not call the AI provider.
 - The comparison route is development-only (`notFound()` in production), omitted from navigation and marked noindex.
 
 ## Earlier verification — iteration 02, 2026-09-26
@@ -101,3 +101,12 @@ Use case: identity-preserve / background-extraction. Asset type: a production PN
 The local preview now opens with all eight pose examples, using the same `ZarvisFigure` component as the chat. Each card describes when it appears; actual conversations still display one pose at a time. Pause/resume controls all eight examples. The previous avatar comparison is collapsed initially to keep the gallery in view.
 
 Verified in Chrome: eight distinct selected pose layers; one pause sets all eight figures to paused; selecting the ZIP 316 example fills and focuses the composer with zero conversation messages (no automatic send). Mobile viewport 390 × 844 has equal body client/scroll widths of 375 px, accounting for the scrollbar. TypeScript, scoped ESLint and `git diff --check` passed. No model or API behavior changed.
+
+
+## Contextual reactions — iteration 05, 2026-09-27
+
+The eight existing artworks now support thirteen expression states. Comparing, uncertain and clarifying reuse the explaining, thinking and exploring artwork with distinct head motion. No new art or model call is needed. Selection is a local cosmetic heuristic over the request and completed answer, not a confidence score or proof of correctness.
+
+Actual source lookup and analysis events select work-in-progress reactions. Pose opacity blends over 580 ms. Settled answers perform one introductory head/hand gesture, then retain slower breathing and blinking; repeated speech gestures stop. Automatic celebration on every completed answer has been removed. Pause, hidden-page suspension and reduced-motion behavior remain supported.
+
+The development gallery includes the three new examples and controls. Browser verification observed an actual uncertain response when the quote reader only had a stale saved quote; it labeled the quote as cached. The figure used `uncertain`, `data-settled=true` and an attentive arrival animation. Pause produced paused body/head animations; reduced motion produced `animation-name: none`. A real Deep analysis comparison completed with one figure. At 390 px, the document's scroll width was also 390 px.

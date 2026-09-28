@@ -61,8 +61,10 @@ function referenceChunks(source: ReferenceSource): KnowledgeDocument[] {
   flush();
   // A selected paragraph must retain document-wide key authority assumptions.
   const scope = source.id === "zip-0310"
-    ? " Scope: every ZIP 310 example assumes Ian holds Alice's full Sapling viewing key (FVK), even when a step mentions its derived IVK. An incoming viewing key alone cannot derive nullifiers or detect later spends."
-    : "";
+    ? " Scope: every ZIP 310 example assumes Ian holds Alice's full Sapling viewing key (FVK), even when a step mentions its derived IVK. An incoming viewing key alone cannot derive nullifiers or detect later spends. Outgoing recovery uses the matching OVK and does not require possession of the full FVK; do not conflate that with spend detection."
+    : source.id === "zip-0317"
+      ? " Scope: conventional fee is wallet policy, not a consensus minimum. For Sapling, logical actions use max(spends, outputs). Each revision has its own status. This repository snapshot is not independent proof of which revision is active on a live network; avoid volunteering an active-revision claim for a timeless fee calculation."
+      : "";
   return chunks.map(({ text, section }, i) => ({ ...(section ? { section } : {}), id: `reference:${source.id}:${i}`, title: source.title, url: source.url, text, kind: "reference" as const, retrievedAt: source.retrievedAt, sourceUpdatedOn: source.sourceUpdatedOn, snapshotNote: source.note + scope }));
 }
 const referenceDocs = references.sources.filter((source) => !source.id.startsWith("zip-")).flatMap(referenceChunks);

@@ -15,6 +15,14 @@ describe("Local knowledge coverage and size", () => {
     expect(excerpts.every((doc) => doc.snapshotNote?.includes("full Sapling viewing key (FVK)"))).toBe(true);
     expect(excerpts.every((doc) => doc.snapshotNote?.includes("incoming viewing key alone cannot derive nullifiers"))).toBe(true);
   });
+  it("preserves OVK recovery and per-revision fee scope in retrieved evidence", () => {
+    const keyDocs = searchKnowledge("ZIP 310 outgoing OVK decrypt output").filter(d => d.id.startsWith("reference:zip-0310:"));
+    expect(keyDocs.length).toBeGreaterThan(0);
+    expect(keyDocs.every(d => d.snapshotNote?.includes("does not require possession of the full FVK"))).toBe(true);
+    const feeDocs = searchKnowledge("ZIP 317 conventional fee logical actions").filter(d => d.id.startsWith("reference:zip-0317:"));
+    expect(feeDocs.length).toBeGreaterThan(0);
+    expect(feeDocs.every(d => d.snapshotNote?.includes("not independent proof"))).toBe(true);
+  });
   it("indexes the explicit public collection and keeps selected context small", () => {
     expect(knowledgeCoverage.sourceFiles).toBeGreaterThan(45);
     const docs = searchKnowledge("Zcash funding governance methodology ceremony grants treasury");

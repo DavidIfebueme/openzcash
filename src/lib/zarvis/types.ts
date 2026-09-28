@@ -10,4 +10,4 @@ export type ZarvisEvent =
   | { type: "error"; message: string };
 export type ZarvisStatus = { available: boolean; provider: "OpenAI" | "xAI (Grok)"; webSearch: boolean };
 
-export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error" | "greeting" | "pleased" | "reading" | "exploring" | "protecting";
+export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error" | "greeting" | "pleased" | "reading" | "exploring" | "protecting" | "comparing" | "uncertain" | "clarifying";

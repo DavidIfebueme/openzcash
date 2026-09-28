@@ -18,14 +18,14 @@ This mode does not read, increment or reset the quota counters, so an exhausted 
 
 ## Cost reference (checked 2026-09-25)
 
-GPT-5 mini: $0.25 / million input tokens, $0.025 / million cached input tokens, and $2.00 / million output tokens (including reasoning). Example: 10,000 input + 2,000 output tokens = $0.0065 before tools. Web search adds $0.01 per tool call plus search-content tokens. A model-assisted question can use up to three model requests when extra data and research are needed; many require only one synthesis call. History, instructions and retrieved sources all count as input; visible answer length is not total token usage.
+GPT-5 mini: $0.25 / million input tokens, $0.025 / million cached input tokens, and $2.00 / million output tokens (including reasoning). Example: 10,000 input + 2,000 output tokens = $0.0065 before tools. Web search adds $0.01 per tool call plus search-content tokens. A model-assisted question can use up to three model requests (four for deeper analysis) when extra data and research are needed; many require only one synthesis call. History, instructions and retrieved sources all count as input; visible answer length is not total token usage.
 
 - https://developers.openai.com/api/docs/models/gpt-5-mini
 - https://developers.openai.com/api/docs/pricing
 
 ## Flagship local evaluation (2026-09-26)
 
-The local preview was switched to `ZARVIS_MODEL=gpt-6-astra` at the user's request, using the existing server-only key. Reasoning remains `low`, output is limited to 3,000 tokens per model call, and there is no automatic fallback to another model. This is a preview configuration, not a change to Railway or the default model above.
+The local preview was switched to `ZARVIS_MODEL=gpt-6-astra` at the user's request, using the existing server-only key. At that evaluation, reasoning was `low` and output was limited to 3,000 tokens per model call, and there is no automatic fallback to another model. This is a preview configuration, not a change to Railway or the default model above.
 
 Current standard GPT-6 Astra pricing per million tokens: **$10 input, $1 cached input, $12.50 cache writes, $50 output**. Reasoning tokens and repeated context count toward usage; web search has separate fees. Check actual project usage before choosing a production model. Source: https://developers.openai.com/api/docs/models/gpt-6-astra and https://developers.openai.com/api/docs/pricing.
 
@@ -55,7 +55,7 @@ XAI_API_KEY=<secret-manager-value>
 
 OpenAI uses `ZARVIS_PROVIDER=openai`, `OPENAI_API_KEY` and the explicitly configured `ZARVIS_MODEL`. If no model is set, the defaults remain `gpt-5-mini` for OpenAI and `grok-4.7` for xAI. Missing Grok credentials do not silently fall back to OpenAI. Unknown providers disable the endpoint. Readiness and privacy copy follow the configured provider.
 
-The adapter uses fixed provider hosts, the Responses API, `store: false`, low reasoning, 3,000 output tokens per model call, no automatic retries and the shared app deadline. It requests `max_tool_calls: 2` with OpenAI and the documented `max_turns: 2` with xAI. Grok search receives at most five allowed primary/community domains and no OpenAI-only verbosity setting. Encrypted reasoning is explicitly requested for both providers and forwarded unchanged within a stateless tool loop. Neither provider's requested hosted-tool limit is presented as a dollar cap. Grok has been contract-tested and exercised locally with real 4.6/4.7 responses; see the dated evaluation reports for results and limits.
+The adapter uses fixed provider hosts, the Responses API, `store: false`, bounded reasoning/output by response depth, no automatic retries and the shared app deadline described below. It requests `max_tool_calls: 2` with OpenAI and the documented `max_turns: 2` with xAI. Grok search receives at most five allowed primary/community domains and no OpenAI-only verbosity setting. Encrypted reasoning is explicitly requested for both providers and forwarded unchanged within a stateless tool loop. Neither provider's requested hosted-tool limit is presented as a dollar cap. Grok has been contract-tested and exercised locally with real 4.6/4.7 responses; see the dated evaluation reports for results and limits.
 
 Official integration references: [Grok 4.7](https://docs.x.ai/developers/grok-4-7), [Responses contract](https://docs.x.ai/developers/rest-api-reference/inference/responses), [web search](https://docs.x.ai/developers/tools/web-search), [xAI data policy](https://docs.x.ai/developers/faq/security), [OpenAI prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching).
 
@@ -73,7 +73,7 @@ Conversation state stays in browser memory and survives ordinary workspace navig
 
 A daily HMAC digest of the proxy-reported network address keys short-lived abuse counters. Raw addresses and messages are not persisted by this feature. Counters expire at the end of their windows and are removed on subsequent requests; they are not audience analytics or unique-person counts. Proxy-derived network quotas are advisory; atomic global caps remain effective even if headers are forged. No location or identifier is sent to the model provider as a search location / user identifier.
 
-Chat and feedback JSON uploads have an absolute five-second read deadline and cancel on timeout or disconnect. The server enforces a 32 KiB chat request body, up to 40 recent messages / 18,000 characters, a 2,000-character question, at most three model rounds, up to two automatic public lookups plus three model-requested local lookups, two requested hosted-tool calls for OpenAI or two server-side rounds for xAI per model call (a round may contain multiple searches), 3,000 output tokens per model call, no automatic provider retries and a 55-second generation deadline. Usage limits are 5 requests per network per 10 minutes, 20 per day, plus the global hourly/daily limits in Postgres. Failed/aborted requests consume their reservation to prevent retry abuse. A request can still incur cost before cancellation. Source content and user-supplied instructions cannot grant access to additional tools.
+Chat and feedback JSON uploads have an absolute five-second read deadline and cancel on timeout or disconnect. The server enforces a 32 KiB chat request body, up to 40 recent messages / 18,000 characters, a 2,000-character question, at most three model rounds (four for deeper analysis), up to two automatic public lookups plus three model-requested local lookups (five for deeper analysis), two requested hosted-tool calls for OpenAI or two server-side rounds for xAI per model call (a round may contain multiple searches), 3,000 output tokens per model call (6,000 for deeper analysis), no automatic provider retries and a 55-second generation deadline (110 seconds for deeper analysis). Usage limits are 5 requests per network per 10 minutes, 20 per day, plus the global hourly/daily limits in Postgres. Failed/aborted requests consume their reservation to prevent retry abuse. A request can still incur cost before cancellation. Source content and user-supplied instructions cannot grant access to additional tools.
 
 The UI renders no model-generated HTML or images. No third-party model endpoints are exposed in browser CSP; calls and the API key stay server-side. The model cannot send transactions, access funds, execute scripts, contact others or modify records.
 
@@ -129,8 +129,25 @@ The selected candidates are Grok 4.6 and 4.7. See [the real-provider evaluation]
 
 ## Complete ZIP catalog (September 28)
 
-The catalog is retrieval, not model training. Explanations still use the selected external model with bounded local evidence; hosted web research is reserved for missing/stale facts. `lookup_zcash_zips` retrieves additional passages within the existing three-local-lookup limit. Document section ancestry is retained to distinguish pool-specific rules, and ZIP 310 retains its full-viewing-key assumptions.
+The catalog is retrieval, not model training. Explanations still use the selected external model with bounded local evidence; hosted web research is reserved for missing/stale facts. `lookup_zcash_zips` retrieves additional passages within the selected response depth's local-lookup limit. Document section ancestry is retained to distinguish pool-specific rules, and ZIP 310 retains its full-viewing-key assumptions.
 
 A plain one-turn “What is the latest ZIP?” / “Qual é o último ZIP?” can answer without a model call when the catalog is fresh. It ranks the `Created` header, states missing dates and explicitly does not claim first publication or activation. Qualified questions and conversations continue through synthesis. Unknown identifiers are reported as absent from the snapshot, never proof that no proposal exists elsewhere. Newest-by-creation, highest number and source revision are different fields.
 
 Run `python3 scripts/eval-zarvis-zips.py --confirm-paid` for four synthetic loopback cases: one local reply and three model-assisted questions, including the original timeout query and a technical follow-up. Tool loops may make multiple model requests; the flag acknowledges possible charges. This script never loads credentials.
+
+
+## Response depth and analytical follow-through — 2026-09-27
+
+The composer offers **Auto**, **Quick** and **Deep analysis**. This selection is transient browser state and is a validated enum in the request; callers cannot choose arbitrary time or token budgets. Auto uses a local bilingual intent check. A short confirmation can inherit analytical intent from the preceding exchange.
+
+| Mode | Reasoning | Model rounds | Model-requested local lookups | Output tokens / call | Generation deadline |
+| --- | --- | --- | --- | --- | --- |
+| Quick; ordinary Auto questions | low | 3 | 3 | 3,000 | 55 s |
+| Auto analytical questions | medium | 4 | 5 | 6,000 | 110 s |
+| Explicit Deep analysis | high | 4 | 5 | 6,000 | 110 s |
+
+Provider timeouts are 50 / 90 seconds within those overall generation deadlines. These are upper bounds, not latency promises or spending caps. Quick still addresses requested analysis, with a smaller budget. Auto can miss unusual phrasing; the explicit selection overrides routing. Deep analysis uses the configured provider/model, not a separate model. Supported effort levels were checked against the [Grok 4.7 documentation](https://docs.x.ai/developers/models/grok-4.7).
+
+Simple numeric treasury questions retain the deterministic calculator reply. Analytical scenarios retain that verified numeric block and then synthesize interpretation, limitations and requested sensitivity checks. The existing unsupported-amount check also runs on that analysis. This checks numeric provenance, not full semantic correctness. Final model rounds cannot request tools and must return an answer or a specific evidence gap rather than a promise to look something up later.
+
+ZIP retrieval includes scope notes for ZIP 310 and revision-specific caveats for ZIP 317. Created/Last-Updated, retrieval time, specification status and actual network activation remain distinct. See [the refinement evaluation](zarvis-refinement-evaluation.md) for real local responses, failed iterations and release limitations.

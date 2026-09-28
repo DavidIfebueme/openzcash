@@ -2,7 +2,8 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ZarvisEvent, ZarvisExpression, ZarvisSource, ZarvisStatus } from "@/lib/zarvis/types";
 import { sessionPreferences, type ZarvisSession } from "@/lib/zarvis/session";
-import { answerExpression, progressExpression } from "@/lib/zarvis/expression";
+import { answerExpression, completionExpression, progressExpression } from "@/lib/zarvis/expression";
+import type { ResponseDepth } from "@/lib/zarvis/depth";
 import { conversationContext, MAX_QUESTION_LENGTH } from "@/lib/zarvis/context";
 
 export type DisplayMessage = {
@@ -11,6 +12,7 @@ export type DisplayMessage = {
 };
 type ChatState = {
   messages: DisplayMessage[]; draft: string; setDraft: (value: string) => void;
+  depth: ResponseDepth; setDepth: (value: ResponseDepth) => void;
   motionPaused: boolean; toggleMotion: () => void;
   busy: boolean; expression: ZarvisExpression; progress: string; error: string | null; status: ZarvisStatus | null;
   send: (question?: string, retry?: boolean) => void;
@@ -28,10 +30,9 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
   const [replying, setReplying] = useState(false);
-  const [pleased, setPleased] = useState(false);
+  const [depth, setDepth] = useState<ResponseDepth>("auto");
   const [motionPaused, setMotionPaused] = useState(false);
   const [pageHidden, setPageHidden] = useState(false);
-  const pleasedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<ZarvisStatus | null>(null);
@@ -55,14 +56,12 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     return () => {
       document.removeEventListener("visibilitychange", visibility);
       active.current?.abort();
-      if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
     };
   }, []);
 
   function clear() {
     active.current?.abort(); active.current = null;
-    setMessages([]); setDraft(""); setError(null); setBusy(false); setReplying(false); setPleased(false); setProgress("");
-    if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
+    setMessages([]); setDraft(""); setError(null); setBusy(false); setReplying(false); setProgress("");
     statusChecked.current = false; checkStatus();
   }
   function stop() { active.current?.abort(); }
@@ -83,14 +82,13 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
     const id = crypto.randomUUID();
     const controller = new AbortController(); active.current = controller;
     setMessages([...history, { id, role: "assistant", content: "", incomplete: true, pose: answerExpression(history.findLast((message) => message.role === "user")?.content ?? questionText) }]);
-    if (pleasedTimer.current) clearTimeout(pleasedTimer.current);
-    setPleased(false); setDraft(""); setBusy(true); setReplying(false); setError(null); setProgress("Reading your question…");
+    setDraft(""); setBusy(true); setReplying(false); setError(null); setProgress("Reading your question…");
     let completed = false;
     const update = (patch: Partial<DisplayMessage>) => setMessages((all) => all.map((m) => m.id === id ? { ...m, ...patch } : m));
     try {
       const response = await fetch("/api/zarvis", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: context.map(({ role, content }) => ({ role, content })), session }),
+        body: JSON.stringify({ messages: context.map(({ role, content }) => ({ role, content })), session, depth }),
         signal: controller.signal,
       });
       if (!response.ok) {
@@ -109,9 +107,7 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
         if (event.type === "replace") { setReplying(true); text = event.text; update({ content: text }); }
         if (event.type === "error") throw new Error(event.message);
         if (event.type === "done") {
-          completed = true; update({ sources: event.sources, feedbackToken: event.feedbackToken, incomplete: false });
-          setPleased(true);
-          pleasedTimer.current = setTimeout(() => setPleased(false), 1800);
+          completed = true; update({ sources: event.sources, feedbackToken: event.feedbackToken, incomplete: false, pose: completionExpression(history.findLast((m) => m.role === "user")?.content ?? questionText, text) });
         }
       };
       try {
@@ -136,6 +132,6 @@ export function ZarvisProvider({ children }: { children: ReactNode }) {
   // Expressions follow actual chat events; completed answers are not verification badges.
   const answerPose = messages.findLast((message) => message.role === "assistant")?.pose ?? "explaining";
   const expression: ZarvisExpression = busy ? (replying ? answerPose : progressExpression(progress))
-    : error ? "error" : draft.trim() ? "listening" : pleased ? "pleased" : "idle";
-  return <Context.Provider value={{ messages, draft, setDraft, busy, expression, motionPaused: motionPaused || pageHidden, toggleMotion: () => setMotionPaused((paused) => !paused), progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
+    : error ? "error" : draft.trim() ? "listening" : "idle";
+  return <Context.Provider value={{ messages, draft, setDraft, depth, setDepth, busy, expression, motionPaused: motionPaused || pageHidden, toggleMotion: () => setMotionPaused((paused) => !paused), progress, error, status, send, stop, clear, checkStatus }}>{children}</Context.Provider>;
 }

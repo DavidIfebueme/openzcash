@@ -12,7 +12,7 @@ const states: { value: ZarvisExpression; label: string }[] = [
   { value: "listening", label: "Listening" }, { value: "thinking", label: "Thinking" },
   { value: "explaining", label: "Replying" }, { value: "reading", label: "Reading" },
   { value: "exploring", label: "Exploring" }, { value: "protecting", label: "Privacy" },
-  { value: "pleased", label: "Celebrate" }, { value: "error", label: "Error" },
+  { value: "comparing", label: "Comparing" }, { value: "uncertain", label: "Uncertain" }, { value: "clarifying", label: "Clarifying" }, { value: "pleased", label: "Celebrate" }, { value: "error", label: "Error" },
 ];
 const examples: { value: ZarvisExpression; label: string; when: string; example: string; question?: string }[] = [
   { value: "idle", label: "At rest", when: "Waiting for a question or listening while you type.", example: "Open the chat and start typing." },
@@ -22,7 +22,9 @@ const examples: { value: ZarvisExpression; label: string; when: string; example:
   { value: "reading", label: "Reading", when: "For ZIPs and documentation, or while reading public OpenZcash records.", example: "What is ZIP 316?", question: "What is ZIP 316? Explain briefly and link the official source." },
   { value: "exploring", label: "Exploring", when: "For ecosystem questions, or while checking web sources.", example: "Which Zcash wallets can I explore?", question: "Which Zcash wallets can I explore? Give a short overview with sources." },
   { value: "protecting", label: "Privacy", when: "For questions about privacy, security and viewing keys.", example: "What can a viewing key reveal?", question: "What can a Zcash viewing key reveal, and can it spend funds? Answer briefly." },
-  { value: "pleased", label: "Complete", when: "For a brief moment after an answer finishes, then back to its topic pose.", example: "Completion, not a guarantee of accuracy." },
+  { value: "comparing", label: "Comparing", when: "While analyzing a scenario or comparing alternatives.", example: "Compare the assumptions behind two treasury scenarios." },
+  { value: "uncertain", label: "Needs evidence", when: "When the answer cannot verify a claim or the data is unavailable.", example: "I could not verify that claim." },
+  { value: "clarifying", label: "Clarifying", when: "When the answer asks for a missing detail.", example: "Which network do you mean?" },
 ];
 
 export function ZarvisIterations() {
@@ -38,10 +40,10 @@ export function ZarvisIterations() {
   }
   return <div className="zarvis-studio">
     <header className="zarvis-studio-header">
-      <div><p className="zarvis-studio-eyebrow">LOCAL PREVIEW</p><h1>Eight poses. One Zarvis.</h1><p>See every pose in motion and when it appears in the chat.</p></div>
+      <div><p className="zarvis-studio-eyebrow">LOCAL PREVIEW</p><h1>One Zarvis. Reactions with purpose.</h1><p>Eight poses, with distinct reactions for analysis, uncertainty and clarification.</p></div>
       <Link href="/zarvis">Open full chat ↗</Link>
     </header>
-    <section className="zarvis-pose-gallery" aria-label="Eight animated pose examples">
+    <section className="zarvis-pose-gallery" aria-label="Animated conversation states">
       <div className="zarvis-gallery-toolbar"><p>Animated examples · no AI requests</p><button type="button" onClick={chat.toggleMotion}>{chat.motionPaused ? "Resume motion" : "Pause motion"}</button></div>
       <div className="zarvis-pose-grid">{examples.map(({ value, label, when, example, question }, index) => <article className="zarvis-pose-card" key={value} aria-label={`${label} example`}>
         <header><span>{String(index + 1).padStart(2, "0")}</span><h2>{label}</h2></header>
