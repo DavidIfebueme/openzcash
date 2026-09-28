@@ -12,9 +12,17 @@ Zarvis is the OpenZcash AI guide: `/zarvis`, the navigation entry, and a floatin
 
 ## Local testing without request quotas
 
-Set `ZARVIS_LOCAL_UNLIMITED=true` in the local development environment when deliberately testing without hourly, daily or per-network question limits. This setting only takes effect with `NODE_ENV=development` and an explicit HTTP loopback `ZARVIS_ORIGIN` (`127.0.0.1`, `localhost` or `::1`). Production always uses the normal quota path even if this flag is accidentally set. The flag is false by default.
+Set `ZARVIS_LOCAL_UNLIMITED=true` in the local development environment when deliberately testing without hourly, daily or per-network question limits. This setting only takes effect with `NODE_ENV=development` and an explicit HTTP loopback `ZARVIS_ORIGIN` (`127.0.0.1`, `localhost` or `::1`). This local flag never changes production quotas. The flag is false by default.
 
-This mode does not read, increment or reset the quota counters, so an exhausted test counter no longer blocks the preview. Disable the flag to resume ordinary quotas. The origin checks, input limits, per-answer output budget, deadline and stop/cancel behavior still apply. Model-assisted answers continue to use the configured provider and incur its normal API costs. Deterministic local answers make no model call. All submitted questions still count toward request quotas outside unlimited local testing.
+This mode does not read, increment or reset the quota counters, so an exhausted test counter no longer blocks the preview. Disable the flag to resume ordinary quotas. The origin checks, input limits, per-answer output budget, deadline and stop/cancel behavior still apply. Model-assisted answers continue to use the configured provider and incur its normal API costs. Deterministic local answers make no model call. All submitted questions count toward request quotas unless local testing or the explicit launch window below is active.
+
+## Temporary launch window
+
+Set the server-only `ZARVIS_QUOTA_PAUSE_UNTIL` to an explicit UTC expiry such as `2026-09-29T03:00:00.000Z` (midnight ending September 28 in Sao Paulo). The override is active only during the final 24 hours before that instant. Omitted, malformed, timezone-less, expired or more distant values keep normal quotas. The server rechecks the clock for every request; at expiry it automatically resumes the configured global quotas and ordinary network quotas without a restart or scheduled job. Clear the variable to end the window early.
+
+During this window, global hourly/daily and per-network question counters are bypassed without reading, incrementing or resetting them. Existing counters remain intact for normal enforcement afterward. Accepted in-flight answers can finish under their existing deadline. The feature enable switch, origin/body checks, per-process concurrency, token/tool budgets and deadlines still apply. Model-assisted answers incur normal provider costs; there is no application request-count spending cap during the window. Direct answers still make no model call.
+
+The authenticated `GET /api/zarvis/metrics` response includes `quota.paused`, `quota.resumesAt` (the configured UTC expiry), and the normal `dailyLimit` / `hourlyLimit`. This is current policy, not usage counters. Public readiness does not disclose these settings.
 
 ## Cost reference (checked 2026-09-25)
 
@@ -103,7 +111,7 @@ Real-provider smoke tests require a securely configured funded provider account.
 
 ## Operations and feedback
 
-`ZARVIS_MAX_CONCURRENT` defaults to eight active generations per server process (bounded to 32). Excess requests receive 429/Retry-After before a model call. This also applies during unlimited local testing. Atomic global request quotas in Postgres remain the cross-replica cost/abuse safeguard; per-process concurrency is not a global dollar cap.
+`ZARVIS_MAX_CONCURRENT` defaults to eight active generations per server process (bounded to 32). Excess requests receive 429/Retry-After before a model call. This also applies during unlimited local testing and a temporary launch window. Outside those explicit exceptions, atomic global request quotas in Postgres remain the cross-replica cost/abuse safeguard; per-process concurrency is not a global dollar cap.
 
 `GET /api/zarvis/metrics` requires the existing admin session. It exposes aggregate success/error/abort/busy counts, local/model routing, tokens/cache hits, numeric fallbacks, feedback and latency buckets. Counters reset with the server and are **per process**, not durable audience analytics or unique-person counts. Set `ZARVIS_AGGREGATE_METRICS=true` to emit these cumulative counters at most once a minute when traffic arrives. No prompt, reply, credential, raw IP or visitor identifier is added to these metrics. Hosting logs are separate.
 

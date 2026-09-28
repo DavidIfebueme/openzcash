@@ -8,8 +8,8 @@ import { zarvisConfig } from "./config";
 /** Durable, atomic limits shared across replicas; failures close the paid API. */
 export async function reserveZarvisRequest(headers: Headers) {
   const config = zarvisConfig();
-  // The server configuration permits this only for an opted-in loopback dev preview.
-  if (config.unlimitedLocalTesting) return { allowed: true, retryAfter: 0 };
+  // Explicit loopback testing or a time-bounded server launch window; existing counters stay intact.
+  if (config.unlimitedLocalTesting || config.quotaPause.active) return { allowed: true, retryAfter: 0 };
   // Advisory network limit only: global caps still apply if a proxy header is spoofed.
   const network = (headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown").trim().slice(0, 80);
   const now = Date.now();

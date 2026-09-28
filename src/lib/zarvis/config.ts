@@ -15,6 +15,18 @@ function unlimitedLocalTesting(): boolean {
   } catch { return false; }
 }
 
+/** Server-only launch override, evaluated per request and limited to a 24-hour window. */
+function quotaPause(): { active: boolean; until: string | null } {
+  const raw = process.env.ZARVIS_QUOTA_PAUSE_UNTIL?.trim() ?? "";
+  const inactive = { active: false, until: null };
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(raw)) return inactive;
+  const deadline = Date.parse(raw);
+  const canonical = raw.length === 20 ? `${raw.slice(0, -1)}.000Z` : raw;
+  if (!Number.isFinite(deadline) || new Date(deadline).toISOString() !== canonical) return inactive;
+  const remaining = deadline - Date.now();
+  return { active: remaining > 0 && remaining <= 86_400_000, until: canonical };
+}
+
 export function zarvisConfig() {
   const requestedProvider = process.env.ZARVIS_PROVIDER?.trim() || "openai";
   const provider = requestedProvider === "xai" ? "xai" : "openai";
@@ -28,6 +40,7 @@ export function zarvisConfig() {
     model: process.env.ZARVIS_MODEL?.trim() || (provider === "xai" ? "grok-4.7" : "gpt-5-mini"),
     webSearch: process.env.ZARVIS_WEB_SEARCH !== "false",
     unlimitedLocalTesting: unlimitedLocalTesting(),
+    quotaPause: quotaPause(),
     dailyLimit: limit("ZARVIS_DAILY_REQUEST_LIMIT", 100, 10_000),
     hourlyLimit: limit("ZARVIS_HOURLY_REQUEST_LIMIT", 30, 1_000),
   };
