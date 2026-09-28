@@ -1,6 +1,6 @@
 # Zarvis preproduction audit — September 27, 2026
 
-> Follow-up: the user selected Grok 4.6 and 4.7, configured its key, and completed local live testing after this audit. See [the Grok evaluation](zarvis-grok-evaluation.md) for fixes, measured results and the remaining broad-search timeout. The original inspection below is a dated snapshot. Production remains disabled.
+> Follow-up: the user selected Grok 4.6 and 4.7, configured its key, and completed local live testing after this audit. See [the Grok evaluation](zarvis-grok-evaluation.md) for fixes, measured results and the original broad-search timeout. The [ZIP catalog follow-up](zarvis-zip-catalog-evaluation.md) records the subsequent local resolution for that query. The original inspection below is a dated snapshot. Production remains disabled.
 
 ## Release decision
 

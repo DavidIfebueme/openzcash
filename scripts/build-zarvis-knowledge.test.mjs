@@ -19,7 +19,7 @@ test("extracts visible copy without executing code, importing modules or copying
 test("the indexed PDF snapshots still match the published files", async () => {
   const { createHash } = await import("node:crypto");
   const corpus = JSON.parse(fs.readFileSync(new URL("../src/lib/zarvis/reference-content.json", import.meta.url), "utf8"));
-  assert.ok(corpus.sources.length >= 14);
+  assert.ok(corpus.sources.length >= 4);
   for (const source of corpus.sources) {
     assert.ok(source.retrievedAt); assert.ok(source.note); assert.ok(source.sha256);
     assert.match(source.url, /^https:\/\/(zips.z.cash|openzcash.org)\//);

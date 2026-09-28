@@ -26,8 +26,9 @@
     "knowledge:build": "node scripts/build-zarvis-knowledge.mjs",
     "knowledge:check": "node scripts/build-zarvis-knowledge.mjs --check",
     "test:knowledge": "node --test scripts/build-zarvis-knowledge.test.mjs",
-    "knowledge:sync": "python3 scripts/sync-zarvis-references.py",
-    "eval:zarvis": "vitest run src/lib/zarvis/evaluation.test.ts"
+    "knowledge:sync": "npm run knowledge:sync:zips && python3 scripts/sync-zarvis-references.py",
+    "eval:zarvis": "vitest run src/lib/zarvis/evaluation.test.ts",
+    "knowledge:sync:zips": "node --import tsx scripts/sync-zarvis-zips.ts"
   },
   "dependencies": {
     "@grpc/grpc-js": "^1.14.4",

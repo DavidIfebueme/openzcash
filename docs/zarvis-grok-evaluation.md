@@ -1,5 +1,8 @@
 # Zarvis: live Grok integration evaluation
 
+> September 28 follow-up: the [complete internal ZIP catalog](zarvis-zip-catalog-evaluation.md) reduced the same broad ZIP query from 54.09 seconds / 22 hosted searches to 7.03 seconds / zero hosted searches in a local test. The historical failures below are retained.
+
+
 Date: September 28, 2026 UTC (September 27 in São Paulo). Branch: `michae2xl/zarvis-assistant`. Follow-up to the [preproduction audit](zarvis-preproduction-audit.md).
 
 ## State

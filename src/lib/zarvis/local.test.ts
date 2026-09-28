@@ -3,6 +3,12 @@ vi.mock("server-only", () => ({}));
 const mocks = vi.hoisted(() => ({ lookup: vi.fn(), ledger: vi.fn() }));
 vi.mock("./data", async (original) => ({ ...await original<object>(), lookupPublicData: mocks.lookup }));
 vi.mock("./ledger", async (original) => ({ ...await original<object>(), queryLedger: mocks.ledger }));
+vi.mock("./zips", async () => {
+  const { bundledZipCorpus } = await import("./knowledge");
+  return { getZipCorpus: vi.fn().mockResolvedValue({ corpus: bundledZipCorpus, stale: false }) };
+});
+import { getZipCorpus } from "./zips";
+import { bundledZipCorpus } from "./knowledge";
 import { directIntent, prepareLocal, retrievalQuestion, lookupLedger } from "./local";
 import type { ChatMessage } from "./types";
 const user = (content: string): ChatMessage => ({ role: "user", content });
@@ -69,9 +75,21 @@ describe("Precise local answers", () => {
     const result = await prepareLocal([user("ZCG grant payments in 2024"), answer("A dated total."), user("2025")], signal());
     expect(result.direct).toContain("In **2025**");
   });
-  it("checks current ZIPs externally after local retrieval and caps automatic public lookups", async () => {
+  it("keeps explicit ZIP explanations and short confirmations on internal evidence", async () => {
+    const result = await prepareLocal([user("Explain ZIP 259"), answer("ZIP 259 is a draft about NU7. I can explain it."), user("sim")], signal());
+    expect(result.external).toBe(false); expect(result.direct).toBeUndefined();
+    expect(result.documents.some((d) => d.url.endsWith("zip-0259"))).toBe(true);
+  });
+  it("allows external verification when a requested ZIP is absent or current evidence is stale", async () => {
+    expect((await prepareLocal([user("Explain ZIP 99999")], signal())).external).toBe(true);
+    vi.mocked(getZipCorpus).mockResolvedValueOnce({ corpus: bundledZipCorpus, stale: true });
     const result = await prepareLocal([user("What is the latest ZIP?")], signal());
-    expect(result.external).toBe(true); expect(mocks.lookup).not.toHaveBeenCalled();
+    expect(result.external).toBe(true); expect(result.direct).toBeUndefined();
+    expect(JSON.parse(result.evidence[0].content).data.stale).toBe(true);
+  });
+  it("uses the fresh complete ZIP catalog before external research and caps automatic public lookups", async () => {
+    const result = await prepareLocal([user("What is the latest ZIP?")], signal());
+    expect(result.external).toBe(false); expect(result.direct).toContain("Created"); expect(result.evidence[0].content).toContain("official_zip_catalog"); expect(mocks.lookup).not.toHaveBeenCalled();
     await prepareLocal([user("Compare treasury balances, meetings, elections and grant recipients")], signal());
     expect(mocks.lookup).toHaveBeenCalledTimes(2);
   });

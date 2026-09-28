@@ -1,11 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
-const mocks = vi.hoisted(() => ({ create: vi.fn(), lookup: vi.fn(), prepare: vi.fn(), ledger: vi.fn(), config: vi.fn(), scenario: vi.fn() }));
+const mocks = vi.hoisted(() => ({ create: vi.fn(), lookup: vi.fn(), prepare: vi.fn(), ledger: vi.fn(), config: vi.fn(), scenario: vi.fn(), zips: vi.fn() }));
 vi.mock("openai", () => ({ default: class { responses = { create: mocks.create }; } }));
 vi.mock("./config", () => ({ zarvisConfig: mocks.config }));
 vi.mock("./data", async (original) => ({ ...await original<object>(), lookupPublicData: mocks.lookup }));
 vi.mock("./local", async (original) => ({ ...await original<object>(), prepareLocal: mocks.prepare, lookupLedger: mocks.ledger }));
 vi.mock("./scenario", async (original) => ({ ...await original<object>(), lookupScenario: mocks.scenario }));
+vi.mock("./zips", async (original) => ({ ...await original<object>(), lookupZips: mocks.zips }));
 import { computeScenario } from "./scenario";
 import { generateAnswer } from "./openai";
 import type { ZarvisEvent } from "./types";
@@ -65,6 +66,14 @@ describe("Zarvis local-first orchestration", () => {
     }
     expect(JSON.stringify(mocks.create.mock.calls[1][0].input)).toContain("2026-09-16");
     expect(emitted.at(-1)).toEqual({ type: "done", sources: [source] });
+  });
+  it("retrieves a missing ZIP passage internally without adding hosted search", async () => {
+    mocks.zips.mockResolvedValue({ content: '{"data":{"kind":"official_zip_catalog","stale":false}}', source: { title: "ZIP catalog", url: "https://zips.z.cash/", retrievedAt: "2026-09-28T00:00:00Z" } });
+    mocks.create.mockResolvedValueOnce(events([call("zip-lookup", '{"query":"ZIP 32 hardened derivation"}', "lookup_zcash_zips")])).mockResolvedValueOnce(events([answer("A sourced ZIP explanation.")]));
+    const metrics = await generateAnswer(question, new AbortController().signal, () => {});
+    expect(mocks.zips).toHaveBeenCalledTimes(1);
+    expect(metrics).toMatchObject({ webSearchCalls: 0, localLookups: 1, modelCalls: 2 });
+    expect(mocks.create.mock.calls.every(([p]) => p.tools.every((t: { type: string }) => t.type !== "web_search"))).toBe(true);
   });
   it("enables web research only after an explicit missing-evidence request", async () => {
     mocks.create.mockResolvedValueOnce(events([call("research", '{"reason":"missing_local_evidence"}', "request_external_research")])).mockResolvedValueOnce(events([{ type: "web_search_call" }, answer("A verified external fact.")]));

@@ -1,0 +1,111 @@
+[
+  {
+    "case": "local-latest",
+    "question": "Qual é o último ZIP?",
+    "seconds": 0.14,
+    "passed": true,
+    "answer": "Pelo campo **Created** dos ZIPs numerados no catálogo oficial, o mais recente é o **[ZIP 259: Deployment of the NU7 Network Upgrade](https://github.com/zcash/zips/blob/afa086bd976e316612a5c06fb139429958d07d84/zips/zip-0259.md)**, criado em **2026-09-15**, com status **Draft**. Catálogo verificado em 28 de set. de 2026, 00:50 UTC.\n\nEssa é a data de criação declarada no documento, não uma confirmação da primeira publicação. Alguns ZIPs não informam essa data; o maior número também não indica o mais recente. O status do documento não comprova ativação na rede.",
+    "session": {},
+    "sources": [
+      {
+        "title": "ZIP 155: addrv2 message",
+        "url": "https://zips.z.cash/zip-0155",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "ZIP 221: FlyClient - Consensus-Layer Changes",
+        "url": "https://zips.z.cash/zip-0221",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "ZIP 2001: Lockbox Funding Streams",
+        "url": "https://zips.z.cash/zip-2001",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "Official Zcash ZIP catalog",
+        "url": "https://zips.z.cash/",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      }
+    ],
+    "error": null
+  },
+  {
+    "case": "current-zip-research",
+    "question": "Check official sources now: what is the latest published Zcash ZIP as of today? Give its title, status, source URL and verification date; do not assume the highest number is the newest publication.",
+    "seconds": 7.03,
+    "passed": true,
+    "answer": "The newest numbered ZIP by its **Created** date in the official catalog is [ZIP 259: Deployment of the NU7 Network Upgrade](https://zips.z.cash/zip-0259), status **Draft**. That catalog was retrieved on 28 September 2026 at 00:50 UTC from revision `afa086bd976e` of the [zcash/zips](https://github.com/zcash/zips/blob/afa086bd976e316612a5c06fb139429958d07d84/zips/zip-0259.md) repository. Its Created date is 15 September 2026; that is the author’s creation date, not a verified first-publication time, and Draft does not mean network activation.\n\nThe highest number is not the newest: [ZIP 2007](https://zips.z.cash/zip-2007) is Reserved and was created on 5 July 2025. Twenty-seven numbered documents have no Created date, so an undated file could still be newer than ZIP 259.",
+    "session": {},
+    "sources": [
+      {
+        "title": "ZIP 403: Verification Behaviour of zcashd",
+        "url": "https://zips.z.cash/zip-0403",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "Official Zcash ZIP catalog",
+        "url": "https://zips.z.cash/",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      }
+    ],
+    "error": null
+  },
+  {
+    "case": "full-corpus-zip-32",
+    "question": "Explain ZIP 32 hardened key derivation in plain English, in two sentences with a source.",
+    "seconds": 4.33,
+    "passed": true,
+    "answer": "ZIP 32 hardened key derivation makes a new child key only from the parent secret key and chain code, and only when the child index is in the hardened range (2³¹ or higher). If the index is not hardened, derivation fails, which is why Orchard wallets in this spec support hardened derivation only. [ZIP 32](https://zips.z.cash/zip-0032)",
+    "session": {},
+    "sources": [
+      {
+        "title": "ZIP 32: Shielded Hierarchical Deterministic Wallets",
+        "url": "https://zips.z.cash/zip-0032",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "ZIP 416: Spending Key Derivation in the `zcashd` wallet",
+        "url": "https://zips.z.cash/zip-0416",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "Official Zcash ZIP catalog",
+        "url": "https://zips.z.cash/",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      }
+    ],
+    "error": null
+  },
+  {
+    "case": "zip-context-followup",
+    "question": "And how does that differ from non-hardened derivation?",
+    "seconds": 16.35,
+    "passed": true,
+    "answer": "Non-hardened derivation uses a child index below 2³¹. For Sapling, ZIP 32 supports it from an extended full viewing key, so later addresses can be derived without the parent spending key. Hardened derivation uses an index of 2³¹ or higher and requires parent spending-key material, so a viewing key alone cannot produce those children. Orchard in this specification allows only hardened derivation. [ZIP 32](https://zips.z.cash/zip-0032)",
+    "session": {},
+    "sources": [
+      {
+        "title": "ZIP 32: Shielded Hierarchical Deterministic Wallets",
+        "url": "https://zips.z.cash/zip-0032",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "ZIP 416: Spending Key Derivation in the `zcashd` wallet",
+        "url": "https://zips.z.cash/zip-0416",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      },
+      {
+        "title": "OpenZcash · ecosystem",
+        "url": "https://openzcash.org/api/ecosystem",
+        "retrievedAt": "2026-09-28T00:56:14.831Z"
+      },
+      {
+        "title": "Official Zcash ZIP catalog",
+        "url": "https://zips.z.cash/",
+        "retrievedAt": "2026-09-28T00:50:52.801Z"
+      }
+    ],
+    "error": null
+  }
+]

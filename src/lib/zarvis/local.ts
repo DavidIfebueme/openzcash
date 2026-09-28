@@ -2,6 +2,8 @@ import "server-only";
 import { lookupPublicData, lookupSchema } from "./data";
 import { queryLedger, ledgerQuerySchema, type LedgerQuery, type LedgerSummary } from "./ledger";
 import { searchKnowledge } from "./knowledge";
+import { getZipCorpus } from "./zips";
+import { isZipQuestion, zipCatalogEvidence, latestZipAnswer, requestedZips } from "./zip-catalog";
 import { boundedRead } from "./timeout";
 import type { ChatMessage, ZarvisSource } from "./types";
 
@@ -118,7 +120,8 @@ export function relevantTopics(query: string): Array<typeof lookupSchema._output
 export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal): Promise<LocalPlan> {
   signal.throwIfAborted();
   const query = retrievalQuestion(messages);
-  const documents = searchKnowledge(query);
+  const zip = isZipQuestion(query) ? await getZipCorpus(signal) : undefined;
+  const documents = searchKnowledge(query, 4, 5000, zip?.corpus);
   const intent = directIntent(messages);
   const pt = portuguese(messages);
   if (intent?.type === "ledger") {
@@ -129,12 +132,17 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal)
   const scenarioQuestion = /(?:simul|scenario|cenario|\b[0-9]+\s*[x×]\b)/i.test(query) && /treasur|tesour|cypherpunk|cipherpunk|lockbox|zcg/i.test(query);
   const topics = scenarioQuestion ? [] : intent?.type === "price" ? ["price" as const] : relevantTopics(query);
   const evidence = await Promise.all(topics.map((topic) => lookupPublicData({ topic, query: "" }, signal)));
+  if (zip) evidence.push(zipCatalogEvidence(query, zip.corpus, zip.stale));
   signal.throwIfAborted();
   const q = normalizeQuestion(query);
-  // Dated local notes do not establish current protocol status, releases or the newest ZIP.
-  const external = /\b(?:latest|newest|current|ultimo|ultima|atual|today|hoje|recent\w*)\b/.test(q)
+  // The complete fresh official catalog covers ZIP metadata; other current external facts still need research.
+  const currentExternal = /\b(?:latest|newest|current|ultimo|ultima|atual|today|hoje|recent\w*)\b/.test(q)
     && /\b(?:zips?|nu\d+|upgrade|release|protocol|protocolo|versao)\b/.test(q);
-  return { query, documents, evidence, direct: intent?.type === "price" ? priceAnswer(evidence[0], pt) : undefined, external };
+  const missingZip = zip && requestedZips(query).some((n) => !zip.corpus.documents.some((d) => d.number === n));
+  const external = zip ? !!missingZip || (zip.stale && currentExternal) : currentExternal;
+  const direct = intent?.type === "price" ? priceAnswer(evidence[0], pt)
+    : zip && messages.length === 1 ? latestZipAnswer(query, zip.corpus, zip.stale, pt) : undefined;
+  return { query, documents, evidence, direct, external };
 }
 
 export function ledgerFactsAnswer(data: LedgerSummary, pt: boolean): string | undefined {
