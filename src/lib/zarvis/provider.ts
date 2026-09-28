@@ -11,8 +11,14 @@ export function providerClient(config: Config, timeout = 50_000) {
   // Fixed hosts: never route a credential using a user-supplied URL or SDK environment override.
   return new OpenAI({ apiKey: config.apiKey, baseURL: config.provider === "xai" ? "https://api.x.ai/v1" : "https://api.openai.com/v1", maxRetries: 0, timeout });
 }
-export function providerSearchTool(config: Config, zipOnly = false): Tool {
-  if (zipOnly) return { type: "web_search", filters: { allowed_domains: ["zips.z.cash"] }, ...(config.provider === "openai" ? { search_context_size: "low" as const } : {}) };
+export function providerSearchTool(config: Config, scope: "general" | "zip" | "mining" | "history" = "general"): Tool {
+  if (scope === "zip") return { type: "web_search", filters: { allowed_domains: ["zips.z.cash"] }, ...(config.provider === "openai" ? { search_context_size: "low" as const } : {}) };
+  if (scope === "mining" || scope === "history") return {
+    type: "web_search", filters: { allowed_domains: scope === "mining"
+      ? ["zcashinfo.com", "zecstats.com", "zips.z.cash", "z.cash", "electriccoin.co"]
+      : ["openzcash.org", "z.cash", "electriccoin.co", "shieldedlabs.net", "zfnd.org"] },
+    ...(config.provider === "openai" ? { search_context_size: "low" as const } : {}),
+  };
   if (config.provider === "xai") return { type: "web_search", filters: { allowed_domains: ["z.cash", "zips.z.cash", "electriccoin.co", "zfnd.org", "forum.zcashcommunity.com"] } };
   return { type: "web_search", filters: { allowed_domains: SEARCH_DOMAINS }, search_context_size: "low" };
 }

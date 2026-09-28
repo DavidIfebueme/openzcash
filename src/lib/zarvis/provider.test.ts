@@ -21,7 +21,16 @@ describe("Explicit provider configuration", () => {
   });
   it.each(["xai", "openai"])("narrows ZIP research to the official catalog for %s", (provider) => {
     vi.stubEnv("ZARVIS_PROVIDER", provider);
-    expect(providerSearchTool(zarvisConfig(), true)).toMatchObject({ filters: { allowed_domains: ["zips.z.cash"] } });
+    expect(providerSearchTool(zarvisConfig(), "zip")).toMatchObject({ filters: { allowed_domains: ["zips.z.cash"] } });
+  });
+  it.each(["xai", "openai"])("uses mining and biography sources within five domains for %s", (provider) => {
+    vi.stubEnv("ZARVIS_PROVIDER", provider);
+    const config = zarvisConfig();
+    const mining = providerSearchTool(config, "mining") as { filters: { allowed_domains: string[] } };
+    expect(mining.filters.allowed_domains).toContain("zcashinfo.com");
+    expect(mining.filters.allowed_domains).toContain("zecstats.com");
+    expect(mining.filters.allowed_domains.length).toBeLessThanOrEqual(5);
+    expect(providerSearchTool(config, "history")).toMatchObject({ filters: { allowed_domains: expect.arrayContaining(["openzcash.org", "shieldedlabs.net"]) } });
   });
   it("does not silently switch providers or reuse the OpenAI key when a Grok key is absent", () => {
     vi.stubEnv("ZARVIS_PROVIDER", "xai"); vi.stubEnv("XAI_API_KEY", ""); vi.stubEnv("OPENAI_API_KEY", "openai-test");

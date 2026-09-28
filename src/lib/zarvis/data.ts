@@ -7,12 +7,12 @@ import type { Catalog } from "@/lib/ecosystem/types";
 import type { DevFundReportedData } from "@/lib/treasury/dev-fund";
 
 export const lookupSchema = z.object({
-  topic: z.enum(["price", "treasuries", "markets", "grants", "recipients", "disbursements", "proposals", "coinholder", "zechub", "ecosystem", "news", "funding_history", "site", "meetings", "elections", "totals", "schedule", "investments", "governance", "monthly"]),
+  topic: z.enum(["mining", "price", "treasuries", "markets", "grants", "recipients", "disbursements", "proposals", "coinholder", "zechub", "ecosystem", "news", "funding_history", "site", "meetings", "elections", "totals", "schedule", "investments", "governance", "monthly"]),
   query: z.string().max(120),
 }).strict();
 export const lookupTool = {
   type: "function" as const, name: "lookup_openzcash",
-  description: "Read current public OpenZcash records with source dates. Use price for the current ZEC/USD quote, including its timestamp and freshness. Use markets for market volumes, trading venues, supply and public holdings, not the simple ZEC price. Use site to search local documentation/methodology/ceremony pages, meetings/elections for ZCG governance, totals for published pivots, schedule for future payments, investments for Maya transfers, governance for dated protocol records, monthly for published reading sets; site for indexed PDF/document excerpts. Other topics cover treasury balances, ZCG grants, recipients, grant applications, news and the ecosystem. The proposals topic contains funding applications to ZCG, NOT Zcash Improvement Proposals (ZIPs). Use site for indexed ZIP document snapshots. Current protocol status still requires official-source verification. query: optional short project/person name to narrow records, or empty for overview. Results may be partial. Does not access wallets, private records, user pages or arbitrary URLs.",
+  description: "Read current public OpenZcash records with source dates. Use mining for the current network solrate estimate from ZcashInfo (20-block average with heights, block timestamps and freshness, not historical or pool-share data). Use price for the current ZEC/USD quote, including its timestamp and freshness. Use markets for market volumes, trading venues, supply and public holdings, not the simple ZEC price. Use site to search local documentation/methodology/ceremony pages, meetings/elections for ZCG governance, totals for published pivots, schedule for future payments, investments for Maya transfers, governance for dated protocol records, monthly for published reading sets; site for indexed PDF/document excerpts. Other topics cover treasury balances, ZCG grants, recipients, grant applications, news and the ecosystem. The proposals topic contains funding applications to ZCG, NOT Zcash Improvement Proposals (ZIPs). Use site for indexed ZIP document snapshots. Current protocol status still requires official-source verification. query: optional short project/person name to narrow records, or empty for overview. Results may be partial. Does not access wallets, private records, user pages or arbitrary URLs.",
   strict: true,
   parameters: {
     type: "object", properties: {
@@ -22,7 +22,7 @@ export const lookupTool = {
   },
 };
 export const links: Record<z.infer<typeof lookupSchema>["topic"], string> = {
-  price: "/api/zec-price", treasuries: "/zcg/treasury-calculator", markets: "/zec-observatory",
+  mining: "https://api.zcashinfo.com/api/v1/mining/overview", price: "/api/zec-price", treasuries: "/zcg/treasury-calculator", markets: "/zec-observatory",
   grants: "/api/zcg/data/grants", recipients: "/api/zcg/data/recipients",
   disbursements: "/api/zcg/data/disbursements", proposals: "/api/zcg/office",
   coinholder: "/api/zcg/coinholder/round", zechub: "/api/zechub/treasury",
@@ -129,8 +129,9 @@ export function treasuryContext(funds: DevFundReportedData) {
   };
 }
 
-async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], query: string): Promise<unknown> {
+async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], query: string, signal: AbortSignal): Promise<unknown> {
   // Explicit handlers only: no tool-controlled imports, hostnames, SQL or paths.
+  if (topic === "mining") return (await import("./mining")).readMiningSnapshot(signal);
   const request = new Request(`https://openzcash.org${links[topic]}${query ? `?search=${encodeURIComponent(query)}` : ""}`);
   switch (topic) {
     case "site": { const { searchKnowledge, knowledgeCoverage } = await import("./knowledge"); return { coverage: knowledgeCoverage, documents: searchKnowledge(query, 5, 5000), note: "Reviewed references and static site documentation excerpts, not current account balances. Navigation labels do not establish page contents. Source revisions do not establish reporting dates." }; }
@@ -170,17 +171,17 @@ export async function lookupPublicData(args: unknown, signal: AbortSignal): Prom
   const parsed = lookupSchema.safeParse(args);
   if (!parsed.success) return { content: JSON.stringify({ error: "Unsupported public-data lookup." }) };
   const { topic, query } = parsed.data;
-  const url = `https://openzcash.org${links[topic]}`;
+  const url = links[topic].startsWith("https://") ? links[topic] : `https://openzcash.org${links[topic]}`;
   try {
     signal.throwIfAborted();
-    const data = await boundedRead(() => readPublicData(topic, query), signal);
+    const data = await boundedRead(() => readPublicData(topic, query, signal), signal);
     signal.throwIfAborted();
     const retrievedAt = new Date().toISOString();
     let ledgerImportedAt: string | null | undefined;
     if (["grants", "recipients", "disbursements"].includes(topic)) {
       try { ledgerImportedAt = (await (await import("@/lib/zcg/freshness")).latestImportAt())?.toISOString() ?? null; } catch { ledgerImportedAt = null; }
     }
-    return { content: JSON.stringify({ sourceUrl: url, retrievedAt, ledgerImportedAt, ...compactData(data, query) }), source: { title: `OpenZcash · ${topic.replaceAll("_", " ")}`, url, retrievedAt } };
+    return { content: JSON.stringify({ sourceUrl: url, retrievedAt, ledgerImportedAt, ...compactData(data, query) }), source: { title: topic === "mining" ? "ZcashInfo · mining snapshot" : `OpenZcash · ${topic.replaceAll("_", " ")}`, url, retrievedAt } };
   } catch {
     signal.throwIfAborted();
     return { content: JSON.stringify({ sourceUrl: url, error: "Public data temporarily unavailable. Do not invent current figures; direct the user to this page." }) };

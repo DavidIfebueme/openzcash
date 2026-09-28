@@ -4,7 +4,7 @@ import type { ZarvisSource } from "./types";
 export const SEARCH_DOMAINS = [
   "z.cash", "zips.z.cash", "zcash.github.io", "zcash.readthedocs.io",
   "zfnd.org", "zcashfoundation.org", "electriccoin.co", "zechub.wiki",
-  "forum.zcashcommunity.com", "shieldedlabs.net", "openzcash.org",
+  "forum.zcashcommunity.com", "shieldedlabs.net", "openzcash.org", "zcashinfo.com", "zecstats.com",
 ];
 
 export function safeSourceUrl(raw: string): string | null {
@@ -58,6 +58,31 @@ export const KNOWLEDGE: KnowledgeNote[] = [
     text: "The calculator compares a circulating-supply target with a fixed maximum-supply target. Mining projections include halvings and assume the company's mining share remains constant. A mining-only ceiling is conditional on that model, not proof that a company can never reach its target; purchases or a changing mining share can change the result. 'Mine, then buy' is a single purchase of the remaining ZEC at the chosen future price, not an annual expense. Mining costs, price impact and future spending growth are excluded. ZCG + Lockbox coverage values dated balances at a scenario price against a fixed annual USD budget; separate legal restrictions still apply. The share of spending funded by ZEC sales is an assumption, not evidence that all grant recipients sell their ZEC. Never recycle 4.24% or another historic output as a current prediction.", reviewedOn,
   },
   {
+    id: "mining-solrate", title: "ZcashInfo: estimated solrate and mining windows", url: "https://zcashinfo.com/learn/solrate/",
+    keywords: "hashrate solrate hashrates mining mineracao dificuldade difficulty current atual network rede estimativa janela window zcashinfo",
+    text: "ZcashInfo estimates post-Blossom network solrate as difficulty × 8192 / 75, in solutions per second (Sol/s). Its dashboard uses a 20-block average, while charts use other windows. This is inferred mining power, not a count of machines. Pool solrate is estimated as attributed block share multiplied by the network solrate for the same period. Short windows have statistical variance; unknown attribution and missing blocks affect interpretation. Compare measurements only with their source time, block range or averaging window and Sol/s units. These reviewed notes contain no live hashrate or pool shares.", reviewedOn: "2026-09-28",
+  },
+  {
+    id: "mining-pools", title: "ZcashInfo: mining pool attribution", url: "https://zcashinfo.com/learn/pool-attribution/",
+    keywords: "mining pools mineracao mineradores pool share ownership participacao oferta blocos foundry viabtc antpool zcashinfo",
+    text: "ZcashInfo identifies pools using coinbase tags, signatures and other public-chain evidence. Attribution confidence varies; unidentified blocks remain Unknown. Pool block share describes attributed blocks in a chosen interval, not the operator's ZEC holdings, unique miners, equipment ownership or proven control over every participant. Pool participants can change pools, and received coins may be distributed or sold. Preserve Unknown in the denominator. Do not infer company treasury ownership or motives from a pool ranking. Use the Pools page for dated rankings; this methodology note does not contain a current ranking.", reviewedOn: "2026-09-28",
+  },
+  {
+    id: "mining-statistics", title: "ZecStats: hashrate methodology and complete daily series", url: "https://zecstats.com/chart/hashrate",
+    keywords: "zecstats zcashstats hashrate hash rates mining dificuldade mineracao solrate compare comparar different diferentes janela window dia daily",
+    text: "ZecStats describes its hashrate as a difficulty-derived estimate in solutions per second. Its daily series excludes the current incomplete UTC day; report the observation day separately from retrieval time. Equihash Sol/s is not directly comparable with Bitcoin SHA-256 hashes/s. Differences from ZcashInfo may reflect averaging windows, observation times, indexing lag or estimation methods; inspect these before declaring either source wrong. Difficulty is protocol data; estimated hashrate is an inference. A short-term difficulty rise alone does not prove additional miners joined. Never present this static methodology as a current measurement.", reviewedOn: "2026-09-28",
+  },
+  {
+    id: "zooko-background", title: "Zooko Wilcox and Zcash's origins", url: "https://z.cash/learn/who-created-zcash/",
+    keywords: "zooko wilcox biography biografia founder fundador who quem history historia origins origem ecc",
+    text: "Zcash's own history credits a group of scientists with its invention and Electric Coin Company and Zooko Wilcox with bringing it to life. It describes Zooko as a computer-security specialist and original cypherpunk. The company was formed in 2015 and Zcash launched in October 2016. Do not portray him as the sole inventor of all Zcash cryptography. For his earlier work and the 2016 ceremony, retrieve the OpenZcash Road and People records. Historical biographies do not establish a present-day job title; verify current affiliations separately. A ZIP author field is not a biography, and contact addresses are unnecessary unless requested.", reviewedOn: "2026-09-28",
+  },
+  {
+    id: "zooko-affiliation", title: "Shielded Labs: Zooko's listed role", url: "https://shieldedlabs.net/team/",
+    keywords: "zooko wilcox biography biografia role cargo atual trabalho chief product officer shielded labs",
+    text: "When reviewed on September 28, 2026, Shielded Labs' own team page listed Zooko Wilcox as Chief Product Officer. This is a dated affiliation snapshot, not proof the role remains unchanged after that date. It is separate from his earlier ECC CEO role.", reviewedOn: "2026-09-28",
+  },
+  {
     id: "governance", title: "OpenZcash governance and decision homes", url: "https://openzcash.org/governance",
     keywords: "governance vote voting decision upgrade poll zip nu6 nu7 governanca votacao decisao",
     text: "Separate a proposal, sentiment poll, funding decision, software release and activated consensus rule. Forum discussion is not binding protocol policy. ZCG, coinholder-directed funding, Zcash Foundation, development organizations and node operators have distinct responsibilities. Link to the relevant decision venue and dated announcement; do not infer motives or consensus from a single comment.", reviewedOn,
@@ -86,7 +111,7 @@ export function publicSiteGuide(): string {
   ).join("\n");
 }
 
-const STOP = new Set("the a an of on in at from into then than when where why to and or is are how what which with for does do can would about em de da do dos das os as que como qual quais para por um uma no na e o a eu me my it this zcash zec openzcash".split(" "));
+const STOP = new Set("the a an of on in at from into then than when where why to and or is are how what which who was were with for does do can would about em de da do dos das os as que quem foi como qual quais para por um uma no na e o a eu me my it this zcash zec openzcash".split(" "));
 export function terms(value: string): string[] {
   return [...new Set(value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().match(/[\p{L}\p{N}]{2,}/gu) ?? [])].filter((t) => !STOP.has(t));
 }

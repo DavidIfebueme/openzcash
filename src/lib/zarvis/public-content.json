@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "edba09fbbf3401c9",
+  "sourceRevision": "b084f7c361f4c0e6",
   "sourceFiles": 54,
   "documents": [
     {
@@ -79,7 +79,7 @@
       "id": "src/app/zcg/decisions/page.tsx:0",
       "url": "https://openzcash.org/zcg/decisions",
       "title": "zcg · decisions",
-      "text": "Decisions · ZCG · OpenZcash\nEvery verdict the Zcash Community Grants committee has taken on a grant proposal, dated, with the minutes of that day and the grant it created.\nDecisions\nEvery verdict the ZCG committee has taken on a grant proposal, dated by the ZCG sheet under the site's D-1 publication rule, with the minutes of that day and the grant it created.\nVerdicts\nApproved\nRejected\nLatest verdict\nEvery verdict\nFilter by outcome or search a proposal; export the view as CSV.\nVerdicts and dates come from the official ZCG sheet. Minutes are linked when a committee meeting falls on the decision day. A verdict links to the grant it created when the titles match."
+      "text": "Decisions · ZCG · OpenZcash\nEvery verdict the Zcash Community Grants committee has taken on a grant proposal, dated, with the minutes of that day and the grant it created.\nnumeric\nDecisions\nEvery verdict the ZCG committee has taken on a grant proposal, dated by the ZCG sheet under the site's D-1 publication rule, with the minutes of that day and the grant it created.\nZCG committee\nVerdicts\nApproved\nRejected\nLatest verdict\nEvery verdict\nFilter by outcome or search a proposal; export the view as CSV.\nVerdicts and dates come from the official ZCG sheet. Minutes are linked when a committee meeting falls on the decision day. A verdict links to the grant it created when the titles match."
     },
     {
       "id": "src/app/zcg/totals/page.tsx:0",
@@ -115,7 +115,7 @@
       "id": "src/app/zcg/investments/page.tsx:0",
       "url": "https://openzcash.org/zcg/investments",
       "title": "zcg · investments",
-      "text": "ZCG Investments · OpenZcash\n↗\nNative swaps\nNative ZEC ↔ CACAO\nTrade assets\nTrading balances within Maya\nSynthetic assets\nSynth minting and redemption\nOriginal contribution\nLP position now\nIf ZEC had been held\nInvestments\nThe liquidity ZCG supports. The activity it enables. The position the treasury holds.\nExplore the ZCG position\n↓\nNative ZEC liquidity\nMaya Protocol\nExplore ZEC pool\nAll-time ZEC pool volume\nSwapped through the entire ZEC pool\n.\nIncludes native, trade and synth swaps. This is pool activity, not ZCG revenue.\nReported swaps\nProtocol operations · all time\nZEC in the pool\nZCG pool share\nShare of liquidity-provider units\nSource data\nPool activity\nZEC volume over time\nVolume history is temporarily unavailable. Other pool data remains available above.\nBehind the total\nWhat makes up the volume\n%\nVolume breakdown unavailable.\nLast 30 days\nMidgard reports no swaps in this window.\nTreasury performance\nThe ZCG position\nZCG and FPF seeded this position. Pool usage and the treasury’s financial result answer different questions.\nZEC / CACAO\nvs. contribution\nLP position is\nvs. holding\nA common USD scale\nProviding liquidity vs. holding ZEC\nA current position valuation, ZEC price and contribution record are needed for this comparison."
+      "text": "ZCG Investments · OpenZcash\nnumeric\n↗\nNative swaps\nNative ZEC ↔ CACAO\nTrade assets\nTrading balances within Maya\nSynthetic assets\nSynth minting and redemption\nOriginal contribution\nLP position now\nIf ZEC had been held\nInvestments\nThe liquidity ZCG supports. The activity it enables. The position the treasury holds.\nExplore the ZCG position\n↓\nNative ZEC liquidity\nMaya Protocol\nExplore ZEC pool\nAll-time ZEC pool volume\nSwapped through the entire ZEC pool\n.\nIncludes native, trade and synth swaps. This is pool activity, not ZCG revenue.\nReported swaps\nProtocol operations · all time\nZEC in the pool\nZCG pool share\nShare of liquidity-provider units\nSource data\nPool activity\nZEC volume over time\nVolume history is temporarily unavailable. Other pool data remains available above.\nBehind the total\nWhat makes up the volume\n%\nVolume breakdown unavailable.\nLast 30 days\nMidgard reports no swaps in this window.\nTreasury performance\nThe ZCG position\nZCG and FPF seeded this position. Pool usage and the treasury’s financial result answer different questions.\nZEC / CACAO\nvs. contribution\nLP position is\nvs. holding\nA common USD scale\nProviding liquidity vs. holding ZEC\nA current position valuation, ZEC price and contribution record are needed for this comparison."
     },
     {
       "id": "src/app/zcg/investments/page.tsx:1",
@@ -151,7 +151,7 @@
       "id": "src/app/zcg/coinholder/votes/page.tsx:0",
       "url": "https://openzcash.org/zcg/coinholder/votes",
       "title": "zcg · coinholder · votes",
-      "text": "Coinholder votes · FPF · OpenZcash\nHow Zcash coinholders direct the coinholder fund: the poll that set up the grants program, each quarterly round, and the verdict on every proposal, with the key-holders' veto.\nCoinholder votes\nHow coinholders direct the fund that received the lockbox at NU6.1: the poll that set up the grants program, each quarterly round, and the verdict on every proposal. A proposal passes when at least 420,000 ZEC vote and a simple majority approves; the key-holders sign the payouts and can veto them (ZIP 1016).\nRounds decided\nApproved\nRejected\nVetoed\nPolls\nThe program's ratification and every quarterly round, newest first.\nCurrent round →\nVoting until\n.\n↗\nEvery proposal\nThe verdict on each proposal put to coinholders. Filter by outcome or decider; export the view as CSV.\nThe fund →\nProposal verdicts come from the official Coinholder sheet; polls from their published results and the program's forum threads. Voting rules from ZIP 1016."
+      "text": "Coinholder votes · FPF · OpenZcash\nHow Zcash coinholders direct the coinholder fund: the poll that set up the grants program, each quarterly round, and the verdict on every proposal, with the key-holders' veto.\nnumeric\nCoinholder votes\nHow coinholders direct the fund that received the lockbox at NU6.1: the poll that set up the grants program, each quarterly round, and the verdict on every proposal. A proposal passes when at least 420,000 ZEC vote and a simple majority approves; the key-holders sign the payouts and can veto them (ZIP 1016).\nCoinholders\nRounds decided\nApproved\nRejected\nVetoed\nPolls\nThe program's ratification and every quarterly round, newest first.\nCurrent round →\nVoting until\n.\n↗\nEvery proposal\nThe verdict on each proposal put to coinholders. Filter by outcome or decider; export the view as CSV.\nThe fund →\nProposal verdicts come from the official Coinholder sheet; polls from their published results and the program's forum threads. Voting rules from ZIP 1016."
     },
     {
       "id": "src/app/zcg/coinholder/pool/page.tsx:0",
@@ -169,7 +169,7 @@
       "id": "src/app/funding-history/page.tsx:0",
       "url": "https://openzcash.org/funding-history",
       "title": "funding history",
-      "text": "Zcash's Since block zero · OpenZcash\nEvery ZEC the Zcash protocol has allocated outside mining since the genesis block, computed block by block from the consensus rules and valued at the close of the day it was paid.\nZcash's Since block zero\nEvery ZEC the protocol has paid outside mining since the genesis block, computed block by block from the consensus rules and valued at the ZEC/USD close of the day it was paid. Heights by day from Blockchair; daily closes from Bitfinex.\nAllocated outside mining\nUSD at receipt\nSame ZEC at today's price\nIn-protocol lockbox\nBy recipient\nWho each consensus rule paid, for how long, and what that ZEC was worth on the days it arrived.\nRecipient\nPeriod\nShare\nZEC\nAvg. price\nFollow the money\nto\n→\n↗\nSince\n(block\n),\nmore blocks have paid\nto ZCG and added\nto the lockbox. The daily series closes at the last complete UTC day.\nYear by year\nZEC allocated outside mining each calendar year. The halvings and Blossom show as steps; the price at receipt does the rest.\nYear\nFounders' Reward\nDev Fund 2020\nZCG\nLockbox\nTotal ZEC\nimg\nMilestones\nThe heights where the rules changed. Each links to its block on CipherScan.\nGenesis. The Founders' Reward starts at 20% of each block, on a slow-start ramp.\nThe slow start ends: 12.5 ZEC per block, 2.5 ZEC of it Founders' Reward.\nBlossom: 75-second blocks. The per-block subsidy halves; daily issuance does not."
+      "text": "Zcash's Since block zero · OpenZcash\nEvery ZEC the Zcash protocol has allocated outside mining since the genesis block, computed block by block from the consensus rules and valued at the close of the day it was paid.\nnumeric\nZcash's Since block zero\nEvery ZEC the protocol has paid outside mining since the genesis block, computed block by block from the consensus rules and valued at the ZEC/USD close of the day it was paid. Heights by day from Blockchair; daily closes from Bitfinex.\nAllocated outside mining\nUSD at receipt\nSame ZEC at today's price\nIn-protocol lockbox\nBy recipient\nWho each consensus rule paid, for how long, and what that ZEC was worth on the days it arrived.\nRecipient\nPeriod\nShare\nZEC\nAvg. price\nFollow the money\nto\n→\n↗\nSince\n(block\n),\nmore blocks have paid\nto ZCG and added\nto the lockbox. The daily series closes at the last complete UTC day.\nYear by year\nZEC allocated outside mining each calendar year. The halvings and Blossom show as steps; the price at receipt does the rest.\nYear\nFounders' Reward\nDev Fund 2020\nZCG\nLockbox\nTotal ZEC\nimg\nMilestones\nThe heights where the rules changed. Each links to its block on CipherScan.\nGenesis. The Founders' Reward starts at 20% of each block, on a slow-start ramp.\nThe slow start ends: 12.5 ZEC per block, 2.5 ZEC of it Founders' Reward.\nBlossom: 75-second blocks. The per-block subsidy halves; daily issuance does not."
     },
     {
       "id": "src/app/funding-history/page.tsx:1",
@@ -181,7 +181,7 @@
       "id": "src/app/governance/page.tsx:0",
       "url": "https://openzcash.org/governance",
       "title": "governance",
-      "text": "Zcash governance · OpenZcash\nDecisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nZcash governance\nDecisions that bind the whole network: every upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open. Grant decisions live with the bodies that take them.\nNetwork upgrades\nCoinholder polls\nStill being decided\nLargest poll\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nProtocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked."
+      "text": "Zcash governance · OpenZcash\nDecisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.\nnumeric\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nZcash governance\nDecisions that bind the whole network: every upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open. Grant decisions live with the bodies that take them.\nZIP process and coinholders\nNetwork upgrades\nCoinholder polls\nStill being decided\nLargest poll\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nProtocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked."
     },
     {
       "id": "src/app/zec-observatory/page.tsx:0",
@@ -271,7 +271,7 @@
       "id": "src/app/zechub/page.tsx:0",
       "url": "https://openzcash.org/zechub",
       "title": "zechub",
-      "text": "ZecHub DAO · OpenZcash\nimg\n%\nfunded ·\npaid\nyes\n·\nno\nDonations\nFPF program fund\nZecHub Inc\nZecHub DAO\ndaodao.zone\nTreasury sheet\nGitHub · ZecHub\nTreasury overview\nAllocations & payouts\nGovernance\nResearch with Copilot ↗\nTotal treasury · 3 funds\nDonations treasury\nAvailable in source snapshot\nPaid out to date\nZEC price used\nFPF allocation by category\nSince\n: FPF\n, donations\n.\nGrants: paid vs committed\nChanged this week\nSubscribe to new ZecHub treasury payouts via RSS\nRSS ↗\nNew payouts recorded on the treasury dashboard between imports.\nRecent proposals\nOpen now\nPassed / executed\nLatest proposals\nProposals are temporarily unavailable: the DAO DAO indexer did not respond. Try again shortly, or open\nthe DAO on daodao.zone ↗\nZecHub Copilot\nAsk your own agent why a vote passed or failed. It computes both tests a proposal has to clear (67% of yes+no and 40% turnout), names every voter, and reads the treasury without mistaking the headline total for spendable money.\nGet the skill\nTreasury balances and payout records mirror the\nZecHub DAO Treasury Dashboard ↗\nmaintained by the DAO\n, re-imported every 6 hours. Indicative USD values apply the separately dated market quote to those recorded balances; they do not establish current holdings or available funds. Proposals are read live from the DAO DAO indexer. The\nfunded\nchip links a proposal to its payout line by title match."
+      "text": "ZecHub DAO · OpenZcash\nnumeric\nimg\n%\nfunded ·\npaid\nyes\n·\nno\nDonations\nFPF program fund\nZecHub Inc\nZecHub DAO\ndaodao.zone\nTreasury sheet\nGitHub · ZecHub\nTreasury overview\nAllocations & payouts\nGovernance\nResearch with Copilot ↗\nTotal treasury · 3 funds\nDonations treasury\nAvailable in source snapshot\nPaid out to date\nZEC price used\nFPF allocation by category\nSince\n: FPF\n, donations\n.\nGrants: paid vs committed\nChanged this week\nSubscribe to new ZecHub treasury payouts via RSS\nRSS ↗\nNew payouts recorded on the treasury dashboard between imports.\nRecent proposals\nOpen now\nPassed / executed\nLatest proposals\nProposals are temporarily unavailable: the DAO DAO indexer did not respond. Try again shortly, or open\nthe DAO on daodao.zone ↗\nZecHub Copilot\nAsk your own agent why a vote passed or failed. It computes both tests a proposal has to clear (67% of yes+no and 40% turnout), names every voter, and reads the treasury without mistaking the headline total for spendable money.\nGet the skill\nTreasury balances and payout records mirror the\nZecHub DAO Treasury Dashboard ↗\nmaintained by the DAO\n, re-imported every 6 hours. Indicative USD values apply the separately dated market quote to those recorded balances; they do not establish current holdings or available funds. Proposals are read live from the DAO DAO indexer. The\nfunded\nchip links a proposal to its payout line by title match."
     },
     {
       "id": "src/app/arborist/page.tsx:0",
@@ -324,98 +324,464 @@
     {
       "id": "src/lib/ceremony/story.ts:0",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "The idea of untraceable money\nLong before blockchains, cryptographer David Chaum published “Blind Signatures for Untraceable Payments” (1982): a bank could sign a digital coin without seeing it, so the coin could later be spent without the bank linking it back to you. Digital cash that behaved like cash.\nChaum founded DigiCash in 1989 to build it. Its eCash ran a real pilot at a US bank in 1995, but the company went bankrupt in 1998. The world was not ready, and the money still needed a bank at the center.\nOne detail matters for this story: in 1996 a computer science student named Zooko Wilcox took a leave of absence to work as a junior coder at DigiCash. The company failed; the apprenticeship did not.\nThe cypherpunks\nIn 1992 a mailing list formed around a simple position: privacy in the electronic age would have to be built with code, not requested from institutions. Eric Hughes opened his 1993 manifesto with the line “Privacy is necessary for an open society in the electronic age.”\nThe list became the proving ground for everything that followed: remailers, digital cash schemes, and the culture of shipping working cryptography instead of position papers. Zooko Wilcox, who later brought Zcash to life, was posting to the list by 1997: an “original cypherpunk,” as Zcash’s own site puts it.\nThe missing pieces"
+      "title": "ceremony · road · 1982 · The idea of untraceable money",
+      "text": "Chapter era: 1982\nThe idea of untraceable money\nDavid Chaum\nLong before blockchains, cryptographer David Chaum published “Blind Signatures for Untraceable Payments” (1982): a bank could sign a digital coin without seeing it, so the coin could later be spent without the bank linking it back to you. Digital cash that behaved like cash.\nChaum founded DigiCash in 1989 to build it. Its eCash ran a real pilot at a US bank in 1995, but the company went bankrupt in 1998. The world was not ready, and the money still needed a bank at the center.\nOne detail matters for this story: in 1996 a computer science student named Zooko Wilcox took a leave of absence to work as a junior coder at DigiCash. The company failed; the apprenticeship did not."
     },
     {
       "id": "src/lib/ceremony/story.ts:1",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "Adam Back’s Hashcash (1997) made computation itself a scarce stamp. Wei Dai’s b-money and Nick Szabo’s bit gold (late 1990s) sketched money without a central issuer. Each solved a piece; none shipped as money.\nHal Finney, veteran cypherpunk and PGP developer, also wrote working code for zero-knowledge proofs. At the rump session of the Crypto ’98 conference in Santa Barbara, on August 25, 1998, he gave a five-minute talk, “A zero-knowledge proof of possession of a pre-image of a SHA-1 hash”: a program that proves you know a message with a given SHA-1 hash without revealing the message, built on a proof system Ronald Cramer and Ivan Damgård presented at the same conference. It was a talk, not a paper, and the session was filmed.\nIn 2004 Finney built RPOW, reusable proofs of work: tokens minted from hashcash that could pass from person to person. The prototype ran on a central server and never took off. When Bitcoin appeared he was, by his own account, the first person besides its creator to run it, and he received the first Bitcoin transaction ever sent (January 12, 2009).\nFinney died in 2014. The problem he spent decades on, private electronic cash that needs no permission, is the problem Zcash exists to finish.\nHal Finney at the Crypto ’98 rump session\nCrypto ’98 rump session program\nCramer and Damgård, Crypto ’98\nCrypto ’98 rump session videos"
+      "title": "ceremony · road · 1992 · The cypherpunks",
+      "text": "Chapter era: 1992\nThe cypherpunks\nHughes, May, Gilmore and a mailing list\nIn 1992 a mailing list formed around a simple position: privacy in the electronic age would have to be built with code, not requested from institutions. Eric Hughes opened his 1993 manifesto with the line “Privacy is necessary for an open society in the electronic age.”\nThe list became the proving ground for everything that followed: remailers, digital cash schemes, and the culture of shipping working cryptography instead of position papers. Zooko Wilcox, who later brought Zcash to life, was posting to the list by 1997: an “original cypherpunk,” as Zcash’s own site puts it."
     },
     {
       "id": "src/lib/ceremony/story.ts:2",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "Bitcoin ships, and exposes everything\nThe Bitcoin whitepaper (October 31, 2008) and genesis block (January 3, 2009) solved decentralized consensus. Money finally worked without a bank.\nBut it worked in public. Every amount, every counterparty, every balance, forever, on a ledger anyone can read. Bitcoin realized the cypherpunk dream of permissionless money while inverting its premise of privacy.\nThe problem Satoshi left open\nOn January 26, 2009, eighteen days after Bitcoin’s first release, Zooko Wilcox wrote a short post on his own blog, Zooko’s Hack Log, about why digital cash had failed at DigiCash and where it might work next. It ends by pointing to bit gold, b-money and “BitCoin by Satoshi Nakamoto.” It is one of the earliest known blog posts to mention Bitcoin, and Zooko has called it the first. By March 2009, bitcoin.org listed “Zooko’s blog” among its related links, beside b-money and bit gold. The link led into Tahoe-LAFS, the decentralized storage system Zooko was building at allmydata: the blog lived on its test grid."
+      "title": "ceremony · road · 1997–2004 · The missing pieces",
+      "text": "Chapter era: 1997–2004\nThe missing pieces\nBack, Dai, Szabo, Finney\nAdam Back’s Hashcash (1997) made computation itself a scarce stamp. Wei Dai’s b-money and Nick Szabo’s bit gold (late 1990s) sketched money without a central issuer. Each solved a piece; none shipped as money.\nHal Finney, veteran cypherpunk and PGP developer, also wrote working code for zero-knowledge proofs. At the rump session of the Crypto ’98 conference in Santa Barbara, on August 25, 1998, he gave a five-minute talk, “A zero-knowledge proof of possession of a pre-image of a SHA-1 hash”: a program that proves you know a message with a given SHA-1 hash without revealing the message, built on a proof system Ronald Cramer and Ivan Damgård presented at the same conference. It was a talk, not a paper, and the session was filmed.\nIn 2004 Finney built RPOW, reusable proofs of work: tokens minted from hashcash that could pass from person to person. The prototype ran on a central server and never took off. When Bitcoin appeared he was, by his own account, the first person besides its creator to run it, and he received the first Bitcoin transaction ever sent (January 12, 2009).\nFinney died in 2014. The problem he spent decades on, private electronic cash that needs no permission, is the problem Zcash exists to finish.\nHal Finney at the Crypto ’98 rump session"
     },
     {
       "id": "src/lib/ceremony/story.ts:3",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "In August 2010 a BitcoinTalk thread asked whether Bitcoin could work without publishing every transaction, and another user suggested zero-knowledge proofs. Satoshi called the problem a very interesting one and said a solution would make a much better Bitcoin possible. He doubted the tool, though: to rule out a double-spend, a node seemed to need to know about every transaction.\nTwo days later, in the same thread, he floated “key blinding”, a fresh, unlinkable key for every payment, and pointed to an unfinished draft on recipient-hiding encryption. He named no author. The draft is widely attributed to Daira-Emma Hopwood, writing under a former name. By then Hopwood was also a Tahoe-LAFS developer alongside Zooko, and in 2016 was the first-named author of the Zcash protocol specification.\nOn August 21 Tahoe-LAFS began accepting bitcoin donations, and Zooko, signing as the project’s community organizer, opened a thread about building Bitcoin payments into it. Satoshi’s reply left the proposal aside. It opened with Zooko’s name and thanked him, in public, for blogging about Bitcoin back when it was announced on the Cryptography mailing list. His last forum post came that December. In 2022 Zooko pointed back to the August thread: four months later Satoshi was gone, and three years after that, a solution was found."
+      "title": "ceremony · road · 1997–2004 · The missing pieces",
+      "text": "Santa Barbara, August 25, 1998. Filmed by Takeshi Shimoyama, edited by Kevin McCurley.\nCrypto ’98 rump session program\nCramer and Damgård, Crypto ’98\nCrypto ’98 rump session videos"
     },
     {
       "id": "src/lib/ceremony/story.ts:4",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "It's hard to think of how to apply zero-knowledge-proofs in this case.\nZooko’s post, Jan 2009\nbitcoin.org, Mar 2009\nSatoshi on key blinding\nTahoe-LAFS takes bitcoin\nSatoshi thanks Zooko\nZcash protocol specification, 2016\nZooko, 2022\nZerocoin, then Zerocash\nZerocoin (2013, Miers, Garman, Green and Rubin at Johns Hopkins) proposed a cryptographic washing machine bolted onto Bitcoin. Zerocash (2014, Ben-Sasson, Chiesa, Garman, Green, Miers, Tromer and Virza) went further: a full currency where sender, receiver and amount are hidden, yet every transaction is verified.\nThe tool that made it possible was the zk-SNARK, a succinct proof that a statement is true without revealing why. The proofs predate these papers; Zerocash was the moment they became a payment system on paper. It needed a team willing to make it real.\nZerocoin, IEEE S&P 2013\nZerocash, IEEE S&P 2014\nThe Ceremony\nZcash’s original proving system required secret parameters that, if any single party kept them, could be used to counterfeit coins invisibly. So on October 22 and 23, 2016 the launch team ran a multi-party ceremony: six witnesses in separate places, air-gapped hardware, destroyed key material. If even one of them was honest, the combined secret could never be rebuilt."
+      "title": "ceremony · road · 2008–2009 · Bitcoin ships, and exposes everything",
+      "text": "Chapter era: 2008–2009\nBitcoin ships, and exposes everything\nSatoshi Nakamoto\nThe Bitcoin whitepaper (October 31, 2008) and genesis block (January 3, 2009) solved decentralized consensus. Money finally worked without a bank.\nBut it worked in public. Every amount, every counterparty, every balance, forever, on a ledger anyone can read. Bitcoin realized the cypherpunk dream of permissionless money while inverting its premise of privacy."
     },
     {
       "id": "src/lib/ceremony/story.ts:5",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "The stations were paranoia made real. Peter Todd ran his from a rented car on a drive through British Columbia, a trip he called the “Cypherpunk Desert Bus.” At the Denver station, a phone behaved strangely enough mid-ceremony that the moment became a Radiolab story. And one witness, known only as “John Dobbertin,” stayed pseudonymous for six years: in April 2022, Zcash Media revealed he was Edward Snowden.\nOn October 28, 2016 the genesis block was mined. That day, in a thin early market on the Poloniex exchange, one ZEC briefly reached roughly 3,300 BTC, and it still traded at 48 BTC later in the day, CoinDesk reported. The experiment was live.\nThe Design of the Ceremony\nDenver footage\nCeremony data\nDesert Bus\nRadiolab\nLaunch\nOct 28 · Genesis\nMainnet launches with Sprout shielded transactions, a 21M cap, 2.5-minute blocks and a 12.5 ZEC subsidy, ramped in over a 34-day slow start. The Founders’ Reward directs 20% of the subsidy to the founding team, investors and the Zcash Foundation for the first four years, 10% of total supply.\nThe quiet save, then Sapling\nMar 1 · A flaw found\nAriel Gabizon finds a flaw in the proving system Sprout used that could have allowed invisible counterfeiting. It is fixed quietly by the Sapling upgrade in October and disclosed in February 2019. No evidence of exploitation was ever found.\nOct 28 · Sapling"
+      "title": "ceremony · road · 2009–2010 · The problem Satoshi left open",
+      "text": "Chapter era: 2009–2010\nThe problem Satoshi left open\nSatoshi Nakamoto, Zooko Wilcox, Daira-Emma Hopwood\nOn January 26, 2009, eighteen days after Bitcoin’s first release, Zooko Wilcox wrote a short post on his own blog, Zooko’s Hack Log, about why digital cash had failed at DigiCash and where it might work next. It ends by pointing to bit gold, b-money and “BitCoin by Satoshi Nakamoto.” It is one of the earliest known blog posts to mention Bitcoin, and Zooko has called it the first. By March 2009, bitcoin.org listed “Zooko’s blog” among its related links, beside b-money and bit gold. The link led into Tahoe-LAFS, the decentralized storage system Zooko was building at allmydata: the blog lived on its test grid.\nIn August 2010 a BitcoinTalk thread asked whether Bitcoin could work without publishing every transaction, and another user suggested zero-knowledge proofs. Satoshi called the problem a very interesting one and said a solution would make a much better Bitcoin possible. He doubted the tool, though: to rule out a double-spend, a node seemed to need to know about every transaction."
     },
     {
       "id": "src/lib/ceremony/story.ts:6",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "A redesign of shielded transactions cuts proving time and memory sharply, making shielded payments practical on phones. It ships on the network’s second birthday, on parameters from a new, larger ceremony.\nBlossom\nDec 11 · 75-second blocks\nBlock time drops from 150 to 75 seconds and the per-block subsidy from 12.5 to 6.25 ZEC, keeping issuance per hour unchanged. It is why the first halving lands on 3.125, not 6.25.\nFirst halving and the Dev Fund\nJul · Heartwood\nShielded coinbase: miners can receive block rewards directly into shielded addresses.\nNov 18 · Canopy, the first halving\nThe subsidy halves to 3.125 ZEC. The Founders’ Reward ends and ZIP 1014’s Dev Fund begins: 7% to Bootstrap (ECC), 5% to the Zcash Foundation and 8% to Major Grants, run by ZOMG and renamed Zcash Community Grants in February 2022.\nNU5: no more ceremonies\nMay 31 · Orchard and Halo 2\nThe Halo 2 proving system removes the trusted setup for the new Orchard pool, and Unified Addresses bundle transparent, Sapling and Orchard receivers into one address.\nJun · Sandblasting\nA sustained spam attack bloats the chain and exposes wallet sync pain. It forces the fee overhaul of ZIP 317 and a generation of faster sync work.\nSecond halving and the lockbox\n2023–2024 · New stewards"
+      "title": "ceremony · road · 2009–2010 · The problem Satoshi left open",
+      "text": "In August 2010, two days after his first response in the same BitcoinTalk thread, Satoshi floated “key blinding”, a fresh, unlinkable key for every payment, and pointed to an unfinished draft on recipient-hiding encryption. He named no author. The draft is widely attributed to Daira-Emma Hopwood, writing under a former name. By then Hopwood was also a Tahoe-LAFS developer alongside Zooko, and in 2016 was the first-named author of the Zcash protocol specification.\nOn August 21, 2010, Tahoe-LAFS began accepting bitcoin donations, and Zooko, signing as the project’s community organizer, opened a thread about building Bitcoin payments into it. Satoshi’s reply left the proposal aside. It opened with Zooko’s name and thanked him, in public, for blogging about Bitcoin back when it was announced on the Cryptography mailing list. His last forum post came that December. In 2022 Zooko pointed back to the August thread: four months later Satoshi was gone, and three years after that, a solution was found.\nIt's hard to think of how to apply zero-knowledge-proofs in this case.\nSatoshi Nakamoto, BitcoinTalk, August 11, 2010\nZooko’s post, Jan 2009\nbitcoin.org, Mar 2009\nSatoshi on key blinding\nTahoe-LAFS takes bitcoin\nSatoshi thanks Zooko\nZcash protocol specification, 2016\nZooko, 2022"
     },
     {
       "id": "src/lib/ceremony/story.ts:7",
       "url": "https://openzcash.org/ceremony/road",
-      "title": "ceremony · road",
-      "text": "Zooko steps back from ECC leadership, Zashi ships as ECC’s mobile wallet, and Zebra, the Foundation’s Rust node, reaches production alongside zcashd.\nNov 23 · NU6, the second halving\nThe subsidy halves to 1.5625 ZEC. 8% goes to Zcash Community Grants, paid to the Financial Privacy Foundation, and 12%, 0.1875 ZEC per block, accrues in an in-protocol lockbox.\nCoinholders take the wheel\nNov 24 · NU6.1\nThe lockbox pays its 78,750 ZEC to a coinholder-controlled fund, and the 8% and 12% streams continue to the third halving (ZIP 271, ZIP 1016). Coinholders now vote on grants from the fund; key-holders sign the payouts.\nThe Orchard emergency, then year ten\nMar 16 · A veto\nTwo key-holders, the Zcash Foundation and Shielded Labs, announce a veto of the $2.67M Q4 2025 grant to Bootstrap (ECC), approved by coinholders months earlier.\nJun 2–3 · The Orchard emergency\nA soundness flaw in the Orchard circuit leads to an emergency soft fork that disables Orchard at block 3,363,426; the NU6.2 network upgrade at block 3,364,600 re-enables it with a corrected circuit (ZIP 257).\nJul 28 · Ironwood\nNU6.3 activates at block 3,428,143 with a new shielded pool, Ironwood (ZIP 258). Orchard stops taking new funds, and balances move out into Ironwood.\nSep 14 · NU7’s scope"
+      "title": "ceremony · road · 2013–2014 · Zerocoin, then Zerocash",
+      "text": "Chapter era: 2013–2014\nZerocoin, then Zerocash\nJohns Hopkins, MIT, Technion, Tel Aviv\nZerocoin (2013, Miers, Garman, Green and Rubin at Johns Hopkins) proposed a cryptographic washing machine bolted onto Bitcoin. Zerocash (2014, Ben-Sasson, Chiesa, Garman, Green, Miers, Tromer and Virza) went further: a full currency where sender, receiver and amount are hidden, yet every transaction is verified.\nThe tool that made it possible was the zk-SNARK, a succinct proof that a statement is true without revealing why. The proofs predate these papers; Zerocash was the moment they became a payment system on paper. It needed a team willing to make it real.\nZerocoin, IEEE S&P 2013\nZerocash, IEEE S&P 2014"
     },
     {
       "id": "src/lib/ceremony/story.ts:8",
       "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2016 · The Ceremony",
+      "text": "Chapter era: 2016\nThe Ceremony\nSix witnesses, air-gapped machines, one secret guest\nZcash’s original proving system required secret parameters that, if any single party kept them, could be used to counterfeit coins invisibly. So on October 22 and 23, 2016 the launch team ran a multi-party ceremony: six witnesses in separate places, air-gapped hardware, destroyed key material. If even one of them was honest, the combined secret could never be rebuilt.\nThe stations were paranoia made real. Peter Todd ran his from a rented car on a drive through British Columbia, a trip he called the “Cypherpunk Desert Bus.” At the Denver station, a phone behaved strangely enough mid-ceremony that the moment became a Radiolab story. And one witness, known only as “John Dobbertin,” stayed pseudonymous for six years: in April 2022, Zcash Media revealed he was Edward Snowden.\nOn October 28, 2016 the genesis block was mined. That day, in a thin early market on the Poloniex exchange, one ZEC briefly reached roughly 3,300 BTC, and it still traded at 48 BTC later in the day, CoinDesk reported. The experiment was live.\nThe Design of the Ceremony\nDenver footage\nCeremony data\nDesert Bus\nRadiolab"
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:9",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2016 · Launch",
+      "text": "Year: 2016\nLaunch\nOct 28 · Genesis\nMainnet launches with Sprout shielded transactions, a 21M cap, 2.5-minute blocks and a 12.5 ZEC subsidy, ramped in over a 34-day slow start. The Founders’ Reward directs 20% of the subsidy to the founding team, investors and the Zcash Foundation for the first four years, 10% of total supply."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:10",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2018 · The quiet save, then Sapling",
+      "text": "Year: 2018\nThe quiet save, then Sapling\nMar 1 · A flaw found\nAriel Gabizon finds a flaw in the proving system Sprout used that could have allowed invisible counterfeiting. It is fixed quietly by the Sapling upgrade in October and disclosed in February 2019. No evidence of exploitation was ever found.\nOct 28 · Sapling\nA redesign of shielded transactions cuts proving time and memory sharply, making shielded payments practical on phones. It ships on the network’s second birthday, on parameters from a new, larger ceremony."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:11",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2019 · Blossom",
+      "text": "Year: 2019\nBlossom\nDec 11 · 75-second blocks\nBlock time drops from 150 to 75 seconds and the per-block subsidy from 12.5 to 6.25 ZEC, keeping issuance per hour unchanged. It is why the first halving lands on 3.125, not 6.25."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:12",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2020 · First halving and the Dev Fund",
+      "text": "Year: 2020\nFirst halving and the Dev Fund\nJul · Heartwood\nShielded coinbase: miners can receive block rewards directly into shielded addresses.\nNov 18 · Canopy, the first halving\nThe subsidy halves to 3.125 ZEC. The Founders’ Reward ends and ZIP 1014’s Dev Fund begins: 7% to Bootstrap (ECC), 5% to the Zcash Foundation and 8% to Major Grants, run by ZOMG and renamed Zcash Community Grants in February 2022."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:13",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2022 · NU5: no more ceremonies",
+      "text": "Year: 2022\nNU5: no more ceremonies\nMay 31 · Orchard and Halo 2\nThe Halo 2 proving system removes the trusted setup for the new Orchard pool, and Unified Addresses bundle transparent, Sapling and Orchard receivers into one address.\nJun · Sandblasting\nA sustained spam attack bloats the chain and exposes wallet sync pain. It forces the fee overhaul of ZIP 317 and a generation of faster sync work."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:14",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2024 · Second halving and the lockbox",
+      "text": "Year: 2024\nSecond halving and the lockbox\n2023–2024 · New stewards\nZooko hands the ECC CEO role to Josh Swihart in December 2023. Zashi ships as ECC’s mobile wallet in 2024, while Zebra, the Foundation’s Rust node, reaches production alongside zcashd.\nNov 23 · NU6, the second halving\nThe subsidy halves to 1.5625 ZEC. 8% goes to Zcash Community Grants, paid to the Financial Privacy Foundation, and 12%, 0.1875 ZEC per block, accrues in an in-protocol lockbox."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:15",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2025 · Coinholders take the wheel",
+      "text": "Year: 2025\nCoinholders take the wheel\nNov 24 · NU6.1\nThe lockbox pays its 78,750 ZEC to a coinholder-controlled fund, and the 8% and 12% streams continue to the third halving (ZIP 271, ZIP 1016). Coinholders now vote on grants from the fund; key-holders sign the payouts."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:16",
+      "url": "https://openzcash.org/ceremony/road",
+      "title": "ceremony · road · 2026 · The Orchard emergency, then year ten",
+      "text": "Year: 2026\nThe Orchard emergency, then year ten\nMar 16 · A veto\nTwo key-holders, the Zcash Foundation and Shielded Labs, announce a veto of the $2.67M Q4 2025 grant to Bootstrap (ECC), approved by coinholders months earlier.\nJun 2–3 · The Orchard emergency\nA soundness flaw in the Orchard circuit leads to an emergency soft fork that disables Orchard at block 3,363,426; the NU6.2 network upgrade at block 3,364,600 re-enables it with a corrected circuit (ZIP 257).\nJul 28 · Ironwood\nNU6.3 activates at block 3,428,143 with a new shielded pool, Ironwood (ZIP 258). Orchard stops taking new funds, and balances move out into Ironwood.\nSep 14 · NU7’s scope\nCoinholders vote to keep the halvings, retire v4 transactions at NU7 and move to 25-second blocks; 2.4M ZEC took part in the first question. They also back reissuance from February 2031, but coinholder and community polls reach no shared majority on the date, and NU7 takes 2031 as the more conservative choice.\nOct 28 · Ten years\nTen years since the genesis block."
+    },
+    {
+      "id": "src/lib/ceremony/story.ts:17",
+      "url": "https://openzcash.org/ceremony/road",
       "title": "ceremony · road",
-      "text": "Coinholders vote to keep the halvings, retire v4 transactions at NU7 and move to 25-second blocks; 2.4M ZEC took part in the first question. They also back reissuance from February 2031, but coinholder and community polls reach no shared majority on the date, and NU7 takes 2031 as the more conservative choice.\nOct 28 · Ten years\nTen years since the genesis block."
+      "text": "“The reward halved from 12.5 to 6.25 in 2020”\nNo. Blossom (2019) moved to 75-second blocks and 6.25 ZEC per block with unchanged hourly issuance. The 2020 halving went to 3.125, and 2024 to 1.5625.\n“Zerocash created zk-SNARKs”\nZero-knowledge proofs date to 1985, and the first known SNARK construction, Micali’s CS proofs, to 1994; the zk-SNARKs Zerocash used come from the early 2010s. Zerocash was the first full payment design built on them, hiding sender, receiver and amount; Zcash made it run in production.\n“Zcash is governed by a DAO”\nThere is no Zcash DAO. Decisions run through the ZIP process, ZCAP and coinholder polls, coinholder votes on the fund (ZIP 1016) and independent organizations. ZecHub runs a DAO, and it governs a community project, not the protocol.\n“ZOMG runs the Major Grants”\nNot since February 2022, when Zcash Open Major Grants was renamed Zcash Community Grants. It still funds independent teams doing major ongoing development; since NU6 in November 2024 its stream is paid to the Financial Privacy Foundation."
     },
     {
       "id": "src/lib/ceremony/people.ts:0",
       "url": "https://openzcash.org/ceremony/people",
-      "title": "ceremony · people",
-      "text": "The Design of the Ceremony, Oct 26, 2016\nZooko Wilcox\nRan the Denver station\nAndrew Miller\nComputer scientist and Zcash technical advisor\nPeter Van Valkenburgh\nCoin Center; ran the Washington, D.C. station\nHis notes on the D.C. station\nPeter Todd\nBitcoin Core developer; ran his station in a rented car on a drive through British Columbia, which he named the Cypherpunk Desert Bus\nPeter Todd's post, Oct 2016\nThe Cypherpunk Desert Bus, Nov 2016\nDerek Hinch\nNCC Group, secretly hired as a compute node operator\nEdward Snowden\nWhistleblower and privacy advocate, pseudonymous until 2022\nCommunity forum, April 2022\nForbes, Apr 27, 2022\nMorgen Peck\nJournalist invited to observe the Denver station\nIEEE Spectrum, the inside story\nZerocoin, IEEE S&P 2013\nZerocash, IEEE S&P 2014\nEli Ben-Sasson\nZerocash\nAlessandro Chiesa\nChristina Garman\nZerocoin\nMatthew Green\nIan Miers\nAviel D. Rubin\nEran Tromer\nMadars Virza\nDavid Chaum\nBlind signatures, 1982; DigiCash\nEric Hughes\nA Cypherpunk's Manifesto, 1993\nTim May\nThe cypherpunks mailing list, 1992\nJohn Gilmore\nAdam Back\nHashcash, 1997\nWei Dai\nb-money, late 1990s\nNick Szabo\nBit gold, late 1990s\nHal Finney\nA zero-knowledge proof talk, 1998; RPOW, 2004; received the first Bitcoin transaction, 2009\nSatoshi Nakamoto\nBitcoin, 2008; doubted zero-knowledge proofs could fit it, 2010\nDaira-Emma Hopwood"
+      "title": "ceremony · people · Zooko Wilcox",
+      "text": "Zooko Wilcox\nRole: Ran the Denver station\nIdentity publicly disclosed: October 26, 2016"
     },
     {
       "id": "src/lib/ceremony/people.ts:1",
       "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Andrew Miller",
+      "text": "Andrew Miller\nRole: Computer scientist and Zcash technical advisor\nIdentity publicly disclosed: October 26, 2016"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:2",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Peter Van Valkenburgh",
+      "text": "Peter Van Valkenburgh\nRole: Coin Center; ran the Washington, D.C. station\nIdentity publicly disclosed: October 26, 2016\nHis notes on the D.C. station"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:3",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Peter Todd",
+      "text": "Peter Todd\nKnown as: Fabrice Renault\nRole: Bitcoin Core developer; ran his station in a rented car on a drive through British Columbia, which he named the Cypherpunk Desert Bus\nIdentity publicly disclosed: October 2016, in his own post\nPeter Todd's post, Oct 2016\nThe Cypherpunk Desert Bus, Nov 2016"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:4",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Derek Hinch",
+      "text": "Derek Hinch\nKnown as: Moses Spears\nRole: NCC Group, secretly hired as a compute node operator\nIdentity publicly disclosed: October 23, 2016"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:5",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Edward Snowden",
+      "text": "Edward Snowden\nKnown as: John Dobbertin\nRole: Whistleblower and privacy advocate, pseudonymous until 2022\nIdentity publicly disclosed: April 2022, Zcash Media\nCommunity forum, April 2022\nForbes, Apr 27, 2022"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:6",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Morgen Peck",
+      "text": "Morgen Peck\nRole: Journalist invited to observe the Denver station\nIdentity publicly disclosed: Her report, December 2016\nIEEE Spectrum, the inside story"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:7",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Eli Ben-Sasson",
+      "text": "Eli Ben-Sasson\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:8",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Alessandro Chiesa",
+      "text": "Alessandro Chiesa\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:9",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Christina Garman",
+      "text": "Christina Garman\nZerocoin\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:10",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Matthew Green",
+      "text": "Matthew Green\nZerocoin\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:11",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Ian Miers",
+      "text": "Ian Miers\nZerocoin\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:12",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Aviel D. Rubin",
+      "text": "Aviel D. Rubin\nZerocoin"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:13",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Eran Tromer",
+      "text": "Eran Tromer\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:14",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Madars Virza",
+      "text": "Madars Virza\nZerocash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:15",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · David Chaum",
+      "text": "David Chaum\nBlind signatures, 1982; DigiCash"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:16",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Eric Hughes",
+      "text": "Eric Hughes\nA Cypherpunk's Manifesto, 1993"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:17",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Tim May",
+      "text": "Tim May\nThe cypherpunks mailing list, 1992"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:18",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · John Gilmore",
+      "text": "John Gilmore\nThe cypherpunks mailing list, 1992"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:19",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Adam Back",
+      "text": "Adam Back\nHashcash, 1997"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:20",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Wei Dai",
+      "text": "Wei Dai\nb-money, late 1990s"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:21",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Nick Szabo",
+      "text": "Nick Szabo\nBit gold, late 1990s"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:22",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Hal Finney",
+      "text": "Hal Finney\nA zero-knowledge proof talk, 1998; RPOW, 2004; received the first Bitcoin transaction, 2009"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:23",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Satoshi Nakamoto",
+      "text": "Satoshi Nakamoto\nBitcoin, 2008; doubted zero-knowledge proofs could fit it, 2010"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:24",
+      "url": "https://openzcash.org/ceremony/people",
+      "title": "ceremony · people · Daira-Emma Hopwood",
+      "text": "Daira-Emma Hopwood\nTahoe-LAFS; first-named author of the Zcash protocol specification, 2016"
+    },
+    {
+      "id": "src/lib/ceremony/people.ts:25",
+      "url": "https://openzcash.org/ceremony/people",
       "title": "ceremony · people",
-      "text": "Tahoe-LAFS; first-named author of the Zcash protocol specification, 2016"
+      "text": "The Design of the Ceremony, Oct 26, 2016\nZerocoin, IEEE S&P 2013\nZerocash, IEEE S&P 2014"
     },
     {
       "id": "src/lib/ceremony/record.ts:0",
       "url": "https://openzcash.org/ceremony/record",
-      "title": "ceremony · record",
-      "text": "720p MP4s rendered from the 1080p footage (size shown), light OGV copies\nCC BY-NC 4.0\nWAV originals (size shown), FLAC and MP3 copies\nAn earlier upload of the wide shot; its uploader marks it superseded by the item above\nNot stated\nThe station's DVDs: operating systems, disks A to F, test burns and a checksum script\nNearly 48 hours of his air-gapped station, cut to one video\nYouTube licence\nYouTube\nPeter Van Valkenburgh's notes, with his timelapse and photo album\nGitHub gist\nHis story and photos of the car-mounted station; the footage is unreleased. He later added notes: he came to doubt the setup should be called a multi-party computation, then restored the post\npetertodd.org\nTranscript, proving key, R1CS, OS images and checksums\nDisc images and Tails\nCC BY 3.0, except the software on the disc images\nDisc images\nPodcast episode, July 14, 2017\nWNYC Studios, all rights reserved\nRadiolab\nVideo by Electric Coin Company, 2017\nElectric Coin Company, YouTube licence\nOct 28, 2016\nGenesis block\nMainnet launches on the parameters the ceremony produced.\nMar 2018\nThe quiet save\nA flaw in the proving system is found, fixed quietly by the Sapling upgrade in October 2018, then disclosed in February 2019. No exploitation was ever found.\nMay 31, 2022\nNo more ceremonies"
+      "title": "ceremony · record · Denver station, three cameras",
+      "text": "Denver station, three cameras\n720p MP4s rendered from the 1080p footage (size shown), light OGV copies\nCC BY-NC 4.0"
     },
     {
       "id": "src/lib/ceremony/record.ts:1",
       "url": "https://openzcash.org/ceremony/record",
-      "title": "ceremony · record",
-      "text": "NU5 brings Orchard and Halo 2, a proving system that needs no ceremony at all. Sapling still uses the parameters from its own 2018 ceremony."
+      "title": "ceremony · record · Denver station, three microphones",
+      "text": "Denver station, three microphones\nWAV originals (size shown), FLAC and MP3 copies\nCC BY-NC 4.0"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:2",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Denver station, Vcam-long",
+      "text": "Denver station, Vcam-long\nAn earlier upload of the wide shot; its uploader marks it superseded by the item above\nNot stated"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:3",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Denver station, disc images",
+      "text": "Denver station, disc images\nThe station's DVDs: operating systems, disks A to F, test burns and a checksum script\nNot stated"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:4",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Orlando station, Andrew Miller",
+      "text": "Orlando station, Andrew Miller\nNearly 48 hours of his air-gapped station, cut to one video\nYouTube licence\nYouTube"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:5",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · DC station, written account",
+      "text": "DC station, written account\nPeter Van Valkenburgh's notes, with his timelapse and photo album\nNot stated\nGitHub gist"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:6",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Desert Bus, Peter Todd's account",
+      "text": "Desert Bus, Peter Todd's account\nHis story and photos of the car-mounted station; the footage is unreleased. He later added notes: he came to doubt the setup should be called a multi-party computation, then restored the post\nNot stated\npetertodd.org"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:7",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Sprout MPC data",
+      "text": "Sprout MPC data\nTranscript, proving key, R1CS, OS images and checksums\nNot stated"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:8",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Cypherpunk Desert Bus, Peter Todd",
+      "text": "Cypherpunk Desert Bus, Peter Todd\nDisc images and Tails\nCC BY 3.0, except the software on the disc images"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:9",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · DC station",
+      "text": "DC station\nDisc images\nNot stated"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:10",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Radiolab, \"The Ceremony\"",
+      "text": "Radiolab, \"The Ceremony\"\nPodcast episode, July 14, 2017\nWNYC Studios, all rights reserved\nRadiolab"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:11",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · \"Zcash Ceremony\", short film",
+      "text": "\"Zcash Ceremony\", short film\nVideo by Electric Coin Company, 2017\nElectric Coin Company, YouTube licence\nYouTube"
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:12",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Oct 28, 2016 · Genesis block",
+      "text": "Date: Oct 28, 2016\nGenesis block\nMainnet launches on the parameters the ceremony produced."
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:13",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · Mar 2018 · The quiet save",
+      "text": "Date: Mar 2018\nThe quiet save\nA flaw in the proving system is found, fixed quietly by the Sapling upgrade in October 2018, then disclosed in February 2019. No exploitation was ever found."
+    },
+    {
+      "id": "src/lib/ceremony/record.ts:14",
+      "url": "https://openzcash.org/ceremony/record",
+      "title": "ceremony · record · May 31, 2022 · No more ceremonies",
+      "text": "Date: May 31, 2022\nNo more ceremonies\nNU5 brings Orchard and Halo 2, a proving system that needs no ceremony at all. Sapling still uses the parameters from its own 2018 ceremony."
     },
     {
       "id": "src/lib/ceremony/films.ts:0",
       "url": "https://openzcash.org/ceremony/watch",
-      "title": "ceremony · watch",
-      "text": "The other stations\nOrlando Station Report\n2016-10-27\nNearly 48 hours at his station in Florida, cut to seventy minutes: choosing a store by coin flip, buying the desktop, pulling its hard drive and wireless card, the rounds, and yanking the RAM at the end.\nTimestamped photos of the DC station\n2016-11-02\nA GoPro photo every ten seconds, from bringing the compute node home to the end of the ceremony. He cut both RAM sticks with tin snips on October 23.\nFinal run, Zcash parameter generation\n2016-10-21\nHis phone photos and video clips from October 21 to 24, linked from his written account of the DC station.\nThe short film\nZcash Ceremony\n2017-01-04\nThe story of the ceremony, with images and video by Peter Todd, Andrew Miller, Peter Van Valkenburgh, NCC Group, Nathaniel Kramer and Zcash.\nWho was John Dobbertin\nWhy Snowden Helped Launch Zcash\n2022-04-27\nFirst released as “The End of Zcash’s Trusted Setup: Who is John Dobbertin?”, with Edward Snowden, Sean Bowe and Zooko Wilcox.\nEdward Snowden on why he took part\n2024-12-05\nA short excerpt of the same interview.\nThe next ceremonies\nPowers of Tau, round 41\n2018-01-23\nA contribution computed in a private airplane, with radioactive waste from Chernobyl as the entropy source.\nThe Greatest Secret\n2018-03-17\nRound 85 in New York: street recordings from dice-chosen cameras, cut into chunks and fed to the air-gapped laptop as entropy."
+      "title": "ceremony · watch · 2016-10-27 · Orlando Station Report",
+      "text": "Orlando Station Report\nAndrew Miller\nDate: 2016-10-27\nNearly 48 hours at his station in Florida, cut to seventy minutes: choosing a store by coin flip, buying the desktop, pulling its hard drive and wireless card, the rounds, and yanking the RAM at the end."
     },
     {
       "id": "src/lib/ceremony/films.ts:1",
       "url": "https://openzcash.org/ceremony/watch",
-      "title": "ceremony · watch",
-      "text": "Drilling the RAM\n2017-11-16\nRound 6: a foil Faraday cage in a windowless bathroom, then the RAM, USB drive and CPU destroyed with a drill and a hammer.\nTalks and podcasts\nZcash Review, episode 2: Design of the Ceremony\n2016-11-20\nRecorded four weeks after the ceremony, on its design and execution.\nPeter Todd and Zcash\n2017-01-31\nThe Desert Bus witness on his experience of the trusted setup.\nThe Ceremony\n2017-07-14\nMorgen Peck tells Molly Webster the story of the ceremony, from inside the Denver station.\nParameter Generation\n2017-11-26\nAn open-ended talk on how the Zcash Foundation could help set up zk-SNARK parameters, given at Devcon3 in Cancún days before Powers of Tau took its first contribution.\nDemocratizing zk-SNARKs\nThe multi-party computation protocol behind Powers of Tau, among the next generation of zk-SNARKs.\nCultivating Sapling\n2018-07-02\nStarts at 9:00, where Powers of Tau and the Sapling MPC are covered.\nCryptographic Hocus-Pocus Meaning Nothing\n2019-05-01\nA witness on the trusted setup he took part in.\nSean Bowe on SNARKs, Trusted Setups and Elliptic Curve Cryptography\n2019-05-08\nThe author of the Sprout and Sapling setups on the story of Zcash and Powers of Tau.\nPeter Todd’s two GoPros recorded hours of the Cypherpunk Desert Bus, switched off while he typed his entropy, but he has not released the footage; his repository only commits to the files by hash."
+      "title": "ceremony · watch · 2016-11-02 · Timestamped photos of the DC station",
+      "text": "Timestamped photos of the DC station\nPeter Van Valkenburgh\nDate: 2016-11-02\nA GoPro photo every ten seconds, from bringing the compute node home to the end of the ceremony. He cut both RAM sticks with tin snips on October 23."
     },
     {
       "id": "src/lib/ceremony/films.ts:2",
       "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2016-10-21 · Final run, Zcash parameter generation",
+      "text": "Final run, Zcash parameter generation\nPeter Van Valkenburgh\nDate: 2016-10-21\nHis phone photos and video clips from October 21 to 24, linked from his written account of the DC station."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:3",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2017-01-04 · Zcash Ceremony",
+      "text": "Zcash Ceremony\nElectric Coin Company\nDate: 2017-01-04\nThe story of the ceremony, with images and video by Peter Todd, Andrew Miller, Peter Van Valkenburgh, NCC Group, Nathaniel Kramer and Zcash."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:4",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2022-04-27 · Why Snowden Helped Launch Zcash",
+      "text": "Why Snowden Helped Launch Zcash\nZcash Media\nDate: 2022-04-27\nFirst released as “The End of Zcash’s Trusted Setup: Who is John Dobbertin?”, with Edward Snowden, Sean Bowe and Zooko Wilcox."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:5",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2024-12-05 · Edward Snowden on why he took part",
+      "text": "Edward Snowden on why he took part\nZcash Media\nDate: 2024-12-05\nA short excerpt of the same interview."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:6",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2018-01-23 · Powers of Tau, round 41",
+      "text": "Powers of Tau, round 41\nAndrew Miller and Ryan Pierce\nDate: 2018-01-23\nA contribution computed in a private airplane, with radioactive waste from Chernobyl as the entropy source."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:7",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2018-03-17 · The Greatest Secret",
+      "text": "The Greatest Secret\nPatrick Mylund Nielsen and Amber Baldet\nDate: 2018-03-17\nRound 85 in New York: street recordings from dice-chosen cameras, cut into chunks and fed to the air-gapped laptop as entropy."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:8",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2017-11-16 · Drilling the RAM",
+      "text": "Drilling the RAM\nHudson Jameson and Steven Schroeder\nDate: 2017-11-16\nRound 6: a foil Faraday cage in a windowless bathroom, then the RAM, USB drive and CPU destroyed with a drill and a hammer."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:9",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2016-11-20 · Zcash Review, episode 2: Design of the Ceremony",
+      "text": "Zcash Review, episode 2: Design of the Ceremony\nZooko Wilcox and Andreas Antonopoulos\nDate: 2016-11-20\nRecorded four weeks after the ceremony, on its design and execution."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:10",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2017-01-31 · Peter Todd and Zcash",
+      "text": "Peter Todd and Zcash\nBitcoin Knowledge Podcast\nDate: 2017-01-31\nThe Desert Bus witness on his experience of the trusted setup."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:11",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2017-07-14 · The Ceremony",
+      "text": "The Ceremony\nRadiolab, WNYC Studios\nDate: 2017-07-14\nMorgen Peck tells Molly Webster the story of the ceremony, from inside the Denver station."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:12",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2017-11-26 · Parameter Generation",
+      "text": "Parameter Generation\nAndrew Miller, Devcon3\nDate: 2017-11-26\nAn open-ended talk on how the Zcash Foundation could help set up zk-SNARK parameters, given at Devcon3 in Cancún days before Powers of Tau took its first contribution."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:13",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2017-11-26 · Democratizing zk-SNARKs",
+      "text": "Democratizing zk-SNARKs\nSean Bowe, Devcon3\nDate: 2017-11-26\nThe multi-party computation protocol behind Powers of Tau, among the next generation of zk-SNARKs."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:14",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2018-07-02 · Cultivating Sapling",
+      "text": "Cultivating Sapling\nSean Bowe, Zcon0\nDate: 2018-07-02\nStarts at 9:00, where Powers of Tau and the Sapling MPC are covered."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:15",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2019-05-01 · Cryptographic Hocus-Pocus Meaning Nothing",
+      "text": "Cryptographic Hocus-Pocus Meaning Nothing\nPeter Todd, Magical Crypto Conference\nDate: 2019-05-01\nA witness on the trusted setup he took part in."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:16",
+      "url": "https://openzcash.org/ceremony/watch",
+      "title": "ceremony · watch · 2019-05-08 · Sean Bowe on SNARKs, Trusted Setups and Elliptic Curve Cryptography",
+      "text": "Sean Bowe on SNARKs, Trusted Setups and Elliptic Curve Cryptography\nZero Knowledge Podcast, episode 76\nDate: 2019-05-08\nThe author of the Sprout and Sapling setups on the story of Zcash and Powers of Tau."
+    },
+    {
+      "id": "src/lib/ceremony/films.ts:17",
+      "url": "https://openzcash.org/ceremony/watch",
       "title": "ceremony · watch",
-      "text": "His account, Nov 14, 2016\nEvidence archive"
+      "text": "The other stations\nTwo more witnesses filmed their air-gapped machines from purchase to the end of the ceremony.\nThe short film\nElectric Coin Company's own account, released in January 2017.\nWho was John Dobbertin\nThe last pseudonym, revealed in 2022.\nThe next ceremonies\nPowers of Tau (2017–2018) let anyone take part, and some participants went further with their air gaps.\nTalks and podcasts\nThe people who designed and ran the ceremonies, in their own words.\nPeter Todd’s two GoPros recorded hours of the Cypherpunk Desert Bus, switched off while he typed his entropy, but he has not released the footage; his repository only commits to the files by hash.\nHis account, Nov 14, 2016\nEvidence archive"
     },
     {
       "id": "src/data/governance/record.json:0",

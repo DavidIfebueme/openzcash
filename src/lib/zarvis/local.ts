@@ -6,6 +6,8 @@ import { getZipCorpus } from "./zips";
 import { isZipQuestion, zipCatalogEvidence, latestZipAnswer, requestedZips } from "./zip-catalog";
 import { boundedRead } from "./timeout";
 import type { ChatMessage, ZarvisSource } from "./types";
+import { miningAnswer } from "./mining";
+import { needsMiningResearch } from "./research-scope";
 import { directIntent, normalizeQuestion } from "./direct-intent";
 import { faqAnswer } from "./direct-faq";
 import { treasuryAnswer, numberedZipAnswer } from "./direct-data";
@@ -13,11 +15,11 @@ import { sessionPreferences, type ZarvisSession } from "./session";
 export { directIntent, normalizeQuestion } from "./direct-intent";
 
 export type Evidence = { content: string; source?: ZarvisSource };
-export type LocalPlan = { query: string; documents: ReturnType<typeof searchKnowledge>; evidence: Evidence[]; direct?: string; external: boolean };
+export type LocalPlan = { query: string; documents: ReturnType<typeof searchKnowledge>; evidence: Evidence[]; direct?: string; reviewedFaq?: boolean; external: boolean };
 /** Retrieve for the latest topic; short replies can refer to the preceding answer/offer. */
 export function retrievalQuestion(messages: ChatMessage[]): string {
   const latest = messages.at(-1)?.content ?? "";
-  if (latest.length <= 70 && /^(?:yes|sim|ok|sure|please|continue|pode|isso|e\b|and\b|what about\b|how about\b|explain(?: (?:that|it|more))?$|explique(?: (?:isso|mais))?$|por que\b|why\b)/i.test(latest.trim())) {
+  if (latest.length <= 70 && /^(?:yes|sim|ok|sure|please|continue|tell me more|conte mais|fale mais|aprofunde|pode|isso|e\b|and\b|what about\b|how about\b|explain(?: (?:that|it|more))?$|explique(?: (?:isso|mais))?$|por que\b|why\b)/i.test(latest.trim())) {
     return `${messages.slice(-3, -1).map((m) => m.content.slice(0, 900)).join("\n")}\n${latest}`;
   }
   return latest;
@@ -86,6 +88,7 @@ export function relevantTopics(query: string): Array<typeof lookupSchema._output
   if (/\b(?:paid|payments|pagou|pagos?|pagamentos|gastos|gastou)\b/.test(q) && /\b(?:grants?|zcg)\b/.test(q) && !/\b(?:treasury|tesouro|balance|saldo)\b/.test(q)) return [];
   const matches: Array<[RegExp, typeof lookupSchema._output.topic]> = [
     [/\b(?:price|preco|cotacao)\b/, "price"],
+    [/\b(?:hashrate|solrate|difficulty|dificuldade)\b.*\b(?:current|today|now|atual|hoje|agora)\b|\b(?:current|today|now|atual|hoje|agora)\b.*\b(?:hashrate|solrate|difficulty|dificuldade)\b/, "mining"],
     [/\b(?:treasur\w*|tesour\w*|balances?|saldos?|holdings?|lockbox)\b/, "treasuries"],
     [/\b(?:meetings?|reunioes|reuniao)\b/, "meetings"],
     [/\b(?:elections?|committee|eleicoes|eleicao|comite|membros)\b/, "elections"],
@@ -121,7 +124,11 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal,
   }
   if (intent?.type === "faq") {
     const answer = faqAnswer(intent.id, pt);
-    return { query, documents: [{ id: `direct-${intent.id}`, ...answer.source, text: answer.text, kind: "reference" }], evidence: [], direct: answer.text, external: false };
+    return { query, documents: [{ id: `direct-${intent.id}`, ...answer.source, text: answer.text, kind: "reference" }], evidence: [], direct: answer.text, reviewedFaq: true, external: false };
+  }
+  if (intent?.type === "mining") {
+    const result = await lookupPublicData({ topic: "mining", query: "" }, signal);
+    return { query, documents: [], evidence: [result], direct: miningAnswer(result.content, pt), external: false };
   }
   const zip = isZipQuestion(query) ? await getZipCorpus(signal) : undefined;
   const documents = searchKnowledge(query, 4, 5000, zip?.corpus);
@@ -144,7 +151,7 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal,
   const currentExternal = /\b(?:latest|newest|current|ultimo|ultima|atual|today|hoje|recent\w*)\b/.test(q)
     && /\b(?:zips?|nu\d+|upgrade|release|protocol|protocolo|versao)\b/.test(q);
   const missingZip = zip && requestedZips(query).some((n) => !zip.corpus.documents.some((d) => d.number === n));
-  const external = zip ? !!missingZip || (zip.stale && (currentExternal || intent?.type === "zip")) : currentExternal;
+  const external = zip ? !!missingZip || (zip.stale && (currentExternal || intent?.type === "zip")) : currentExternal || (needsMiningResearch(query) && !topics.includes("mining"));
   const direct = intent?.type === "price" ? priceAnswer(evidence[0], pt)
     : intent?.type === "zip" && zip ? numberedZipAnswer(intent.number, intent.overview, zip.corpus, zip.stale, pt)
     : intent?.type === "latest_zip" && zip ? latestZipAnswer("What is the latest ZIP?", zip.corpus, zip.stale, pt) : undefined;

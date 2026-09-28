@@ -10,6 +10,8 @@ Auto and Quick use reviewed text or validated public-data formatting for the com
 | Privacy and keys | What can a Sapling incoming viewing key reveal? | Incoming/full/outgoing distinctions; no spending authority |
 | Supply and halvings | What is 5% of 21 million ZEC? | Fixed maximum versus changing circulating supply |
 | Site navigation/methodology | Where is the treasury calculator? | Existing public OpenZcash pages |
+| Mining definitions and source comparison | What is solrate? / Why do ZcashInfo and ZecStats show different hashrates? | Reviewed methodology, units, averaging windows and attribution limits |
+| Current network solrate | Qual é o hashrate atual da rede Zcash? | Validated ZcashInfo API snapshot, 20 blocks, heights and UTC timestamps; 60-second cache |
 | USD price | Qual é o preço do ZEC? | Shared quote with its time and stale state |
 | Community holdings | What are the ZCG and Lockbox balances? | Dated ZCG report, block-based Lockbox estimate, separate quote |
 | Grant payments | How much has ZCG paid in grants? | Full selected ledger aggregate, historical budget values |
@@ -17,13 +19,13 @@ Auto and Quick use reviewed text or validated public-data formatting for the com
 | Numbered ZIPs | What is ZIP 317? | Exact document, revision-specific status, Created and official abstract excerpt |
 | Latest ZIP | What is the latest ZIP? | Fresh catalog ordered by declared Created date, not publication or highest number |
 
-Nineteen reviewed fact/navigation topics have English and Portuguese text. Numbered ZIP abstracts are quoted in their original language, explicitly labeled as English in Portuguese answers. They are not model translations or technical analyses.
+Reviewed fact/navigation topics have English and Portuguese text. Numbered ZIP abstracts are quoted in their original language, explicitly labeled as English in Portuguese answers. They are not model translations or technical analyses.
 
 ## Context
 
 Supported follow-ups retain the known subject: “e em 2025?” keeps the ledger program and project; “e o Lockbox?” switches the fund; “when was it created?” keeps the exact ZIP number. Greetings, thanks and supported EN/PT, USD and brief-response preferences do not erase that subject. Explicit stored preferences are respected.
 
-An unrecognized earlier user instruction keeps the conversation on model synthesis, because it might set formatting, language or other constraints. A bare “yes/sim” is not turned into a repeated factual answer. Deep analysis always uses the selected model. Comparisons, predictions, technical reasoning, unsupported currencies/languages, detailed-response preferences and additional qualifications retain model synthesis even when the underlying facts exist internally.
+An unrecognized earlier user instruction keeps the conversation on model synthesis, because it might set formatting, language or other constraints. A bare “yes/sim” is not turned into a repeated factual answer. Deep analysis always uses the selected model. Except for a fully matched reviewed methodology FAQ, comparisons, predictions, technical reasoning, unsupported currencies/languages, detailed-response preferences and additional qualifications retain model synthesis even when the underlying facts exist internally.
 
 ## Data limits
 

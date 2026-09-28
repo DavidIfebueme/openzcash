@@ -90,6 +90,14 @@ describe("Zarvis local-first orchestration", () => {
     expect(mocks.create.mock.calls[0][0].tools.find((t: { type: string }) => t.type === "web_search")).toMatchObject({ filters: { allowed_domains: ["zips.z.cash"] } });
     expect(metrics.webSearchCalls).toBe(1);
   });
+  it("passes mining sources to the first research round and preserves their citations", async () => {
+    mocks.config.mockReturnValue({ provider: "xai", apiKey: "unit-test-not-a-key", model: "grok-4.7", webSearch: true });
+    mocks.prepare.mockResolvedValue({ query: "current Zcash hashrate", documents: [], evidence: [], external: true });
+    mocks.create.mockResolvedValueOnce(events([{ type: "web_search_call" }, answer("A dated estimate from [ZecStats](https://zecstats.com/chart/hashrate).") ]));
+    const metrics = await generateAnswer(question, new AbortController().signal, () => {});
+    expect(mocks.create.mock.calls[0][0].tools.find((t: { type: string }) => t.type === "web_search")).toMatchObject({ filters: { allowed_domains: expect.arrayContaining(["zcashinfo.com", "zecstats.com"]) } });
+    expect(metrics.webSearchCalls).toBe(1);
+  });
   it("does not enable research when disabled, even if a model requests it", async () => {
     mocks.config.mockReturnValue({ provider: "openai", apiKey: "test", model: "gpt-6-astra", webSearch: false });
     mocks.create.mockResolvedValueOnce(events([call("research", '{"reason":"missing_local_evidence"}', "request_external_research")])).mockResolvedValueOnce(events([answer("I cannot verify that current fact.")]));

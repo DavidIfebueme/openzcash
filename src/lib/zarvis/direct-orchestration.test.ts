@@ -33,6 +33,10 @@ beforeEach(() => {
 describe("Real local planner through the answer orchestrator, provider forbidden", () => {
   it.each([
     ["What is Zcash?"], ["What is a full viewing key?"], ["Where is the treasury calculator?"],
+    ["What is solrate?"], ["O que é um pool de mineração?"], ["Where can I find Zcash mining data?"],
+    ["Why do ZcashInfo and ZecStats show different hashrates?"],
+    ["Qual é o hashrate atual da rede Zcash? Cite a fonte, a data e a janela de medição."],
+    ["O ZcashInfo e o ZecStats mostram hashrates diferentes. Isso significa que um está errado? Como comparar os dois corretamente?"],
     ["Qual é o preço do ZEC?"], ["How much has ZCG paid in grants?"],
     ["How much did coinholders pay in grants to Zingo in 2024?", "e em 2025?"],
     ["What does ZCG hold?", "e o Lockbox?"], ["What are the ZCG and Lockbox balances?"],

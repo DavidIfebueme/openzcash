@@ -10,6 +10,7 @@ import { lookupScenario, scenarioTool, scenarioAnswer } from "./scenario";
 import { sessionPreferences, type ZarvisSession } from "./session";
 import { isFinancialEvidence, unsupportedAmounts, ledgerComparisonEvidence, ledgerComparisonAnswer } from "./grounding";
 import { answerPlan, type ResponseDepth } from "./depth";
+import { researchScope } from "./research-scope";
 import { providerClient, providerOptions, providerSearchTool } from "./provider";
 import { citedSources, renderResponse } from "./answer";
 import type { ChatMessage, ZarvisEvent, ZarvisSource } from "./types";
@@ -38,7 +39,8 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
   signal.throwIfAborted();
   const metrics: GenerationMetrics = { depth: plan.depth, reasoningEffort: plan.effort, route: local.direct ? "local" : "model", provider: config.provider, model: config.model, modelCalls: 0, localLookups: local.evidence.length, webSearchCalls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, usageReported: false };
   const candidates: ZarvisSource[] = [...local.documents.map(({ title, url, retrievedAt }) => ({ title, url, ...(retrievedAt ? { retrievedAt } : {}) })), ...local.evidence.flatMap((item) => item.source ? [item.source] : [])];
-  if (local.direct && !plan.analyze) { complete(local.direct, candidates); return metrics; }
+  // A fully matched reviewed FAQ can explain a simple comparison. Explicit Deep still requests synthesis.
+  if (local.direct && (!plan.analyze || (local.reviewedFaq && depth !== "deep"))) { complete(local.direct, candidates); return metrics; }
   metrics.route = "model";
   const client = providerClient(config, plan.providerTimeoutMs);
   if (plan.depth === "deep") emit({ type: "status", message: "Thinking through the evidence…" });
@@ -57,7 +59,7 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
     signal.throwIfAborted();
     const tools: Tool[] = round < plan.rounds - 1 && lookups < plan.lookups ? [lookupTool, ledgerTool, scenarioTool, zipTool] : [];
     if (round < plan.rounds - 1 && config.webSearch && !allowWeb && !webUsed) tools.push(researchTool);
-    if (round < plan.rounds - 1 && allowWeb && !webUsed) tools.push(providerSearchTool(config, /\bzips?\b/i.test(local.query ?? "")));
+    if (round < plan.rounds - 1 && allowWeb && !webUsed) tools.push(providerSearchTool(config, researchScope(local.query ?? "")));
     if (round === plan.rounds - 1) input.push({ role: "developer", content: "Final synthesis round: no further tools are available. Answer the user's actual question now using the evidence already returned. Do not promise to retrieve or check something later. If a required fact is still missing, identify that specific gap and explain what the available evidence does establish." });
     const parameters: ResponseCreateParamsStreaming & { max_tool_calls?: number; max_turns?: number } = {
       model: config.model, instructions: systemPrompt(plan.depth), input: [...input], tools,

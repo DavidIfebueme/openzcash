@@ -94,3 +94,18 @@ describe("Precise local answers", () => {
     expect(mocks.lookup).toHaveBeenCalledTimes(2);
   });
 });
+
+
+it("reads current network measurements directly while keeping comparisons local", async () => {
+  const current = await prepareLocal([user("Qual é o hashrate atual da rede Zcash? Cite a data e a janela.")], signal());
+  expect(current.external).toBe(false); expect(current.direct).toContain("Não consegui confirmar");
+  expect(mocks.lookup).toHaveBeenCalledWith({ topic: "mining", query: "" }, expect.any(AbortSignal));
+  const methodology = await prepareLocal([user("O ZcashInfo e o ZecStats mostram hashrates diferentes. Como comparar corretamente?")], signal());
+  expect(methodology.external).toBe(false);
+  expect(methodology.documents.some(d => d.url.includes("zecstats.com"))).toBe(true);
+});
+
+it("keeps the person in short requests for more depth", () => {
+  const query = retrievalQuestion([user("Quem é Zooko?"), answer("Zooko ajudou a criar o Zcash."), user("Conte mais.")]);
+  expect(query).toContain("Zooko"); expect(query).toContain("Conte mais");
+});

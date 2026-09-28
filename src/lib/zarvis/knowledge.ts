@@ -5,9 +5,11 @@ import zipSnapshot from "./zip-content.json";
 import { requestedZips } from "./zip-catalog";
 import type { ZipCorpus } from "./zip-source";
 import { KNOWLEDGE, terms } from "./sources";
+import { isHistoricalQuestion } from "./research-scope";
 
 export type KnowledgeDocument = { id: string; title: string; url: string; text: string; section?: string; reviewedOn?: string; retrievedAt?: string; sourceUpdatedOn?: string | null; snapshotNote?: string; kind: "reference" | "site documentation" | "navigation" };
 const aliases: Record<string, string[]> = {
+  zooko: ["wilcox"], snowden: ["edward"], satoshi: ["nakamoto"],
   pagamento: ["paid", "payment", "disbursement"], pagamentos: ["paid", "payments", "disbursements"], pago: ["paid"], pagos: ["paid"], gastou: ["paid", "spending"], gastos: ["spending", "budget"],
   projeto: ["project", "grant"], projetos: ["projects", "grants"], beneficiario: ["recipient"], beneficiarios: ["recipients"], proposta: ["proposal"], propostas: ["proposals"],
   tesouro: ["treasury"], tesouros: ["treasuries", "treasury"], saldo: ["balance"], saldos: ["balances"], preco: ["price"], cotacao: ["price"],
@@ -16,7 +18,7 @@ const aliases: Record<string, string[]> = {
   governanca: ["governance"], reuniao: ["meeting"], reunioes: ["meetings"], eleicao: ["election"], eleicoes: ["elections"], membros: ["members"], comite: ["committee"],
   cerimonia: ["ceremony"], historia: ["history"], mineracao: ["mining"], oferta: ["supply"], orcamento: ["budget"], comunidade: ["community"], comunidades: ["communities"],
   blossom: ["shorter", "target", "spacing"], intervalo: ["spacing"], blocos: ["block"],
-  noticias: ["news"], ultimo: ["latest"], ultimos: ["latest"], atual: ["current"], mensal: ["monthly"], relatorio: ["report"], relatorios: ["reports"],
+  noticias: ["news"], ultimo: ["latest"], ultimos: ["latest"], atual: ["current"], mensal: ["monthly"], mensais: ["monthly", "reports"], relatorio: ["report"], relatorios: ["reports"],
 };
 export function searchTerms(value: string): string[] {
   return [...new Set(terms(value).flatMap((word)=>[word, ...(Object.hasOwn(aliases, word) ? aliases[word] : [])]))];
@@ -91,14 +93,45 @@ function buildSearchIndex(corpus: ZipCorpus) {
   const averageLength = normalized.reduce((sum, item) => sum + item.length, 0) / normalized.length;
   return { normalized, frequency, averageLength, count: all.length, zipChunks: zipDocs.length };
 }
+/** Assemble a bounded chronology from the site's actual public paragraphs, without model calls. */
+function personHistoryDocument(query: string): KnowledgeDocument | undefined {
+  const normalized = ` ${terms(query).join(" ")} `;
+  const people = index.documents.filter(doc => doc.id.startsWith("src/lib/ceremony/people.ts:"));
+  const names = [...new Set(people.map(doc => doc.text.split("\n")[0]))];
+  const nicknames: Record<string, string[]> = { "Zooko Wilcox": ["zooko"], "Satoshi Nakamoto": ["satoshi"], "Edward Snowden": ["snowden"] };
+  const matches = names.map(name => ({ name, aliases: [terms(name).join(" "), ...(nicknames[name] ?? [])] }))
+    .filter(person => person.aliases.some(alias => normalized.includes(` ${alias} `)));
+  if (matches.length !== 1) return;
+  const person = matches[0];
+  const passages: Array<{ title: string; text: string }> = []; const seen = new Set<string>();
+  for (const doc of index.documents.filter(doc => doc.id.startsWith("src/lib/ceremony/story.ts:"))) {
+    for (const paragraph of doc.text.split("\n")) {
+      const text = ` ${terms(paragraph).join(" ")} `;
+      if (paragraph.length < 100 || seen.has(paragraph) || !person.aliases.some(alias => text.includes(` ${alias} `))) continue;
+      passages.push({ title: doc.title, text: `${doc.title}:\n${paragraph}` }); seen.add(paragraph);
+    }
+  }
+  // Cover different periods before spending the remaining budget on one long chapter.
+  const selected = new Set<number>(); const chapters = new Set<string>(); let used = 0;
+  for (const diverse of [true, false]) for (const [i, passage] of passages.entries()) {
+    if (selected.has(i) || (diverse && chapters.has(passage.title)) || used + passage.text.length > 2400) continue;
+    selected.add(i); chapters.add(passage.title); used += passage.text.length;
+  }
+  const parts = passages.filter((_, i) => selected.has(i)).map(p => p.text);
+  if (!parts.length) return;
+  return { id: `person-history:${person.name}`, title: `${person.name} · selected public history`, url: "https://openzcash.org/ceremony/road", text: parts.join("\n\n"), kind: "site documentation", snapshotNote: "Selected public Road passages, not a complete biography. Chapter eras provide context; use dates stated in the individual facts." };
+}
 export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus: ZipCorpus = bundledZipCorpus): KnowledgeDocument[] {
   let searchIndex = indexes.get(corpus);
   if (!searchIndex) { searchIndex = buildSearchIndex(corpus); indexes.set(corpus, searchIndex); }
   const { normalized, frequency, averageLength, count } = searchIndex;
   const normalizedQuery = query.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+  const historical = isHistoricalQuestion(query);
   const matchingConcepts = concepts.filter(([, pattern]) => pattern.test(normalizedQuery));
   const tokens = [...new Set([...searchTerms(query), ...matchingConcepts.flatMap(([, , words]) => words)])];
   const zips = requestedZips(query);
+  const blossomSpacing = /\bblossom\b/.test(normalizedQuery) && /block|bloco|spacing|intervalo|seconds|segundos/.test(normalizedQuery);
+  const monthly = /\b(?:monthly|mensais|mensal)\b/.test(normalizedQuery);
   const scored = normalized.map(({ doc, title, tokens: body, length }, i) => {
     let score = 0;
     for (const token of tokens) {
@@ -108,11 +141,33 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
     }
     if (matchingConcepts.some(([id]) => id === doc.id)) score += 12;
     if (zips.some((number) => doc.url.endsWith(`zip-${String(number).padStart(4, "0")}`))) score += 30;
+    if (!zips.length && score > 0) {
+      if (blossomSpacing && doc.url.endsWith("zip-0208")) score += 25;
+      if (monthly && doc.url.startsWith("https://openzcash.org/monthly")) score *= 3;
+    }
+    if (historical && score > 0) {
+      if (doc.kind !== "navigation") {
+        if (doc.url === "https://openzcash.org/ceremony/road") score *= 5;
+        else if (doc.url === "https://openzcash.org/ceremony/people") score *= 2.5;
+        else if (doc.url.startsWith("https://openzcash.org/ceremony/")) score *= 0.9;
+      }
+      if (/\b(?:zooko|wilcox)\b/.test(normalizedQuery)) {
+        if (doc.id === "zooko-background") score += 30;
+        if (doc.id === "zooko-affiliation") score += 20;
+      }
+      if (doc.id.startsWith("reference:zip-") || doc.id.startsWith("reference:draft-")) score *= 0.12;
+    }
     if (doc.kind === "navigation") score *= 0.35;
     return { doc, i, score };
   }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score || a.i - b.i);
   const selected: KnowledgeDocument[] = []; const perPage = new Map<string, number>(); let used = 2;
+  const biography = historical ? personHistoryDocument(query) : undefined;
+  if (biography && limit > 0 && JSON.stringify(biography).length + used <= budget) {
+    selected.push(biography); used += JSON.stringify(biography).length;
+    perPage.set(biography.url, 2);
+  }
   for (const { doc } of scored) {
+    if (selected.length >= limit) break;
     if ((perPage.get(doc.url) ?? 0) >= 2) continue;
     const size = JSON.stringify(doc).length + (selected.length ? 1 : 0);
     if (used + size > budget) continue;
