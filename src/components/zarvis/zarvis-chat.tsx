@@ -84,7 +84,9 @@ export function ZarvisChat({ compact = false }: { compact?: boolean }) {
         <div className="zarvis-composer-bottom"><div className="zarvis-depth-control">
           <ZarvisDepthSelect value={chat.depth} disabled={chat.busy} onChange={chat.setDepth}/>
           <span className="zarvis-character-count">{chat.draft.length > 1_600 ? `${chat.draft.length} / ${MAX_QUESTION_LENGTH}` : ""}</span></div>
-          {chat.busy ? <button type="button" className="zarvis-send" onClick={chat.stop} aria-label="Stop response">■</button> : <button type="submit" className="zarvis-send" disabled={!chat.status?.available || !chat.draft.trim()} aria-label="Send question">↑</button>}
+          {chat.busy ? <button type="button" className="zarvis-stop" onClick={chat.stop} aria-label="Stop response" title="Stop response">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="3" y="3" width="10" height="10" rx="2"/></svg>
+          </button> : <button type="submit" className="zarvis-send" disabled={!chat.status?.available || !chat.draft.trim()} aria-label="Send question">↑</button>}
         </div>
       </form>
       <div className="zarvis-privacy"><span>Zarvis can make mistakes.</span><details><summary>Privacy &amp; data</summary><p>Simple data lookups can be answered by OpenZcash. When AI is needed, recent messages and relevant public data are sent to {provider}. OpenZcash keeps this conversation in browser memory; reloading clears it. Questions are not put in page URLs. Shared calculator links contain only scenario assumptions. Feedback sends your rating without the conversation text.</p><p>Provider response storage is disabled for this integration. Provider retention policies may still apply. <a href={provider === "xAI (Grok)" ? "https://docs.x.ai/developers/faq/security" : "https://developers.openai.com/api/docs/guides/your-data"} target="_blank" rel="noopener noreferrer">Provider data policy ↗</a></p><p>Never share recovery phrases, private keys or viewing keys. Hosting access logs and short-lived abuse counters are separate from the conversation.</p></details></div>

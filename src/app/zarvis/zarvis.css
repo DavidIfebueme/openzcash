@@ -56,6 +56,12 @@
 .zarvis-send { display: grid; place-items: center; width: 34px; height: 34px; border: 0; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 24px; cursor: pointer; }
 .zarvis-send:disabled { opacity: .2; cursor: default; }
 .zarvis-send:hover:not(:disabled) { background: var(--accent-ink); }
+.zarvis-stop { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; padding: 0; border: 1px solid var(--line-strong); border-radius: 11px; background: var(--surface2); color: var(--muted); cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease; }
+.zarvis-stop::before { content: ""; position: absolute; inset: -5px; }
+.zarvis-stop svg { display: block; }
+.zarvis-stop:hover { border-color: var(--muted); background: var(--surface); color: var(--ink); }
+.zarvis-stop:active { background: var(--line); }
+@media (prefers-reduced-motion: reduce) { .zarvis-stop { transition: none; } }
 .zarvis-privacy { display: flex; justify-content: center; align-items: start; gap: 14px; margin-top: 10px; font-size: 10px; color: var(--dim); }
 .zarvis-privacy details { max-width: 350px; text-align: right; }
 .zarvis-privacy summary { cursor: pointer; }
