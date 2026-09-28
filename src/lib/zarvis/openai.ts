@@ -31,14 +31,14 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
   const config = zarvisConfig();
   const plan = answerPlan(messages, depth);
   const session = sessionPreferences(priorSession, messages);
-  const local = await prepareLocal(messages, signal);
+  const local = await prepareLocal(messages, signal, session);
   const evidence = [...local.evidence];
   const pt = session.language ? session.language === "pt" : portuguese(messages);
   const complete = (answer: string, candidates: ZarvisSource[]) => { emit({ type: "session", session }); finish(answer, candidates, emit); };
   signal.throwIfAborted();
   const metrics: GenerationMetrics = { depth: plan.depth, reasoningEffort: plan.effort, route: local.direct ? "local" : "model", provider: config.provider, model: config.model, modelCalls: 0, localLookups: local.evidence.length, webSearchCalls: 0, inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, usageReported: false };
   const candidates: ZarvisSource[] = [...local.documents.map(({ title, url, retrievedAt }) => ({ title, url, ...(retrievedAt ? { retrievedAt } : {}) })), ...local.evidence.flatMap((item) => item.source ? [item.source] : [])];
-  if (local.direct && !plan.analyze && !session.language && !session.currency && !session.detail) { complete(local.direct, candidates); return metrics; }
+  if (local.direct && !plan.analyze) { complete(local.direct, candidates); return metrics; }
   metrics.route = "model";
   const client = providerClient(config, plan.providerTimeoutMs);
   if (plan.depth === "deep") emit({ type: "status", message: "Thinking through the evidence…" });

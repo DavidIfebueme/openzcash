@@ -15,7 +15,7 @@ export function sessionPreferences(previous: ZarvisSession = {}, messages: ChatM
   const result = { ...sessionSchema.parse(previous) };
   for (const message of messages) {
     if (message.role !== "user") continue;
-    const q = message.content.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+    const q = message.content.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().replace(/[.!?,]/g, "").replace(/\s+/g, " ").trim().replace(/^(?:please |por favor )/, "").replace(/(?: please| por favor)$/, "");
     const language = q.match(/^(?:please )?(?:answer|reply|respond|responda|responde)(?: to me)? (?:in|em) (english|ingles|portuguese|portugues|spanish|espanhol|french|frances)[.!]?$/);
     if (language) result.language = ({ english: "en", ingles: "en", portuguese: "pt", portugues: "pt", spanish: "es", espanhol: "es", french: "fr", frances: "fr" } as const)[language[1] as "english"];
     if (/^(?:use|usar|mostre em|show amounts in) (usd|dollars|dolares)[.!]?$/.test(q)) result.currency = "USD";

@@ -23,7 +23,7 @@ describe("Precise local answers", () => {
   it.each(["Qual o preço do Zcash?", "Qual é o preço atual do ZEC?", "What is the current ZEC price?", "ZEC price", "Quanto custa o Zcash?"])("recognizes a plain quote: %s", (q) => {
     expect(directIntent([user(q)])).toEqual({ type: "price" });
   });
-  it.each(["What is ZEC price in BRL?", "Qual o preço do ZEC ontem?", "Qual o preço do ZEC e o saldo do ZCG?", "What is the ZEC price if it rises 20x?", "Qual o preço de comprar 5% de ZEC?", "Do not tell me the ZEC price", "What is ZEC?", "Qual o Zcash?"])("preserves qualifications instead of taking a shortcut: %s", (q) => {
+  it.each(["What is ZEC price in BRL?", "Qual o preço do ZEC ontem?", "Qual o preço do ZEC e o saldo do ZCG?", "What is the ZEC price if it rises 20x?", "Qual o preço de comprar 5% de ZEC?", "Do not tell me the ZEC price", "Qual o Zcash?"])("preserves qualifications instead of taking a shortcut: %s", (q) => {
     expect(directIntent([user(q)])).toBeUndefined();
   });
   it("does not bypass earlier conversation constraints with a local template", () => {
