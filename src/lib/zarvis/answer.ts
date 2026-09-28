@@ -12,16 +12,18 @@ export function renderResponse(response: OpenAIResponse): { text: string; source
       if (part.type === "refusal") { paragraphs.push(part.refusal); continue; }
       if (part.type !== "output_text") continue;
       let text = part.text;
-      const citations = part.annotations.filter((a) => a.type === "url_citation").sort((a, b) => b.start_index - a.start_index);
+      const citations = (part.annotations ?? []).filter((a) => a.type === "url_citation").sort((a, b) => b.start_index - a.start_index);
       for (const citation of citations) {
         const url = safeSourceUrl(citation.url);
         if (!url) continue;
-        const title = citation.title.replace(/[\[\]\r\n]/g, " ").slice(0, 150) || "Source";
+        const title = (citation.title || "Source").replace(/[\[\]\r\n]/g, " ").slice(0, 150) || "Source";
         sources.set(url, { title, url, retrievedAt: new Date().toISOString() });
-        if (citation.start_index >= 0 && citation.end_index >= citation.start_index && citation.end_index <= text.length)
+        if (citation.start_index >= 0 && citation.end_index > citation.start_index && citation.end_index <= text.length)
           text = text.slice(0, citation.start_index) + `[${title}](${url})` + text.slice(citation.end_index);
       }
-      paragraphs.push(text.replace(/\uE200[^\uE201]*\uE201/gu, ""));
+      // xAI can return zero-offset source inventories and internal citation markers.
+      // Inventories belong in the source list, never inserted at the start of the prose.
+      paragraphs.push(text.replace(/\uE200render_inline_citation[^\r\n\u0081]{0,500}\u0081/gu, "").replace(/\uE200[^\uE201]*\uE201/gu, ""));
     }
   }
   return { text: paragraphs.join("\n\n"), sources: [...sources.values()] };

@@ -120,3 +120,8 @@ Answer feedback sends only a signed one-hour ticket and a useful/needs-work vote
 ## Preproduction audit
 
 See [the September 27 audit](zarvis-preproduction-audit.md) for corrected findings, the latest local verification results, the development-tool dependency follow-up, and the remaining production/CI/Grok release gates. The feature remains disabled in production pending those checks.
+
+
+## Live Grok validation
+
+The selected candidates are Grok 4.6 and 4.7. See [the real-provider evaluation](zarvis-grok-evaluation.md) for credential setup, observed fixes, usage and the remaining newest-ZIP research timeout. `scripts/eval-zarvis-live.py --confirm-paid --extended` adds bare-confirmation and live-research cases. The local preview uses 4.7; this does not enable production.

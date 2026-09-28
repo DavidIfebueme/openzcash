@@ -126,6 +126,21 @@ describe("Zarvis citations", () => {
     expect(citedSources("https://evil.example/", [source])).toEqual([]);
   });
 
+  it("keeps xAI zero-offset source inventories out of the answer body", () => {
+    const response = { output: [{ type: "message", content: [{ type: "output_text", text: "ZIP 310 is Draft. \uE200render_inline_citation visp\u0087citation_id visp\u00800 visp\u0081", annotations: [{ type: "url_citation", start_index: 0, end_index: 0, title: "ZIP 310", url: "https://zips.z.cash/zip-0310" }] }] }] } as OpenAIResponse;
+    const result = renderResponse(response);
+    expect(result.text.trim()).toBe("ZIP 310 is Draft.");
+    expect(result.sources).toMatchObject([{ title: "ZIP 310", url: "https://zips.z.cash/zip-0310" }]);
+  });
+  it("handles absent annotation metadata without losing the answer or trusting unsafe URLs", () => {
+    const response = { output: [{ type: "message", content: [
+      { type: "output_text", text: "Plain text." },
+      { type: "output_text", text: "Fact [1]", annotations: [{ type: "url_citation", start_index: 5, end_index: 8, url: "https://zips.z.cash/zip-0310" }, { type: "url_citation", start_index: 0, end_index: 0, title: "Unsafe", url: "https://evil.example/" }] },
+    ] }] } as OpenAIResponse;
+    const result = renderResponse(response);
+    expect(result.text).toBe("Plain text.\n\nFact [Source](https://zips.z.cash/zip-0310)");
+    expect(result.sources).toHaveLength(1);
+  });
   it("renders provider annotations and only lists sources cited in the answer", () => {
     const response = { output: [{ type: "message", content: [{ type: "output_text", text: "Privacy [1]", annotations: [{ type: "url_citation", start_index: 8, end_index: 11, title: "Zcash", url: "https://z.cash/learn/how-to-use-zcash/" }] }] }] } as OpenAIResponse;
     const result = renderResponse(response);

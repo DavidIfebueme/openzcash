@@ -1,5 +1,7 @@
 # Zarvis preproduction audit — September 27, 2026
 
+> Follow-up: the user selected Grok 4.6 and 4.7, configured its key, and completed local live testing after this audit. See [the Grok evaluation](zarvis-grok-evaluation.md) for fixes, measured results and the remaining broad-search timeout. The original inspection below is a dated snapshot. Production remains disabled.
+
 ## Release decision
 
 The confirmed findings below are fixed in the draft Zarvis branch and verified locally. **Keep the PR in draft and the production feature disabled** until the release gates below are completed. No merge, production deployment, Railway setting change or provider switch was performed during this audit.

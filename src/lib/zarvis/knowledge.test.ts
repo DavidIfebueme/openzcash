@@ -8,6 +8,13 @@ describe("Local knowledge coverage and size", () => {
   it.each([["como funciona a metodologia dos pagamentos", "/zcg/methodology"], ["Zcash ceremony participants", "/ceremony/people"], ["viewing keys sender recipient", "zip-0310"], ["treasury calculator cypherpunk", "treasury-calculator"]])("finds relevant public material: %s", (q, target) => {
     expect(searchKnowledge(q).some((d) => d.url.includes(target))).toBe(true);
   });
+  it("keeps full-key scope attached to isolated ZIP 310 excerpts", () => {
+    const docs = searchKnowledge("ZIP 310 new unspent note nullifier incoming IVK");
+    const excerpts = docs.filter((doc) => doc.id.startsWith("reference:zip-0310:"));
+    expect(excerpts.length).toBeGreaterThan(0);
+    expect(excerpts.every((doc) => doc.snapshotNote?.includes("full Sapling viewing key (FVK)"))).toBe(true);
+    expect(excerpts.every((doc) => doc.snapshotNote?.includes("incoming viewing key alone cannot derive nullifiers"))).toBe(true);
+  });
   it("indexes the explicit public collection and keeps selected context small", () => {
     expect(knowledgeCoverage.sourceFiles).toBeGreaterThan(45);
     const docs = searchKnowledge("Zcash funding governance methodology ceremony grants treasury");

@@ -67,3 +67,17 @@ export function ledgerComparisonEvidence(evidence: Evidence[]): Evidence | undef
   const differenceUsd = (Math.round(toUsd * 100) - Math.round(fromUsd * 100)) / 100;
   return { content: JSON.stringify({ data: { fromYear: a.filters.year, toYear: b.filters.year, scope: a.filters.scope, search: a.filters.search, fromUsd, toUsd, differenceUsd, absoluteDifferenceUsd: Math.abs(differenceUsd), changePercent: fromUsd > 0 ? differenceUsd / fromUsd * 100 : null, importedAt: a.importedAt, note: "Computed comparison of the same ledger population across payment years. Historical budget values of paid entries; not bank settlement. Percent change is undefined for a zero/negative starting value." } }) };
 }
+
+/** Keep verified arithmetic when a model answer fails the financial-figure guard. */
+export function ledgerComparisonAnswer(evidence: Evidence[], pt: boolean): string | undefined {
+  const comparison = ledgerComparisonEvidence(evidence);
+  if (!comparison) return;
+  const data = JSON.parse(comparison.content).data;
+  const locale = pt ? "pt-BR" : "en-US";
+  const usd = new Intl.NumberFormat(locale, { style: "currency", currency: "USD", signDisplay: "exceptZero" }).format(data.differenceUsd);
+  const percent = data.changePercent === null ? (pt ? "variação percentual indefinida" : "percent change undefined")
+    : new Intl.NumberFormat(locale, { style: "percent", minimumFractionDigits: 2, maximumFractionDigits: 2, signDisplay: "exceptZero" }).format(data.changePercent / 100);
+  return pt
+    ? `**${data.fromYear} → ${data.toYear}**: variação de **${usd} (${percent})**, usando o mesmo escopo do registro e a mesma importação.`
+    : `**${data.fromYear} → ${data.toYear}**: change of **${usd} (${percent})**, using the same ledger scope and import.`;
+}

@@ -39,7 +39,11 @@ const referenceDocs: KnowledgeDocument[] = references.sources.flatMap((source) =
     }
   }
   if (chunk) chunks.push(chunk);
-  return chunks.map((text, i) => ({ id: `reference:${source.id}:${i}`, title: source.title, url: source.url, text, kind: "reference" as const, retrievedAt: source.retrievedAt, sourceUpdatedOn: source.sourceUpdatedOn, snapshotNote: source.note }));
+  // A selected paragraph must retain document-wide key authority assumptions.
+  const scope = source.id === "zip-0310"
+    ? " Scope: every ZIP 310 example assumes Ian holds Alice's full Sapling viewing key (FVK), even when a step mentions its derived IVK. An incoming viewing key alone cannot derive nullifiers or detect later spends."
+    : "";
+  return chunks.map((text, i) => ({ id: `reference:${source.id}:${i}`, title: source.title, url: source.url, text, kind: "reference" as const, retrievedAt: source.retrievedAt, sourceUpdatedOn: source.sourceUpdatedOn, snapshotNote: source.note + scope }));
 });
 const navigation: KnowledgeDocument[] = APPS.filter((app)=>!app.admin).flatMap((app)=>[
   {id:`nav:${app.id}`,title:app.label,url:`https://openzcash.org${app.href}`,text:app.sub,kind:"navigation" as const},

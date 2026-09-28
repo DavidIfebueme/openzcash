@@ -7,7 +7,7 @@ import { ledgerTool } from "./ledger";
 import { prepareLocal, lookupLedger, type Evidence, portuguese, ledgerFactsAnswer } from "./local";
 import { lookupScenario, scenarioTool, scenarioAnswer } from "./scenario";
 import { sessionPreferences, type ZarvisSession } from "./session";
-import { isFinancialEvidence, unsupportedAmounts, ledgerComparisonEvidence } from "./grounding";
+import { isFinancialEvidence, unsupportedAmounts, ledgerComparisonEvidence, ledgerComparisonAnswer } from "./grounding";
 import { providerClient, providerOptions, providerSearchTool } from "./provider";
 import { citedSources, renderResponse } from "./answer";
 import type { ChatMessage, ZarvisEvent, ZarvisSource } from "./types";
@@ -52,7 +52,7 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
     signal.throwIfAborted();
     const tools: Tool[] = round < 2 && lookups < 3 ? [lookupTool, ledgerTool, scenarioTool] : [];
     if (round < 2 && config.webSearch && !allowWeb && !webUsed) tools.push(researchTool);
-    if (allowWeb && !webUsed) tools.push(providerSearchTool(config));
+    if (allowWeb && !webUsed) tools.push(providerSearchTool(config, /\bzips?\b/i.test(local.query ?? "")));
     const parameters: ResponseCreateParamsStreaming & { max_tool_calls?: number; max_turns?: number } = {
       model: config.model, instructions: systemPrompt(), input: [...input], tools,
       parallel_tool_calls: true, max_output_tokens: 3_000,
@@ -92,7 +92,8 @@ export async function generateAnswer(messages: ChatMessage[], signal: AbortSigna
         const ledgers = evidence.flatMap((item) => {
           try { const data = JSON.parse(item.content).data; const answer = data?.filters ? ledgerFactsAnswer(data, pt) : undefined; return answer ? [answer] : []; } catch { return []; }
         });
-        text = ledgers.length ? ledgers.join("\n\n") : (pt
+        const comparison = ledgerComparisonAnswer(evidence, pt);
+        text = ledgers.length ? [...(comparison ? [comparison] : []), ...ledgers].join("\n\n") : (pt
           ? "Não consegui validar todos os valores desta resposta. Consulte os dados e as datas nas fontes abaixo; não vou apresentar um número sem confirmação."
           : "I could not validate all figures in this answer. Please check the data and dates in the sources below; I cannot present an unverified amount.");
       }

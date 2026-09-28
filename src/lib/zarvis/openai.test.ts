@@ -72,6 +72,15 @@ describe("Zarvis local-first orchestration", () => {
     expect(mocks.create.mock.calls[0][0].tools.some((t: { type: string }) => t.type === "web_search")).toBe(false);
     expect(mocks.create.mock.calls[1][0].tools.some((t: { type: string }) => t.type === "web_search")).toBe(true);
   });
+  it("narrows Grok ZIP sources without changing its existing turn limit", async () => {
+    mocks.config.mockReturnValue({ provider: "xai", apiKey: "unit-test-not-a-key", model: "grok-4.7", webSearch: true });
+    mocks.prepare.mockResolvedValue({ query: "latest ZIP", documents: [], evidence: [], external: true });
+    mocks.create.mockResolvedValueOnce(events([{ type: "web_search_call" }, answer("The official catalog does not establish publication order.")]));
+    const metrics = await generateAnswer(question, new AbortController().signal, () => {});
+    expect(mocks.create.mock.calls[0][0].max_turns).toBe(2);
+    expect(mocks.create.mock.calls[0][0].tools.find((t: { type: string }) => t.type === "web_search")).toMatchObject({ filters: { allowed_domains: ["zips.z.cash"] } });
+    expect(metrics.webSearchCalls).toBe(1);
+  });
   it("does not enable research when disabled, even if a model requests it", async () => {
     mocks.config.mockReturnValue({ provider: "openai", apiKey: "test", model: "gpt-6-astra", webSearch: false });
     mocks.create.mockResolvedValueOnce(events([call("research", '{"reason":"missing_local_evidence"}', "request_external_research")])).mockResolvedValueOnce(events([answer("I cannot verify that current fact.")]));
@@ -127,6 +136,22 @@ describe("Zarvis local-first orchestration", () => {
     expect(JSON.stringify(emitted)).not.toContain("999 billion");
     expect(metrics.groundingFallbacks).toBe(1);
     expect(emitted.at(-1)?.type).toBe("done");
+  });
+  it("preserves a computed ledger change when unverified model figures trigger fallback", async () => {
+    const entry = (year: number, usd: string) => ({ content: JSON.stringify({ data: {
+      filters: { year, scope: "zcg_grants", search: "" }, importedAt: "2026-09-27T00:00:00Z",
+      budgetedUsdOfPaidEntries: usd, recordedZecPaid: "1", paidEntries: 1,
+      paidEntriesMissingUsd: 0, paidEntriesMissingZec: 0,
+    } }) });
+    mocks.prepare.mockResolvedValue({ documents: [], evidence: [entry(2024, "3396155.67"), entry(2025, "3858126.64")], external: false });
+    mocks.create.mockResolvedValueOnce(events([answer("The increase was $999 billion.")]));
+    const emitted: ZarvisEvent[] = [];
+    const metrics = await generateAnswer([{ role: "user", content: "Compare 2024 and 2025 paid grants, with the dollar and percent change." }], new AbortController().signal, (e) => emitted.push(e));
+    const text = emitted.find((e) => e.type === "replace");
+    expect(text).toMatchObject({ text: expect.stringContaining("+$461,970.97 (+13.60%)") });
+    expect(JSON.stringify(emitted)).not.toContain("999 billion");
+    expect(JSON.stringify(emitted)).toContain("budgeted values");
+    expect(metrics.groundingFallbacks).toBe(1);
   });
   it("carries session preferences as data when old messages are no longer present", async () => {
     mocks.create.mockResolvedValueOnce(events([answer("A resposta em português.")]));
