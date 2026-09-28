@@ -254,10 +254,33 @@
 .zarvis-feedback { display: inline-flex; align-items: center; gap: .75rem; margin-inline-start: .75rem; color: var(--muted); font-size: .7rem; }
 
 /* Conversational motion: a prepared gesture, a soft settle, then quiet reading. */
-.zarvis-depth-control { display: flex; align-items: center; gap: 12px; }
-.zarvis-depth-control select { font: inherit; font-size: 12px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; max-width: 150px; cursor: pointer; }
-.zarvis-depth-control select:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.zarvis-depth-control select:disabled { opacity: .6; cursor: default; }
+/* A compact trigger, with detail revealed only when choosing a response mode. */
+.zarvis-depth-control { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.zarvis-character-count { font-size: 10px; color: var(--dim); white-space: nowrap; }
+.zarvis-depth { position: relative; flex-shrink: 0; }
+.zarvis-depth-trigger { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 6px 9px; margin-left: -5px; border: 1px solid transparent; border-radius: 10px; background: transparent; color: var(--muted); font: inherit; font-size: 12px; font-weight: 500; line-height: 20px; cursor: pointer; transition: background .15s, color .15s, border-color .15s; }
+.zarvis-depth-trigger > svg { width: 16px; height: 16px; flex-shrink: 0; }
+.zarvis-depth-trigger .zarvis-depth-chevron { width: 12px; height: 12px; margin-left: 2px; color: var(--dim); transition: transform .15s; }
+.zarvis-depth-trigger:hover:not(:disabled), .zarvis-depth-trigger[aria-expanded="true"] { color: var(--ink); background: var(--surface2); border-color: var(--line); }
+.zarvis-depth-trigger[aria-expanded="true"] .zarvis-depth-chevron { transform: rotate(180deg); }
+.zarvis-depth-trigger:disabled { opacity: .45; cursor: default; }
+.zarvis-depth-menu { position: absolute; z-index: 30; left: -5px; bottom: calc(100% + 9px); width: min(288px, calc(100vw - 72px)); padding: 6px; border: 1px solid var(--line-strong); border-radius: 16px; background: var(--surface); box-shadow: 0 12px 36px #00000016, 0 2px 6px #00000008; animation: zarvis-depth-appear .15s ease-out; transform-origin: bottom left; }
+.zarvis-depth-heading { padding: 7px 10px 8px; color: var(--dim); font-size: 10px; font-weight: 500; letter-spacing: .035em; }
+.zarvis-depth-option { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 58px; padding: 10px; border: 0; border-radius: 10px; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.zarvis-depth-option:hover, .zarvis-depth-option:focus-visible { background: var(--surface2); }
+.zarvis-depth-option[aria-checked="true"] { background: var(--accent-soft); }
+.zarvis-depth-option-icon { display: grid; place-items: center; width: 28px; height: 28px; flex-shrink: 0; color: var(--muted); }
+.zarvis-depth-option-icon svg { width: 19px; height: 19px; }
+.zarvis-depth-option-copy { display: grid; gap: 3px; flex: 1; min-width: 0; font-size: 12px; font-weight: 500; line-height: 1.35; }
+.zarvis-depth-option-copy small { color: var(--muted); font-size: 10px; font-weight: 400; line-height: 1.45; }
+.zarvis-depth-check { width: 15px; height: 15px; flex-shrink: 0; color: var(--accent-ink); visibility: hidden; }
+.zarvis-depth-option[aria-checked="true"] .zarvis-depth-check { visibility: visible; }
+.zarvis-depth-option[aria-checked="true"] .zarvis-depth-option-icon { color: var(--accent-ink); }
+.rd-shell .zarvis-depth-option:focus-visible { outline: 1px solid var(--accent); outline-offset: -2px; box-shadow: none; }
+.rd-shell .zarvis-depth-trigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; box-shadow: none; }
+@keyframes zarvis-depth-appear { from { opacity: 0; transform: translateY(4px) scale(.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@media (pointer: coarse) { .zarvis-depth-trigger { min-height: 40px; } }
+@media (prefers-reduced-motion: reduce) { .zarvis-depth-menu { animation: none; } .zarvis-depth-trigger, .zarvis-depth-chevron { transition: none; } }
 .zarvis-figure .zarvis-pose { transition-duration: .58s, 0s; }
 .zarvis-figure .zarvis-rig-head { animation-timing-function: cubic-bezier(.37,0,.23,1); }
 .zarvis-figure .zarvis-rig-arm { animation-name: zarvis-intent-gesture; animation-duration: 10.7s; }
