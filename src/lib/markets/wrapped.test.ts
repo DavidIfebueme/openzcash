@@ -26,6 +26,51 @@ const pool = {
   volume: { h24: 120 },
 };
 describe("issuer-identified ZEC pools", () => {
+  it("includes the Binance-Peg contract on either side and deduplicates BSC indexers", () => {
+    const bsc = WRAPPED_ASSETS.find((a) => a.id === "binance-bsc")!;
+    expect(bsc.token).toBe("0x1Ba42e5193dfA8B03D15dd1B86a3113bbBEF8Eeb");
+    const pancake = {
+      chainId: "bsc",
+      dexId: "pancakeswap",
+      pairAddress: "0xBSC1",
+      baseToken: { address: bsc.token },
+      quoteToken: { address: "0xWBNB" },
+      volume: { h24: 150 },
+    };
+    const uniswap = {
+      ...pancake,
+      dexId: "uniswap",
+      pairAddress: "0xBSC2",
+      baseToken: { address: "0xUSDT" },
+      quoteToken: { address: bsc.token.toLowerCase() },
+      volume: { h24: 75 },
+    };
+    const gecko = parseGeckoPools({
+      data: [{
+        attributes: { address: "0xbsc1", volume_usd: { h24: "150" } },
+        relationships: {
+          base_token: { data: { id: `bsc_${bsc.token.toLowerCase()}` } },
+          quote_token: { data: { id: "bsc_0xWBNB" } },
+          dex: { data: { id: "pancakeswap-v3-bsc" } },
+        },
+      }],
+    }, bsc, asOf);
+    const merged = aggregateWrappedPools([
+      ...parseWrappedPools([pancake, uniswap], bsc, asOf),
+      ...gecko,
+    ]);
+    expect(merged.pools).toHaveLength(2);
+    expect(merged.venues).toMatchObject([
+      { id: "wrapped-bsc-pancakeswap", volumeUsd: 150, pairs: 1 },
+      { id: "wrapped-bsc-uniswap", volumeUsd: 75, pairs: 1 },
+    ]);
+    expect(merged.venues.reduce((total, venue) => total + venue.volumeUsd, 0)).toBe(225);
+    expect(() => parseWrappedPools([{ ...pancake, chainId: "base" }], bsc, asOf)).toThrow();
+    expect(() => parseWrappedPools([{
+      ...pancake,
+      baseToken: { address: "0xOTHER", symbol: "ZEC" },
+    }], bsc, asOf)).toThrow();
+  });
   const geckoPage = (page: number, count = 20) => ({
     data: Array.from({ length: count }, (_, i) => ({
       attributes: {

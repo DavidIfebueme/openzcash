@@ -221,7 +221,7 @@ function leaderboard(venues: Venue[]) {
       ? ({
           solana: "Solana",
           base: "Base",
-          bsc: "BNB Chain",
+          bsc: "BNB Chain (BSC)",
           polygon: "Polygon",
           worldchain: "World Chain",
           katana: "Katana",
@@ -248,6 +248,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     "all" | "whales" | HolderKind
   >("all");
   const [query, setQuery] = useState("");
+  const [tokenQuery, setTokenQuery] = useState("");
   const [venueFilter, setVenueFilter] = useState<"all" | "cex" | "dex">("dex");
   const [milestonesOpen, setMilestonesOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("volume");
@@ -385,11 +386,20 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     return vs.length ? vs.reduce((s, v) => s + v.volumeUsd, 0) : null;
   };
   const cb = data.wrapped.find((w) => w.asset.id === "cbzec-base");
+  const bsc = data.wrapped.find((w) => w.asset.id === "binance-bsc");
   const solana = data.wrapped.filter((w) => w.asset.chain === "solana");
   const solSupply = solana.every((w) => w.supply.data && !w.supply.stale)
     ? solana.reduce((s, w) => s + (w.supply.data?.zec ?? 0), 0)
     : null;
   const featured = [
+    {
+      name: "BNB Chain",
+      value: chainVolume("bsc"),
+      label: "BSC spot volume · 24h",
+      detail: `Binance-Peg ZEC${bsc?.feed.data?.partial ? " · partial coverage" : ""}`,
+      href: "#crosschain",
+      token: bsc?.asset.token,
+    },
     {
       name: "Solana",
       value: chainVolume("solana"),
@@ -401,13 +411,13 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
       href: "#crosschain",
     },
     {
-      name: "NEAR Intents",
-      value: near && !data.nearActivity.stale ? near.volumeUsd : null,
-      label: "Intent volume · 24h",
-      detail: near
-        ? `${usd(near.volume30dUsd)} / 30d · outside spot total${data.nearActivity.stale ? " · saved" : ""}`
-        : "ZEC token feed unavailable",
-      href: "#near-detail",
+      name: "Base",
+      value: chainVolume("base"),
+      label: "Spot volume · 24h",
+      detail: cb?.supply.data
+        ? `${compact(cb.supply.data.zec, 2)} cbZEC issued${cb.supply.stale ? " · saved" : ""}`
+        : "cbZEC + Universal uZEC",
+      href: "#crosschain",
     },
     {
       name: "Maya",
@@ -419,16 +429,23 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
       href: "/zcg/investments",
     },
     {
-      name: "Base",
-      value: chainVolume("base"),
-      label: "Spot volume · 24h",
-      detail: cb?.supply.data
-        ? `${compact(cb.supply.data.zec, 2)} cbZEC issued${cb.supply.stale ? " · saved" : ""}`
-        : "cbZEC + Universal uZEC",
-      href: "#crosschain",
+      name: "NEAR Intents",
+      value: near && !data.nearActivity.stale ? near.volumeUsd : null,
+      label: "Intent volume · 24h",
+      detail: near
+        ? `${usd(near.volume30dUsd)} / 30d · outside spot total${data.nearActivity.stale ? " · saved" : ""}`
+        : "ZEC token feed unavailable",
+      href: "#near-detail",
     },
   ];
-  const tokenPagination = usePagination(data.wrapped);
+  const tokenSearch = tokenQuery.trim().toLowerCase();
+  const tokenRows = data.wrapped.filter(({ asset }) =>
+    [asset.symbol, asset.issuer, asset.chain, asset.chainName, asset.token]
+      .join(" ")
+      .toLowerCase()
+      .includes(tokenSearch),
+  );
+  const tokenPagination = usePagination(tokenRows);
   const kaminoDeposits =
     data.kamino.data?.reserves.reduce((sum, r) => sum + r.zec, 0) ?? null;
 
@@ -676,7 +693,17 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
 
       <div className={styles.featureGrid}>
         {featured.map((f) => (
-          <a key={f.name} href={f.href} className={styles.feature}>
+          <a
+            key={f.name}
+            href={f.href}
+            className={styles.feature}
+            onClick={() => {
+              if (f.href === "#crosschain") {
+                setTokenQuery(f.token ?? f.name.toLowerCase());
+                tokenPagination.setPage(0);
+              }
+            }}
+          >
             <div className={styles.featureTitle}>
               <Logo name={f.name} />
               <strong>{f.name}</strong>
@@ -731,7 +758,10 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                     <strong>{v.name}</strong>
                     <small>
                       {v.id.startsWith("chain-")
-                        ? `${v.members.length} DEX venues · ${v.pairs} pools`
+                        ? `${v.members
+                            .slice(0, 2)
+                            .map((member) => member.name.split(" · ")[0])
+                            .join(" · ")}${v.members.length > 2 ? ` +${v.members.length - 2} more` : ""} · ${v.pairs} pools`
                         : v.kind === "cex"
                           ? "Centralized spot"
                           : v.id === "near-intents"
@@ -866,6 +896,27 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
           title="ZEC across chains"
           caption="Verified token identities. Issued tokens represent existing ZEC; they do not increase native supply."
         />
+        <div className={styles.tokenSearch}>
+          <label htmlFor="token-search">Find a token</label>
+          <div>
+            <input
+              id="token-search"
+              type="search"
+              placeholder="Token, network or contract address…"
+              value={tokenQuery}
+              onChange={(event) => {
+                setTokenQuery(event.target.value);
+                tokenPagination.setPage(0);
+              }}
+            />
+            {tokenQuery && (
+              <button type="button" onClick={() => {
+                setTokenQuery("");
+                tokenPagination.setPage(0);
+              }}>Show all tokens</button>
+            )}
+          </div>
+        </div>
         <div className={styles.panel}>
           <div className={styles.tokenHead} aria-hidden="true">
             <span>Token / issuer</span>
@@ -874,7 +925,11 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <span>Spot volume · 24h</span>
           </div>
           {tokenPagination.items.map((w) => (
-            <details key={w.asset.id} className={styles.tokenRow}>
+            <details
+              key={w.asset.id}
+              className={styles.tokenRow}
+              open={tokenSearch === w.asset.token.toLowerCase() || undefined}
+            >
               <summary>
                 <div className={styles.entity}>
                   <Logo name={w.asset.issuer} />
@@ -885,7 +940,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 </div>
                 <span className={styles.network}>
                   <Logo name={w.asset.chainName} />
-                  {w.asset.chainName}
+                  {w.asset.chain === "bsc" ? "BNB Chain (BSC)" : w.asset.chainName}
                 </span>
                 <div className={styles.tokenValue}>
                   <strong>
@@ -938,6 +993,9 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               </div>
             </details>
           ))}
+          {tokenRows.length === 0 && (
+            <p className={styles.empty}>No registered token matches this search.</p>
+          )}
           <Pagination
             pagination={tokenPagination}
             label="Tokens"

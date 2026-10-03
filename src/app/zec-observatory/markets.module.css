@@ -499,11 +499,13 @@
 }
 .featureGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 12px;
   margin-top: 14px;
 }
 .feature {
+  grid-column: span 2;
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 9px;
   padding: 17px;
@@ -512,6 +514,9 @@
   display: flex;
   flex-direction: column;
   transition: border-color 0.15s;
+}
+.feature:nth-last-child(-n + 2) {
+  grid-column: span 3;
 }
 .feature:hover {
   border-color: var(--dex);
@@ -869,6 +874,41 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   margin-top: 17px;
+}
+.tokenSearch {
+  margin-bottom: 14px;
+}
+.tokenSearch label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.tokenSearch > div {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tokenSearch input {
+  flex: 1 1 240px;
+  min-width: 0;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 16px;
+}
+.tokenSearch button {
+  min-height: 44px;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
 }
 .tokenHead,
 .tokenRow > summary {
@@ -1237,6 +1277,15 @@
   --dex: var(--pos);
   --mint: var(--pos-soft);
 }
+@media (min-width: 1600px) {
+  .featureGrid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .feature,
+  .feature:nth-last-child(-n + 2) {
+    grid-column: auto;
+  }
+}
 @media (min-width: 1400px) {
   .race {
     padding: 26px 32px 20px;
@@ -1388,6 +1437,13 @@
   .featureGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
+  }
+  .feature,
+  .feature:nth-last-child(-n + 2) {
+    grid-column: auto;
+  }
+  .feature:last-child {
+    grid-column: 1 / -1;
   }
   .feature {
     padding: 15px;
