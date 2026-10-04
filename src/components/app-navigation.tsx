@@ -16,6 +16,9 @@ type Props = {
 export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
     const children = apps.filter((child) => child.parentId === app.id);
+    const directChildren = children.filter((child) => child.parentGroup === "pages");
+    const organizations = children.filter((child) => child.parentGroup !== "pages");
+    const containsCurrentOrganization = organizations.some((child) => child.id === place?.app.id);
     const isCurrentApp = place?.app.id === app.id;
     const containsCurrent = children.some((child) => child.id === place?.app.id);
     const hasPages = app.pages.some((page) => !page.hidden);
@@ -25,7 +28,7 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
     const appActive = isCurrentApp && !place?.page;
     const overview = overviewEntry(app);
     const groupId = `${app.id}:organizations`;
-    const groupOpen = openApps[groupId] ?? containsCurrent;
+    const groupOpen = openApps[groupId] ?? containsCurrentOrganization;
     return (
       <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined}>
         <div className="rd-side-app-row">
@@ -80,21 +83,22 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
                 {counts[page.href] ? <small className="tnum">{counts[page.href]}</small> : null}
               </Link>
             ))}
-            {children.length ? (
+            {directChildren.map((child) => renderApp(child, true))}
+            {organizations.length ? (
               <div className="rd-side-org-group">
                 <button
                   type="button"
                   className="rd-side-org-heading"
                   aria-expanded={groupOpen}
                   aria-controls={groupOpen ? `nav-${app.id}-organizations` : undefined}
-                  onClick={() => onToggle(groupId, containsCurrent)}
+                  onClick={() => onToggle(groupId, containsCurrentOrganization)}
                 >
                   <span>Teams &amp; organizations</span>
                   <Glyph d={GLYPH.chevron} size={12} />
                 </button>
                 {groupOpen ? (
                   <div id={`nav-${app.id}-organizations`} className="rd-side-org-list" role="group" aria-label="Teams & organizations">
-                    {children.map((child) => renderApp(child, true))}
+                    {organizations.map((child) => renderApp(child, true))}
                   </div>
                 ) : null}
               </div>

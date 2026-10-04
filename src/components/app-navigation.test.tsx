@@ -27,10 +27,16 @@ describe("grouped ecosystem navigation", () => {
     expect(linkTag(open, '/wallets')).toContain('aria-current="page"');
     expect(render("/zf", { "ecosystem:organizations": false })).not.toContain('href="/zf"');
   });
-  it("keeps the short top-level menu in the requested order", () => {
-    const html = render("/wallets");
-    expect(html.indexOf('href="/arborist"')).toBeLessThan(html.indexOf('href="/communities"'));
-    expect(html.indexOf('href="/communities"')).toBeLessThan(html.indexOf('href="/zcg/fpf"'));
-    expect(html).not.toContain('src="/logos/marks/ecosystem.png"');
+  it("keeps Communities directly accessible inside Ecosystem and FPF with the organizations", () => {
+    const compact = render("/communities");
+    expect(linkTag(compact, '/communities')).toContain('aria-current="page"');
+    expect(compact).not.toContain('href="/zcg/fpf"');
+    expect(compact).toContain('href="/arborist"');
+    const expanded = render("/zcg/fpf");
+    expect(expanded).toContain('role="group" aria-label="Teams &amp; organizations"');
+    expect(linkTag(expanded, '/zcg/fpf')).toContain('aria-current="page"');
+    expect(expanded.match(/href="\/zcg\/fpf"/g)).toHaveLength(1);
+    expect(expanded.indexOf('href="/communities"')).toBeLessThan(expanded.indexOf('class="rd-side-org-group"'));
+    expect(expanded).not.toContain('src="/logos/marks/ecosystem.png"');
   });
 });

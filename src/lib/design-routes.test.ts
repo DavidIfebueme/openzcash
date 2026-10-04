@@ -20,7 +20,7 @@ describe("the navigation hierarchy", () => {
     const ecosystem = appOf("ecosystem");
     const organizations = childAppsOf(ecosystem);
     expect(organizations.map((app) => app.id)).toEqual([
-      "zf", "zodl", "shielded-labs", "zakura", "tachyon", "zechub",
+      "communities", "fpf", "zf", "zodl", "shielded-labs", "zakura", "tachyon", "zechub",
     ]);
     for (const app of organizations) {
       expect(parentAppOf(app)).toBe(ecosystem);
@@ -39,13 +39,13 @@ describe("the navigation hierarchy", () => {
     ]);
   });
 
-  it("keeps Arborist Calls and Communities immediately above the top-level FPF", () => {
+  it("keeps Arborist Calls at the top level and moves Communities and FPF into Ecosystem", () => {
     const rootIds = APPS.filter((app) => !app.parentId && !app.hidden).map((app) => app.id);
-    const fpfIndex = rootIds.indexOf("fpf");
-    expect(rootIds.slice(fpfIndex - 2, fpfIndex + 1)).toEqual([
-      "arborist", "communities", "fpf",
-    ]);
-    expect(parentAppOf(appOf("fpf"))).toBeUndefined();
+    expect(rootIds).toContain("arborist");
+    expect(rootIds).not.toContain("communities");
+    expect(rootIds).not.toContain("fpf");
+    expect(parentAppOf(appOf("fpf"))).toBe(appOf("ecosystem"));
+    expect(appOf("communities").parentGroup).toBe("pages");
   });
 
   it("has unique app IDs and routes, with no orphaned or repeated hierarchy entries", () => {
@@ -99,7 +99,7 @@ describe("backOf", () => {
   });
 
   it("keeps top-level apps and unknown routes returning to ZCG", () => {
-    for (const pathname of ["/ecosystem", "/zcg/fpf", "/arborist", "/communities", "/nowhere"]) {
+    for (const pathname of ["/ecosystem", "/arborist", "/nowhere"]) {
       expect(backOf(pathname)).toEqual({ href: "/zcg", label: "ZCG" });
     }
   });
