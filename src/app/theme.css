@@ -1141,7 +1141,7 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   color: var(--side-ink);
   background: var(--side-hover);
 }
-.rd-side-app[data-open="true"] .rd-side-toggle {
+.rd-side-app[data-open="true"] > .rd-side-app-row > .rd-side-toggle {
   transform: rotate(90deg);
 }
 .rd-side-pages {
@@ -1155,6 +1155,45 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   min-height: 28px;
   font-size: 13px;
 }
+
+/* Organizations are one quiet group within Ecosystem, not competing apps. */
+.rd-side-org-group {
+  margin-top: 7px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+.rd-side-org-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--side-dim);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .015em;
+  cursor: pointer;
+  text-align: left;
+}
+.rd-side-org-heading:hover {
+  color: var(--side-ink);
+  background: var(--side-hover);
+}
+.rd-side-org-heading:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.rd-side-org-heading svg { flex-shrink: 0; transition: transform .15s ease; }
+.rd-side-org-heading[aria-expanded="true"] svg { transform: rotate(90deg); }
+.rd-side-org-list { display: flex; flex-direction: column; gap: 2px; padding-top: 3px; }
+.rd-side-app[data-nested] > .rd-side-app-row > .rd-side-item { min-height: 31px; font-size: 12px; gap: 8px; }
+.rd-side-app[data-nested] .rd-side-logo { width: 18px; height: 18px; border-radius: 4px; }
+.rd-side-app[data-nested] .rd-side-pages { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); }
 
 /* ---------- Zero horizontal scrolling: content fits the column at every width ---------- */
 .rd-body {

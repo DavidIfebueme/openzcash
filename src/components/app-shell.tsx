@@ -6,12 +6,13 @@ import { cn } from "@/lib/utils";
 import { ZarvisDock } from "./zarvis/zarvis-dock";
 import { LogoutButton } from "./logout-button";
 import { ScrollHints } from "./scroll-hints";
-import { APPS, backOf, overviewEntry, placeOf } from "@/lib/design-routes";
-import { AppMark, GLYPH, Glyph, PageMark } from "./app-marks";
+import { APPS, backOf, parentAppOf, placeOf } from "@/lib/design-routes";
+import { GLYPH, Glyph } from "./app-marks";
 import { CommandPalette } from "./command-palette";
 import { MobileTabBar } from "./mobile-tab-bar";
 import { useMediaQuery } from "./use-media-query";
 import { TopBarPlace } from "./top-bar-place";
+import { AppNavigation } from "./app-navigation";
 import { useThemeColor } from "./use-theme-color";
 import { MOBILE_NAV_QUERY } from "@/lib/mobile-tabs";
 import { wrapFocus } from "@/lib/focus-wrap";
@@ -51,6 +52,7 @@ export function AppShell({
   // Hidden apps (Lockbox) open only from the treasury bar.
   const apps = APPS.filter((a) => (!a.admin || isAdmin) && !a.hidden);
   const back = backOf(pathname);
+  const parentApp = place ? parentAppOf(place.app) : undefined;
   const isHome = pathname === "/zcg" || pathname === "/";
 
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -229,86 +231,14 @@ export function AppShell({
           </Link>
         </div>
         <nav className="rd-side-nav" aria-label="Apps">
-          {apps.map((app) => {
-            const isCurrentApp = place?.app.id === app.id;
-            const open = app.pages.length
-              ? (openApps[app.id] ?? (isCurrentApp || app.open === true))
-              : false;
-            const appActive = isCurrentApp && !place?.page;
-            // Apps with inner pages list their landing page as "Overview", so the
-            // open list carries the highlight; the name keeps it when collapsed.
-            const overview = overviewEntry(app);
-            return (
-              <div key={app.id} className="rd-side-app" data-open={open}>
-                <div className="rd-side-app-row">
-                  <Link
-                    href={app.href}
-                    className="rd-side-item"
-                    aria-current={appActive && !(overview && open) ? "page" : undefined}
-                    title={app.sub}
-                    onClick={() => openApp(app.id)}
-                    data-long={app.label.length > 18 || undefined}
-                  >
-                    <AppMark app={app} />
-                    <span className="rd-side-label">{app.label}</span>
-                    {app.share ? (
-                      <small className="rd-side-share tnum" title={app.share.label}>
-                        <span aria-hidden>{app.share.value}</span>
-                        <span className="sr-only">, {app.share.label}</span>
-                      </small>
-                    ) : null}
-                    {counts[app.href] ? (
-                      <small className="tnum">{counts[app.href]}</small>
-                    ) : null}
-                  </Link>
-                  {app.pages.length ? (
-                    <button
-                      type="button"
-                      className="rd-side-toggle"
-                      aria-expanded={open}
-                      aria-label={`${open ? "Collapse" : "Expand"} ${app.label}`}
-                      onClick={() => toggleApp(app.id, isCurrentApp || app.open === true)}
-                    >
-                      <Glyph d={GLYPH.chevron} size={12} />
-                    </button>
-                  ) : null}
-                </div>
-                {open ? (
-                  <div className="rd-side-pages">
-                    {overview ? (
-                      <Link
-                        href={overview.href}
-                        className="rd-side-item rd-side-page"
-                        aria-current={appActive ? "page" : undefined}
-                      >
-                        <PageMark mark={overview.mark} href={overview.href} />
-                        <span className="rd-side-label">{overview.label}</span>
-                      </Link>
-                    ) : null}
-                    {app.pages.filter((p) => !p.hidden).map((p) => {
-                      const active =
-                        place?.page?.href === p.href ||
-                        place?.detail?.parent.href === p.href;
-                      return (
-                        <Link
-                          key={p.href}
-                          href={p.href}
-                          className="rd-side-item rd-side-page"
-                          aria-current={active ? "page" : undefined}
-                        >
-                          <PageMark mark={p.mark} href={p.href} />
-                          <span className="rd-side-label">{p.label}</span>
-                          {counts[p.href] ? (
-                            <small className="tnum">{counts[p.href]}</small>
-                          ) : null}
-                        </Link>
-                      );
-                    })}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+          <AppNavigation
+            apps={apps}
+            place={place}
+            counts={counts}
+            openApps={openApps}
+            onToggle={toggleApp}
+            onOpen={openApp}
+          />
         </nav>
         <div className="rd-side-foot">
           <Link href="/zcg/methodology">Sources &amp; methodology</Link>
@@ -351,6 +281,12 @@ export function AppShell({
           <nav className="rd-breadcrumb" aria-label="Breadcrumb">
             {place ? (
               <>
+                {parentApp ? (
+                  <>
+                    <Link href={parentApp.href}>{parentApp.label}</Link>
+                    <span aria-hidden>›</span>
+                  </>
+                ) : null}
                 {place.page ? (
                   <Link href={place.app.href}>{place.app.label}</Link>
                 ) : (

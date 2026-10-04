@@ -595,6 +595,15 @@ html:has(.rd-sheet[open]) {
     height: 44px;
     border-radius: 10px;
   }
+  .rd-side-org-heading {
+    min-height: 44px;
+    font-size: 12px;
+    padding-inline: 12px;
+  }
+  .rd-side-app[data-nested] > .rd-side-app-row > .rd-side-item {
+    min-height: 44px;
+    font-size: 14px;
+  }
   .rd-side-foot {
     flex-direction: row;
     flex-wrap: wrap;

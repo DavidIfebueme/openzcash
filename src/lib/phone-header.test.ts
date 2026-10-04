@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { APPS, placeOf } from "./design-routes";
+import { APPS, backOf, childAppsOf, placeOf } from "./design-routes";
 import { PHONE_MARK_SIZE, phoneHeaderOf } from "./phone-header";
 
 const publicFile = (src: string) =>
@@ -34,6 +34,26 @@ describe("phoneHeaderOf", () => {
     expect(header?.title).toBe("ZEC Observatory");
     expect(header?.app.logo).toBeUndefined();
     expect(header?.app.icon).toBe("chart");
+  });
+
+  it("puts Ecosystem above each organization landing page while keeping the organization's mark", () => {
+    for (const app of childAppsOf(appOf("ecosystem"))) {
+      expect(phoneHeaderOf(placeOf(app.href))).toEqual({
+        level: "page",
+        app,
+        over: { label: "Ecosystem", href: "/ecosystem" },
+        title: app.label,
+      });
+    }
+  });
+
+  it("puts the organization above its own inner page", () => {
+    expect(phoneHeaderOf(placeOf("/zechub/copilot"))).toEqual({
+      level: "page",
+      app: appOf("zechub"),
+      over: { label: "ZecHub DAO", href: "/zechub" },
+      title: "ZecHub Copilot",
+    });
   });
 
   it("puts the app over the page on a page inside an app", () => {
@@ -91,6 +111,14 @@ describe("phoneHeaderOf", () => {
         expect(header?.app).toBe(place?.app);
         expect(header?.title).toBe(place?.page?.label ?? place?.app.label);
       }
+    }
+  });
+
+  it("uses the back destination as the parent line on every nested route", () => {
+    const hrefs = APPS.flatMap((app) => [app.href, ...app.pages.map((page) => page.href)]);
+    for (const href of [...hrefs, "/zcg/grant", "/ecosystem/history/zaino"]) {
+      const header = phoneHeaderOf(placeOf(href));
+      if (header?.over) expect(header.over, href).toEqual(backOf(href));
     }
   });
 

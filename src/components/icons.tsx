@@ -30,6 +30,18 @@ export const IconBook = svg(
   </>,
 );
 
+/** Connected participants: projects, teams and organizations in one ecosystem. */
+export const IconEcosystem = svg(
+  <>
+    <path d="M10 10 6 6m8 4 4-4m-8 8-4 4m8-4 4 4" />
+    <circle cx="12" cy="12" r="3" />
+    <circle cx="4.5" cy="4.5" r="2.2" />
+    <circle cx="19.5" cy="4.5" r="2.2" />
+    <circle cx="4.5" cy="19.5" r="2.2" />
+    <circle cx="19.5" cy="19.5" r="2.2" />
+  </>,
+);
+
 export const IconDashboard = svg(
   <>
     <rect x="3" y="3" width="7" height="9" rx="1.5" />
