@@ -22,7 +22,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
     <header className={styles.hero}>
       <div><div className={styles.eyebrow}>Project history / {identity.category}</div><div className={styles.identity}>
         <BrandMark brand={historyBrand(identity)} category={identity.category} /><h1>{history.project.name}</h1>
-      </div><p>{history.project.description}</p><CommunityCredit screen="project-history" compact /></div>
+      </div><p>{history.project.description}</p></div>
       <div className={styles.actions}><Link className={styles.primary} href={`/zarvis?q=${encodeURIComponent(`Show project history for ${identity.id}.`)}`}>Ask about it →</Link><a className={styles.action} href="#history-sources">Verify sources ↓</a></div>
     </header><ProjectHistoryView history={history} /><CommunityCredit screen="project-history" />
   </div>;

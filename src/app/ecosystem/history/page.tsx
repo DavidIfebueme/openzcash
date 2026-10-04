@@ -16,7 +16,6 @@ export default async function HistoryPage() {
       <div><div className={styles.eyebrow}>Ecosystem / evidence over time</div>
         <h1>Project histories</h1>
         <p>Explore the teams, tools and communities building Zcash. Follow their funding and published work.</p>
-        <CommunityCredit screen="project-history" compact />
       </div>
       <div className={styles.actions}><Link className={styles.action} href="/zcg/grants">Grant ledger →</Link></div>
     </header>

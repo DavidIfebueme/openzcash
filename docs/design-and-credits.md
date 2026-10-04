@@ -18,7 +18,7 @@ Use `CommunityCredit` from `src/components/community-credit.tsx`; register the s
 
 - Give credit when a community contribution informs a delivered screen or improvement. Keep the exact handle supplied by the contributor/user.
 - Describe the role accurately: design, feedback, research, or a neutral community contribution. Do not infer authorship from a suggestion. No invented profile links or endorsements.
-- Show a quiet attribution at the end of the screen. A compact byline can link to it where discoverability matters. Avoid promotional banners or duplicate prominent badges.
+- Show a quiet attribution only in the footer, at the end of the screen. Keep headers free of credit bylines and avoid duplicate attribution badges.
 - A screen-family credit applies to its interface, not authorship of the projects, data or research displayed. Keep source attribution and project-maintainer identity separate.
 - Preserve prior credits when improving a screen. Add further contributors and roles when verified; do not replace them with the newest requester's name.
 - OpenZcash retains its implementation/design attribution as appropriate. Community acknowledgments are not an exclusivity or ownership claim.
