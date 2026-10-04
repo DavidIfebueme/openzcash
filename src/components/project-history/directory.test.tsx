@@ -16,10 +16,23 @@ beforeEach(() => { query.value = ""; });
 describe("project history evidence views", () => {
   it("distinguishes unavailable paid entries from a known zero", () => {
     const html = render([entry("known", 0, 0), entry("unavailable", null, null)]);
-    expect(html).toMatch(/Paid entries<\/dt><dd>0<\/dd>/);
-    expect(html).toMatch(/Paid entries<\/dt><dd>—<\/dd>/);
+    expect(html).toMatch(/Paid entries<\/dt><dd[^>]*>0<\/dd>/);
+    expect(html).toMatch(/Paid entries<\/dt><dd[^>]*>Unavailable<\/dd>/);
     expect(html).toContain('href="/ecosystem/history/known"');
-    expect(html).toContain("Latest release");
+    expect(html).toContain("Release");
+    expect(html).toContain("Source unavailable");
+    expect(html).toContain("Not linked");
+  });
+  it("keeps payment activity distinct from acceptance and published work", () => {
+    const payment = entry("recent-payment", 3, 3);
+    payment.latestEvent = { title: "Milestone payment", date: "2026-10-01", kind: "payment" };
+    const html = render([payment]);
+    expect(html).toContain(">Payment</small>");
+    expect(html).toContain("Not linked");
+    expect(html).toContain("3 paid entries to review");
+    expect(html).not.toContain("Work sources</dt>");
+    payment.insights.acceptedEntries = 1;
+    expect(render([payment])).toContain("1 entry linked");
   });
   it("does not present zero acceptance gaps when the payment reader is unavailable", () => {
     query.value = "view=acceptance";

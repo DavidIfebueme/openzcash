@@ -14,22 +14,22 @@ export default async function HistoryPage() {
   const brands = Object.fromEntries(projectHistoryDirectory().map(item => [item.id, historyBrand(item)]));
   return <div className={`${styles.page} ${styles.directoryPage}`}>
     <header className={styles.hero}>
-      <div><div className={styles.eyebrow}>Ecosystem / evidence over time</div>
+      <div>
         <h1>Project histories</h1>
-        <p>Explore the teams, tools and communities building Zcash. Follow their funding and published work.</p>
+        <p>Follow the funding. Inspect the work. Form your own view.</p>
       </div>
       <div className={styles.actions}><Link className={styles.action} href="/zcg/grants">Grant ledger →</Link></div>
     </header>
-    <div className={styles.freshness}><span>Repository snapshot <b>{displayDate(index.repositorySnapshotAt)}</b></span><span>Latest ledger import <b>{index.ledgerImportedAt ? displayDate(index.ledgerImportedAt) : "unavailable"}</b></span><a href="#reading-history">How to read this →</a></div>
+    <div className={styles.freshness}><span>Repositories <b>{displayDate(index.repositorySnapshotAt)}</b></span><span>Ledger <b>{index.ledgerImportedAt ? displayDate(index.ledgerImportedAt) : "unavailable"}</b></span><a href="#reading-history">Reading guide ↓</a></div>
     <RepositoryFreshness snapshotAt={index.repositorySnapshotAt} asOf={new Date().toISOString()} />
     {(!index.coverage.proposalsAvailable || !index.coverage.paymentsAvailable) && <p className={styles.notice} role="status">Financial coverage is incomplete. Unavailable payments appear as “—”; dated grant references remain visible.</p>}
     <HistoryDirectory items={index.items} brands={brands} paymentsAvailable={index.coverage.paymentsAvailable} />
-    <section id="reading-history" className={styles.reading} aria-labelledby="reading-title">
-      <h2 id="reading-title">How to read this</h2>
-      <div><div><h3>Linked records, distinct claims</h3><p>A grant, a payment and a release answer different questions. Open a history to inspect the records and their sources.</p></div>
-        <div><h3>Coverage is not a score</h3><p>Missing evidence does not establish inactivity, non-delivery or low adoption. Counts describe what is linked here.</p></div>
-        <div><h3>Shared grants can overlap</h3><p>An award can support several projects. Funding is shown in each grant’s context and is not summed across this directory.</p></div></div>
-    </section>
+    <details id="reading-history" className={styles.reading}>
+      <summary>How to read these records</summary>
+      <div><div><h3>Different kinds of evidence</h3><p>Funding, publications and milestone acceptance answer different questions. Shared repositories may include non-Zcash work.</p></div>
+        <div><h3>Coverage, not a score</h3><p>Missing links do not establish inactivity or non-delivery. Dates show the source snapshot, not a live feed.</p></div>
+        <div><h3>Shared funding</h3><p>An award can appear across several projects. Inspect its scope before comparing amounts.</p></div></div>
+    </details>
     <CommunityCredit screen="project-history" />
   </div>;
 }

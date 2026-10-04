@@ -172,3 +172,11 @@ separate chain-analytics branch or change the Monthly publication pipeline.
 History consumes the complete collected public release listing when available, with a compatibility fallback for older snapshots. Removed publications retain their original observed-at date and an explicit no-longer-listed state; they are excluded from latest-current-activity summaries. An updated repository cutoff never substitutes for a report's publication date.
 
 Curated ZecHub DAO proposal references appear as dated context, outside ZCG/Coinholder financial totals. Contextual grant-status notes (for example, ZecKit closure and later maintainer updates) remain in the timeline and do not create additional grants. Community report links with unextracted dates remain undated until a source review admits their claims.
+
+### Evaluation-focused presentation
+
+The directory uses aligned records rather than large activity counters. Keep identity, funding associations, latest event type/date and acceptance evidence separate. A recent payment must be labeled as payment; it is not recent development. Missing joins say “not linked,” never “not paid” or “not delivered.”
+
+The project overview leads with the latest source-backed work and a compact evidence summary, followed by individually scoped grant amounts and open research questions. It does not rank projects or turn release counts into a quality score. Shared awards and withheld amounts remain visible next to monetary values; full definitions, activity descriptions and methodology use accessible disclosures. Preserve the full evidence underneath the shorter presentation.
+
+Keep collection dates visible, maintain neutral unknown states, show explicit preview/unlisted labels, and retain contributor attribution only in the footer. The four section IDs and filter query parameters remain compatible with existing shared URLs.
