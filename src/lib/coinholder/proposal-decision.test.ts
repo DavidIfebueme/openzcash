@@ -19,6 +19,24 @@ describe("proposal decision", () => {
     expect(d.options.reduce((n, o) => n + o.size, 0)).toBeCloseTo(1);
   });
 
+  it("uses the directional denominator for each option, excluding Abstain", () => {
+    const row = verifyRound(q3).rows.find(r => r.ballot === 14)!;
+    const d = proposalDecision(q3, row)!;
+    expect(d.options.map(o => o.directionalShare === null ? null : (o.directionalShare * 100).toFixed(1)))
+      .toEqual(["66.4", "16.4", "17.2", null]);
+    expect(d.options.reduce((sum, o) => sum + (o.directionalShare ?? 0), 0)).toBeCloseTo(1);
+    expect(d.options[0].share).not.toBe(d.options[0].directionalShare);
+  });
+
+  it.each([
+    { approve: 0, reject: 0, rejectLower: 0, abstain: 420000 },
+    { approve: 0, reject: 0, rejectLower: 0, abstain: 0 },
+  ])("has no directional percentages when there are no directional votes", tally => {
+    const round = { ...q3, proposals: [{ ...q3.proposals[0], tally }] };
+    const d = proposalDecision(round, verifyRound(round).rows[0])!;
+    expect(d.options.every(o => o.directionalShare === null)).toBe(true);
+  });
+
   it("places the quorum above all votes when participation is short, without stretching the bar", () => {
     const base = q3.proposals[0];
     const round = { ...q3, proposals: [{ ...base, tally: { approve: 200000, reject: 10000, rejectLower: 10000, abstain: 10000 } }] };

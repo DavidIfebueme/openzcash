@@ -2,6 +2,7 @@ import { formatZec, QUORUM_ZEC } from "@/lib/coinholder/derive";
 import { proposalDecision } from "@/lib/coinholder/proposal-decision";
 import { formatShare } from "@/lib/coinholder/verify-view";
 import styles from "./proposal-detail.module.css";
+import { segmentLabelY } from "./proposal-graph-layout";
 
 type Decision = NonNullable<ReturnType<typeof proposalDecision>>;
 const display = (value: number) => formatZec(value, 2);
@@ -20,6 +21,7 @@ export function ProposalGraph({ data, digits }: { data: Decision; digits: number
     { key: "majority", line: y(data.majorityPosition), met: data.majorityMet },
     { key: "quorum", line: y(data.quorumPosition), met: data.quorumMet },
   ].sort((a, b) => a.line - b.line);
+  const referenceLines = markers.filter(marker => marker.key !== "majority" || data.directional > 0).map(marker => marker.line);
   const firstTop = Math.max(104, Math.min(markers[0].line - 58, floor - 248));
   const secondTop = Math.min(floor - 116, Math.max(firstTop + 132, markers[1].line - 58));
   const directionalTextY = Math.max(285, Math.min(floor - 105, (directionalY + floor) / 2 - 30));
@@ -38,12 +40,15 @@ export function ProposalGraph({ data, digits }: { data: Decision; digits: number
       <text x={x + width / 2} y={33} textAnchor="middle" className={styles.graphMuted}>All votes</text>
       <text x={x + width / 2} y={58} textAnchor="middle" className={styles.graphTotal}>{display(data.total)} ZEC</text>
       <line x1={x - 5} x2={x - 5} y1={90} y2={floor} className={styles.axis} />
-      {data.options.map(option => <g key={option.key}>
-        <rect x={x} y={y(option.start + option.size)} width={width} height={height * option.size} className={styles[option.key]}>
-          <title>{`${option.label}: ${formatZec(option.value, digits)} ZEC`}</title>
-        </rect>
-        {height * option.size >= 27 && <text x={x + width / 2} y={y(option.start + option.size / 2) + 4} textAnchor="middle" className={styles.segmentLabel} data-option={option.key}>{display(option.value)} ZEC · {formatShare(option.share!)}</text>}
-      </g>)}
+      {data.options.map(option => {
+        const labelY = segmentLabelY(y(option.start + option.size), y(option.start), referenceLines);
+        return <g key={option.key}>
+          <rect x={x} y={y(option.start + option.size)} width={width} height={height * option.size} className={styles[option.key]}>
+            <title>{`${option.label}: ${formatZec(option.value, digits)} ZEC`}</title>
+          </rect>
+          {labelY !== null && <text x={x + width / 2} y={labelY} textAnchor="middle" className={styles.segmentLabel} data-option={option.key}>{display(option.value)} ZEC · {formatShare(option.share!)}</text>}
+        </g>;
+      })}
       <text x={x - 12} y={top + 4} textAnchor="end" className={styles.axisLabel}>{display(data.total)}</text>
       {abstain && abstain.size > .065 && data.directional / data.scaleMax > .065 && <text x={x - 12} y={directionalY + 4} textAnchor="end" className={styles.axisLabel}>{display(data.directional)}</text>}
       <text x={x - 12} y={floor + 5} textAnchor="end" className={styles.axisLabel}>0</text>

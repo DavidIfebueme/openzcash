@@ -35,9 +35,7 @@ export function ProposalDetail({ round, proposal, row, chain, digits, poll }: {
     : row.agrees === false ? approved ? "Passes the vote calculation" : "Does not pass the vote calculation"
     : approved ? row.rule === "funded" ? "Proposal funded" : "Proposal passed" : "Proposal rejected";
   const withoutMet = data !== null && data.directional >= QUORUM_ZEC;
-  const thresholdSummary = !data ? "" : hasAbstain && data.quorumMet && withoutMet
-    ? "The 420,000 ZEC minimum is met with or without Abstain."
-    : `The 420,000 ZEC minimum is ${data.quorumMet ? "met" : "not met"}${hasAbstain ? " under FPF’s current counting rule" : ""}.`;
+  const thresholdSummary = !data ? "" : `The 420,000 ZEC participation threshold is ${data.quorumMet ? "met" : "not met"}.`;
   return <div className={`${shared.page} ${styles.detail}`}>
     <header className={styles.header}>
       <h1>{proposal.title}</h1>
@@ -64,17 +62,18 @@ export function ProposalDetail({ round, proposal, row, chain, digits, poll }: {
           <span className={styles.verdictIcon} aria-hidden="true">{!data || poll || proposal.outcome === "vetoed" ? "i" : approved ? "✓" : "×"}</span>
           {poll && <span className={styles.eyebrow}>For comparison only</span>}
           <h2>{result}</h2>
-          <p>{data ? `${data.approveShare === null ? "No directional votes were cast." : `${accept} is ${formatShare(data.approveShare)} of the directional vote${hasAbstain ? ", with Abstain excluded" : ""}.`} ${thresholdSummary}${poll ? " This poll set the program’s terms; this is not a grant approval decision." : ""}` : "The official status is kept separate from a calculation we cannot perform."}</p>
+          <p>{data ? `${data.approveShare === null ? "No directional votes were cast." : `${accept} is ${formatShare(data.approveShare)} of the directional vote.`} ${thresholdSummary}${poll ? " This poll set the program’s terms; this is not a grant approval decision." : ""}` : "The official status is kept separate from a calculation we cannot perform."}</p>
+          {data && <p><strong>FPF’s current counting rule:</strong>{" "}{hasAbstain ? "All votes, including Abstain, count toward the 420,000 ZEC participation threshold. Abstain is excluded from the approval majority." : "All votes count toward the 420,000 ZEC participation threshold. Approval requires more than 50% of the directional vote."}</p>}
           {row.note && !proposal.correction && <p>{row.note.text} {row.note.href && <a href={row.note.href} target="_blank" rel="noreferrer">Source ↗</a>}</p>}
           {row.agrees === false && <p><strong>The calculation differs from the published result. Review the source before relying on this outcome.</strong></p>}
         </div>
         {data && <>
           <div className={styles.tableWrap}>
-            <table className={styles.tally}>
+            <table className={`${styles.tally} ${styles.optionTotals}`}>
               <caption>Vote totals, all options</caption>
-              <thead><tr><th scope="col">Option</th><th scope="col">ZEC</th><th scope="col">% of all votes</th></tr></thead>
-              <tbody>{data.options.map(option => <tr key={option.key}><th scope="row"><i className={styles[option.key]} />{shortOption(option.key, option.label)}</th><td>{zec(option.value)}</td><td>{option.share === null ? "—" : formatShare(option.share)}</td></tr>)}</tbody>
-              <tfoot><tr><th scope="row">Total</th><td>{zec(data.total)}</td><td>{data.total > 0 ? "100%" : "—"}</td></tr></tfoot>
+              <thead><tr><th scope="col">Option</th><th scope="col">ZEC</th><th scope="col">% of all votes</th><th scope="col">% of directional vote</th></tr></thead>
+              <tbody>{data.options.map(option => <tr key={option.key}><th scope="row"><i className={styles[option.key]} />{shortOption(option.key, option.label)}</th><td>{zec(option.value)}</td><td>{option.share === null ? "—" : formatShare(option.share)}</td><td>{option.key === "abstain" ? <span className={styles.excluded}>Excluded</span> : option.directionalShare === null ? "—" : formatShare(option.directionalShare)}</td></tr>)}</tbody>
+              <tfoot><tr><th scope="row">Total</th><td>{zec(data.total)}</td><td>{data.total > 0 ? "100%" : "—"}</td><td>{data.directional > 0 ? "100%" : "—"}</td></tr></tfoot>
             </table>
           </div>
           <div className={styles.tableWrap}>
@@ -83,7 +82,7 @@ export function ProposalDetail({ round, proposal, row, chain, digits, poll }: {
               <tbody>
                 <tr><th scope="row">Participation threshold (ZIP 1016)</th><td>{formatZec(QUORUM_ZEC, 2)}</td></tr>
                 <tr><th scope="row">All votes{hasAbstain ? ", with Abstain (FPF’s rule)" : ""}</th><td>{zec(data.total)} <b className={styles.check} data-met={data.quorumMet} aria-label={data.quorumMet ? "Minimum met" : "Below minimum"}>{data.quorumMet ? "✓" : "×"}</b></td></tr>
-                <tr><th scope="row">Directional vote{hasAbstain ? ", without Abstain" : ""}</th><td>{zec(data.directional)} <b className={styles.check} data-met={withoutMet} aria-label={withoutMet ? "Also meets minimum" : "Below minimum without Abstain"}>{withoutMet ? "✓" : "×"}</b></td></tr>
+                <tr><th scope="row">Directional vote{hasAbstain ? ", without Abstain" : ""}</th><td>{zec(data.directional)}</td></tr>
                 <tr><th scope="row">{accept}</th><td>{zec(row.accept!)}</td></tr>
                 <tr><th scope="row">{hasLower ? "Rejects combined" : reject}</th><td>{zec(data.rejected)}</td></tr>
                 <tr><th scope="row">Majority cutoff (50% of directional vote)</th><td>{formatZec(data.majorityCutoff, digits + 1)}</td></tr>

@@ -42,6 +42,40 @@ describe("proposal detail route", () => {
     expect(html).toContain("not proof of disbursement");
   });
 
+  it.each([
+    { ballot: 4, id: "60", result: "funded", shares: ["99.9%", "0.1%", "&lt;0.1%", "Excluded"] },
+    { ballot: 13, id: "48", result: "rejected", shares: ["11.3%", "87.9%", "0.7%", "Excluded"] },
+    { ballot: 14, id: "55", result: "funded", shares: ["66.4%", "16.4%", "17.2%", "Excluded"] },
+  ])("explains the rule and both percentage bases on ballot #$ballot", async ({ id, result, shares }) => {
+    const html = await render("q3-2026", id);
+    const tally = html.match(/<table[^>]*><caption>Vote totals, all options<\/caption>[\s\S]*?<\/table>/)![0];
+    expect(tally).toContain("% of all votes");
+    expect(tally).toContain("% of directional vote");
+    const body = tally.match(/<tbody>([\s\S]*?)<\/tbody>/)![1];
+    const lastCells = [...body.matchAll(/<tr>([\s\S]*?)<\/tr>/g)].map(row =>
+      [...row[1].matchAll(/<td>([\s\S]*?)<\/td>/g)].at(-1)![1].replace(/<[^>]*>/g, ""));
+    expect(lastCells).toEqual(shares);
+    const verdict = html.slice(html.indexOf(`<h2>Proposal ${result}</h2>`), html.indexOf("<table"));
+    expect(verdict).toContain("FPF’s current counting rule:");
+    expect(verdict).toContain("All votes, including Abstain, count toward the 420,000 ZEC participation threshold. Abstain is excluded from the approval majority.");
+    const directionalRow = html.match(/<tr><th scope="row">Directional vote[^<]*<\/th>([\s\S]*?)<\/tr>/)![1];
+    expect(directionalRow).not.toMatch(/✓|×|data-met|aria-label/);
+    expect(html).toContain('aria-label="Minimum met"');
+  });
+
+  it.each([0, 420000])("shows undefined directional percentages for an all-Abstain tally of %s", abstain => {
+    const base = ROUNDS.find(r => r.id === "q3-2026")!;
+    const proposal = { ...base.proposals[0], tally: { approve: 0, reject: 0, rejectLower: 0, abstain } };
+    const round = { ...base, proposals: [proposal] };
+    const check = verifyRound(round);
+    const html = renderToStaticMarkup(<ProposalDetail round={round} proposal={proposal} row={check.rows[0]} chain={null} digits={3} poll={false} />);
+    const tally = html.match(/<table[^>]*><caption>Vote totals, all options<\/caption>[\s\S]*?<\/table>/)![0];
+    expect(tally).not.toMatch(/NaN|Infinity/);
+    expect(tally).toMatch(/<td>—<\/td><\/tr><\/tfoot>/);
+    expect(tally).toContain("Excluded");
+    expect(html).toContain("No directional votes were cast.");
+  });
+
   it("handles every historical question and preserves veto and discarded states", () => {
     for (const round of ROUNDS) {
       const check = verifyRound(round);

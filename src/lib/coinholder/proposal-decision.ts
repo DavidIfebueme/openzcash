@@ -19,6 +19,7 @@ export function proposalDecision(round: Round, row: VerifyRow) {
   const options = round.ballot.map(option => {
     const value = row[FIELD[option.key]] ?? 0;
     const segment = { ...option, value, share: total > 0 ? value / total : null,
+      directionalShare: option.key !== "abstain" && directional > 0 ? value / directional : null,
       start: bottom / scaleMax, size: value / scaleMax };
     bottom += value;
     return segment;

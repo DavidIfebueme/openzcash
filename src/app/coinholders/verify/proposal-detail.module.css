@@ -60,7 +60,8 @@
 .detail .tally th, .detail .tally td { padding: 7px 9px; border: 1px solid var(--line); text-align: right; font-size: inherit; }
 .detail .tally th { background: transparent; font-weight: 450; color: var(--ink); letter-spacing: normal; text-transform: none; }
 .detail .tally th:first-child { text-align: left; }
-.detail .tally thead th { color: var(--muted); background: var(--surface2); font-size: 11px; white-space: nowrap; }
+.detail .tally thead th { color: var(--muted); background: var(--surface2); font-size: 11px; white-space: normal; }
+.optionTotals .excluded { color: var(--muted); font-size: 11px; }
 .tally i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 7px; }
 .tally td { white-space: nowrap; }
 .detail .tally tfoot { background: var(--surface2); }
@@ -146,4 +147,8 @@
   .verifyHead { align-items: flex-start; flex-direction: column; gap: 12px; }
   .downloads { gap: 14px; }
   .downloads span { flex-basis: 100%; }
+}
+
+@container coinholders (max-width: 320px) {
+  .detail .optionTotals th, .detail .optionTotals td { padding: 8px 3px; }
 }
