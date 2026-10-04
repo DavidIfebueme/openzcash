@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { CommunityCredit } from "@/components/community-credit";
 import { HistoryDirectory } from "@/components/project-history/directory";
-import { projectBrand } from "@/components/ecosystem/branding";
+import { historyBrand } from "@/components/project-history/branding";
 import { readHistoryIndex, projectHistoryDirectory } from "@/lib/project-history/data";
 import { displayDate } from "@/lib/ecosystem/catalog";
 import styles from "@/components/project-history/history.module.css";
@@ -10,12 +10,12 @@ export const metadata = { title: "Project histories · OpenZcash", description: 
 export const dynamic = "force-dynamic";
 export default async function HistoryPage() {
   const index = await readHistoryIndex();
-  const brands = Object.fromEntries(projectHistoryDirectory().map(item => [item.id, item.project ? projectBrand(item.project) : null]));
-  return <div className={styles.page}>
+  const brands = Object.fromEntries(projectHistoryDirectory().map(item => [item.id, historyBrand(item)]));
+  return <div className={`${styles.page} ${styles.directoryPage}`}>
     <header className={styles.hero}>
       <div><div className={styles.eyebrow}>Ecosystem / evidence over time</div>
         <h1>Project histories</h1>
-        <p>Follow the funding. Inspect the work. See what the sources establish.</p>
+        <p>Explore the teams, tools and communities building Zcash. Follow their funding and published work.</p>
         <CommunityCredit screen="project-history" compact />
       </div>
       <div className={styles.actions}><Link className={styles.action} href="/zcg/grants">Grant ledger →</Link></div>

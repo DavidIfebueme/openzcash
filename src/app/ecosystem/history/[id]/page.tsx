@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { readProjectHistory, projectHistoryDirectory } from "@/lib/project-history/data";
 import { ProjectHistoryView } from "@/components/project-history/history";
 import { BrandMark } from "@/components/ecosystem/identity";
-import { projectBrand } from "@/components/ecosystem/branding";
+import { historyBrand } from "@/components/project-history/branding";
 import styles from "@/components/project-history/history.module.css";
 
 export const dynamic = "force-dynamic";
@@ -21,7 +21,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   return <div className={styles.page}>
     <header className={styles.hero}>
       <div><div className={styles.eyebrow}>Project history / {identity.category}</div><div className={styles.identity}>
-        <BrandMark brand={identity.project ? projectBrand(identity.project) : null} category={identity.category} /><h1>{history.project.name}</h1>
+        <BrandMark brand={historyBrand(identity)} category={identity.category} /><h1>{history.project.name}</h1>
       </div><p>{history.project.description}</p><CommunityCredit screen="project-history" compact /></div>
       <div className={styles.actions}><Link className={styles.primary} href={`/zarvis?q=${encodeURIComponent(`Show project history for ${identity.id}.`)}`}>Ask about it →</Link><a className={styles.action} href="#history-sources">Verify sources ↓</a></div>
     </header><ProjectHistoryView history={history} /><CommunityCredit screen="project-history" />

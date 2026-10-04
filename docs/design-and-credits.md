@@ -30,6 +30,14 @@ Current attributions:
 | Coinholder verification | Page design by vaspholdings | Built by OpenZcash |
 | Project histories | Community contribution by socrates1024 | Designed and built by OpenZcash |
 
+## Project-history discovery
+
+- The directory opens by the existing ecosystem category order, with A–Z within each area. A recent payment must not implicitly become a featured-project ranking.
+- Use compact All / Projects / Communities scope controls. Community identity is determined by `communityId`, not by the category: ZecHub is Education, while some Community-category entries are software projects.
+- Keep Latest dated activity and Name A–Z available as explicit sort choices. Public work includes community reports as well as releases; Published releases remains a separate filter.
+- Resolve identity marks through `historyBrand`, which reuses the verified project and community catalogs. Never substitute a team's mark without labeling it as a maintainer mark, and never invent missing logos.
+- Directory controls use 16px form text on small screens to avoid iOS focus zoom.
+
 ## Navigation
 
 `src/lib/design-routes.ts` is the shared app order. Ecosystem follows ZCG, with Development, Project histories, DeFi, Z3 and Wallets under it. Preserve routes, app grouping and the detail-to-directory back path when moving a block.

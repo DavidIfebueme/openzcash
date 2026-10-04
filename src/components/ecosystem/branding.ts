@@ -3,7 +3,7 @@ import type { ClassifiedRepository, Project } from "@/lib/ecosystem/types";
 export type Brand = {
   src: string;
   name: string;
-  kind: "project" | "maintainer" | "namespace";
+  kind: "project" | "community" | "maintainer" | "namespace";
   sourceUrl: string;
 };
 
@@ -12,6 +12,7 @@ export type Brand = {
 export const ORGANIZATION_BRANDS: Record<string, Brand> = {
   "zcash-core": { src: "/logos/ecosystem/zcash.png", name: "Zcash", kind: "namespace", sourceUrl: "https://github.com/zcash" },
   "zcash-foundation": { src: "/logos/ecosystem/zcash-foundation.png", name: "Zcash Foundation", kind: "maintainer", sourceUrl: "https://github.com/ZcashFoundation" },
+  "project-tachyon": { src: "/logos/ecosystem/tachyon.png", name: "Project Tachyon", kind: "maintainer", sourceUrl: "https://github.com/tachyon-zcash" },
   "shielded-labs": { src: "/logos/ecosystem/shielded-labs.png", name: "Shielded Labs", kind: "maintainer", sourceUrl: "https://github.com/ShieldedLabs" },
   zakura: { src: "/logos/ecosystem/zakura.png", name: "Zakura", kind: "maintainer", sourceUrl: "https://zakura.com/" },
   zodl: { src: "/logos/ecosystem/zodl-lab.png", name: "ZODL", kind: "maintainer", sourceUrl: "https://github.com/zodl-inc" },
@@ -29,7 +30,7 @@ export const PROJECT_BRANDS: Record<string, Brand> = {
 };
 
 export function isLocalBrandAsset(src: string): boolean {
-  return /^\/(?:logos|wallet-logos)\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.(?:png|jpg|svg|webp)$/.test(src);
+  return /^\/(?:logos|wallet-logos|community-logos)\/(?:[a-z0-9-]+\/)*[a-z0-9-]+\.(?:png|jpg|svg|webp)$/.test(src);
 }
 
 export function organizationBrand(id: string | null | undefined): Brand | null {
@@ -52,5 +53,6 @@ export function repositoryBrand(repository: ClassifiedRepository): Brand | null 
 }
 
 export function brandLabel(brand: Brand): string {
+  if (brand.kind === "community") return `${brand.name} community logo`;
   return brand.kind === "project" ? `${brand.name} logo` : `${brand.name} · ${brand.kind} mark`;
 }

@@ -35,3 +35,9 @@ GitHub avatar identity was checked against the public account API. ZecHub is a U
 The generic mdBook favicon on the FROST documentation and the default GitHub identicon for zecrocks were deliberately not used as product logos. FROST identifies Zcash Foundation as the maintainer; zecrocks uses its category glyph until a dedicated mark is verified.
 
 Original asset copyright and trademark rights remain with their respective owners. This catalog uses the marks for identification only.
+
+## Project history directory
+
+The history directory resolves community identities through the existing `COMMUNITIES` catalog, including its 13 locally stored community marks. That catalog records its verification date and links to the communities' own public accounts. A community mark is labeled **community logo**; it is never inferred from a country flag or a lead's personal avatar. ZecHub retains its existing project mark because its history deliberately joins the two catalogs.
+
+Project histories preserve dedicated product logos and explicitly label maintainer or namespace marks. The existing, sourced Tachyon asset is now connected to its `project-tachyon` maintainer identity. Unknown identities continue to use the category glyph. These presentation mappings change neither source records nor financial associations.
