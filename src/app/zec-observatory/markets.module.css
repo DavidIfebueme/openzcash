@@ -172,7 +172,7 @@
   top: 68px;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 5px;
   padding: 5px;
   border: 1px solid var(--line);
@@ -634,6 +634,50 @@
 }
 .panelHeader .sectionTitle p {
   font-size: 13px;
+}
+.liquidityGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 12px;
+  padding: 0 22px 18px;
+}
+.liquidityCard {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--soft);
+}
+.liquidityCard small {
+  margin-top: 5px;
+}
+.liquidityStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 12px;
+  margin: 18px 0;
+}
+.liquidityStats dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+.liquidityStats dd {
+  margin: 3px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.liquidityCard p {
+  font-size: 12px;
+  color: var(--muted);
+}
+.liquidityNotes {
+  display: grid;
+  gap: 8px;
+  padding: 15px 22px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+  color: var(--muted);
 }
 .filters {
   display: inline-flex;
@@ -1295,6 +1339,12 @@
   }
 }
 @media (max-width: 1050px) {
+  .jumpNav {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .page [id] {
+    scroll-margin-top: 198px;
+  }
   .missionGrid {
     grid-template-columns: minmax(0, 1fr) 240px;
   }
@@ -1375,9 +1425,6 @@
     padding: 9px 7px;
     gap: 6px;
     font-size: 13px;
-  }
-  .jumpNav a:nth-last-child(-n + 2) {
-    grid-column: span 3;
   }
   .page [id] {
     scroll-margin-top: 198px;

@@ -317,6 +317,12 @@ describe("the real navigation model", () => {
     expect(first("coinholder results").href).toBe("/coinholders/results");
   });
 
+  it("keeps consolidated destinations discoverable by their former names", () => {
+    expect(first("Z3").href).toBe("/ecosystem/history/z3");
+    expect(first("DeFi").href).toBe("/zec-observatory");
+    expect(first("liquidity").href).toBe("/zec-observatory");
+  });
+
   it("gives every row a unique address within the list", () => {
     const hrefs = paletteRows(buildPalette(apps, "", false).groups).map(
       (r) => r.href,

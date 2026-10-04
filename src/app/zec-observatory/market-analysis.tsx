@@ -59,6 +59,7 @@ const width = (n: number) =>
 const sections = [
   { id: "volume", label: "Overview", Icon: IconChart },
   { id: "trading", label: "Markets", Icon: IconSwap },
+  { id: "liquidity", label: "Liquidity", Icon: IconSwap },
   { id: "crosschain", label: "Cross-chain", Icon: IconGlobe },
   { id: "holdings", label: "Holdings", Icon: IconWallet },
   { id: "funds", label: "Funds", Icon: IconTrend },
@@ -239,7 +240,13 @@ function leaderboard(venues: Venue[]) {
   return [...grouped.values()].sort((a, b) => b.volumeUsd - a.volumeUsd);
 }
 
-export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
+export function MarketAnalysis({
+  initial,
+  liquidity,
+}: {
+  initial: MarketDashboard;
+  liquidity: ReactNode;
+}) {
   const [data, setData] = useState(initial);
   const [refreshing, setRefreshing] = useState(false),
     [refreshFailed, setRefreshFailed] = useState(false);
@@ -822,6 +829,17 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         </p>
       </section>
 
+      <section className={styles.panel} aria-labelledby="liquidity">
+        <div className={styles.panelHeader}>
+          <Title
+            id="liquidity"
+            title="DeFi liquidity"
+            caption="Pool depth, value and available yield for tracked venues. Native and bridged ZEC are identified separately."
+          />
+        </div>
+        {liquidity}
+      </section>
+
       <details id="near-detail" className={styles.nearDetails}>
         <summary>
           <span className={styles.entity}>
@@ -1224,7 +1242,7 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
         {holderFilter === "dex" && data.mayaPoolZec !== null && (
           <p className={styles.scopeNote}>
             Maya pool depth: <strong>{number(data.mayaPoolZec)} ZEC</strong>.{" "}
-            <Link href="/defi">Explore liquidity →</Link>
+            <a href="#liquidity">Explore liquidity →</a>
           </p>
         )}
       </section>

@@ -603,7 +603,7 @@ export default async function InvestmentsPage() {
             </p>
             <FeedNote feed={activity.liquidity} />
           </div>
-          <Link href="/defi">
+          <Link href="/zec-observatory#liquidity">
             Compare ZEC liquidity across venues{" "}
             <span aria-hidden="true">→</span>
           </Link>

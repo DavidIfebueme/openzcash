@@ -109,7 +109,7 @@ describe("phoneHeaderOf", () => {
         const place = placeOf(page.href);
         const header = phoneHeaderOf(place);
         expect(header?.app).toBe(place?.app);
-        expect(header?.title).toBe(place?.page?.label ?? place?.app.label);
+        expect(header?.title).toBe(place?.detail?.label ?? place?.page?.label ?? place?.app.label);
       }
     }
   });

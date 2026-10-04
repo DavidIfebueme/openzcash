@@ -1,8 +1,8 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-// Maya liquidity now lives inside the DeFi app (one less front-page tile).
+// Pool liquidity is part of the Observatory's market coverage.
 export default function MayaRedirect() {
-  redirect("/defi");
+  permanentRedirect("/zec-observatory#liquidity");
 }

@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "sourceRevision": "2af63355c9fb9c9a",
-  "sourceFiles": 57,
+  "sourceRevision": "0b1643465bd0849f",
+  "sourceFiles": 55,
   "documents": [
     {
       "id": "src/app/zcg/page.tsx:0",
@@ -205,7 +205,7 @@
       "id": "src/app/zec-observatory/page.tsx:0",
       "url": "https://openzcash.org/zec-observatory",
       "title": "zec observatory",
-      "text": "ZEC Observatory · OpenZcash\nZcash markets, supply and public holdings. Compare CEX and DEX spot volume, track intent activity separately, and inspect on-chain balances and institutional disclosures."
+      "text": "ZEC Observatory · OpenZcash\nZcash markets, liquidity, supply and public holdings. Compare CEX and DEX spot volume, inspect tracked pools, and explore on-chain balances and institutional disclosures."
     },
     {
       "id": "src/app/ecosystem/page.tsx:0",
@@ -224,18 +224,6 @@
       "url": "https://openzcash.org/development",
       "title": "development",
       "text": "Development · OpenZcash\nPublic Zcash repository inventory with real default-branch activity, releases, purpose tags and historical funding sources."
-    },
-    {
-      "id": "src/app/defi/page.tsx:0",
-      "url": "https://openzcash.org/defi",
-      "title": "defi",
-      "text": "ZEC DeFi liquidity · OpenZcash\nNative ZEC pool depth, value locked and yield from public Midgard APIs (Maya Protocol, THORChain), refreshed every few minutes.\nZEC DeFi liquidity\nZCG&rsquo;s own position on Maya, its value and the fees it earns, is on\nInvestments →\n.\nCompare trading activity and public exchange balances on\nZEC Observatory →\nNative ZEC liquidity\nPool depth, value locked and yield across the venues that hold native ZEC, from their public APIs.\nPools live\nZEC in pools\nTotal value locked\nNo pool data right now. The venues&rsquo; APIs may be briefly unreachable. This refreshes automatically.\npool\nZEC depth\nTVL\nZEC price\nData: Maya & THORChain (Midgard v2) and NEAR / Rhea Finance (GeckoTerminal). NEAR Intents holds further large cross-chain ZEC liquidity across many bridged pairs, not summed here to avoid double-counting their shared vault."
-    },
-    {
-      "id": "src/app/z3/page.tsx:0",
-      "url": "https://openzcash.org/z3",
-      "title": "z3",
-      "text": "Z3 stack · OpenZcash\nzcashd is deprecated. The Z3 stack (Zebra, Zaino, Zallet) is its modular Rust replacement: a validating node, an indexing/lightwallet service and a wallet, run together.\nZebra\nConsensus full node (zebrad): an independent Rust implementation of the Zcash protocol, replacing zcashd's consensus.\nProduction\nZaino\nIndexing & lightwallet service: the gRPC/JSON-RPC layer that serves wallets, taking over the role lightwalletd played for zcashd.\nFeature-complete\nZallet\nFull-node wallet: the daemon and RPCs that replace zcashd's built-in wallet, paired with Zebra + Zaino.\nAlpha\nZ3 · the zcashd successor\nzcashd is deprecated. The Z3 stack (Zebra, Zaino, Zallet) is its modular Rust replacement: a validating node, an indexing/lightwallet service and a wallet, run together. Much of the Dev Fund and ZCG spend is building toward it.\nZ3 updates on the forum ↗\nThree components. One connected system.\nConsensus, indexing and wallet operations each have a dedicated role in the Rust successor to zcashd.\n0\n·\nOfficial\nzcashd deprecation & migration guide\nWhy zcashd is being retired and how the ecosystem moves to the Z3 stack.\nThe stack\n· GitHub ↗"
     },
     {
       "id": "src/app/news/page.tsx:0",
