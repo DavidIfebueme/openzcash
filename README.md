@@ -74,6 +74,13 @@ imports still use the separate `CRON_SECRET` when triggered manually.
 npm run typecheck && npm test && npm run build
 ```
 
+## Design and community contributions
+
+New and substantially revised screens follow the
+[evidence-led design and credit standard](docs/design-and-credits.md): clear
+records, accessible sources, both themes and visible attribution for community
+contributions. Coinholder verification is the visual reference.
+
 ## Stack
 
 Next.js 16 (App Router) · React 19 · TypeScript · Postgres + Drizzle ·

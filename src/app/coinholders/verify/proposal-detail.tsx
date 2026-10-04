@@ -1,3 +1,4 @@
+import { CommunityCredit } from "@/components/community-credit";
 import Link from "next/link";
 import type { Round, RoundProposal } from "@/lib/coinholder/types";
 import type { ChainReport } from "@/lib/coinholder/verify-export";
@@ -131,6 +132,6 @@ export function ProposalDetail({ round, proposal, row, chain, digits, poll }: {
     </section>
     {(proposal.correction || proposal.notes?.length || proposal.links.length) ? <section id="proposal-context" className={styles.context}><h2>Proposal & context</h2>{proposal.correction && row.note && <p>{row.note.text} {row.note.href && <a href={row.note.href} target="_blank" rel="noreferrer">FPF correction ↗</a>}</p>}{proposal.notes?.map(note => <p key={note}>{note}</p>)}<p className={styles.links}>{proposal.links.map(link => <a key={link.href} href={link.href} target="_blank" rel="noreferrer">{link.label} ↗</a>)}</p></section> : null}
     <nav className={styles.neighbors} aria-label="Other proposals">{neighbors.map(({ p, label }) => p ? <Link key={label} href={proposalVerifyHref(round.id, p.id)}><small>{label}</small><span>{p.title}</span></Link> : <span key={label} />)}</nav>
-    <footer id="community-credit" className={styles.credit} aria-label="Community contribution"><span>Page design by <strong>vaspholdings</strong></span><span aria-hidden="true">·</span><span>Built by OpenZcash</span></footer>
+    <CommunityCredit screen="coinholder-verification" />
   </div>;
 }

@@ -52,6 +52,12 @@ do shell e as duas tesourarias ficam fixas no rodapé de todas as páginas.
 
 ## 3. Princípios
 
+Para fichas individuais e novas telas, a evolução aprovada segue o visual do
+Coinholder e o [padrão de evidências e créditos](../design-and-credits.md).
+Créditos discretos no fim da tela são permitidos; não substituem fontes nem
+criam um segundo índice de navegação. Ecosystem agora vem logo após ZCG
+no modelo compartilhado, preservando suas páginas.
+
 Direção visual aprovada em 20/09/2026 (referência: Mercury; mockups em
 https://claude.ai/artifact/Q8VGqjxTubVq1BaJCNbvZY):
 
@@ -75,8 +81,8 @@ https://claude.ai/artifact/Q8VGqjxTubVq1BaJCNbvZY):
 6. Navegação: o modelo em `src/lib/design-routes.ts` é uma lista de apps com
    Monthly e News no topo, depois ZCG (aberto por padrão), FPF, as
    organizações na ordem Zcash Foundation, ZODL, Shielded Labs, Zakura,
-   Tachyon, ZecHub DAO, depois Arborist Calls, Communities e Ecosystem, que
-   agrupa Development, DeFi, Z3 e Wallets como páginas (Manage só para
+   Tachyon, ZecHub DAO, depois Arborist Calls e Communities. Ecosystem vem
+   imediatamente após ZCG e agrupa Development, Project histories, DeFi, Z3 e Wallets como páginas (Manage só para
    admin; Lockbox oculto), cada um com logo oficial quando existe. Zakura, ZODL e Tachyon abrem seus registros
    no Ecosystem (`?project=zakura`, `?org=zodl`, `?org=project-tachyon`).
    A home é a visão geral do ZCG: `/` redireciona para `/zcg`, o banner leva

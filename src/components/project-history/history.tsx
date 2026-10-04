@@ -35,7 +35,7 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
   return <>
     <div className={styles.freshness}><span>Repository snapshot <b>{displayDate(history.repositorySnapshotAt)}</b></span><span>Latest ledger import <b>{history.ledgerImportedAt ? displayDate(history.ledgerImportedAt) : "unavailable"}</b></span><span>Reviewed additions <b>{history.reviews.filter(review => review.linked && !review.supersededBy).length}</b></span></div>
     {(!history.coverage.paymentsAvailable || !history.coverage.proposalsAvailable) && <p role="status" className={styles.notice}>A financial source is unavailable. This view retains dated catalog context; missing values are not zero.</p>}
-    <div className={styles.layout}><div>
+    <div className={styles.layout}><div className={styles.record}>
       <div className={styles.tabs} role="tablist" aria-label="Project history sections">
         {[["overview", "Overview"], ["funding", "Funding"], ["timeline", "Timeline"], ["evidence", "Evidence"]].map(([id, title], index) => <button key={id} type="button" role="tab" className={styles.tab} id={`tab-${id}`} aria-controls={`panel-${id}`} aria-selected={tab === id} tabIndex={tab === id ? 0 : -1} onClick={() => setTab(id)} onKeyDown={event => {
           const next = event.key === "ArrowRight" ? (index + 1) % 4 : event.key === "ArrowLeft" ? (index + 3) % 4 : event.key === "Home" ? 0 : event.key === "End" ? 3 : null;
@@ -45,7 +45,7 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
       <section role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`}>
         {tab === "overview" && <HistoryOverview history={history} select={(section, type) => update({ section, ...(type ? { kind: type, month: "" } : {}) }, true)} />}
         {tab === "timeline" && <>
-          <div className={styles.filters}>
+          <div className={`${styles.filters} ${styles.timelineFilters}`}>
             <label>Record type<select value={kind} onChange={event => update({ kind: event.target.value })}><option value="">All records</option>{kinds.map(value => <option value={value} key={value}>{value[0].toUpperCase() + value.slice(1)}</option>)}</select></label>
             <label>Event month · UTC<input type="month" min="2016-01" max="2099-12" value={month} onChange={event => update({ month: event.target.value })} /></label>
             {(month || kind) && <button className={styles.more} onClick={() => update({ month: "", kind: "" })}>Reset filters</button>}
@@ -100,16 +100,20 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
           </article>) : <p className={styles.empty}>No additional source reviews have been admitted for this project yet. The timeline still contains its linked ledger and repository records.</p>}
         </>}
       </section>
-    </div><aside className={styles.aside}>
+    </div></div>
+    <section id="history-sources" className={styles.sourcePanel} aria-labelledby="sources-title">
+      <div className={styles.sourceHead}><div><h2 id="sources-title">Verify the sources</h2><p>The records behind this history, with their collection dates.</p></div><a className={styles.action} href={`/api/project-history/${history.project.id}`} target="_blank" rel="noopener noreferrer">Open source data ↗</a></div>
+      <div className={styles.aside}>
       <section><h2>Source coverage</h2><dl>
         <dt>Project identity reviewed</dt><dd>{displayDate(history.registryCheckedAt)}</dd>
         <dt>Repository snapshot · not live</dt><dd>{displayDate(history.repositorySnapshotAt)}</dd>
         <dt>Latest mirror row import</dt><dd>{history.ledgerImportedAt ? displayDate(history.ledgerImportedAt) : "Unavailable"}</dd>
         <dt>Proposal / payment readers</dt><dd>{history.coverage.proposalsAvailable ? "Available" : "Unavailable"} / {history.coverage.paymentsAvailable ? "Available" : "Unavailable"}</dd>
       </dl></section>
-      <section><h2>Reading the evidence</h2><p>Source records document funding and decisions. Published artifacts establish releases. Team reports describe claimed work. Reviewed delivery requires evidence tied to a specific milestone.</p><p>Payment alone never marks work delivered.</p></section>
+      <section><h2>Reading the evidence</h2><p>Source records document funding and decisions. Published artifacts establish releases, not grant completion. Team reports describe claimed work. Reviewed delivery requires evidence tied to a specific milestone.</p><p>Payment alone never marks work delivered.</p></section>
       {history.reportLinks.length > 0 && <section><h2>Community reports</h2><ul>{history.reportLinks.map(report => <li key={report.url}><a className={styles.source} href={report.url} target="_blank" rel="noopener noreferrer">{report.title} ↗</a></li>)}</ul><p>These are report sources to inspect, not verified completion claims.</p></section>}
-      <section><h2>Reuse this history</h2><p>The same public record is available to Zarvis and monthly reporting.</p><a className={styles.source} href={`/api/project-history/${history.project.id}`} target="_blank" rel="noopener noreferrer">Open source data ↗</a></section>
-    </aside></div>
+      <section><h2>One public record</h2><p>The same linked history is available to Zarvis and monthly reporting. Reviewed corrections stay visible in the Evidence tab.</p></section>
+      </div>
+    </section>
   </>;
 }

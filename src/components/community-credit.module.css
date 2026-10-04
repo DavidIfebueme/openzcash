@@ -1,0 +1,6 @@
+.credit { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 24px; padding: 20px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; line-height: 1.6; text-align: center; scroll-margin-top: 80px; }
+.credit strong, .byline strong { color: var(--ink); font-weight: 600; }
+.byline { display: inline-block; font-size: 12px; line-height: 1.6; color: var(--muted); text-decoration: none; text-underline-offset: 3px; }
+.byline:hover { text-decoration: underline; }
+.byline:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 520px) { .credit { flex-direction: column; gap: 3px; } .divider { display: none; } }

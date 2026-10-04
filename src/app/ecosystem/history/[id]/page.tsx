@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CommunityCredit } from "@/components/community-credit";
 import { notFound } from "next/navigation";
 import { readProjectHistory, projectHistoryDirectory } from "@/lib/project-history/data";
 import { ProjectHistoryView } from "@/components/project-history/history";
@@ -18,12 +19,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ id: st
   if (!history) notFound();
   const identity = projectHistoryDirectory().find(item => item.id === id)!;
   return <div className={styles.page}>
-    <Link className={styles.back} href="/ecosystem/history">← All project histories</Link>
     <header className={styles.hero}>
       <div><div className={styles.eyebrow}>Project history / {identity.category}</div><div className={styles.identity}>
-        {identity.project && <BrandMark brand={projectBrand(identity.project)} category={identity.category} />}<h1>{history.project.name}</h1>
-      </div><p>{history.project.description}</p></div>
-      <div className={styles.actions}><Link className={styles.primary} href={`/zarvis?q=${encodeURIComponent(`Show project history for ${identity.id}.`)}`}>Ask Zarvis ↗</Link><a className={styles.action} href={`/api/project-history/${id}`}>Data ↗</a></div>
-    </header><ProjectHistoryView history={history} />
+        <BrandMark brand={identity.project ? projectBrand(identity.project) : null} category={identity.category} /><h1>{history.project.name}</h1>
+      </div><p>{history.project.description}</p><CommunityCredit screen="project-history" compact /></div>
+      <div className={styles.actions}><Link className={styles.primary} href={`/zarvis?q=${encodeURIComponent(`Show project history for ${identity.id}.`)}`}>Ask about it →</Link><a className={styles.action} href="#history-sources">Verify sources ↓</a></div>
+    </header><ProjectHistoryView history={history} /><CommunityCredit screen="project-history" />
   </div>;
 }
