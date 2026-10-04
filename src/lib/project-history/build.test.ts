@@ -92,6 +92,29 @@ describe("project history financial and evidence boundaries", () => {
     expect(result.timeline.find(event => event.kind === "release")).toMatchObject({ evidence: "published_artifact", grantId: null });
     expect(result.grants[0].milestones[0].deliveryEvidence).toEqual([]);
   });
+  it("retains older release evidence after the rolling activity window moves", () => {
+    const older = { tagName: "v1.0.0", name: null, publishedAt: "2025-01-01T00:00:00Z", url: "https://github.com/example/alpha/releases/tag/v1", isPrerelease: false };
+    const current = { ...older, tagName: "v2.0.0-rc.0", publishedAt: "2026-10-01T00:00:00Z", url: "https://github.com/example/alpha/releases/tag/v2-rc" };
+    const repo = { fullName: "example/alpha", activity: { releases: [current], releaseHistory: [older, current], latestRelease: current, checkedAt: "2026-10-02" } } as Repository;
+    const result = make({}, { ...identity, repositories: [repo] });
+    const releases = result.timeline.filter(event => event.kind === "release");
+    expect(releases).toHaveLength(2);
+    expect(releases[0]).toMatchObject({ releaseChannel: "prerelease", date: current.publishedAt });
+    expect(releases[0].detail).toContain("Prerelease");
+    expect(releases[1].source.url).toBe(older.url);
+    expect(eventsInMonth(result.timeline, "2025-01")).toHaveLength(1);
+  });
+  it("preserves a withdrawn publication with its original observation date", () => {
+    const release = { tagName: "v2-beta", name: null, publishedAt: "2026-09-01T00:00:00Z", url: "https://github.com/example/alpha/releases/tag/v2-beta", isPrerelease: true,
+      lastObservedAt: "2026-09-08T00:00:00Z", missingAsOf: "2026-10-04T00:00:00Z" };
+    const repo = { fullName: "example/alpha", activity: { releases: [], releaseHistory: [], latestRelease: null, unlistedReleases: [release], checkedAt: release.missingAsOf } } as unknown as Repository;
+    const result = make({}, { ...identity, repositories: [repo] });
+    expect(result.timeline.find(event => event.kind === "release")).toMatchObject({ sourceState: "unlisted", source: { observedAt: release.lastObservedAt } });
+    const reviewed = { ...review, kind: "published_artifact" as const, milestoneIds: [], id: "reviewed-release", sourceUrl: release.url, date: "2026-09-01", reviewedAt: "2026-09-08" };
+    const enriched = make({}, { ...identity, repositories: [repo] }, undefined, [reviewed]);
+    expect(enriched.timeline.find(event => event.kind === "release")).toMatchObject({ sourceState: "unlisted", releaseChannel: "prerelease" });
+    expect(enriched.timeline.find(event => event.kind === "release")?.detail).toContain("no longer listed");
+  });
   it("preserves unknown event dates instead of substituting import time", () => {
     const result = make({ proposals: [{ ...proposal, decisionDate: null }], payments: [{ ...payment, paidDate: "2026-02-30" }] });
     expect(result.timeline.find(event => event.kind === "decision")?.date).toBeNull();

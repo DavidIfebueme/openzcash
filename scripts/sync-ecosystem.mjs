@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile, mkdir, rename } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { collectPublicPages, collectReleasePages, canPublishSnapshot } from "./lib/ecosystem-collection.mjs";
+import { ACTIVITY_CACHE_VERSION, resumeCollectionCache, collectPublicPages, collectReleasePages, releaseActivity, unlistedReleaseHistory, snapshotPublicationIssues } from "./lib/ecosystem-collection.mjs";
 
 // Read-only GitHub collection. No clone, checkout, installation or execution
 // of discovered repositories. gh supplies its existing authentication.
@@ -16,14 +16,18 @@ const snapshotFile = path.join(dataDir, "snapshot.json");
 const cacheFile = path.join(root, ".cache/ecosystem-github.json");
 const registry = JSON.parse(await readFile(registryFile, "utf8"));
 const reuseCache = process.argv.includes("--cached");
-let cached = { version: 2, owners: {}, repositories: {}, activity: {} };
+let cached = { version: ACTIVITY_CACHE_VERSION, owners: {}, repositories: {}, activity: {} };
 if (reuseCache) {
-  try { cached = JSON.parse(await readFile(cacheFile, "utf8")); } catch {}
+  let value;
+  try { value = JSON.parse(await readFile(cacheFile, "utf8")); }
+  catch { throw new Error("No readable collection cache. Run sync-ecosystem without --cached."); }
+  cached = resumeCollectionCache(value);
+  console.log("Resuming cached source reads at cutoff " + cached.collectedAt + "; this is not a fresh collection.");
 }
-// Version 2 requires exhaustive release pagination and one shared cutoff.
-if (cached.version !== 2) cached = { version: 2, owners: cached.owners, repositories: cached.repositories, activity: {} };
 const startedAt = cached.collectedAt || new Date().toISOString();
 cached.collectedAt = startedAt;
+let previousSnapshot = null;
+try { previousSnapshot = JSON.parse(await readFile(snapshotFile, "utf8")); } catch {}
 const problems = [];
 
 async function gh(endpoint, extra = []) {
@@ -34,7 +38,9 @@ async function gh(endpoint, extra = []) {
       "-H", "X-GitHub-Api-Version: 2022-11-28",
       ...extra,
     ], { maxBuffer: 32 * 1024 * 1024, timeout: 120_000 });
-    return JSON.parse(stdout);
+    const result = JSON.parse(stdout);
+    if (result.errors?.length) throw new Error("Incomplete GitHub response");
+    return result;
   } catch (error) {
     // Never echo process environment, auth headers or the gh command.
     throw new Error("GitHub request failed: " + endpoint.split("?")[0] +
@@ -155,9 +161,9 @@ async function collectActivity(batch) {
       ",name:" + JSON.stringify(name) + ") { id isEmpty defaultBranchRef { name target { " +
       "... on Commit { " + periods.map(days => "d" + days +
         ":history(since:" + JSON.stringify(since[days]) + ",until:" + JSON.stringify(startedAt) + ") { totalCount }").join(" ") +
-      " } } } latestRelease { name tagName publishedAt url isPrerelease } " +
+      " } } } latestRelease { name tagName publishedAt url isPrerelease isDraft } " +
       "releases(first:100,orderBy:{field:CREATED_AT,direction:DESC}) {" +
-      "nodes { name tagName publishedAt url isPrerelease } pageInfo { hasNextPage endCursor } } }";
+      "nodes { name tagName publishedAt url isPrerelease isDraft } pageInfo { hasNextPage endCursor } } }";
   }).join(" ") + " }";
   const result = await gh("graphql", ["-f", "query=" + query]);
   for (let index = 0; index < batch.length; index++) {
@@ -177,14 +183,15 @@ async function collectActivity(batch) {
       const page = await gh("graphql", ["-f", "query=query { repository(owner:" +
         JSON.stringify(owner) + ",name:" + JSON.stringify(name) +
         ") { releases(first:100,after:" + JSON.stringify(cursor) +
-        ",orderBy:{field:CREATED_AT,direction:DESC}) { nodes { name tagName publishedAt url isPrerelease } " +
+        ",orderBy:{field:CREATED_AT,direction:DESC}) { nodes { name tagName publishedAt url isPrerelease isDraft } " +
         "pageInfo { hasNextPage endCursor } } } }"]);
       return page.data?.repository?.releases;
     });
     cached.activity[repo.id] = {
       checkedAt: startedAt, since, commits,
-      latestRelease: item.latestRelease,
-      releases: releases.filter(release => release.publishedAt >= since[90] && release.publishedAt <= startedAt),
+      ...releaseActivity(releases, item.latestRelease, startedAt, since[90]),
+      unlistedReleases: unlistedReleaseHistory(releases.filter(release => release.isDraft === false),
+        previousSnapshot?.repositories.find(previous => previous.id === repo.id)?.activity, startedAt),
       sourceUrl: "https://github.com/" + repo.fullName + "/activity",
     };
   }
@@ -223,9 +230,12 @@ await writeFile(cacheFile, JSON.stringify(cached));
 await mkdir(dataDir, { recursive: true });
 const temporary = snapshotFile + ".tmp";
 await writeFile(temporary, JSON.stringify(snapshot, null, 2) + "\n");
-// Do not replace a usable snapshot with a failed or incomplete owner scan.
-if (!canPublishSnapshot(snapshot)) {
+// Selected aliases must still resolve to their reviewed stable identities, and
+// every repository must have a complete release read. Failures cannot erase history.
+const publicationIssues = snapshotPublicationIssues(snapshot, { requiredRepositories: selectedNames, previousSnapshot });
+if (publicationIssues.length) {
   console.error("Collection incomplete; previous snapshot retained. See " + temporary);
+  for (const issue of publicationIssues) console.error(issue);
   process.exitCode = 1;
 } else {
   await rename(temporary, snapshotFile);

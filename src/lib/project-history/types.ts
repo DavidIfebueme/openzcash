@@ -7,6 +7,8 @@ export type HistoryIdentity = {
   website: string; project: Project | null; communityId: string | null;
   recipientKeys: string[]; applicationTopics: number[];
   reportTopics: { id: number; title: string }[];
+  /** Reviewed DAO proposal references only; no payment inference or mixed totals. */
+  daoFundingSources?: { ref: string; title: string; url: string; createdAt: string; period: string; reviewedAt: string }[];
   repositories: Repository[]; checkedAt: string;
 };
 export type Source = { label: string; url: string; observedAt: string | null };
@@ -31,6 +33,8 @@ export type HistoryEvent = {
   title: string; detail: string; date: string | null;
   evidence: "source_record" | "published_artifact" | "team_reported" | "reviewed_delivery" | "documented_integration" | "usage_observation";
   source: Source; grantId: string | null;
+  sourceState?: "unlisted";
+  releaseChannel?: "release" | "prerelease";
   budgetUsdCents?: string | null; recordedZecZat?: string | null;
 };
 export type Amount = { known: string | null; records: number; missing: number };

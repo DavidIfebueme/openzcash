@@ -12,6 +12,13 @@ const record = (data: Partial<FinanceRecords> = {}) => buildProjectHistory(ident
 const release = { id: "release", projectId: "alpha", kind: "published_artifact" as const, title: "Release published", summary: "A published artifact, not acceptance.", date: "2026-09-20", sourceUrl: "https://example.org/releases/1", reviewedAt: "2026-10-01", reviewNote: "Inspected the published release and its event date.", milestoneIds: [], supersedes: null };
 
 describe("source-led project insights", () => {
+  it("does not promote a removed publication as the latest current work", () => {
+    const history = record();
+    history.timeline.unshift({ id: "removed", kind: "release", title: "Removed beta", date: "2026-10-01", detail: "No longer listed", sourceState: "unlisted", evidence: "published_artifact", source, grantId: null });
+    expect(projectInsights(history).latestWork).toBeNull();
+    expect(projectInsights(history).latestEvent?.id).not.toBe("removed");
+    expect(projectInsights(history).publishedArtifacts).toBe(1);
+  });
   it("does not turn a paid row or published release into acceptance or adoption", () => {
     const history = buildProjectHistory(identity, [identity], finance, "2026-09-08", [release]);
     expect(projectInsights(history)).toMatchObject({ paidEntries: 1, publishedArtifacts: 1, acceptedEntries: 0, acceptanceGaps: 1, integrations: 0, usageObservations: 0 });

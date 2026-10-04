@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "f229018fe1b499fd",
+  "sourceRevision": "2af63355c9fb9c9a",
   "sourceFiles": 57,
   "documents": [
     {
@@ -1627,7 +1627,7 @@
       "id": "src/lib/communities/data.ts:6",
       "url": "https://openzcash.org/communities",
       "title": "communities · Zcash Ghana",
-      "text": "Zcash Ghana\nCountry: Ghana\nRegion: Africa\nLanguage: English\nZCG ledger recipient: ZcashGH\nA105\nBig things ahead for Zcash Ghana\nZcash Ghana (July 2026 - September 2026)\nZcash Ghana — Our First Year Journey (June 2025 – June 2026)\nCommunity education and meetups across Ghana, under ZCG grants."
+      "text": "Zcash Ghana\nCountry: Ghana\nRegion: Africa\nLanguage: English\nZCG ledger recipient: ZcashGH\nA105\nZcash Ghana (October 2026 - December 2026)\nBig things ahead for Zcash Ghana\nZcash Ghana (July 2026 - September 2026)\nZcash Ghana — Our First Year Journey (June 2025 – June 2026)\nCommunity education and meetups across Ghana, under ZCG grants."
     },
     {
       "id": "src/lib/communities/data.ts:7",

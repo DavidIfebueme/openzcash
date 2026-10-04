@@ -26,6 +26,32 @@
       "reviewNote": "Read the official September 29 release and its zainod, zaino-serve and zaino-state changes. Recorded publication only, without inferring use or completion of a funded milestone.",
       "milestoneIds": [],
       "supersedes": null
+    },
+    {
+      "id": "zodl-ios-release-3-15-0-us",
+      "projectId": "zodl-wallet",
+      "kind": "published_artifact",
+      "title": "ZODL 3.15.0 published on the US iOS App Store",
+      "summary": "Apple’s US App Store metadata records ZODL for iOS version 3.15.0, published September 28, 2026. This is a platform-specific publication record; it does not establish downloads, production adoption or acceptance of a funded milestone.",
+      "date": "2026-09-28",
+      "sourceUrl": "https://itunes.apple.com/lookup?id=1672392439&country=us",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Queried Apple’s official lookup endpoint for app 1672392439 with country=us. Checked trackName, version=3.15.0 and currentVersionReleaseDate=2026-09-28T15:18:32Z. The linked listing is https://apps.apple.com/us/app/zodl-zcash-wallet/id1672392439. Kept this iOS publication separate from the Android GitHub release and from the absence of GitHub releases in zodl-inc/zodl-ios.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "vizor-ios-release-0-0-50-us",
+      "projectId": "vizor-wallet",
+      "kind": "published_artifact",
+      "title": "Vizor 0.0.50 published on the US iOS App Store",
+      "summary": "Apple’s US App Store metadata records Vizor for iOS version 0.0.50, published October 3, 2026. Its version differs from the desktop release 0.0.59. Publication does not establish downloads, production adoption or grant acceptance.",
+      "date": "2026-10-03",
+      "sourceUrl": "https://itunes.apple.com/lookup?id=6776591245&country=us",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Queried Apple’s official lookup endpoint for app 6776591245 with country=us. Checked trackName, version=0.0.50 and currentVersionReleaseDate=2026-10-03T07:44:57Z. The linked listing is https://apps.apple.com/us/app/vizor-zcash-wallet/id6776591245. Compared with the independent chainapsis/vizor-wallet desktop release 0.0.59 published 2026-10-03T08:52:01Z; did not merge platform versions.",
+      "milestoneIds": [],
+      "supersedes": null
     }
   ]
 }

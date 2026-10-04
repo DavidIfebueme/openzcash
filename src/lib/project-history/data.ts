@@ -88,7 +88,7 @@ export async function readHistoryIndex() {
     const history = buildProjectHistory(identity, identities, finance, catalog.snapshot.collectedAt, reviewed, now, index);
     const { grants, paidEntries, acceptedEntries, acceptanceGaps, publishedArtifacts, integrations, usageObservations, reportSources, publicWorkSources, latestEvent } = projectInsights(history);
     return { ...history.project, insights: { grants, paidEntries, acceptedEntries, acceptanceGaps, publishedArtifacts, integrations, usageObservations, reportSources, publicWorkSources },
-      latestEvent: latestEvent ? { title: latestEvent.title, date: latestEvent.date, kind: latestEvent.kind } : null };
+      latestEvent: latestEvent ? { title: latestEvent.title, date: latestEvent.date, kind: latestEvent.kind, ...(latestEvent.releaseChannel ? { releaseChannel: latestEvent.releaseChannel } : {}) } : null };
   });
   return { items, coverage: { proposalsAvailable: finance.proposalsAvailable, paymentsAvailable: finance.paymentsAvailable },
     repositorySnapshotAt: catalog.snapshot.collectedAt, ledgerImportedAt: finance.importedAt };

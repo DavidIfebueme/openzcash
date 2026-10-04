@@ -138,6 +138,7 @@ With GitHub CLI already authenticated for public read access:
 ```sh
 npm run sync-ecosystem
 npm run test:ecosystem-sync
+npm run audit:ecosystem
 npm test
 npm run typecheck
 npm run lint
@@ -147,7 +148,7 @@ npm run build
 The normal sync refreshes every inventory and activity measurement. The optional
 `npm run sync-ecosystem -- --cached` resumes a local research collection using
 its existing cutoff and cached source reads; it is not a freshness check.
-The cache is ignored by Git and must never contain tokens or private metadata.
+Cached resumes are accepted only within 24 hours and explicitly retain the original cutoff. The cache is ignored by Git and must never contain tokens or private metadata.
 
 A classification-only review can retain the existing GitHub snapshot. In that
 case, review the registry changes, reconcile only its SHA-256 in the snapshot,
@@ -157,7 +158,7 @@ GitHub collection date. Changes to the collected identity/inventory scope
 require a collector run, not a hash-only reconciliation.
 
 A failed or incomplete full-account scan cannot replace the prior snapshot.
-Selected-repository or activity failures are recorded as scoped warnings.
+Selected-repository or activity failures also prevent publication. The collector checks stable repository IDs to prevent a reused path from silently changing project identity.
 Review warnings, registry changes, identity transfers, proposal decisions and
 funding evidence before publishing. The GitHub sync does not automatically
 reclassify new grant proposals or validate new funding associations.
@@ -167,3 +168,19 @@ alias matching, filters, historical grants, missing activity, fork exclusion,
 source URL safety and registry/snapshot consistency.
 
 X/Social Radar ingestion and its API are outside this implementation.
+
+### Source freshness and history audit
+
+`npm run audit:ecosystem` checks the catalog-to-snapshot hash, all mapped repository names, complete source reads and a seven-day repository freshness budget. It exits nonzero on stale/incomplete data. Run it before publishing ecosystem/history changes. It does not schedule a refresh or validate milestone delivery. History screens also disclose when repository data is more than seven days old.
+
+To produce an inspectable per-identity map with an explicitly supplied public ledger export:
+
+```sh
+npm run audit:ecosystem -- --finance /path/to/public-finance-records.json --baseline /path/to/prior-snapshot.json --output /path/to/audit.json
+```
+
+The output includes every catalog identity, canonical repository, collection time, platform-specific reviewed additions, grant-association basis and unresolved evidence gaps. An omitted finance export leaves finance unassessed; the command never imports or writes the ledger.
+
+`activity.releases` remains the 90-day activity measurement. `activity.releaseHistory` preserves the complete currently listed published release history fetched through the common cutoff. Tags without published releases and drafts are excluded. Previously observed records absent from a successful new listing are retained in `unlistedReleases`, with their original observation time and missing-as-of date; they remain traceable but do not become current release claims. A new measurement cutoff is not a rereview of all manually curated descriptions or financial associations.
+
+Raw GitHub prerelease flags are preserved. Presentation also recognizes explicit alpha/beta/RC/preview markers in version tags, because maintainers can leave GitHub's flag unset. A non-preview marker alone is not proof of a stable package, mainnet activation or production deployment. App Store versions remain separately scoped by platform and storefront.

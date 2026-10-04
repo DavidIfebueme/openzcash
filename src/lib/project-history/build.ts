@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { isPreviewRelease } from "@/lib/ecosystem/releases";
 import { safeExternalUrl } from "@/lib/ecosystem/catalog";
 import type { ReviewedEvidence } from "./evidence";
 import { historyAmount } from "./format";
@@ -26,9 +27,9 @@ export function sumAmounts(values: (string | null)[]): Amount {
 function bindings(identity: HistoryIdentity, finance: FinanceRecords) {
   const result = new Map<string, { title: string; program: Program; source: Source; status: string; date: string | null; scopeUrl: string | null; note: string }>();
   for (const event of identity.project?.funding.events ?? []) {
-    if (!event.program || !["zcg", "coinholder"].includes(event.program) || event.status === "organization-level") continue;
+    if (event.kind === "context" || !event.program || !["zcg", "coinholder"].includes(event.program) || event.status === "organization-level") continue;
     const id = key(event.program, event.title);
-    if (!result.has(id)) result.set(id, { title: event.title, program: event.program, source: source("Catalog funding source", event.sourceUrl, identity.checkedAt), status: event.status, date: validDate(event.date), scopeUrl: safeExternalUrl(event.scopeSourceUrl), note: event.associationNote ?? "" });
+    if (!result.has(id)) result.set(id, { title: event.title, program: event.program, source: source("Catalog funding source", event.sourceUrl, event.reviewedAt ?? identity.checkedAt), status: event.status, date: validDate(event.date), scopeUrl: safeExternalUrl(event.scopeSourceUrl), note: event.associationNote ?? "" });
   }
   // Community recipient associations were reviewed in the community catalog.
   // An umbrella recipient is never split into its regional beneficiaries here.
@@ -61,7 +62,8 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
   const linked = index.byIdentity.get(identity.id) ?? bindings(identity, finance);
   const { ownership } = index;
   const timeline: HistoryEvent[] = [], grants: GrantHistory[] = [], gaps: string[] = [];
-  const add = (event: HistoryEvent) => { if (!timeline.some(item => item.id === event.id)) timeline.push(event); };
+  const eventIds = new Set<string>();
+  const add = (event: HistoryEvent) => { if (!eventIds.has(event.id)) { eventIds.add(event.id); timeline.push(event); } };
   const eligibleReviews = reviewed.filter(entry => entry.reviewedAt <= now.toISOString().slice(0, 10));
   const superseded = new Set(eligibleReviews.map(entry => entry.supersedes).filter(Boolean));
   const activeReviews = eligibleReviews.filter(entry => entry.projectId === identity.id && !superseded.has(entry.id));
@@ -118,13 +120,29 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
   }
 
   for (const repo of identity.repositories) {
-    const releases = [...(repo.activity?.releases ?? []), ...(repo.activity?.latestRelease ? [repo.activity.latestRelease] : [])];
+    const releases = [...(repo.activity?.releaseHistory ?? repo.activity?.releases ?? []), ...(repo.activity?.latestRelease ? [repo.activity.latestRelease] : [])];
     for (const release of releases) add({ id: `release-${stableId(release.url)}`, kind: "release",
-      title: `${repo.fullName} · ${release.tagName}`, detail: `${release.isPrerelease ? "Prerelease" : "Release"} published by the repository maintainer. No grant milestone acceptance is inferred.`,
+      title: `${repo.fullName} · ${release.tagName}`, detail: `${isPreviewRelease(release) ? "Prerelease (GitHub flag or version tag)" : "Release"} published by the repository maintainer. No grant milestone acceptance is inferred.`,
+      releaseChannel: isPreviewRelease(release) ? "prerelease" : "release",
       date: validDate(release.publishedAt), evidence: "published_artifact", grantId: null,
       source: source("Repository release", release.url, repo.activity?.checkedAt ?? repositorySnapshotAt) });
   }
+  // Prior observations remain traceable when a release disappears from the public listing.
+  for (const repo of identity.repositories) for (const release of repo.activity?.unlistedReleases ?? []) {
+    add({ id: `release-${stableId(release.url)}`, kind: "release", title: `${repo.fullName} · ${release.tagName}`,
+      detail: `Previously observed release; no longer listed in the repository's public releases as of ${release.missingAsOf.slice(0, 10)}. Last observed ${release.lastObservedAt.slice(0, 10)}. Current download availability is unverified.`,
+      releaseChannel: isPreviewRelease(release) ? "prerelease" : "release", sourceState: "unlisted",
+      date: validDate(release.publishedAt), evidence: "published_artifact", grantId: null,
+      source: source("Previously observed repository release", release.url, release.lastObservedAt) });
+  }
   for (const event of identity.project?.funding.events ?? []) {
+    if (event.kind === "context") {
+      add({ id: `funding-context-${stableId(event.sourceUrl)}`, kind: "context", title: event.title,
+        detail: "Dated source about an existing grant. This status update is not a separate award and supplies no payment amount.",
+        date: validDate(event.date), evidence: "source_record", grantId: null,
+        source: source("Grant status context", event.sourceUrl, identity.checkedAt) });
+      continue;
+    }
     if (event.status === "organization-level") add({ id: `context-${stableId(event.sourceUrl)}`, kind: "context", title: "Organization-level funding context",
       detail: "This source describes the organization. It does not establish a separate grant or an allocation to this component.",
       date: validDate(event.date), evidence: "source_record", grantId: null, source: source("Organization source", event.sourceUrl, identity.checkedAt) });
@@ -140,15 +158,23 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
       title: topic.title, detail: "Linked community report source. Individual claims and publication dates have not yet been extracted or accepted in this history.",
       date: null, evidence: "team_reported", grantId: null, source: source("Community report", url, identity.checkedAt) });
   }
+  for (const proposal of identity.daoFundingSources ?? []) add({
+    id: `dao-context-${proposal.ref}`, kind: "context", title: `ZecHub DAO ${proposal.ref} · ${proposal.title}`,
+    detail: `Approved DAO proposal in the community catalog reviewed ${proposal.reviewedAt}. Timeline date is proposal creation, not approval or payment. Stated period: ${proposal.period}. DAO financial totals are outside this history’s ZCG/Coinholder records.`,
+    date: validDate(proposal.createdAt), evidence: "source_record", grantId: null,
+    source: source("ZecHub DAO proposal", proposal.url, proposal.reviewedAt),
+  });
   const reviewKinds = { team_reported: "report", published_artifact: "release", documented_integration: "integration", usage_observation: "usage" } as const;
   for (const entry of activeReviews.filter(item => item.kind !== "reviewed_delivery")) {
-    // A reviewed release supersedes a snapshot entry for the same artifact.
+    let observed: HistoryEvent | undefined;
+    // A review can enrich a publication, but cannot reverse a later missing-source observation.
     if (entry.kind === "published_artifact") {
       const duplicate = timeline.findIndex(event => event.kind === "release" && event.source.url === entry.sourceUrl);
-      if (duplicate >= 0) timeline.splice(duplicate, 1);
+      if (duplicate >= 0) { observed = timeline.splice(duplicate, 1)[0]; eventIds.delete(observed.id); }
     }
     add({ id: `review-${entry.id}`, kind: reviewKinds[entry.kind as keyof typeof reviewKinds],
-      title: entry.title, detail: entry.summary, date: entry.date, evidence: entry.kind, grantId: null,
+      title: entry.title, detail: observed?.sourceState === "unlisted" ? `${entry.summary} ${observed.detail}` : entry.summary, date: entry.date, evidence: entry.kind, grantId: null,
+      ...(observed?.sourceState ? { sourceState: observed.sourceState } : {}), ...(observed?.releaseChannel ? { releaseChannel: observed.releaseChannel } : {}),
       source: source(entry.kind === "team_reported" ? "Team report" : "Reviewed public source", entry.sourceUrl, entry.reviewedAt) });
   }
   const reviews = eligibleReviews.filter(entry => entry.projectId === identity.id).map(entry => ({ ...entry,
@@ -158,7 +184,8 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
   if (reviews.some(entry => !entry.supersededBy && !entry.linked)) gaps.push("A reviewed record cannot be linked to the current ledger. Its acceptance claim is withheld pending an exact re-link.");
   if (!finance.proposalsAvailable) gaps.push("The proposal source is unavailable. Dated catalog references are retained; current decisions and requested amounts cannot be confirmed.");
   if (!finance.paymentsAvailable) gaps.push("The payment source is unavailable. Missing totals must not be interpreted as zero.");
-  if (!grants.length) gaps.push("No project-specific grant identity is linked. This does not establish that the project is unfunded.");
+  if (identity.daoFundingSources?.length) gaps.push("ZecHub DAO grants are linked as dated context. DAO payments and totals are not included in these ZCG/Coinholder financial records; see the community funding sources.");
+  if (!grants.length) gaps.push("No project-specific ZCG/Coinholder grant identity is linked. This does not establish that the project is unfunded.");
   if (!timeline.some(event => event.evidence === "reviewed_delivery")) gaps.push("No milestone acceptance evidence is linked in this history yet. This is a coverage gap, not a finding of non-delivery.");
   if (!identity.repositories.length) gaps.push("No repository is linked. Community output and other non-code work must be assessed from its own sources.");
   timeline.sort((a, b) => (b.date ?? "").localeCompare(a.date ?? "") || a.id.localeCompare(b.id));

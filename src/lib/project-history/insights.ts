@@ -10,7 +10,7 @@ export function projectInsights(history: ProjectHistory) {
   const usage = history.timeline.filter(event => event.kind === "usage");
   const reportSources = new Set(history.timeline.filter(event => event.kind === "report").map(event => event.source.url));
   const publicWorkSources = new Set(history.timeline.filter(event => ["release", "report", "delivery", "integration", "usage"].includes(event.kind)).map(event => event.source.url));
-  const latest = (kinds: HistoryEvent["kind"][]) => history.timeline.find(event => event.date && kinds.includes(event.kind)) ?? null;
+  const latest = (kinds: HistoryEvent["kind"][]) => history.timeline.find(event => event.sourceState !== "unlisted" && event.date && kinds.includes(event.kind)) ?? null;
   const acceptanceGaps = history.coverage.paymentsAvailable ? paid.filter(row => !row.deliveryEvidence.length).length : null;
   const checks: { title: string; detail: string; section: "funding" | "evidence" | "timeline" }[] = [];
   if (!history.coverage.paymentsAvailable || !history.coverage.proposalsAvailable) checks.push({ title: "Restore financial source coverage", detail: "A source could not be read. Current payment or decision coverage is incomplete.", section: "evidence" });
@@ -34,14 +34,14 @@ export function projectInsights(history: ProjectHistory) {
 export type ProjectInsights = ReturnType<typeof projectInsights>;
 export type HistoryIndexItem = ProjectHistory["project"] & {
   insights: Pick<ProjectInsights, "grants" | "paidEntries" | "acceptedEntries" | "acceptanceGaps" | "publishedArtifacts" | "integrations" | "usageObservations" | "reportSources" | "publicWorkSources">;
-  latestEvent: Pick<HistoryEvent, "title" | "date" | "kind"> | null;
+  latestEvent: Pick<HistoryEvent, "title" | "date" | "kind" | "releaseChannel"> | null;
 };
 
 /** Navigation is based on reviewed associations, never substring similarity. */
 export function historyLinksForGrant(identities: HistoryIdentity[], grant: { title: string; program: Program; recipientKey?: string }) {
   const normalize = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase();
   return identities.filter(identity =>
-    identity.project?.funding.events.some(event => event.program === grant.program && event.status !== "organization-level" && normalize(event.title) === normalize(grant.title)) ||
+    identity.project?.funding.events.some(event => event.kind !== "context" && event.program === grant.program && event.status !== "organization-level" && normalize(event.title) === normalize(grant.title)) ||
     (grant.recipientKey && identity.recipientKeys.includes(grant.recipientKey))
   ).map(({ id, name }) => ({ id, name, href: `/ecosystem/history/${id}?section=funding` }));
 }

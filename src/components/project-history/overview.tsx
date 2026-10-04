@@ -20,8 +20,8 @@ export function HistoryOverview({ history, select }: { history: ProjectHistory; 
         <p>{facts.grants} associated grant {facts.grants === 1 ? "record" : "records"}. Requests, decisions and payments stay separate.</p>
       </button>
       <button onClick={() => select("timeline", history.project.communityId ? "report" : "release")} className={styles.dimension}>
-        <span className={styles.dimensionLabel}>02 / Public work <span aria-hidden>→</span></span>
-        {history.project.communityId ? <><strong>{facts.reportSources} <small>linked report {facts.reportSources === 1 ? "source" : "sources"}</small></strong><p>Reports document community work. Individual claims still need review.</p></> : <><strong>{facts.publishedArtifacts} <small>linked {facts.publishedArtifacts === 1 ? "release" : "releases"}</small></strong><p>Publication is evidenced. It does not establish funded scope completion.</p></>}
+        <span className={styles.dimensionLabel}>02 / Published records <span aria-hidden>→</span></span>
+        {history.project.communityId ? <><strong>{facts.reportSources} <small>linked report {facts.reportSources === 1 ? "source" : "sources"}</small></strong><p>Reports document community work. Individual claims still need review.</p></> : <><strong>{facts.publishedArtifacts} <small>release {facts.publishedArtifacts === 1 ? "record" : "records"}</small></strong><p>Repository and app-store releases. Shared repositories can include non-Zcash work; publication is not funded delivery.</p></>}
       </button>
       <button onClick={() => select("funding")} className={styles.dimension}>
         <span className={styles.dimensionLabel}>03 / Milestone acceptance <span aria-hidden>→</span></span>

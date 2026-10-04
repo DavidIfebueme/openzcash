@@ -1534,9 +1534,89 @@
           "url": "https://github.com/zbitech"
         }
       ]
+    },
+    {
+      "id": "chainapsis",
+      "name": "Chainapsis / KPLR",
+      "githubOwners": [
+        "chainapsis"
+      ],
+      "description": "Team behind Keplr and the Vizor Zcash wallet. Vizor source and release signing identify Chainapsis; its Coinholder application identifies the organization as KPLR.",
+      "website": "https://vizor.cash/",
+      "funding": {
+        "label": "Organization funding not mapped",
+        "status": "unassessed",
+        "history": []
+      },
+      "sources": [
+        {
+          "title": "Vizor official website — team behind Keplr",
+          "url": "https://vizor.cash/"
+        },
+        {
+          "title": "Vizor source and release signing identity",
+          "url": "https://github.com/chainapsis/vizor-wallet"
+        },
+        {
+          "title": "Organization identity in the Vizor Coinholder application",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66"
+        }
+      ]
     }
   ],
   "projects": [
+    {
+      "id": "alex-sol-node-security-research",
+      "name": "Alex Sol node security research",
+      "organizationId": null,
+      "category": "Research",
+      "tags": [
+        "security-research"
+      ],
+      "description": "Alex Sol’s independent vulnerability research across zcashd and Zebra. The retroactive application covers the researcher’s disclosed findings, separate from the node maintainers’ remediation work.",
+      "website": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/57",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/57"
+        },
+        {
+          "title": "ZODL disclosure referenced by the researcher",
+          "url": "https://zodl.com/zcashd-sprout-verification-vulnerability"
+        },
+        {
+          "title": "Official Zebra advisory for one listed finding",
+          "url": "https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-3vmh-33xr-9cqh"
+        }
+      ],
+      "funding": {
+        "label": "Grant decisions recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Temporary Detectable Unlimited mint and sell Exploit",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A49",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/57",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/57",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application names Alex Sol / alexs-scalar and explicitly spans zcashd and Zebra vulnerabilities. It is not assigned in full to both node projects or either maintaining organization. References to prior bounty receipts remain applicant-reported; no payment is imported from those prose tables.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "Funding belongs to the named applicant and approved scope. Approval is not evidence of payment, delivery, acceptance, deployment or current support. Financial values remain in the source ledger."
+      },
+      "logo": null,
+      "relatedProjectIds": [
+        "zcashd",
+        "zebra"
+      ]
+    },
     {
       "id": "arti",
       "name": "Arti",
@@ -1560,25 +1640,27 @@
             "title": "Arti: a pure-Rust Tor implementation for Zcash and beyond",
             "status": "approved",
             "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A29",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/arti-a-pure-rust-tor-implementation-for-zcash-and-beyond/38776",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/arti-a-pure-rust-tor-implementation-for-zcash-and-beyond/38776",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Arti, a project to rewrite Tor in Rust: onion services and beyond!",
             "status": "approved",
             "date": "2022-09-06",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A115",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/proposal-review-arti-a-project-to-rewrite-tor-in-rust-onion-services-and-beyond/42578?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/proposal-review-arti-a-project-to-rewrite-tor-in-rust-onion-services-and-beyond/42578?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "These approvals concern the named Arti and onion-service proposals. Arti is shared privacy infrastructure, not an exclusively Zcash-funded application. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -1694,35 +1776,38 @@
             "title": "Upgrade BTCPayServer Zcash Plugin for 2.1",
             "status": "approved",
             "date": "2025-04-14",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A332",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/upgrade-btcpayserver-zcash-plugin-for-2-1/50800",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/upgrade-btcpayserver-zcash-plugin-for-2-1/50800",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "BTCPayServer Multi-Account and 0conf Mempool Support",
             "status": "approved",
             "date": "2026-05-01",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A540",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/btcpayserver-multi-account-and-0conf-mempool-notifications/55316",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/55316/26",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "BTCPayServer Multi-Store GraphQL Client",
             "status": "approved",
             "date": "2026-08-31",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A652",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/btcpayserver-multi-store-support-and-native-graphql-client/57128",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/57128/2",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -1743,6 +1828,61 @@
       ],
       "stage": "integration",
       "logo": null
+    },
+    {
+      "id": "cipherpay",
+      "name": "CipherPay",
+      "organizationId": "kenbak",
+      "category": "Payments & DeFi",
+      "tags": [
+        "payments"
+      ],
+      "description": "Atmosphere Labs / Kenbak’s Zcash merchant payment platform and commerce integrations. Its application explicitly separates CipherPay’s repositories and grant scope from CipherScan and Open Wallet Standard work.",
+      "website": "https://cipherpay.app",
+      "repositories": [
+        "atmospherelabs-dev/cipherpay-api",
+        "atmospherelabs-dev/cipherpay-web",
+        "atmospherelabs-dev/cipherpay-shopify",
+        "atmospherelabs-dev/cipherpay-woocommerce",
+        "atmospherelabs-dev/cipherpay-x402"
+      ],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/30"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "CipherPay",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A27",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/30",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/30",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
+      "logo": null,
+      "notices": [
+        {
+          "kind": "capability",
+          "label": "One application repository unavailable",
+          "summary": "The application links cipherpay-mcp, whose public GitHub endpoint returned 404 on October 4, 2026. Five other listed repositories were reachable. This is a source-coverage gap, not evidence of non-delivery.",
+          "sourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/30",
+          "date": "2026-10-04"
+        }
+      ]
     },
     {
       "id": "cipherscan",
@@ -1783,16 +1923,135 @@
             "title": "CipherScan",
             "status": "approved",
             "date": "2026-02-16",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A468",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/cipherscan-2026-privacy-intelligence-for-zcash/54151",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/cipherscan-2026-privacy-intelligence-for-zcash/54151",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "CipherScan Coinholder Retroactive Grant 2026",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A47",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/47",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/47",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The official application names CipherScan and links Kenbak/cipherscan plus Kenbak/cipherscan-rust. It identifies the retroactive scope separately from existing ZCG milestones and from CipherPay.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
+      },
+      "logo": null
+    },
+    {
+      "id": "colosseum-zcash-track",
+      "name": "Colosseum Zcash track",
+      "organizationId": null,
+      "category": "Community",
+      "tags": [
+        "events"
+      ],
+      "description": "The Zcash track in Colosseum’s Crypto World’s Fair hackathon, with a dedicated competition scope and prize pool. The grant does not establish funding or delivery by any individual entrant.",
+      "website": "https://colosseum.com/hackathon",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/414"
+        },
+        {
+          "title": "Organizer announcement referenced in the application",
+          "url": "https://blog.colosseum.com/expanding-the-arena/"
+        }
+      ],
+      "funding": {
+        "label": "Grant decisions recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Colosseum | Crypto World's Fair | Zcash Track",
+            "status": "approved",
+            "date": "2026-09-14",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A670",
+            "scopeSourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/414",
+            "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/414",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application identifies Colosseum’s Zcash-specific hackathon track. Prize targets and event dates are planned scope; no entrant, winning project, or prize payment is inferred from this approval.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "Funding belongs to the named applicant and approved scope. Approval is not evidence of payment, delivery, acceptance, deployment or current support. Financial values remain in the source ledger."
+      },
+      "logo": null
+    },
+    {
+      "id": "connaugh-zcash-videos",
+      "name": "Connaugh Zcash videos",
+      "organizationId": null,
+      "category": "Education",
+      "tags": [
+        "education"
+      ],
+      "description": "Connaugh’s short documentary-style Zcash films published at @zkmarketer. The history separates the retroactive first-film award from the later ZCG proposal for 24 additional videos.",
+      "website": "https://x.com/zkmarketer",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/420"
+        },
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/55"
+        },
+        {
+          "title": "First film linked by the retroactive application",
+          "url": "https://x.com/zkmarketer/status/2082103793253335140"
+        }
+      ],
+      "funding": {
+        "label": "Grant decisions recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "24 Videos @zkMarketer",
+            "status": "approved",
+            "date": "2026-09-14",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A676",
+            "scopeSourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/420",
+            "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/420",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "ZCG #420 explicitly identifies Connaugh and @zkmarketer, the same creator and publication channel as Coinholder #55. Its scope is 24 additional films over 12 weeks; it is not another funding record for the five films in the earlier retroactive award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Connaugh Zcash Videos",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A52",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/55",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/55",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application explicitly identifies Connaugh and five films at @zkmarketer during July–August 2026. This association does not independently verify the applicant’s view/impression figures or imply a ZCG payment.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "Funding belongs to the named applicant and approved scope. Approval is not evidence of payment, delivery, acceptance, deployment or current support. Financial values remain in the source ledger."
       },
       "logo": null
     },
@@ -2058,15 +2317,15 @@
             "title": "Elemental ZEC – Zcash UI Component Kit and Payment Processor",
             "status": "approved",
             "date": null,
-            "dateType": "decision-date-unverified",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A60",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/elemental-zec-ui-component-kit-and-payment-processor/40110",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/elemental-zec-ui-component-kit-and-payment-processor/40110",
             "ledgerRecordedDate": "2021-07-13",
-            "dateNote": "The ledger's recorded date predates the primary proposal discussion; the actual decision date has not been established.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2120,25 +2379,27 @@
             "title": "Free2Z",
             "status": "approved",
             "date": "2022-05-16",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A91",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/free2-whats-your/41289?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/free2-whats-your/41289?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Free2Z: Preparing the Garden For Spring",
             "status": "approved",
             "date": "2023-02-20",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A166",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/free2z-preparing-the-garden-for-spring/43979",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/free2z-preparing-the-garden-for-spring/43979",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2260,26 +2521,78 @@
             "title": "Zcash Wallet Community Developer 2024",
             "status": "approved",
             "date": "2024-01-22",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A241",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-wallet-community-developer-2024/46525",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/46525/9",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zcash Wallet Community Developer 2024 Q2",
             "status": "approved",
             "date": "2024-04-15",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A261",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-wallet-community-developer-2024-q2-q4/47259/2",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/47259/6",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "The recorded community-developer grants identify this proof-of-concept binding work. They do not establish funding for the entire FROST implementation, the Zcash Foundation, or every ZecDev repository. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
+      },
+      "logo": null
+    },
+    {
+      "id": "graphsense-zcash-accounting",
+      "name": "GraphSense Zcash accounting repair",
+      "organizationId": null,
+      "category": "Infrastructure",
+      "tags": [
+        "data-infrastructure"
+      ],
+      "description": "Steven Hert’s contribution correcting GraphSense accounting for Zcash shielded balances, with validation and operator handoff. The scoped grant is distinct from funding the wider GraphSense analytics platform.",
+      "website": "https://github.com/graphsense/graphsense-lib/pull/163",
+      "repositories": [
+        "graphsense/graphsense-lib"
+      ],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/424"
+        },
+        {
+          "title": "Upstream Zcash accounting pull request, merged September 16, 2026",
+          "url": "https://github.com/graphsense/graphsense-lib/pull/163"
+        },
+        {
+          "title": "GraphSense maintainer scope discussion",
+          "url": "https://github.com/graphsense/graphsense-lib/issues/126#issuecomment-5539032754"
+        }
+      ],
+      "funding": {
+        "label": "Grant decisions recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "GraphSense Zcash Shielded Accounting Repair",
+            "status": "approved",
+            "date": "2026-09-28",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A680",
+            "scopeSourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/424",
+            "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/424",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application explicitly targets graphsense/graphsense-lib PR #163, authored by steven3002. The upstream PR was merged on 2026-09-16; this does not prove all grant validation/handoff milestones accepted or production re-ingestion completed. General GraphSense releases must not be described as work delivered by this grant.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "Funding belongs to the named applicant and approved scope. Approval is not evidence of payment, delivery, acceptance, deployment or current support. Financial values remain in the source ledger."
       },
       "logo": null
     },
@@ -2344,13 +2657,14 @@
             "title": "Hito",
             "status": "approved",
             "date": "2026-05-11",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A551",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-hito-hardware-wallet-zcash-cold-signing-orchard/55539",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-hito-hardware-wallet-zcash-cold-signing-orchard/55539",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2408,6 +2722,50 @@
       "logo": null
     },
     {
+      "id": "ironwood-external-audits",
+      "name": "Ironwood external security audits",
+      "organizationId": "valar-group",
+      "category": "Research",
+      "tags": [
+        "security-research"
+      ],
+      "description": "External security reviews coordinated by Valar Group during the Ironwood response. The reimbursement application covers third-party audits and AI review costs, separately from Valar Group development and Zakura-only work.",
+      "website": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/56",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/56"
+        },
+        {
+          "title": "Published audit reports referenced in the application",
+          "url": "https://github.com/Zellic/publications/pull/245"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Ironwood external audit re-imbursement",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A53",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/56",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/56",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
+      "logo": null
+    },
+    {
       "id": "ironwood-verification",
       "name": "Ironwood formal verification",
       "organizationId": "zcash-core",
@@ -2424,9 +2782,37 @@
         "zcash/ironwood"
       ],
       "funding": {
-        "label": "Cross-organization work; no unified project funding claim",
-        "status": "not-verified",
-        "events": []
+        "label": "Coinholder awards for the formal-verification scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Ironwood zk-SNARK Formal Verification (Project Tachyon)",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A45",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/50",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/50",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "Project Tachyon’s application explicitly identifies zcash/ironwood as the formal-verification artifact. It excludes Zakura development and ZODL’s independently scoped formal work; this is not funding of the whole Tachyon protocol roadmap.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Project Tachyon - Bonus Grant for Ironwood zk-SNARK Formal Verification",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A48",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/52#issuecomment-5294050649",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/52#issuecomment-5294050649",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "This bonus explicitly references Coinholder application #50 and the same zcash/ironwood formal-verification artifact. Tachyon Foundation is the proposed beneficiary; no funds go to the nominator or Shielded Labs. This is separate from the general Tachyon protocol roadmap and is an additional award, not a second delivery.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "The linked Coinholder awards cover Project Tachyon’s Ironwood formal verification and its bonus. They do not fund the whole Tachyon protocol roadmap, Zakura development, ZODL integration or every contributor to the shared repository. Approval does not establish payment or milestone acceptance."
       },
       "sources": [
         {
@@ -2439,6 +2825,53 @@
         }
       ],
       "logo": null
+    },
+    {
+      "id": "ironwood-human-readable-proof",
+      "name": "Ironwood human-readable proof",
+      "organizationId": null,
+      "category": "Research",
+      "tags": [
+        "formal-verification"
+      ],
+      "description": "Ariel Gabizon’s planned mathematical exposition of the Bulletproofs argument used in Ironwood verification, beginning with a short paper and LaTeX source. This grant is separate from the machine-checked verification award.",
+      "website": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438"
+        },
+        {
+          "title": "Formal proof described by the proposed exposition",
+          "url": "https://tachyon.z.cash/blog/ironwood-verification-complete/#balance-integrity"
+        }
+      ],
+      "funding": {
+        "label": "Grant decisions recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Human readable version of Ironwood formal verification, first steps - bulletproofs in the AGM",
+            "status": "approved",
+            "date": "2026-09-28",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A693",
+            "scopeSourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438",
+            "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact application names Ariel Gabizon and a PDF/LaTeX deliverable. A possible addition to zcash/ironwood is a suggestion, not an established repository contribution; no upstream repository releases are inherited.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "Funding belongs to the named applicant and approved scope. Approval is not evidence of payment, delivery, acceptance, deployment or current support. Financial values remain in the source ledger."
+      },
+      "logo": null,
+      "relatedProjectIds": [
+        "ironwood-verification"
+      ]
     },
     {
       "id": "keystone-zcash",
@@ -2478,13 +2911,14 @@
             "title": "Zcash (Both Transparent & Shielded Address) Support for Keystone Hardware Wallet",
             "status": "approved",
             "date": "2024-08-19",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A281",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/keystone-hardware-wallet-support-grant-application/48508",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/keystone-hardware-wallet-support-grant-application/48508",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2519,13 +2953,14 @@
             "title": "Zcash Shielded support in Ledger Wallet and Ledger devices",
             "status": "approved",
             "date": "2025-12-08",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A440",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/a-path-forward-for-ledger-and-zcash/50951/131",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/a-path-forward-for-ledger-and-zcash/50951/131",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "This event belongs to LedgerHQ's named shielded-integration proposal. Shared Ledger products and SDKs contain broader work; the event is not blanket funding for their complete codebases or for Zondax's historical project. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2574,25 +3009,27 @@
             "title": "Upstream enhancements to librustzcash",
             "status": "approved",
             "date": "2024-11-11",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A296",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-to-upstream-enhancements-to-librustzcash/49203",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-to-upstream-enhancements-to-librustzcash/49203",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Constant-Time Hardening and Explicit Timing Semantics for Zcash Rust Cryptography",
             "status": "approved",
             "date": "2026-08-21",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A608",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-constant-time-hardening-and-explicit-timing-semantics-for-zcash-rust-cryptography/56503",
             "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/342",
             "repositoryEvidenceKind": "exact-grant-application",
-            "associationNote": "The exact application identifies the target implementation or upstream repository; approval does not establish delivery or acceptance."
+            "associationNote": "The exact application identifies the target implementation or upstream repository; approval does not establish delivery or acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "ChainSafe and Eryx received approvals for the specific upstream contributions identified by each event. These are not grants to every librustzcash maintainer or evidence that the entire project is grant-funded. Shared-namespace stewardship and code maintenance remain separate from grantee identity. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2684,25 +3121,27 @@
             "title": "Transparent & Shielded DEX with Maya Protocol",
             "status": "approved",
             "date": "2024-02-19",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A251",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/transparent-shielded-dex-with-maya-protocol/46857",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/transparent-shielded-dex-with-maya-protocol/46857",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Maya Protocol Advanced Shielded ZEC Support",
             "status": "approved",
             "date": "2026-04-01",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "coinholder",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A18",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/maya-protocol-advanced-shielded-zec-support-retroactive-grant/54593",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/54593/1",
             "repositoryEvidenceKind": "exact-grant-application",
-            "associationNote": "The exact application identifies the target implementation or upstream repository; approval does not establish delivery or acceptance."
+            "associationNote": "The exact application identifies the target implementation or upstream repository; approval does not establish delivery or acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2774,13 +3213,14 @@
             "title": "MFKDF2",
             "status": "approved",
             "date": "2025-08-04",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A355",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-mfkdf2/51614",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-mfkdf2/51614",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2896,25 +3336,27 @@
             "title": "Nighthawk Wallet Design & Development '21",
             "status": "approved",
             "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A27",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/nighthawk-wallet-design-development-grant/39017",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/nighthawk-wallet-design-development-grant/39017",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Nighthawk Wallet & Public Infrastructure",
             "status": "approved",
             "date": "2023-02-21",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A157",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/nighthawk-apps-zcash-development-fund-2023/43742",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/nighthawk-apps-zcash-development-fund-2023/43742",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "The approvals cover the named historical Nighthawk Zcash proposals. This record includes the verified Android repository and does not assert that the entire proposal budget or every deliverable belongs exclusively to Android. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -2959,13 +3401,14 @@
             "title": "Zcash Block Explorer",
             "status": "approved",
             "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A5",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-block-explorer-grant/38141/",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-block-explorer-grant/38141/",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "The event covers the named block-explorer proposal. Zcashex is a related reusable library intentionally preserved as a granular component; the shared repository reference is not a second grant. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3010,12 +3453,13 @@
             "title": "Rhea Zcash Gateway",
             "status": "approved",
             "date": "2026-04-03",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A516",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/rhea-finance-zcash-gateway-browser-wallet-cross-chain-defi/55073",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/55073/10",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3093,13 +3537,14 @@
             "title": "The Nym mixnet for Network Privacy for Zcash",
             "status": "approved",
             "date": "2024-02-05",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A220",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/the-nym-mixnet-for-network-privacy-for-zcash/46324",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/the-nym-mixnet-for-network-privacy-for-zcash/46324",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "The approval concerns Nym network-privacy integration for Zcash. Listing the shared Nym monorepo does not imply that all Nym development was funded by this grant. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3130,13 +3575,14 @@
             "title": "Oblivious Message Retrieval",
             "status": "approved",
             "date": "2021-12-28",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A71",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/oblivious-message-retrieval/40715?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/oblivious-message-retrieval/40715?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3178,12 +3624,13 @@
             "title": "OneKey Zcash Hardware Support with Unified Wallet Architecture (Transparent + Shielded)",
             "status": "approved",
             "date": "2026-03-16",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A506",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/onekey-zcash-hardware-support-with-unified-wallet-architecture-transparent-shielded/54833",
             "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/228",
-            "repositoryEvidenceKind": "maintainer-project-or-progress"
+            "repositoryEvidenceKind": "maintainer-project-or-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3236,6 +3683,63 @@
         }
       ],
       "stage": "library",
+      "logo": null
+    },
+    {
+      "id": "orchard-security-research",
+      "name": "Orchard vulnerability research",
+      "organizationId": null,
+      "category": "Research",
+      "tags": [
+        "security-research"
+      ],
+      "description": "Taylor Hornby’s responsible disclosure of the Orchard counterfeiting vulnerability. The grant is an individual research award, distinct from funding the Orchard library or any organization’s general development.",
+      "website": "https://shieldedlabs.net/the-orchard-counterfeiting-vulnerability/",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/51"
+        },
+        {
+          "title": "Researcher’s public vulnerability account and work log",
+          "url": "https://shieldedlabs.net/the-orchard-counterfeiting-vulnerability/"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Orchard Counterfeiting Vulnerability Bug Bounty",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A46",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/51",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/51",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Taylor Hornby - Bonus Grant for Orchard Counterfeiting Vulnerability Bug Bounty",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A51",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/53",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/53",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "This bonus explicitly references application #51 and the same Orchard disclosure by Taylor Hornby, the sole intended recipient. The nomination adds no new work; it does not fund Shielded Labs, the nominator, or all Orchard library development.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
       "logo": null
     },
     {
@@ -3365,81 +3869,88 @@
             "title": "Shielded Assets (ZSA/UDA) for DeFi on Zcash",
             "status": "approved",
             "date": "2022-01-10",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A69",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/a-proposal-for-shielded-assets-zsa-uda-for-defi-on-zcash/40520/18",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/a-proposal-for-shielded-assets-zsa-uda-for-defi-on-zcash/40520/18",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zcash Shielded Assets - Asset Swaps and Beyond",
             "status": "approved",
             "date": "2023-05-15",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A183",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-shielded-assets-asset-swaps-and-beyond/44497",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-shielded-assets-asset-swaps-and-beyond/44497",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "User-Control for ZSAs",
             "status": "approved",
             "date": "2024-08-19",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A278",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-shielded-asset-swaps-and-transaction-acceptance/48432",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-shielded-asset-swaps-and-transaction-acceptance/48432",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZSAs in NU7/ Zebra ZSA Integration",
             "status": "approved",
             "date": "2025-01-20",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A311",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zsas-in-nu7/49939",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/49939/4",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZSAs in NU7, H2 2025 extension",
             "status": "approved",
             "date": "2025-06-23",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A341",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zsas-in-nu7-h2-2025-extension/51298",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/51298/15",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "OrchardZSA finalization",
             "status": "approved",
             "date": "2025-12-22",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A443",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/orchardzsa-finalization/53732",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/53732/6",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Feature Branch Testnet and Compatible Developer Tooling",
             "status": "approved",
             "date": "2026-06-22",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A528",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/feature-branch-testnet-and-compatible-developer-tooling/55156",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/55156/3",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Each event applies to its named QEDIT shielded-asset proposal. Repositories include program components identified in progress reports; the transaction-tool component remains independently listed. This is not blanket funding for every QEDIT repository. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3516,25 +4027,27 @@
             "title": "Zcash-Avalanche Elastic Subnet Bridge",
             "status": "approved",
             "date": "2023-05-01",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A177",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-elastic-subnet-bridge-on-avalanche/44220",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-elastic-subnet-bridge-on-avalanche/44220",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "red·bridge Launch",
             "status": "approved",
             "date": "2026-07-03",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A601",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-elastic-subnet-bridge-on-avalanche/44220/110",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-elastic-subnet-bridge-on-avalanche/44220/110",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3697,13 +4210,14 @@
             "title": "Bootstrapped and deterministic builds a la StageX",
             "status": "approved",
             "date": "2025-12-08",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A419",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/bootstrapped-and-deterministic-builds-a-la-stagex/53040",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/bootstrapped-and-deterministic-builds-a-la-stagex/53040",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3801,6 +4315,50 @@
       "logo": null
     },
     {
+      "id": "thorswap-metro",
+      "name": "THORSwap and Metro",
+      "organizationId": null,
+      "category": "Payments & DeFi",
+      "tags": [
+        "payments"
+      ],
+      "description": "THORSwap Labs’ cross-chain swap interfaces and Metro wallet integration for ZEC. Its grant covers the named application and integration work; SwapKit is a shared dependency with its own project identity.",
+      "website": "https://app.thorswap.finance/",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/32"
+        },
+        {
+          "title": "Shared SwapKit dependency identified by the application; not a whole-repository funding claim",
+          "url": "https://github.com/swapkit/SwapKit"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "THORSwap/Metro",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A29",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/32",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/32",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
+      "logo": null
+    },
+    {
       "id": "unstoppable-wallet",
       "name": "Unstoppable Wallet",
       "organizationId": "horizontalsystems",
@@ -3840,12 +4398,13 @@
             "title": "Unstoppable Wallet",
             "status": "approved",
             "date": "2025-11-26",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "coinholder",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A9",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/call-for-proposals-coinholder-directed-retroactive-grants-program/52107/13",
             "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/7",
-            "repositoryEvidenceKind": "maintainer-project-or-progress"
+            "repositoryEvidenceKind": "maintainer-project-or-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -3885,6 +4444,110 @@
       "logo": null
     },
     {
+      "id": "valargroup-ironwood-integration",
+      "name": "Valar Group Ironwood integration",
+      "organizationId": "valar-group",
+      "category": "Protocol",
+      "tags": [
+        "protocol-development"
+      ],
+      "description": "Valar Group’s Ironwood consensus integration, migration tooling, testing and activation work. The application separates this scope from external audit invoices, Project Tachyon’s formal verification and Zakura-only development.",
+      "website": "https://github.com/valargroup/ironwood-testnet",
+      "repositories": [
+        "valargroup/ironwood-testnet"
+      ],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/64"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Valargroup Ironwood work",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A60",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/64",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/64",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
+      "logo": null
+    },
+    {
+      "id": "vizor-wallet",
+      "name": "Vizor",
+      "organizationId": "chainapsis",
+      "category": "Wallets",
+      "tags": [
+        "self-custodial",
+        "shielded-wallet",
+        "desktop",
+        "mobile",
+        "Keystone",
+        "coinholder-voting"
+      ],
+      "description": "Self-custodial Zcash wallet from the Keplr team, with shielded transactions, multiple accounts, Keystone signing and desktop/mobile distribution. Its canonical repository is distinct from Valar Group’s development fork.",
+      "website": "https://vizor.cash/",
+      "repositories": [
+        "chainapsis/vizor-wallet"
+      ],
+      "funding": {
+        "label": "Coinholder application submitted after the Q3 deadline",
+        "status": "application-only",
+        "events": [
+          {
+            "title": "Retroactive Grant Application - Vizor Wallet",
+            "status": "submitted-past-deadline",
+            "program": "coinholder",
+            "date": "2026-08-15",
+            "dateNote": "GitHub submission date; this is not an approval or payment date.",
+            "sourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application links chainapsis/vizor-wallet. The program asked for Q4 resubmission because the Q3 deadline had passed; the issue was closed on August 17. This dated application establishes neither approval nor payment. Any later application requires its own source."
+          }
+        ],
+        "scopeNote": "This record preserves the submitted application and its deadline outcome. Requested funding, a program decision and recorded payments remain separate; no funding amount or approval is inferred."
+      },
+      "sources": [
+        {
+          "title": "Vizor official website and distribution",
+          "url": "https://vizor.cash/"
+        },
+        {
+          "title": "Canonical Vizor source repository",
+          "url": "https://github.com/chainapsis/vizor-wallet"
+        },
+        {
+          "title": "Official desktop releases",
+          "url": "https://github.com/chainapsis/vizor-wallet/releases"
+        },
+        {
+          "title": "Coinholder application — submitted after the Q3 deadline",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66"
+        },
+        {
+          "title": "Program response requesting resubmission in Q4",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66#issuecomment-5300129591"
+        }
+      ],
+      "logo": "/wallet-logos/vizor.png",
+      "checkedAt": "2026-10-04"
+    },
+    {
       "id": "webzjs",
       "name": "WebZjs",
       "category": "Libraries & SDKs",
@@ -3910,25 +4573,27 @@
             "title": "WebZjs - ZCash Browser Wallet Library",
             "status": "approved",
             "date": "2024-08-05",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A271",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Chainsafe Systems",
             "status": "approved",
             "date": "2024-12-23",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A308",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/webzjs-browser-library-and-browser-wallet-maintenance/49717",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/webzjs-browser-library-and-browser-wallet-maintenance/49717",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ChainSafe #3 - Zcash Metamask Snap and Webzjs maintenance renewal",
@@ -4015,36 +4680,39 @@
             "title": "YWallet",
             "status": "approved",
             "date": "2022-09-09",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A117",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/ywallet-warp-sync/42620?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/ywallet-warp-sync/42620?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Orchard and UA for YWallet",
             "status": "approved",
             "date": "2022-10-17",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A130",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/orchard-and-ua-for-ywallet/43061",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/orchard-and-ua-for-ywallet/43061",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "YWallet Maintenance and Minor Improvements",
             "status": "approved",
             "date": "2023-07-24",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A202",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/ywallet-maintenance-and-minor-improvements/45041",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/45041/40",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4132,82 +4800,89 @@
             "title": "Build Zaino To Deprecate Zcashd and Decentralize Zcash",
             "status": "approved",
             "date": "2024-10-03",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A284",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zingo-labs-accelerates-zcashd-deprecation/48545",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/48545/61",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Milestone 1.5 approved for Build Zaino To Deprecate Zcashd and Decentralize Zcash",
             "status": "approved",
             "date": "2025-01-28",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A315",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zingo-labs-accelerates-zcashd-deprecation/48545/58",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zingo-labs-accelerates-zcashd-deprecation/48545/58",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zaino Completion",
             "status": "approved",
             "date": "2025-04-14",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A327",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/complete-zaino/50708",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/complete-zaino/50708",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zaino Respecification, No Delay",
             "status": "approved",
             "date": "2025-06-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A342",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zaino-respecification-no-delays/51319",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zaino-respecification-no-delays/51319",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zaino, The Zallet Release",
             "status": "approved",
             "date": "2025-09-19",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A378",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zaino-the-zallet-release/52155",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/52155/1",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zaino Release Stabilization",
             "status": "approved",
             "date": "2026-06-22",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A593",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zaino-release-stabilization/56268",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/56268/13",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "zaino - Stability, Performance & Testing",
             "status": "approved",
             "date": "2026-07-06",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A594",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-zaino-stability-performance-testing/56367",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-zaino-stability-performance-testing/56367",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4271,13 +4946,14 @@
             "title": "ZEC-NAM shielded airdrop protocol",
             "status": "approved",
             "date": "2025-11-24",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A407",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-zec-nam-shielded-airdrop-protocol/52759",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-zec-nam-shielded-airdrop-protocol/52759",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4500,13 +5176,14 @@
             "title": "Zcash Parsers",
             "status": "approved",
             "date": "2024-05-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A269",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-parsers-go-and-kotlin-address-parsers/47647",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-parsers-go-and-kotlin-address-parsers/47647",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4626,15 +5303,15 @@
             "title": "Zcash Blockchain Infrastructure",
             "status": "approved",
             "date": null,
-            "dateType": "decision-date-unverified",
             "ledgerRecordedDate": "2021-07-13",
-            "dateNote": "The ledger's recorded date predates the November 2021 proposal discussion; the actual decision date has not been established.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A66",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-idea-zcash-blockchain-infrastructure-zbi/40514?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-idea-zcash-blockchain-infrastructure-zbi/40514?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "reviewedAt": "2026-10-04"
           }
         ]
       },
@@ -4689,12 +5366,13 @@
             "title": "ZCash SDK Feasibility Study [JS/TS]",
             "status": "approved",
             "date": "2024-02-19",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A231",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-sdk-implementation-js-ts-proposal/46158",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/46158/42",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ]
       },
@@ -4740,24 +5418,26 @@
             "title": "Coin Voting 2.0",
             "status": "approved",
             "date": "2024-11-25",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A294",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/coin-voting-2-0/49177",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/coin-voting-2-0/49177",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Maintenance and Improvements to Coin Voting",
             "status": "approved",
             "date": "2025-10-19",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A387",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-hanh-maintenance-and-improvements-to-coin-voting/52350",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/52350/7",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4815,13 +5495,14 @@
             "title": "Cold Wallet",
             "status": "approved",
             "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A13",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/cold-wallet/38664/",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/cold-wallet/38664/",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4941,13 +5622,14 @@
             "title": "Shielded Support for Ledger Hardware Wallets (NanoS+, NanoX)",
             "status": "approved",
             "date": "2023-03-24",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A173",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/shielded-support-for-ledger-hardware-wallets-nanos-nanox/44113",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/shielded-support-for-ledger-hardware-wallets-nanos-nanox/44113",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -4993,13 +5675,14 @@
             "title": "Zcash Name Service",
             "status": "approved",
             "date": "2026-06-12",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A568",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5019,6 +5702,46 @@
         }
       ],
       "stage": "in_development",
+      "logo": null
+    },
+    {
+      "id": "zcash-network-school-kazakhstan",
+      "name": "Zcash Network School Kazakhstan",
+      "organizationId": null,
+      "category": "Education",
+      "tags": [
+        "education"
+      ],
+      "description": "ZcashMe’s proposed three-month education and onboarding program at Network School Kazakhstan in Astana Hub, with events, office hours, local research and monthly reports.",
+      "website": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/431",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/431"
+        }
+      ],
+      "funding": {
+        "label": "Grant decisions recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Zcash Network School Kazakhstan",
+            "status": "approved",
+            "date": "2026-09-28",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A687",
+            "scopeSourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/431",
+            "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/431",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The official application names ZcashMe, Inc. and this Kazakhstan program. Planned sessions, activations and reports are targets, not verified results. This award is not assigned to earlier Malaysia work or every local participating organization.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "Funding belongs to the named applicant and approved scope. Approval is not evidence of payment, delivery, acceptance, deployment or current support. Financial values remain in the source ledger."
+      },
       "logo": null
     },
     {
@@ -5047,13 +5770,14 @@
             "title": "Zcash Integration for the Open Wallet Standard (OWS)",
             "status": "approved",
             "date": "2026-04-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A527",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-zcash-integration-for-the-open-wallet-standard-ows/55126",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-zcash-integration-for-the-open-wallet-standard-ows/55126",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5217,25 +5941,27 @@
             "title": "Block explorer + Testnet infrastructure",
             "status": "approved",
             "date": "2024-05-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A266",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/block-explorer-testnet-infrastructure/47656",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/block-explorer-testnet-infrastructure/47656",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Block explorer + Testnet infrastructure 2025",
             "status": "approved",
             "date": "2025-06-23",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A347",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/block-explorer-testnet-infrastructure-2025/51451",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/block-explorer-testnet-infrastructure-2025/51451",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "These events concern Cacho's named infrastructure proposals. They are not grants to all maintainers of the shared zcash namespace or organization-wide ECC funding, and do not imply that the original testnet-in-a-box prototype was created under these later grants. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5254,6 +5980,46 @@
       "relatedProjectIds": [
         "ecc-hackworks"
       ]
+    },
+    {
+      "id": "zcashtocash",
+      "name": "Zcash to Cash",
+      "organizationId": null,
+      "category": "Payments & DeFi",
+      "tags": [
+        "payments"
+      ],
+      "description": "ZEC-to-fiat service whose Coinholder application was submitted by Zcash Labs. The application distinguishes the service team from the coordinating and initially funding organization.",
+      "website": "https://zcashto.cash",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/60"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "zcashtocash via ZcashLabs",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A56",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/60",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/60",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
+      "logo": null
     },
     {
       "id": "qedit-zcash-tx-tool",
@@ -5311,24 +6077,26 @@
             "title": "ZCash UniFFI Library",
             "status": "approved",
             "date": "2022-12-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A151",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-uniffi-library-rfp/43468",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zcash-uniffi-library-rfp/43468",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Zcash UniFFI Library addenda",
             "status": "approved",
             "date": "2023-08-21",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A208",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-uniffi-library-addenda-resubmission/44904/8",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/44904/13",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5423,25 +6191,26 @@
             "title": "Payment Gateway with BTCPay",
             "status": "approved",
             "date": null,
-            "dateType": "decision-date-unverified",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A61",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/payment-gateway-btc-pay/40207",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/40207/22",
             "ledgerRecordedDate": "2021-07-13",
-            "dateNote": "The ledger's recorded date predates the primary proposal discussion; the actual decision date has not been established.",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "BTCPayServer - Orchard and UA",
             "status": "approved",
             "date": "2025-08-04",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A360",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-btcpayserver-orchard-and-ua/51773",
             "repositoryEvidenceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/66",
-            "repositoryEvidenceKind": "maintainer-project-or-progress"
+            "repositoryEvidenceKind": "maintainer-project-or-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5591,13 +6360,14 @@
             "title": "Batch-vs-Single Verification Equivalence: Continuous Soundness Fuzzing for Zcash Shielded Verification (incl. Ironwood)",
             "status": "approved",
             "date": "2026-06-29",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A598",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-batch-vs-single-verification-equivalence-continuous-soundness-fuzzing-for-zcash-shielded-verification-incl-ironwood/56308",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-batch-vs-single-verification-equivalence-continuous-soundness-fuzzing-for-zcash-shielded-verification-incl-ironwood/56308",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5645,13 +6415,14 @@
             "title": "Zebra Coverage-Guided Fuzzing Infrastructure",
             "status": "approved",
             "date": "2026-03-30",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A512",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zebra-coverage-guided-fuzzing-infrastructure/54972",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zebra-coverage-guided-fuzzing-infrastructure/54972",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5674,6 +6445,63 @@
           "url": "https://forum.zcashcommunity.com/t/zebra-coverage-guided-fuzzing-infrastructure/54972"
         }
       ],
+      "logo": null
+    },
+    {
+      "id": "zebra-security-research",
+      "name": "Zebra vulnerability research",
+      "organizationId": null,
+      "category": "Research",
+      "tags": [
+        "security-research"
+      ],
+      "description": "Independent security research concerning Zebra consensus and node vulnerabilities. Awards belong to the named researchers and scopes, not to the Zcash Foundation or all Zebra development.",
+      "website": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/58",
+      "repositories": [],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/58"
+        },
+        {
+          "title": "Zebra advisory credits the researcher named in the application",
+          "url": "https://github.com/ZcashFoundation/zebra/security/advisories/GHSA-gq4h-3grw-2rhv"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "Five Critical Zebra Consensus Divergence Vulnerabilities",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A54",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/58",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/58",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A50",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/54",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/54",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application and official GHSA-qp6f-w4r3-h8wg advisory identify independent researcher robustfengbin for CVE-2026-34202. The application distinguishes this individual bounty from ZCG #234 fuzzing infrastructure and from the Foundation remediation team; it is not funding received by ZF.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
       "logo": null
     },
     {
@@ -5705,13 +6533,27 @@
             "title": "Zcash Lightwalletd Infrastructure Development and Maintenance",
             "status": "approved",
             "date": "2024-04-01",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A262",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/rfp-zcash-lightwalletd-infrastructure-development-and-maintenance/47080/39",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/rfp-zcash-lightwalletd-infrastructure-development-and-maintenance/47080/39",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Zec.rocks (16 months of uptime for Zcash wallets)",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A57",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/61",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/61",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The application identifies the Zec.rocks operating program and links its existing zcash-stack and hosh repositories. This operating-cost award is distinct from the earlier ZCG development grant; the full award is not assigned separately to each component.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "This is a program-level approval. Zcash Stack, zecping and Hosh are intentionally retained as granular components, not separate grants or duplicate independent apps. The event does not assign the complete program budget to every included repository. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5823,12 +6665,13 @@
             "title": "Zcash Wallet Community Developer 2024",
             "status": "approved",
             "date": "2024-01-22",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A241",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zcash-wallet-community-developer-2024/46525",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/46525/8",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "These libraries were identified in Pacu's community-developer proposals and reports. The grants cover the documented contributor scope, not all ZecDev projects or all components of the Zcash wallet SDKs. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -5920,61 +6763,66 @@
             "title": "ZecHub",
             "status": "approved",
             "date": "2023-01-25",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A153",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zechub-open-source-education-for-zcash/43761",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zechub-open-source-education-for-zcash/43761",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZecHub, An open source education hub for Zcash",
             "status": "approved",
             "date": "2023-11-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A227",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zechub-proposal-2024/46077?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zechub-proposal-2024/46077?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZecHub: an education hub for Zcash",
             "status": "approved",
             "date": "2024-06-25",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A272",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zechub-an-education-hub-for-zcash-2024-continued/47947",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zechub-an-education-hub-for-zcash-2024-continued/47947",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZecHub 2025: An Education Hub for Zcash",
             "status": "approved",
             "date": "2025-01-06",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A304",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zechub-2025-an-education-hub-for-zcash/49429",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zechub-2025-an-education-hub-for-zcash/49429",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZecHub 2026",
             "status": "approved",
             "date": "2025-12-11",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A442",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zechub-2026/53686",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zechub-2026/53686",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6039,31 +6887,36 @@
             "title": "Zebra Regtest CI Kit (ZRK)",
             "status": "approved",
             "date": "2025-10-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A397",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-application-zecdev-launchpad-one-command-zebra-devnet-reusable-ci/52472",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-application-zecdev-launchpad-one-command-zebra-devnet-reusable-ci/52472",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZCG closes the remainder of the ZecKit grant",
             "status": "remainder-closed",
             "date": "2026-02-20",
-            "dateType": "committee-announcement-date",
             "program": "zcg",
             "sourceUrl": "https://forum.zcashcommunity.com/t/52472/9",
-            "repositoryEvidenceUrl": "https://github.com/zecdev/ZecKit"
+            "repositoryEvidenceUrl": "https://github.com/zecdev/ZecKit",
+            "kind": "context",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Maintainer reports later M3 approval/payment and pending M4 review",
             "status": "maintainer-reported-not-independently-validated",
             "date": "2026-07-20",
-            "dateType": "maintainer-report-date",
             "program": "zcg",
             "sourceUrl": "https://forum.zcashcommunity.com/t/52472/12",
-            "repositoryEvidenceUrl": "https://github.com/zecdev/ZecKit"
+            "repositoryEvidenceUrl": "https://github.com/zecdev/ZecKit",
+            "kind": "context",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6115,7 +6968,6 @@
             "title": "1 year of ZECpages servers",
             "status": "approved",
             "date": "2021-03-09",
-            "dateType": "committee-decision",
             "program": "zcg",
             "sourceUrl": "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/4",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/",
@@ -6123,7 +6975,9 @@
             "ledgerRecordedDate": "2021-07-13",
             "ledgerSourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A20",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6169,13 +7023,14 @@
             "title": "ZECpages Testnet Faucet - App development + 1 year infra",
             "status": "approved",
             "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A21",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/testnet-faucet-from-zecpages/38857",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/testnet-faucet-from-zecpages/38857",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6222,110 +7077,6 @@
         "status": "unassessed",
         "events": []
       },
-      "logo": null
-    },
-    {
-      "id": "zecwallet",
-      "name": "Zecwallet — historical wallet family",
-      "organizationId": null,
-      "category": "Wallets",
-      "tags": [
-        "desktop",
-        "mobile",
-        "full-node",
-        "light-client",
-        "historical"
-      ],
-      "description": "Historical Zecwallet full-node, desktop, mobile and command-line family across ZcashFoundation, adityapk00 and zecwalletco repositories. Zecwallet Lite and its Lightclient Library remain distinct components. A repository's namespace is not proof of whole-family maintenance; current network compatibility is unverified.",
-      "website": "https://www.zecwallet.co",
-      "repositories": [
-        "ZcashFoundation/zecwallet",
-        "adityapk00/zecwallet-lite",
-        "adityapk00/zecwallet-light-cli",
-        "zecwalletco/zecwallet-mobile",
-        "adityapk00/lightwalletd"
-      ],
-      "funding": {
-        "label": "Historical Zecwallet program approvals",
-        "status": "historical-approval",
-        "currentSupport": "unverified",
-        "events": [
-          {
-            "title": "Zecwallet Infra costs",
-            "status": "approved",
-            "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
-            "program": "zcg",
-            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A11",
-            "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643",
-            "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643",
-            "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
-          },
-          {
-            "title": "Zecwallet Liteclient Research and Development",
-            "status": "approved",
-            "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
-            "program": "zcg",
-            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A26",
-            "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zecwallet-lightclient-protocol-research-and-development/38973/2",
-            "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/38973/37",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
-          },
-          {
-            "title": "Zecwallet and Orchard",
-            "status": "approved",
-            "date": "2022-06-15",
-            "dateType": "official-ledger-recorded-decision-date",
-            "program": "zcg",
-            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A106",
-            "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan",
-            "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan",
-            "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
-          }
-        ],
-        "scopeNote": "These are approvals for the named Zecwallet program proposals, not organization-wide funding for the Zcash Foundation. The full-node repository is hosted in its namespace, while related wallet and library components have other owners. The family intentionally overlaps its separately listed Lite and Lightclient Library components. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
-      },
-      "sources": [
-        {
-          "title": "Maintainer repository and project evidence",
-          "url": "https://forum.zcashcommunity.com/t/42134/17"
-        },
-        {
-          "title": "Project scope or funding evidence",
-          "url": "https://forum.zcashcommunity.com/t/42134/44"
-        },
-        {
-          "title": "Project scope or funding evidence",
-          "url": "https://forum.zcashcommunity.com/t/42134/50"
-        },
-        {
-          "title": "Project scope or funding evidence",
-          "url": "https://forum.zcashcommunity.com/t/42134/53"
-        },
-        {
-          "title": "Project scope or funding evidence",
-          "url": "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643"
-        },
-        {
-          "title": "Project scope or funding evidence",
-          "url": "https://forum.zcashcommunity.com/t/zecwallet-lightclient-protocol-research-and-development/38973/2"
-        },
-        {
-          "title": "Project scope or funding evidence",
-          "url": "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan"
-        },
-        {
-          "title": "Historical full-node wallet source hosted in the Foundation namespace",
-          "url": "https://github.com/ZcashFoundation/zecwallet"
-        }
-      ],
-      "relatedProjectIds": [
-        "zecwallet-lite",
-        "zecwallet-light-cli"
-      ],
       "logo": null
     },
     {
@@ -6382,6 +7133,113 @@
         "status": "unassessed",
         "events": []
       },
+      "logo": null
+    },
+    {
+      "id": "zecwallet",
+      "name": "Zecwallet — historical wallet family",
+      "organizationId": null,
+      "category": "Wallets",
+      "tags": [
+        "desktop",
+        "mobile",
+        "full-node",
+        "light-client",
+        "historical"
+      ],
+      "description": "Historical Zecwallet full-node, desktop, mobile and command-line family across ZcashFoundation, adityapk00 and zecwalletco repositories. Zecwallet Lite and its Lightclient Library remain distinct components. A repository's namespace is not proof of whole-family maintenance; current network compatibility is unverified.",
+      "website": "https://www.zecwallet.co",
+      "repositories": [
+        "ZcashFoundation/zecwallet",
+        "adityapk00/zecwallet-lite",
+        "adityapk00/zecwallet-light-cli",
+        "zecwalletco/zecwallet-mobile",
+        "adityapk00/lightwalletd"
+      ],
+      "funding": {
+        "label": "Historical Zecwallet program approvals",
+        "status": "historical-approval",
+        "currentSupport": "unverified",
+        "events": [
+          {
+            "title": "Zecwallet Infra costs",
+            "status": "approved",
+            "date": "2021-07-13",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A11",
+            "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643",
+            "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643",
+            "repositoryEvidenceKind": "proposal-scope",
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Zecwallet Liteclient Research and Development",
+            "status": "approved",
+            "date": "2021-07-13",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A26",
+            "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zecwallet-lightclient-protocol-research-and-development/38973/2",
+            "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/38973/37",
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          },
+          {
+            "title": "Zecwallet and Orchard",
+            "status": "approved",
+            "date": "2022-06-15",
+            "program": "zcg",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A106",
+            "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan",
+            "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan",
+            "repositoryEvidenceKind": "proposal-scope",
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "These are approvals for the named Zecwallet program proposals, not organization-wide funding for the Zcash Foundation. The full-node repository is hosted in its namespace, while related wallet and library components have other owners. The family intentionally overlaps its separately listed Lite and Lightclient Library components. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
+      },
+      "sources": [
+        {
+          "title": "Maintainer repository and project evidence",
+          "url": "https://forum.zcashcommunity.com/t/42134/17"
+        },
+        {
+          "title": "Project scope or funding evidence",
+          "url": "https://forum.zcashcommunity.com/t/42134/44"
+        },
+        {
+          "title": "Project scope or funding evidence",
+          "url": "https://forum.zcashcommunity.com/t/42134/50"
+        },
+        {
+          "title": "Project scope or funding evidence",
+          "url": "https://forum.zcashcommunity.com/t/42134/53"
+        },
+        {
+          "title": "Project scope or funding evidence",
+          "url": "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643"
+        },
+        {
+          "title": "Project scope or funding evidence",
+          "url": "https://forum.zcashcommunity.com/t/zecwallet-lightclient-protocol-research-and-development/38973/2"
+        },
+        {
+          "title": "Project scope or funding evidence",
+          "url": "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan"
+        },
+        {
+          "title": "Historical full-node wallet source hosted in the Foundation namespace",
+          "url": "https://github.com/ZcashFoundation/zecwallet"
+        }
+      ],
+      "relatedProjectIds": [
+        "zecwallet-lite",
+        "zecwallet-light-cli"
+      ],
       "logo": null
     },
     {
@@ -6446,13 +7304,14 @@
             "title": "Zenith Full Node Wallet",
             "status": "approved",
             "date": "2024-02-05",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A240",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zenith-full-node-wallet/46523",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zenith-full-node-wallet/46523",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6553,25 +7412,27 @@
             "title": "Zcash Extensible Wallet Interchange Format (ZeWiF)",
             "status": "approved",
             "date": "2024-12-23",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A309",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-extensible-wallet-interchange-format-zewif/49730",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-extensible-wallet-interchange-format-zewif/49730",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZeWIF Errors Handling Update",
             "status": "approved",
             "date": "2025-10-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A383",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-request-zewif-error-handling-update/52299",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-request-zewif-error-handling-update/52299",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "The approvals concern the named interchange and migration proposals. Zcash Wallet Formats is an intentionally related Zingo Labs component; its inclusion does not transfer repository maintenance to Blockchain Commons or establish a separate component-level award. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6633,13 +7494,14 @@
             "title": "Zcash Extensible Wallet Interchange Format (ZeWiF)",
             "status": "approved",
             "date": "2024-12-23",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A309",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-extensible-wallet-interchange-format-zewif/49730",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-extensible-wallet-interchange-format-zewif/49730",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "Initial ZeWIF proposal, phase 4 / deliverable 4.1: ZExCavator, implemented by Zingo Labs."
+            "associationNote": "Initial ZeWIF proposal, phase 4 / deliverable 4.1: ZExCavator, implemented by Zingo Labs.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Component of the initial ZeWIF approval, not a separate award. The later error-handling renewal is not attributed here. Approval does not establish payment, delivery or current support."
@@ -6672,37 +7534,40 @@
             "title": "ZGo - The Zcash Register",
             "status": "approved",
             "date": "2022-06-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A104",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zgo-the-zcash-register/41885?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zgo-the-zcash-register/41885?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZGo Support 2024",
             "status": "approved",
             "date": "2023-12-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A234",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/vergara-technologies-2024-grant-application/46206",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/vergara-technologies-2024-grant-application/46206",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "ZGo 2025 (Retroactive)",
             "status": "approved",
             "date": "2025-12-08",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A427",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zgo-migration-to-zebra-grant-application/53225",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/zgo-migration-to-zebra-grant-application/53225",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6765,35 +7630,38 @@
             "title": "Ziggurat: the Zcash Network Stability Framework",
             "status": "approved",
             "date": "2021-07-13",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A16",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/ziggurat-the-zcash-network-stability-framework/38758",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/38758/10",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Ziggurat 2.0: Pre-flight testing for the Zebra RC, CI support, a GUI, and more",
             "status": "approved",
             "date": "2022-04-04",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A87",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/ziggurat-2-0/41201?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/ziggurat-2-0/41201?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           },
           {
             "title": "Ziggurat 3.0 - Network Wide Testing and Active Validation",
             "status": "approved",
             "date": "2022-12-12",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A140",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/ziggurat-3-0/43350",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/43350/17",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6886,12 +7754,13 @@
             "title": "Authentic Financial Insight",
             "status": "approved",
             "date": "2023-02-27",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A165",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/zingo-authentic-financial-insights/43945",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/43945/49",
-            "repositoryEvidenceKind": "maintainer-grant-progress"
+            "repositoryEvidenceKind": "maintainer-grant-progress",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -6939,13 +7808,14 @@
             "title": "Implement Orchard Funded Amendment",
             "status": "approved",
             "date": "2022-09-06",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A120",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/implement-orchard/42706?u=decentralistdan",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/implement-orchard/42706?u=decentralistdan",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
@@ -7012,6 +7882,54 @@
         "events": []
       },
       "logo": "/wallet-logos/zkool.png"
+    },
+    {
+      "id": "zodl-core-protocol",
+      "name": "ZODL core protocol development",
+      "organizationId": "zodl",
+      "category": "Protocol",
+      "tags": [
+        "protocol-development"
+      ],
+      "description": "ZODL’s Q1–Q2 2026 core security, consensus and wallet-infrastructure work across shared Zcash repositories. This grant scope is separate from the consumer Zodl wallet and does not assign all shared repository work to one team.",
+      "website": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/33",
+      "repositories": [
+        "zcash/zcash",
+        "zcash/orchard",
+        "zcash/halo2",
+        "zcash/zallet",
+        "zcash/integration-tests",
+        "zcash/zips",
+        "zcash/librustzcash"
+      ],
+      "checkedAt": "2026-10-04",
+      "sources": [
+        {
+          "title": "Official application identifies the project, recipient and scope",
+          "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/33"
+        }
+      ],
+      "funding": {
+        "label": "Coinholder decision recorded for the named scope",
+        "status": "historical-approval",
+        "events": [
+          {
+            "title": "ZODL Q1 & Q2 2026 Core Protocol Development",
+            "status": "approved",
+            "date": "2026-09-29",
+            "program": "coinholder",
+            "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1847584751&range=A30",
+            "scopeSourceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/33",
+            "repositoryEvidenceUrl": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/33",
+            "repositoryEvidenceKind": "exact-grant-application",
+            "associationNote": "The exact official application identifies this scope and recipient. The decision comes from the public ledger imported 2026-10-01. This is not an allocation to every related organization or repository, and approval does not establish payment or milestone acceptance.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
+          }
+        ],
+        "scopeNote": "A scoped grant identity, not a general award to all maintainers of related software. Requested USD, ledger budgets and recorded payments remain distinct."
+      },
+      "logo": null
     },
     {
       "id": "zodl-wallet-sdks",
@@ -7147,13 +8065,14 @@
             "title": "Official Shielded Support for Zcash in Ledger HW Wallet",
             "status": "approved",
             "date": "2023-11-14",
-            "dateType": "official-ledger-recorded-decision-date",
             "program": "zcg",
             "sourceUrl": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A224",
             "scopeSourceUrl": "https://forum.zcashcommunity.com/t/official-shielded-support-for-zcash-in-ledger-hw-wallet/45965",
             "repositoryEvidenceUrl": "https://forum.zcashcommunity.com/t/official-shielded-support-for-zcash-in-ledger-hw-wallet/45965",
             "repositoryEvidenceKind": "proposal-scope",
-            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award."
+            "associationNote": "This exact proposal establishes the project or service scope; canonical code identity is evidenced separately in project.sources. It does not establish that every listed repository was created or fully funded by this award.",
+            "dateNote": "Decision date recorded in the public ledger; application scope independently reviewed on October 4, 2026.",
+            "reviewedAt": "2026-10-04"
           }
         ],
         "scopeNote": "This event belongs to Zondax's named shielded Ledger proposal. It does not belong to LedgerHQ's later program or to Hanh's separate work. Related binding libraries remain separately cataloged; listing them is not an independent grant approval. Approval is not proof of payment, acceptance, delivery, deployment, or current support."

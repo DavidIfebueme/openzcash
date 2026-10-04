@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CommunityCredit } from "@/components/community-credit";
+import { RepositoryFreshness } from "@/components/project-history/freshness";
 import { HistoryDirectory } from "@/components/project-history/directory";
 import { historyBrand } from "@/components/project-history/branding";
 import { readHistoryIndex, projectHistoryDirectory } from "@/lib/project-history/data";
@@ -20,6 +21,7 @@ export default async function HistoryPage() {
       <div className={styles.actions}><Link className={styles.action} href="/zcg/grants">Grant ledger →</Link></div>
     </header>
     <div className={styles.freshness}><span>Repository snapshot <b>{displayDate(index.repositorySnapshotAt)}</b></span><span>Latest ledger import <b>{index.ledgerImportedAt ? displayDate(index.ledgerImportedAt) : "unavailable"}</b></span><a href="#reading-history">How to read this →</a></div>
+    <RepositoryFreshness snapshotAt={index.repositorySnapshotAt} asOf={new Date().toISOString()} />
     {(!index.coverage.proposalsAvailable || !index.coverage.paymentsAvailable) && <p className={styles.notice} role="status">Financial coverage is incomplete. Unavailable payments appear as “—”; dated grant references remain visible.</p>}
     <HistoryDirectory items={index.items} brands={brands} paymentsAvailable={index.coverage.paymentsAvailable} />
     <section id="reading-history" className={styles.reading} aria-labelledby="reading-title">

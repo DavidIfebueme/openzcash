@@ -1,5 +1,7 @@
 export type Source = { title: string; url: string };
 export type FundingEvent = {
+  /** A status update about an existing award is context, not another grant. */
+  kind?: "grant" | "context";
   title: string;
   status: string;
   program?: "zcg" | "coinholder";
@@ -9,6 +11,7 @@ export type FundingEvent = {
   scopeSourceUrl?: string;
   ledgerRecordedDate?: string;
   dateNote?: string;
+  reviewedAt?: string;
   associationNote?: string;
   repositoryEvidenceKind?: string;
 };
@@ -44,6 +47,8 @@ export type Organization = {
   sources: Source[];
 };
 export type Project = {
+  /** Date of an individual identity review; registry date remains the default. */
+  checkedAt?: string;
   id: string;
   name: string;
   organizationId: string | null;
@@ -106,6 +111,10 @@ export type Repository = {
     commits: Record<string, number | null>;
     latestRelease: Release | null;
     releases: Release[];
+    /** All public release records fetched through checkedAt; absent on older snapshots. */
+    releaseHistory?: Release[];
+    /** Previously observed releases absent from the current public listing, not current release claims. */
+    unlistedReleases?: (Release & { lastObservedAt: string; missingAsOf: string })[];
     sourceUrl: string;
   } | null;
 };

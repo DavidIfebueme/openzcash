@@ -1,4 +1,5 @@
 "use client";
+import { isPreviewRelease } from "@/lib/ecosystem/releases";
 
 import Link from "next/link";
 import { Card, Stat } from "@/components/ui";
@@ -464,7 +465,7 @@ export function DetailDialog({
                   <strong>{repo.activity.latestRelease.tagName}</strong>
                   <div className={styles.small}>
                     {displayDate(repo.activity.latestRelease.publishedAt)}
-                    {repo.activity.latestRelease.isPrerelease
+                    {isPreviewRelease(repo.activity.latestRelease)
                       ? " · Prerelease"
                       : ""}
                   </div>
@@ -1081,7 +1082,7 @@ export function EcosystemExplorer({
                             <div className={styles.small}>
                               {displayDate(release.publishedAt)}
                             </div>
-                            {release.isPrerelease && (
+                            {isPreviewRelease(release) && (
                               <Badge muted>Prerelease</Badge>
                             )}
                           </>

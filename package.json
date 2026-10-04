@@ -20,6 +20,7 @@
     "import-ufvk": "tsx scripts/import-ufvk.ts",
     "import-zcg": "node --conditions=react-server --import tsx scripts/import-zcg.ts",
     "sync-ecosystem": "node scripts/sync-ecosystem.mjs",
+    "audit:ecosystem": "tsx scripts/audit-ecosystem.ts",
     "test:ecosystem-sync": "node --test scripts/lib/ecosystem-collection.test.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

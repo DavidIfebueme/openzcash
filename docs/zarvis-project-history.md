@@ -82,7 +82,7 @@ lateness, misconduct or zero funding. No unsupported impact scores are emitted.
 `src/data/project-history/evidence.json` is the versioned admission point for
 reviewed public reports, releases, integrations, usage and milestone evidence.
 It includes two directly inspected Zaino releases as publication evidence only.
-The dated base repository snapshot is unchanged. Approvals, payments and
+Repository sources are refreshed separately with the checked collector and audit command in `docs/ECOSYSTEM.md`. Approvals, payments and
 release reviews cannot manufacture delivery sign-off; no acceptance or usage
 claim has been admitted merely to fill the interface.
 
@@ -166,3 +166,9 @@ Model calls remain disabled in the preview; the direct history answer and model
 tool dispatch have automated coverage. A production-provider smoke check remains
 necessary before enabling the branch for users. This work does not deploy the
 separate chain-analytics branch or change the Monthly publication pipeline.
+
+### October 2026 source audit
+
+History consumes the complete collected public release listing when available, with a compatibility fallback for older snapshots. Removed publications retain their original observed-at date and an explicit no-longer-listed state; they are excluded from latest-current-activity summaries. An updated repository cutoff never substitutes for a report's publication date.
+
+Curated ZecHub DAO proposal references appear as dated context, outside ZCG/Coinholder financial totals. Contextual grant-status notes (for example, ZecKit closure and later maintainer updates) remain in the timeline and do not create additional grants. Community report links with unextracted dates remain undated until a source review admits their claims.

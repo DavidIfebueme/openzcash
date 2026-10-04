@@ -104,7 +104,7 @@ export function isGrantFunded(project: Project): boolean {
   // Only an explicit positive decision associated with this product qualifies.
   // Funding of an owner or a similar-titled application is not substituted.
   return project.funding.events.some(event =>
-    /^(approved|awarded|funded|paid)$/i.test(event.status));
+    event.kind !== "context" && /^(approved|awarded|funded|paid)$/i.test(event.status));
 }
 
 export function filterRepositories(repositories: ClassifiedRepository[], filters: Filters) {
@@ -185,6 +185,7 @@ export function validateCatalog(catalog: Catalog): void {
   }
   if (!catalog.snapshot.repositories.length) throw new Error("Empty ecosystem repository snapshot");
   for (const project of catalog.registry.projects) {
+    if (project.checkedAt && !Number.isFinite(Date.parse(project.checkedAt))) throw new Error("Invalid project review date: " + project.id);
     if (project.organizationId && !catalog.registry.organizations.some(org => org.id === project.organizationId))
       throw new Error("Unknown project organization: " + project.id);
     if (!CATEGORIES.includes(project.category as typeof CATEGORIES[number]))
@@ -196,6 +197,8 @@ export function validateCatalog(catalog: Catalog): void {
         (event.repositoryEvidenceUrl && !safeExternalUrl(event.repositoryEvidenceUrl)) ||
         (event.scopeSourceUrl && !safeExternalUrl(event.scopeSourceUrl))))
       throw new Error("Invalid project provenance: " + project.id);
+    if (project.funding.events.some(event => event.kind && !["grant", "context"].includes(event.kind)))
+      throw new Error("Unknown funding event kind: " + project.id);
     if (project.funding.events.some(event => event.program && !fundingProgramLabel(event.program)))
       throw new Error("Unknown funding program: " + project.id);
     if (project.relatedProjectIds?.some(id => !catalog.registry.projects.some(item => item.id === id)))

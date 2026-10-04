@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import type { ProjectHistory, Amount, HistoryEvent } from "@/lib/project-history/types";
 import { historyAmount } from "@/lib/project-history/format";
 import { displayDate } from "@/lib/ecosystem/catalog";
+import { RepositoryFreshness } from "./freshness";
 import { HistoryOverview } from "./overview";
 import { SourceLink } from "./source-link";
 import styles from "./history.module.css";
@@ -34,6 +35,7 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
   const kinds = [...new Set(history.timeline.map(event => event.kind))];
   return <>
     <div className={styles.freshness}><span>Repository snapshot <b>{displayDate(history.repositorySnapshotAt)}</b></span><span>Latest ledger import <b>{history.ledgerImportedAt ? displayDate(history.ledgerImportedAt) : "unavailable"}</b></span><span>Reviewed additions <b>{history.reviews.filter(review => review.linked && !review.supersededBy).length}</b></span></div>
+    <RepositoryFreshness snapshotAt={history.repositorySnapshotAt} asOf={history.assembledAt} />
     {(!history.coverage.paymentsAvailable || !history.coverage.proposalsAvailable) && <p role="status" className={styles.notice}>A financial source is unavailable. This view retains dated catalog context; missing values are not zero.</p>}
     <div className={styles.layout}><div className={styles.record}>
       <div className={styles.tabs} role="tablist" aria-label="Project history sections">
@@ -53,7 +55,7 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
           <p className={styles.muted} aria-live="polite">{events.length} linked record{events.length === 1 ? "" : "s"}{month ? ` · undated records excluded` : " · undated references appear last"}</p>
           <ol className={styles.timeline}>{events.slice(0, limit).map(event => <li key={event.id} className={styles.event}>
             <time dateTime={event.date ?? undefined}>{event.date ? displayDate(event.date) : "Date not linked"}</time>
-            <div className={styles.eventBody}><span className={`${styles.badge} ${event.evidence === "published_artifact" || event.evidence === "reviewed_delivery" ? styles.artifact : ""}`}>{evidenceLabels[event.evidence]}</span>
+            <div className={styles.eventBody}><span className={`${styles.badge} ${event.evidence === "published_artifact" || event.evidence === "reviewed_delivery" ? styles.artifact : ""}`}>{event.sourceState === "unlisted" ? "Previously observed · no longer listed" : evidenceLabels[event.evidence]}</span>
               <h3>{event.title}</h3><p>{event.detail}</p><SourceLink source={event.source} />
             </div>
           </li>)}</ol>

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import registry from "@/data/ecosystem/registry.json";
 import snapshot from "@/data/ecosystem/snapshot.json";
 import type { Catalog } from "@/lib/ecosystem/types";
-import { classifyRepositories, isGrantFunded } from "@/lib/ecosystem/catalog";
+import { classifyRepositories, isGrantFunded, displayDate } from "@/lib/ecosystem/catalog";
 import { DetailDialog, EcosystemExplorer } from "./explorer";
 
 const catalog = { registry, snapshot } as unknown as Catalog;
@@ -62,7 +62,7 @@ describe("compact catalog presentation", () => {
 
   it("retains snapshot and measurement limitations under sources", () => {
     const html = render("development");
-    expect(html).toContain("Snapshot 08 Sept 2026");
+    expect(html).toContain(`Snapshot ${displayDate(snapshot.collectedAt)}`);
     expect(html).toContain("Repository-wide totals · excludes forks");
     expect(html).toContain("Sources &amp; methodology");
     expect(html).toContain("Shared and multichain codebases may include non-Zcash work.");

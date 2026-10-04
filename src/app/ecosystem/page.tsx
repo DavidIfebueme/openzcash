@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { EcosystemExplorer } from "@/components/ecosystem/explorer";
 import { loadEcosystemCatalog } from "@/lib/ecosystem/data";
+import { explorerCatalog } from "@/lib/ecosystem/explorer-catalog";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 
 // The explorer's headline count, from the same checked snapshot.
@@ -17,7 +18,7 @@ export default function EcosystemPage() {
   return (
     // useSearchParams inside the explorer needs a boundary for the static shell.
     <Suspense fallback={null}>
-      <EcosystemExplorer catalog={loadEcosystemCatalog()} mode="ecosystem" />
+      <EcosystemExplorer catalog={explorerCatalog(loadEcosystemCatalog())} mode="ecosystem" />
     </Suspense>
   );
 }

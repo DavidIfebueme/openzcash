@@ -231,7 +231,8 @@ export const COMMUNITIES: Community[] = [
     language: "English",
     links: {"x": "https://x.com/ZcashGH", "whatsapp": "https://chat.whatsapp.com/KMpce6DJCuUF2ytxgzwe4c", "forumUser": "ogasky"},
     zcg: {"funded": true, "recipient": "ZcashGH", "budgetedUsd": 25200, "grants": 2, "lastPaid": "2026-08-17", zechubDao: { proposals: ["A105"] }},
-    forumTopics: [{ id: 57023, title: "Big things ahead for Zcash Ghana", kind: "announcement" }, { id: 56214, title: "Zcash Ghana (July 2026 - September 2026)", kind: "application" }, { id: 56792, title: "Zcash Ghana — Our First Year Journey (June 2025 – June 2026)", kind: "report" }],
+    // October–December application verified against ZCG issue #428 on 2026-10-04; status and amounts still come from the public ledger.
+    forumTopics: [{ id: 57632, title: "Zcash Ghana (October 2026 - December 2026)", kind: "application" }, { id: 57023, title: "Big things ahead for Zcash Ghana", kind: "announcement" }, { id: 56214, title: "Zcash Ghana (July 2026 - September 2026)", kind: "application" }, { id: 56792, title: "Zcash Ghana — Our First Year Journey (June 2025 – June 2026)", kind: "report" }],
     about: "Community education and meetups across Ghana, under ZCG grants.",
     since: 2025,
   },
