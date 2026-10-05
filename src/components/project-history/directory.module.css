@@ -35,8 +35,8 @@
 .entry:hover { background: var(--surface2); }
 .entry:focus-visible { outline: 2px solid var(--accent); outline-offset: -3px; }
 .identity { display: flex; align-items: center; gap: 15px; min-width: 0; }
-.identity > span:first-child { display: grid; place-items: center; width: 46px; height: 46px; flex: 0 0 46px; background: transparent; border: 0; border-radius: 8px; color: var(--accent-fg); }
-.identity > span:first-child img { width: 42px; height: 42px; max-height: 42px; object-fit: contain; }
+.identity > span:first-child:not([data-community-mark]) { display: grid; place-items: center; width: 46px; height: 46px; flex: 0 0 46px; background: transparent; border: 0; border-radius: 8px; color: var(--accent-fg); }
+.identity > span:first-child:not([data-community-mark]) img { width: 42px; height: 42px; max-height: 42px; object-fit: contain; }
 .identity > div { min-width: 0; }
 .identity h3 { font-size: 16px; font-weight: 650; line-height: 1.35; letter-spacing: -.015em; margin: 0; }
 .identity p { color: var(--text-muted); font-size: 12px; line-height: 1.55; margin: 5px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -109,8 +109,8 @@
   .entry { padding: 20px; gap: 17px 22px; }
   .entryArrow { right: 20px; top: 23px; }
   .identity { gap: 13px; }
-  .identity > span:first-child { width: 42px; height: 42px; flex-basis: 42px; }
-  .identity > span:first-child img { width: 38px; height: 38px; max-height: 38px; }
+  .identity > span:first-child:not([data-community-mark]) { width: 42px; height: 42px; flex-basis: 42px; }
+  .identity > span:first-child:not([data-community-mark]) img { width: 38px; height: 38px; max-height: 38px; }
   .entryFunding dt { font-size: 10px; }
   .entryFunding dd { font-size: 12px; }
   .entryFunding dd[data-unavailable="true"] { font-size: 10px; }

@@ -3,12 +3,13 @@ import Link from "next/link";
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type { HistoryIndexItem } from "@/lib/project-history/insights";
+import { CommunityMark, type CommunityMarkIdentity } from "@/components/communities/community-mark";
 import { BrandMark } from "@/components/ecosystem/identity";
 import type { Brand } from "@/components/ecosystem/branding";
 import { CATEGORIES, displayDate } from "@/lib/ecosystem/catalog";
 import styles from "./directory.module.css";
 
-export function HistoryDirectory({ items, brands, paymentsAvailable }: { items: HistoryIndexItem[]; brands: Record<string, Brand | null>; paymentsAvailable: boolean }) {
+export function HistoryDirectory({ items, brands, communityMarks = {}, paymentsAvailable }: { items: HistoryIndexItem[]; brands: Record<string, Brand | null>; communityMarks?: Record<string, CommunityMarkIdentity | null>; paymentsAvailable: boolean }) {
   const params = useSearchParams();
   const search = params.get("q") ?? "", category = params.get("category") ?? "";
   const scope = ["projects", "communities"].includes(params.get("scope") ?? "") ? params.get("scope")! : "all";
@@ -64,7 +65,7 @@ export function HistoryDirectory({ items, brands, paymentsAvailable }: { items: 
     {groups.map(group => <section className={styles.group} key={group.name} aria-label={group.name || "Matching histories"}>
       {group.name && <div className={styles.groupHeading}><h2>{group.name}</h2><span>{group.total}</span></div>}
       <div className={styles.directory}>{group.items.map(item => <Link className={styles.entry} key={item.id} href={`/ecosystem/history/${item.id}`} prefetch={false}>
-        <div className={styles.identity}><BrandMark brand={brands[item.id] ?? null} category={item.category} /><div><h3>{item.name}</h3>{!group.name && <span className={styles.category}>{item.category}</span>}<p>{item.description}</p></div></div>
+        <div className={styles.identity}>{communityMarks[item.id] ? <CommunityMark community={communityMarks[item.id]!} size={40} /> : <BrandMark brand={brands[item.id] ?? null} category={item.category} />}<div><h3>{item.name}</h3>{!group.name && <span className={styles.category}>{item.category}</span>}<p>{item.description}</p></div></div>
         <dl className={styles.entryFunding}><div><dt>Grants linked</dt><dd>{item.insights.grants}</dd></div><div><dt>Paid entries</dt><dd data-unavailable={item.insights.paidEntries === null}>{item.insights.paidEntries ?? "Unavailable"}</dd></div></dl>
         <div className={styles.entryLatest}><span className={styles.mobileCaption}>Latest activity</span>{item.latestEvent ? <><div><small>{item.latestEvent.releaseChannel === "prerelease" ? "Prerelease" : item.latestEvent.kind === "context" ? "Record" : item.latestEvent.kind[0].toUpperCase() + item.latestEvent.kind.slice(1)}</small><time dateTime={item.latestEvent.date ?? undefined}>{displayDate(item.latestEvent.date ?? "")}</time></div><span className={styles.activityTitle}>{item.latestEvent.title}</span></> : <span className={styles.noEvidence}>No dated record linked</span>}</div>
         <div className={styles.entryAcceptance}><span className={styles.mobileCaption}>Acceptance evidence</span><strong>{item.insights.acceptedEntries > 0 ? `${item.insights.acceptedEntries} ${item.insights.acceptedEntries === 1 ? "entry" : "entries"} linked` : item.insights.acceptanceGaps === null ? "Source unavailable" : "Not linked"}</strong>{item.insights.acceptanceGaps === null ? <span>Payment coverage unavailable</span> : item.insights.acceptanceGaps > 0 ? <span>{item.insights.acceptanceGaps} paid {item.insights.acceptanceGaps === 1 ? "entry" : "entries"} to review</span> : item.insights.paidEntries === 0 ? <span>No paid entries linked</span> : <span>Linked to milestone records</span>}</div>

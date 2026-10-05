@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { CommunityMark } from "@/components/communities/community-mark";
 import { Stat } from "@/components/ui";
 import type { Community, CommunityLinks, Region } from "@/lib/communities/data";
 import type { TopicActivity } from "@/lib/communities/forum-activity";
@@ -318,17 +319,7 @@ export function CommunitiesView({
               <li key={c.id} className={`ws-community-card ${styles.card}`}>
                 {/* Community */}
                 <div className="flex items-center gap-3">
-                  {c.logo ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={c.logo}
-                      alt=""
-                      loading="lazy"
-                      className="h-8 w-8 shrink-0 rounded-lg object-contain ring-1 ring-stone-200"
-                    />
-                  ) : (
-                    <span className="text-xl leading-none">{c.flag}</span>
-                  )}
+                  <CommunityMark community={c} />
                   <div className="min-w-0">
                     <p className="flex items-center gap-2 text-sm font-semibold text-stone-900">
                       <span className="truncate">{c.name}</span>

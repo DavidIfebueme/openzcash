@@ -20,7 +20,7 @@
 .hero p { color: var(--text-muted); max-width: 720px; line-height: 1.6; font-size: 14px; margin: 12px 0 10px; }
 .identity { display: flex; align-items: center; gap: 15px; }
 .identity > span { flex-shrink: 0; }
-.identity > span { background: transparent; border-color: transparent; color: var(--accent-fg); }
+.identity > span:not([data-community-mark]) { background: transparent; border-color: transparent; color: var(--accent-fg); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex-shrink: 0; }
 .action, .primary { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 10px 14px; border: 1px solid var(--border-strong); border-radius: 7px; font-size: 12px; line-height: 1.5; text-decoration: none; color: var(--text-primary); background: var(--surface-1); }
 .primary { border-color: var(--accent); color: var(--accent-fg); }
