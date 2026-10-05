@@ -69,10 +69,10 @@
 .areaList { display: grid; gap: 11px; }
 .area { display: block; color: var(--ink); }
 .area > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 15px; font-size: 12px; }
-.area > div > span { display: inline-flex; align-items: center; gap: 8px; }
+.area > div:first-child > span { display: inline-flex; align-items: center; gap: 8px; }
 .area svg { color: var(--muted); }
 .area b { font-size: 11px; font-weight: 550; font-variant-numeric: tabular-nums; }
-.areaTrack { height: 3px; margin: 6px 0 0 22px; background: var(--line); }
+.areaTrack { display: flex; overflow: hidden; height: 3px; margin: 6px 0 0 22px; background: var(--line); }
 .areaTrack span { display: block; height: 100%; background: var(--accent-muted); }
 .area:hover { color: var(--accent-ink); }
 .area:hover .areaTrack span { background: var(--accent); }
