@@ -10,9 +10,9 @@ const render = (path: string, openApps: Record<string, boolean> = {}, counts: Re
 const linkTag = (html: string, href: string) => html.match(new RegExp(`<a\\b[^>]*href="${href}"[^>]*>`))?.[0] ?? "";
 
 describe("grouped ecosystem navigation", () => {
-  it("interleaves direct destinations in reading order and keeps organization names alphabetical", () => {
+  it("interleaves direct destinations in reading order and keeps the curated organization order", () => {
     const html = render("/communities", { "ecosystem:organizations": true }, { "/ecosystem": "127", "/development": "579", "/communities": "27", "/arborist": "133" });
-    const links = ["/wallets", "/ecosystem/history", "/communities", "/development", "/arborist", "/zcg/fpf", "/shielded-labs", "/tachyon", "/zakura", "/zf", "/zechub", "/zodl"];
+    const links = ["/wallets", "/ecosystem/history", "/communities", "/development", "/arborist", "/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl"];
     links.forEach((href, i) => {
       expect(html.split(`href="${href}"`)).toHaveLength(2);
       if (i) expect(html.indexOf(`href="${href}"`)).toBeGreaterThan(html.indexOf(`href="${links[i - 1]}"`));

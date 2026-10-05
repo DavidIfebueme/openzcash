@@ -37,7 +37,7 @@ export type AppDef = {
   icon: string;
   /** Inner pages, in reading order. */
   pages: AppPage[];
-  /** Reading order when inner pages and direct child apps are interleaved. */
+  /** Reading order for inner pages and grouped child apps. */
   navigationOrder?: string[];
   /** Expanded in the sidebar by default (the visitor can still collapse it). */
   open?: boolean;
@@ -130,7 +130,10 @@ export const APPS: AppDef[] = [
     href: "/ecosystem",
     sub: "Projects, teams & organizations",
     icon: "ecosystem",
-    navigationOrder: ["/wallets", "/ecosystem/history", "/communities", "/development", "/arborist"],
+    navigationOrder: [
+      "/wallets", "/ecosystem/history", "/communities", "/development", "/arborist",
+      "/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl",
+    ],
     pages: [
       { href: "/wallets", label: "Wallets", mark: "/logos/glyphs/wallets.png" },
       { href: "/ecosystem/history", label: "Project histories", mark: "/logos/glyphs/grants.png" },
@@ -206,11 +209,12 @@ export function parentAppOf(app: AppDef): AppDef | undefined {
 export function childAppsOf(app: AppDef, apps: AppDef[] = APPS): AppDef[] {
   const children = apps.filter((candidate) => candidate.parentId === app.id);
   if (app.id !== "ecosystem") return children;
+  const order = new Map(app.navigationOrder?.map((href, index) => [href, index]));
   return children.sort((a, b) => {
     const aDirect = a.parentGroup === "pages", bDirect = b.parentGroup === "pages";
     if (aDirect !== bDirect) return aDirect ? -1 : 1;
-    if (aDirect) return (app.navigationOrder?.indexOf(a.href) ?? -1) - (app.navigationOrder?.indexOf(b.href) ?? -1);
-    return a.label.localeCompare(b.label, "en", { sensitivity: "base" });
+    return (order.get(a.href) ?? Infinity) - (order.get(b.href) ?? Infinity)
+      || a.label.localeCompare(b.label, "en", { sensitivity: "base" });
   });
 }
 
