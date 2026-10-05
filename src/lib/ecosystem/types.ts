@@ -54,6 +54,8 @@ export type Project = {
   organizationId: string | null;
   category: string;
   tags: string[];
+  /** Purpose-only classification review; does not refresh funding or delivery evidence. */
+  classificationReview?: { checkedAt: string; rationale: string; sourceUrls: string[] };
   description: string;
   website: string;
   repositories: string[];

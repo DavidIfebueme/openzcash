@@ -2,6 +2,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HistoryIndexItem } from "@/lib/project-history/insights";
 import { HistoryDirectory } from "./directory";
+import registry from "@/data/ecosystem/registry.json";
+import snapshot from "@/data/ecosystem/snapshot.json";
+import { historyIdentities } from "@/lib/project-history/identities";
+import { countWorkAreas, workAreaHref } from "@/lib/ecosystem/work-areas";
+import type { Catalog } from "@/lib/ecosystem/types";
+import { COMMUNITIES } from "@/lib/communities/data";
 
 const query = vi.hoisted(() => ({ value: "" }));
 vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams(query.value) }));
@@ -96,5 +102,66 @@ describe("directory discovery order", () => {
     expect(render([report, none])).not.toContain('href="/ecosystem/history/No-work"');
     query.value = "view=work";
     expect(render([report])).toContain("No matching histories");
+  });
+});
+
+
+describe("shared overview and history work areas", () => {
+  const education = { ...entry("education-app", 0, 0), category: "Education" };
+  const community = { ...entry("local-community", 1, 0), category: "Community", communityId: "local" };
+  const governance = { ...entry("governance-tool", 0, 0), category: "Governance" };
+  const items = [education, community, governance];
+  const identities = historyIdentities({ registry, snapshot } as unknown as Catalog);
+  const allItems = identities.map(identity => ({ ...entry(identity.id, 0, 0), name: identity.name, category: identity.category, communityId: identity.communityId }));
+
+  it("uses one Community & education group while retaining each raw category", () => {
+    query.value = "area=Community+%26+education";
+    const html = render(items);
+    expect(html).toContain('href="/ecosystem/history/education-app"');
+    expect(html).toContain('href="/ecosystem/history/local-community"');
+    expect(html).not.toContain('href="/ecosystem/history/governance-tool"');
+    expect(html).toContain('aria-label="Community &amp; education"');
+    expect(html).toContain(">Education</span>");
+    expect(html).toContain(">Community</span>");
+    expect(html).toContain('<p aria-live="polite"><strong>2</strong> histories');
+  });
+  it("preserves exact legacy category filters, including education without community records", () => {
+    query.value = "category=Education";
+    const html = render(items);
+    expect(html).toContain('href="/ecosystem/history/education-app"');
+    expect(html).not.toContain('href="/ecosystem/history/local-community"');
+    expect(html).toContain('<option value="Education" selected="">Education only</option>');
+    query.value = "category=Community";
+    const legacy = render(items);
+    expect(legacy).toContain('href="/ecosystem/history/local-community"');
+    expect(legacy).not.toContain('href="/ecosystem/history/education-app"');
+  });
+  it("intersects the area with community scope without treating education apps as groups", () => {
+    query.value = "area=Community+%26+education&scope=communities";
+    const html = render(allItems);
+    expect(html).toContain(`<p aria-live="polite"><strong>${COMMUNITIES.length}</strong> communities`);
+    expect(html).not.toContain('href="/ecosystem/history/eduzec"');
+    // Every community, including the education-category ZecHub overlap, stays discoverable.
+    for (const community of COMMUNITIES) {
+      const identity = identities.find(item => item.communityId === community.id)!;
+      query.value = new URLSearchParams({ area: "Community & education", scope: "communities", q: identity.id }).toString();
+      expect(render(allItems)).toContain(`href="/ecosystem/history/${identity.id}"`);
+    }
+  });
+  it("shows exactly each overview area count after following its shared link", () => {
+    for (const area of countWorkAreas(identities)) {
+      query.value = new URL(workAreaHref(area.area), "https://openzcash.org").search.slice(1);
+      expect(render(allItems)).toContain(`<p aria-live="polite"><strong>${area.count}</strong> ${area.count === 1 ? "history" : "histories"}`);
+    }
+    query.value = "";
+    expect(render(allItems)).toContain(`<p aria-live="polite"><strong>${identities.length}</strong> histories`);
+  });
+  it("normalizes unavailable areas when scope changes and applies a valid area over a stale category", () => {
+    query.value = "scope=communities&area=Nodes";
+    expect(render(items)).toContain('href="/ecosystem/history/local-community"');
+    query.value = "area=Community+%26+education&category=Governance";
+    const html = render(items);
+    expect(html).toContain('href="/ecosystem/history/education-app"');
+    expect(html).not.toContain('href="/ecosystem/history/governance-tool"');
   });
 });

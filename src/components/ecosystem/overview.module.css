@@ -67,11 +67,11 @@
 .page .caption { font-size: 11px; line-height: 1.6; color: var(--muted); margin: 16px 0; }
 .areas { border-left: 1px solid var(--line); padding-left: 28px; }
 .areaList { display: grid; gap: 11px; }
-.area { display: block; color: var(--ink); }
-.area > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 15px; font-size: 12px; }
-.area > div:first-child > span { display: inline-flex; align-items: center; gap: 8px; }
-.area svg { color: var(--muted); }
-.area b { font-size: 11px; font-weight: 550; font-variant-numeric: tabular-nums; }
+.area { display: block; min-width: 0; color: var(--ink); }
+.area > div:first-child { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 12px; }
+.area > div:first-child > span { display: inline-flex; min-width: 0; align-items: center; gap: 8px; line-height: 1.4; }
+.area svg { flex-shrink: 0; color: var(--muted); }
+.area b { white-space: nowrap; font-size: 11px; font-weight: 550; font-variant-numeric: tabular-nums; }
 .areaTrack { display: flex; overflow: hidden; height: 3px; margin: 6px 0 0 22px; background: var(--line); }
 .areaTrack span { display: block; height: 100%; background: var(--accent-muted); }
 .area:hover { color: var(--accent-ink); }

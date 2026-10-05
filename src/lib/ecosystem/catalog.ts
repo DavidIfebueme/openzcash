@@ -3,7 +3,7 @@ import type { Catalog, ClassifiedRepository, Organization, Project, Repository }
 export const CATEGORIES = [
   "Nodes", "Wallets", "Libraries & SDKs", "Cryptography", "Infrastructure",
   "Protocol", "Developer tools", "Payments & DeFi", "Identity",
-  "Community", "Education", "Research", "Historical", "Other",
+  "Community", "Education", "Governance", "Research", "Historical", "Other",
 ] as const;
 
 export function safeExternalUrl(value: string | null | undefined): string | null {
@@ -192,6 +192,10 @@ export function validateCatalog(catalog: Catalog): void {
       throw new Error("Unknown project category: " + project.id);
     if (normalizeTags(project.tags).length !== project.tags.length || project.tags.some(tag => tag !== tag.trim()))
       throw new Error("Duplicate or blank project tags: " + project.id);
+    const review = project.classificationReview;
+    if (review && (!Number.isFinite(Date.parse(review.checkedAt)) || !review.rationale.trim() ||
+      !review.sourceUrls.length || review.sourceUrls.some(url => !safeExternalUrl(url))))
+      throw new Error("Invalid project classification review: " + project.id);
     if (!project.sources.length || project.sources.some(source => !safeExternalUrl(source.url)) ||
       project.funding.events.some(event => !safeExternalUrl(event.sourceUrl) ||
         (event.repositoryEvidenceUrl && !safeExternalUrl(event.repositoryEvidenceUrl)) ||

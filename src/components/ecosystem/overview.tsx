@@ -3,6 +3,8 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Catalog } from "@/lib/ecosystem/types";
 import { buildEcosystemOverview } from "@/lib/ecosystem/overview";
+import { countWorkAreas, workAreaHref } from "@/lib/ecosystem/work-areas";
+import { historyIdentities } from "@/lib/project-history/identities";
 import { classifyRepositories, displayDate, safeExternalUrl } from "@/lib/ecosystem/catalog";
 import { COMMUNITIES, COMMUNITIES_VERIFIED_ON } from "@/lib/communities/data";
 import { readHistoryIndex } from "@/lib/project-history/data";
@@ -37,7 +39,9 @@ export function EcosystemOverview({ catalog }: { catalog: Catalog }) {
   const overview = buildEcosystemOverview(catalog);
   const repositories = classifyRepositories(catalog);
   const organizations = childAppsOf(APPS.find(app => app.id === "ecosystem")!).filter(app => app.parentGroup !== "pages");
-  const maxCategory = Math.max(1, ...overview.categories.map(item => item.count));
+  const histories = historyIdentities(catalog);
+  const areas = countWorkAreas(histories).sort((a, b) => b.count - a.count || a.area.localeCompare(b.area));
+  const maxCategory = Math.max(1, ...areas.map(item => item.count));
   return <div className={styles.page}>
     <header className={styles.hero}><div><h1>Ecosystem insights</h1><p>Activity, releases and evidence across the projects we track.</p></div><Link className={styles.primary} href={catalogHref()}>Browse projects <span aria-hidden="true">↗</span></Link></header>
     <div className={styles.freshness}><span>Code snapshot <b>{displayDate(overview.snapshotAt)}</b></span><span>Registry baseline <b>{displayDate(overview.registryCheckedAt)}</b></span><a href="#overview-sources">Coverage & sources ↓</a></div>
@@ -67,10 +71,11 @@ export function EcosystemOverview({ catalog }: { catalog: Catalog }) {
         {!overview.recentReleases.length && <p className={styles.empty}>No release records found for linked project repositories in this window.</p>}
         <p className={styles.caption}>Published artifacts are evidence of a release, not proof of adoption or milestone acceptance.</p>
       </section>
-      <section className={styles.areas} aria-labelledby="areas-title"><div className={styles.sectionHeading}><div><h2 id="areas-title">Areas of work</h2><p>{overview.counts.projects} mapped projects & components</p></div></div>
-        <div className={styles.areaList}>{overview.categories.map(item => <Link className={styles.area} key={item.category} href={catalogHref({category:item.category})}>
-          <div><span><CategoryIcon category={item.category}/>{item.category}</span><b>{item.count}</b></div><div className={styles.areaTrack} aria-hidden="true"><span style={{width:`${item.count/maxCategory*100}%`}}/></div>
+      <section className={styles.areas} aria-labelledby="areas-title"><div className={styles.sectionHeading}><div><h2 id="areas-title">Areas of work</h2><p>{histories.length} projects & communities</p></div></div>
+        <div className={styles.areaList}>{areas.map(item => <Link className={styles.area} key={item.area} href={workAreaHref(item.area)}>
+          <div><span><CategoryIcon category={item.category}/>{item.area}</span><b>{item.count}</b></div><div className={styles.areaTrack} aria-hidden="true"><span style={{width:`${item.count/maxCategory*100}%`}}/></div>
         </Link>)}</div>
+        <p className={styles.caption}>Grouped by primary purpose. Each project or community appears once.</p>
       </section>
     </div>
     <Suspense fallback={<section className={styles.evidence} aria-busy="true"><h2>Follow the evidence</h2><p className={styles.empty} role="status">Loading project and community records…</p></section>}><EvidenceOverview/></Suspense>
@@ -83,6 +88,7 @@ export function EcosystemOverview({ catalog }: { catalog: Catalog }) {
     <details className={styles.sources} id="overview-sources"><summary>Coverage & sources <span aria-hidden="true">+</span></summary><div className={styles.sourceBody}>
       <p><b>Code activity.</b> Non-fork repositories in the wider inventory, measured on their default branches. Shared repositories may contain work outside Zcash; commits are not a delivery score. {overview.counts.projectRepositories} unique repositories are linked to catalog projects.</p>
       <p><b>Releases.</b> Only repositories linked to catalog projects, excluding forks, archived and disabled repositories. Release records are deduplicated by source; a shared repository may relate to several projects. The feed shows one record per repository. Previews are labeled separately.</p>
+      <p><b>Areas of work.</b> Project histories and community groups share one identity list; ZecHub is counted once. Community and Education are combined for browsing, while their original categories and community membership stay separate.</p>
       <p><b>Evidence.</b> Funding, public work and milestone acceptance are independent records. Shared grants are not added into an ecosystem funding total. The registry baseline is {displayDate(overview.registryCheckedAt)}; individual records can have later review dates. Community directory links were checked {displayDate(COMMUNITIES_VERIFIED_ON)}.</p>
       <div><a href="/api/ecosystem" target="_blank" rel="noopener noreferrer">Catalog snapshot JSON ↗</a><a href="/api/project-history" target="_blank" rel="noopener noreferrer">Project history index JSON ↗</a><Link href="/zcg/methodology">Funding methodology ↗</Link></div>
     </div></details>

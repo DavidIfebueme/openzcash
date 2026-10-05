@@ -1,0 +1,2667 @@
+{
+  "reviewedAt": "2026-10-05",
+  "scope": {
+    "projects": 127,
+    "communityGroups": 27,
+    "uniqueHistories": 153,
+    "sharedIdentity": "zechub"
+  },
+  "method": "All records reviewed against curated descriptions and source inventories; fresh primary reads explicitly distinguished from existing evidence. Classification does not certify delivery, adoption or current availability.",
+  "implementedProjectChanges": 16,
+  "records": [
+    {
+      "id": "alex-sol-node-security-research",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Independent vulnerability findings and responsible disclosures across two node implementations; not a full-node product.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/57"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "arti",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Shared Tor network-privacy implementation; not a Zcash consensus node or wallet.",
+      "sources": [
+        "https://gitlab.torproject.org/tpo/core/arti",
+        "https://forum.zcashcommunity.com/t/38776/1",
+        "https://forum.zcashcommunity.com/t/proposal-review-arti-a-project-to-rewrite-tor-in-rust-onion-services-and-beyond/42578?u=decentralistdan"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "bison-dcrdex",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet is a valid primary category; atomic swaps deserve a secondary Payments & DeFi facet, not a duplicate identity.",
+      "sources": [
+        "https://github.com/decred/dcrdex",
+        "https://bisonwallet.org/"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "blockbook-zcash",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Indexer/API backend with an explorer interface; Zcash configuration uses Zebra. Infrastructure remains valid; explorer is a secondary function.",
+      "sources": [
+        "https://github.com/trezor/blockbook/blob/master/configs/coins/zcash.json"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "btcpay-zcash-plugin",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "Retain broad payments rollup; label specifically as merchant payment integration, not DeFi. Backend libraries are components, not standalone merchant products.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/upgrade-btcpayserver-zcash-plugin-for-2-1/50800",
+        "https://forum.zcashcommunity.com/t/btcpayserver-multi-account-and-0conf-mempool-notifications/55316",
+        "https://forum.zcashcommunity.com/t/btcpayserver-multi-store-support-and-native-graphql-client/57128",
+        "https://plugin-builder.btcpayserver.org/public/plugins/zcash-plugin"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "cipherpay",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "Retain payments rollup; broaden the underspecified payments tag to merchant/ecommerce. Do not inherit CipherScan or OWS capabilities.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/30",
+        "https://cipherpay.app"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "cipherscan",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Explorer/API/indexing product. Broad Infrastructure is valid under existing areas; a dedicated explorer/analytics area would be clearer. Current website and repository redirect to ZecBlock.",
+      "sources": [
+        "https://cipherscan.app/",
+        "https://zecblock.com/",
+        "https://github.com/Kenbak/cipherscan",
+        "https://github.com/Kenbak/zecblock",
+        "https://forum.zcashcommunity.com/t/cipherscan-2026-privacy-intelligence-for-zcash/54151"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "colosseum-zcash-track",
+      "kind": "project",
+      "before": "Community",
+      "classification": "Community",
+      "basis": "An ecosystem hackathon track is an event/program rather than a permanent regional community.",
+      "sources": [
+        "https://blog.colosseum.com/expanding-the-arena/",
+        "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/414",
+        "https://colosseum.com/hackathon"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "community-boston-zcash",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "The Boston meetup, running since the Sapling era: protocol launch events and community gatherings. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/56748",
+        "https://forum.zcashcommunity.com/t/50373",
+        "https://x.com/BostonZcash",
+        "https://linktr.ee/BostonZcash"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-club-zcash-barcelona",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Barcelona meetups under the Zcash en Español umbrella (managed by yoditar). Local club distinct from Español umbrella; show relationship without collapsing identity.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/51247",
+        "https://zcashesp.com/club-zcash-barcelona/"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-club-zcash-caracas",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Caracas meetups under the Zcash en Español umbrella, where financial privacy is a daily necessity. Local club distinct from Español umbrella; show related identity, avoid counting a host platform such as Free2Z as operator.",
+      "sources": [
+        "https://free2z.cash/Yoditar/zpage/club-zcash-caracas-1o-meetup"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-coderaiz-mexico",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Developer-focused education in Mexico, in the Español ecosystem. Proposal describes a university program. Include as community/education initiative, not evidence of an active regional chapter; no inferred formal affiliation from shared geography/language.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/zcash-university-outreach-initiative-mexico-2026-coderaiz-proposal/55506",
+        "https://forum.zcashcommunity.com/t/55506"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "community-elzz-global-ambassador",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "ZecHub DAO Global Ambassador: educational content, X Spaces and ecosystem awareness, with monthly public reports. A person-led outreach initiative, not a territorial community group.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/global-ambassador-elzz-july-2026-report/56859",
+        "https://forum.zcashcommunity.com/t/56859",
+        "https://x.com/CQ_Elzz",
+        "https://t.me/CQ_Elzz"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "community-pesa-ya-siri-zcash-tanzania",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Swahili-language education in Tanzania; proposals so far unfunded by the ZecHub DAO. Include community initiative irrespective of funding outcome; airtime/purchase proposal does not by itself establish a production payment product.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/56593",
+        "https://forum.zcashcommunity.com/t/55558"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-ruzcash",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Russian-language content, translations and community for the CIS region. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/38485",
+        "https://forum.zcashcommunity.com/t/55305",
+        "https://forum.zcashcommunity.com/t/53449",
+        "https://x.com/ruZCASH",
+        "https://www.youtube.com/@prozcash",
+        "https://discord.gg/UrarUa6BM8",
+        "https://bsky.app/profile/ruzcash.bsky.social",
+        "https://medium.com/@ruzcash",
+        "https://pro.zcash.ru"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-arabia",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Arabic-language content and community building across the MENA region. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/57170",
+        "https://forum.zcashcommunity.com/t/56580",
+        "https://x.com/ZcashArabia",
+        "https://www.youtube.com/@ZcashArabia",
+        "https://t.me/ZcashArabia",
+        "https://zcasharabia.xyz"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-brazil",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "The largest regional community in the ZCG ledger: education, events, ZECA voice assistant, and monthly public reports since 2022. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/53702",
+        "https://forum.zcashcommunity.com/t/49458",
+        "https://forum.zcashcommunity.com/t/54628",
+        "https://x.com/zcashbrazil",
+        "https://www.instagram.com/zcashbrazil/",
+        "https://www.youtube.com/@zcashbrasil",
+        "https://t.me/brzcash",
+        "https://discord.gg/zcash",
+        "https://www.facebook.com/ZcashBrasil",
+        "https://zcashbrazil.substack.com",
+        "https://linktr.ee/zcashbrasil",
+        "https://zcashbrasil.com.br"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-china",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Chinese-language content and translations for the Zcash ecosystem. Keep in directory; sparse/revival evidence is not grounds for omission. Activity state must be dated separately.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/33064",
+        "https://forum.zcashcommunity.com/t/56438"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-club-queretaro",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Club Zcash Querétaro, the Español-ecosystem club founded in November 2024, now growing into Zcash México; its Oct–Nov 2026 plan (A178) adds monthly meetups in Puebla. Preserve Querétaro/Zcash México alias and one identity; a planned Puebla expansion is not a separate delivered community or adoption measure.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/55764",
+        "https://forum.zcashcommunity.com/t/56305",
+        "https://x.com/zcashqro",
+        "https://free2z.cash/palmar/zpage/club-zcash-queretaro-mexico-1er-aniversario"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-east-africa",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Grassroots education and merchant onboarding in Uganda and Kenya. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/57144",
+        "https://forum.zcashcommunity.com/t/56405",
+        "https://forum.zcashcommunity.com/t/55860",
+        "https://x.com/ZcashEastAfrica",
+        "https://www.tiktok.com/@zcash.eastafrica",
+        "https://t.me/ZcashEastAfrica",
+        "https://zcasheastafrica.substack.com"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-en-espanol",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "The Spanish-speaking hub, coordinated by yoditar: news, education, its own node, Venezuela outreach and a family of local clubs. Now on Bluesky after an X suspension. Language umbrella and local clubs are distinct identities. Shared members/content do not justify merging them or adding overlapping financial totals.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/56445",
+        "https://forum.zcashcommunity.com/t/53815",
+        "https://forum.zcashcommunity.com/t/55685",
+        "https://forum.zcashcommunity.com/t/55530",
+        "https://x.com/zcashesp1",
+        "https://www.instagram.com/zcashesp/",
+        "https://www.youtube.com/@zcashesp",
+        "https://t.me/zcashesp",
+        "https://bsky.app/profile/zcashesp.bsky.social",
+        "https://zcashesp.substack.com",
+        "https://zcashesp.medium.com",
+        "https://privtr.ee/@zcashesp",
+        "https://zcashesp.com"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-france",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "French-language community and content. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/5544",
+        "https://x.com/ZcashFr"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-ghana",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Community education and meetups across Ghana, under ZCG grants. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/57632",
+        "https://forum.zcashcommunity.com/t/57023",
+        "https://forum.zcashcommunity.com/t/56214",
+        "https://forum.zcashcommunity.com/t/56792",
+        "https://x.com/ZcashGH",
+        "https://chat.whatsapp.com/KMpce6DJCuUF2ytxgzwe4c"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-global-germany",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "German-language community and content. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/50169",
+        "https://x.com/ZcashGermany"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-india",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Education and meetups in India. Node-related application is a separate scope, not a reason to reclassify the community as infrastructure.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/54762",
+        "https://forum.zcashcommunity.com/t/56847",
+        "https://forum.zcashcommunity.com/t/54544",
+        "https://x.com/ZcashIND",
+        "https://www.instagram.com/zcashind/",
+        "https://www.youtube.com/channel/UC0l_AqdXr_i8iD5JOoL2UKQ",
+        "https://t.me/ZcashIN",
+        "https://zcashind.com"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-indonesia",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Bahasa Indonesia content and community, in the QRIS offramp corridor. QRIS corridor context does not make this community a payments product; retain educational/community role.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/38678",
+        "https://x.com/ZcashIdn",
+        "https://zcashidn.substack.com",
+        "https://medium.com/@ZcashIdn"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-japan",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Japanese-language community and translations. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/54827",
+        "https://www.youtube.com/@ZcashJapan",
+        "https://zcashjapan.com"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-korea",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Korean community, funded as a ZecHub DAO Global Ambassador program. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/56458",
+        "https://forum.zcashcommunity.com/t/50498",
+        "https://x.com/zcashkorea",
+        "https://t.me/KoreaZcashCommunity"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-nigeria",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Consecutive ZCG grants of campus bootcamps and meetups across Nigeria. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/53654",
+        "https://forum.zcashcommunity.com/t/56291",
+        "https://x.com/ZcashNigeria",
+        "https://www.tiktok.com/@zcash.nigeria",
+        "https://www.youtube.com/@ZcashNigeria",
+        "https://t.me/zcashnigeria1",
+        "https://www.facebook.com/people/Zcash-Nigeria/61577545730354",
+        "https://zechubnigeria.substack.com",
+        "https://medium.com/zcash-nigeria"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-turkiye",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Street interviews to bootcamps: education and events across Türkiye. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/56274",
+        "https://forum.zcashcommunity.com/t/57087",
+        "https://forum.zcashcommunity.com/t/56903",
+        "https://x.com/ZcashTR",
+        "https://www.instagram.com/zcashturkish/",
+        "https://www.tiktok.com/@zcashtr",
+        "https://www.youtube.com/@ZcashTurkiye",
+        "https://t.me/ZcashTurkiye",
+        "https://bsky.app/profile/zcashtr.bsky.social",
+        "https://medium.com/@zcashturkish"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcash-ukraine",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Ukrainian community and education under wartime conditions. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/54059",
+        "https://forum.zcashcommunity.com/t/52330",
+        "https://x.com/Zcash_ua",
+        "https://www.instagram.com/zcash_ua/",
+        "https://t.me/zcash_ua",
+        "https://www.linkedin.com/company/zcash-ukraine",
+        "https://zcashukraine.substack.com"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcashsa-zcash-south-africa",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "South African community education and meetups. Retain as a community identity under combined community/education rollup; geography/language are separate facets and activity remains evidence-dated.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/57133",
+        "https://forum.zcashcommunity.com/t/56576",
+        "https://forum.zcashcommunity.com/t/55706",
+        "https://x.com/Zcash_SA",
+        "https://t.me/zcashSA",
+        "https://medium.com/@zcashsouthafrica",
+        "https://linktr.ee/zcash_sa"
+      ],
+      "verification": "recorded community description, public identity links and forum-topic inventory; source not refetched this audit",
+      "confidence": "medium-high",
+      "changes": null
+    },
+    {
+      "id": "community-zcast",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "The Spanish-language Zcash podcast, in the Español ecosystem. Spanish-language podcast; related to Español ecosystem, not a separate regional chapter.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/zcast-the-zcash-podcast-in-spanish-a-new-phase/54291",
+        "https://forum.zcashcommunity.com/t/54291",
+        "https://forum.zcashcommunity.com/t/44447",
+        "https://x.com/ZcastEsp",
+        "https://www.youtube.com/@ZcastEsp",
+        "https://bsky.app/profile/zcastesp.bsky.social",
+        "https://zcashesp.com/zcast"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "community-zk-av-club",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "Community media infrastructure: audiovisual production, streaming support and creator tooling for the whole ecosystem. Official site describes workshops, recording and publishing infrastructure; not a regional chapter or generic production company.",
+      "sources": [
+        "https://zkav.club/",
+        "https://forum.zcashcommunity.com/t/53913",
+        "https://forum.zcashcommunity.com/t/43733",
+        "https://x.com/ZkAv_Club",
+        "https://www.youtube.com/@ZkAv_Club",
+        "https://bsky.app/profile/zkavclub.bsky.social",
+        "https://zkav.club"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "connaugh-zcash-videos",
+      "kind": "project",
+      "before": "Education",
+      "classification": "Education",
+      "basis": "Education/media work belongs in community rollup; it is a creator initiative rather than a regional chapter. Planned videos remain separate from published work.",
+      "sources": [
+        "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/420",
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/55",
+        "https://x.com/zkmarketer/status/2082103793253335140",
+        "https://x.com/zkmarketer"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ecc-hackworks",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Official organization calls these prototypes and experiments. Mixed demos should remain Research rather than claiming a single deployed protocol.",
+      "sources": [
+        "https://github.com/zcash-hackworks"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "edge-wallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet classification matches the reviewed product description; retain integration scope without implying all upstream activity is Zcash-specific.",
+      "sources": [
+        "https://github.com/EdgeApp/edge-react-gui",
+        "https://github.com/EdgeApp/edge-react-gui/blob/develop/CHANGELOG.md",
+        "https://edge.app"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "edge-zcash-native",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable native wallet bindings consumed by React Native and Node applications, not a complete end-user wallet.",
+      "sources": [
+        "https://github.com/EdgeApp/react-native-zcash",
+        "https://github.com/EdgeApp/zcash-native"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "eduzec",
+      "kind": "project",
+      "before": "Education",
+      "classification": "Education",
+      "basis": "Official repository identifies an education app; put under community/education without counting it as a community organization or inheriting all ZecHub funding.",
+      "sources": [
+        "https://github.com/ZecHub/EduZEC",
+        "https://github.com/ZecHub"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "elemental-zec",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Umbrella grant bundles reusable components, OAuth and payment/publishing services; Developer tools is defensible for the aggregate. Do not classify the entire grant as only a UI library.",
+      "sources": [
+        "https://github.com/elemental-zcash/react"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "medium",
+      "changes": null
+    },
+    {
+      "id": "free2z",
+      "kind": "project",
+      "before": "Community",
+      "classification": "Community",
+      "basis": "Creator-facing social/content product, not a community group. Current ZUU repository also contains wallet/SDK/experiment projects: do not transfer every monorepo capability to Free2Z.",
+      "sources": [
+        "https://github.com/free2z/zuu",
+        "https://forum.zcashcommunity.com/t/free2z-preparing-the-garden-for-spring/43979",
+        "https://forum.zcashcommunity.com/t/zcash-community-grants-meeting-minutes-2-20-23/44120",
+        "https://forum.zcashcommunity.com/t/free2-whats-your/41289?u=decentralistdan",
+        "https://free2z.cash"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "frost",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Threshold Schnorr signing library and companion tools. Cryptography is more specific than general SDK.",
+      "sources": [
+        "https://frost.zfnd.org/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "graphsense-zcash-accounting",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Scoped GraphSense accounting repair, not the whole analytics platform. Infrastructure is defensible; analytics identifies its data purpose.",
+      "sources": [
+        "https://github.com/graphsense/graphsense-lib/pull/163",
+        "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/424"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "medium",
+      "changes": null
+    },
+    {
+      "id": "halo2",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Proving-system crates and gadgets, not an end-user wallet or node.",
+      "sources": [
+        "https://github.com/zcash/halo2"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "hito-zcash",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet umbrella is valid, but display integration subtype. Milestones are workflow/funding evidence, not capability tags.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/55539/13",
+        "https://forum.zcashcommunity.com/t/55539/16",
+        "https://forum.zcashcommunity.com/t/55539/19",
+        "https://forum.zcashcommunity.com/t/grant-application-hito-hardware-wallet-zcash-cold-signing-orchard/55539",
+        "https://github.com/hito-dev/hito-zcash-milestone-3"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "hosh",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Deployed monitoring/checker/dashboard service for Bitcoin and Zcash light-wallet endpoints; operational infrastructure, not an explorer.",
+      "sources": [
+        "https://github.com/zecrocks/hosh"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ironwood-external-audits",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Application scope is external security-review costs, not protocol implementation or an organization-wide product.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/56"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ironwood-human-readable-proof",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Do not present a planned human-readable proof exposition as a separate machine-checked verification implementation.",
+      "sources": [
+        "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": {
+        "category": "Research",
+        "reason": "Do not present a planned human-readable proof exposition as a separate machine-checked verification implementation.",
+        "sources": [
+          "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438"
+        ],
+        "add": [
+          "cryptography",
+          "mathematical-exposition",
+          "bulletproofs"
+        ],
+        "remove": [
+          "formal-verification"
+        ]
+      }
+    },
+    {
+      "id": "ironwood-verification",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Lean proof development for cryptographic soundness and associated documentation. Cryptography is valid; no deployed node implied.",
+      "sources": [
+        "https://github.com/zcash/ironwood"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "keystone-zcash",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Integration in multichain firmware, not a separate independent wallet. Shielded support claims require the scoped reviewed integration evidence.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/keystone-hardware-wallet-support-grant-application/48508",
+        "https://github.com/KeystoneHQ/keystone3-firmware",
+        "https://keyst.one"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ledger-hq-zcash",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Keep current LedgerHQ integration separate from historical Hanh and Zondax work; do not equate a software integration record with all Ledger products.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/50951/154",
+        "https://forum.zcashcommunity.com/t/50951/170",
+        "https://forum.zcashcommunity.com/t/a-path-forward-for-ledger-and-zcash/50951/131",
+        "https://github.com/LedgerHQ/app-zcash"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ledger-zcash",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Historical Zondax integration stays distinct from Hanh and LedgerHQ; retain funding scopes and audited repository overlap, not generic Ledger grouping.",
+      "sources": [
+        "https://github.com/Zondax/ledger-zcash",
+        "https://forum.zcashcommunity.com/t/official-shielded-support-for-zcash-in-ledger-hw-wallet/45965"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ledger-zcash-bindings",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable integration bindings, separate from device firmware or the wallet app itself.",
+      "sources": [
+        "https://github.com/Zondax/ledger-zcash-rs",
+        "https://github.com/Zondax/ledger-zcash-js"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "librustzcash",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Collection of reusable Zcash and wallet crates. Crypto is an overlapping capability, not grounds to move the entire aggregate to Cryptography.",
+      "sources": [
+        "https://github.com/zcash/librustzcash",
+        "https://zfnd.org/zcash-foundation-assumes-stewardship-of-core-zcash-community-assets/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "lightwalletd",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Serves compact chain data to wallet clients; does not become a wallet simply because wallets consume it.",
+      "sources": [
+        "https://github.com/zcash/lightwalletd",
+        "https://github.com/zcash",
+        "https://zfnd.org/zcash-foundation-assumes-stewardship-of-core-zcash-community-assets/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "maya-zcash",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "DeFi/swap classification fits. external-git is provenance, not product function; shielded-interoperability must not imply end-to-end cross-chain privacy or present availability.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/transparent-shielded-dex-with-maya-protocol/46857",
+        "https://forum.zcashcommunity.com/t/maya-protocol-advanced-shielded-zec-support-retroactive-grant/54593",
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/19",
+        "https://gitlab.com/mayachain/chains/zcash",
+        "https://gitlab.com/mayachain/mayanode",
+        "https://forum.zcashcommunity.com/t/maya-protocol-advanced-shielded-zec-support-retroactive-grant/54593/6",
+        "https://forum.zcashcommunity.com/t/maya-protocol-advanced-shielded-zec-support-retroactive-grant/54593/15"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "mfkdf2",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Key-derivation library supports passkeys and multiple factors; README explicitly warns that it is not production ready. Existing research/prototype qualifiers fit.",
+      "sources": [
+        "https://github.com/multifactor/MFKDF2.rs"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "nighthawk-explorer",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Public explorer program plus client-library component. Broad Infrastructure is defensible; explorer could be a dedicated primary area if adopted consistently.",
+      "sources": [
+        "https://github.com/nighthawk-apps/zcash-explorer"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "nighthawk-legacy-android",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet type remains correct; archived/historical belong in lifecycle, Nighthawk in owner, community-grant in funding. Never hide archival status.",
+      "sources": [
+        "https://github.com/nighthawk-apps/nighthawk-wallet-android",
+        "https://github.com/nighthawk-apps",
+        "https://forum.zcashcommunity.com/t/39017/20",
+        "https://forum.zcashcommunity.com/t/nighthawk-apps-zcash-development-fund-2023/43742",
+        "https://forum.zcashcommunity.com/t/nighthawk-wallet-design-development-grant/39017"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "noir-wallet-adapter",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Framework/provider adapter is reusable integration code; wallet actions are delegated through provider RPC.",
+      "sources": [
+        "https://github.com/NoirWallet/zcash-wallet-adapter"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "noir-wallet-sdk",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Public SDK integrates dApps with Noir; it is not the complete wallet extension.",
+      "sources": [
+        "https://docs.zknoir.com",
+        "https://github.com/NoirWallet/noir-wallet-sdk",
+        "https://forum.zcashcommunity.com/t/rhea-finance-zcash-gateway-browser-wallet-cross-chain-defi/55073"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "nym-zcash",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Network privacy integration in shared Nym infrastructure; broad monorepo must not imply all Nym is a Zcash project.",
+      "sources": [
+        "https://zcash-sdk.nym.com/",
+        "https://github.com/nymtech/nym",
+        "https://zcash-sdk.nym.com/guidance/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "oblivious-message-retrieval",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "README explicitly identifies a C++ proof of concept accompanying a research paper; no deployed light-client integration asserted.",
+      "sources": [
+        "https://github.com/ZeyuThomasLiu/ObliviousMessageRetrieval"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "onekey-zcash",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet integration scope is correct. Under-development status and unverified delivery must stay visible; shielded tag cannot imply completed support.",
+      "sources": [
+        "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/228",
+        "https://forum.zcashcommunity.com/t/onekey-zcash-hardware-support-with-unified-wallet-architecture-transparent-shielded/54833",
+        "https://github.com/OneKeyHQ/firmware-pro"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "orchard",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Implementation of shielded transaction cryptography. Library identity is distinct from the lifecycle of the Orchard pool.",
+      "sources": [
+        "https://github.com/zcash/orchard"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "orchard-security-research",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Independent vulnerability research and disclosure; not funding of Orchard maintenance.",
+      "sources": [
+        "https://shieldedlabs.net/the-orchard-counterfeiting-vulnerability/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ows-zcash",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable wallet/signing integration in a shared standard implementation; local use and upstream contribution remain distinct.",
+      "sources": [
+        "https://github.com/Kenbak/core",
+        "https://forum.zcashcommunity.com/t/55126/6",
+        "https://forum.zcashcommunity.com/t/grant-application-zcash-integration-for-the-open-wallet-standard-ows/55126"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "qedit-zcash-tx-tool",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Testing/transaction-generation utility supporting ZSA work, not itself the ZSA protocol.",
+      "sources": [
+        "https://github.com/QED-it/zcash_tx_tool"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "qedit-zsa",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "ZSA protocol program includes modified nodes, cryptography, specifications and test tooling. Protocol is the correct primary scope, without implying activation.",
+      "sources": [
+        "https://github.com/QED-it/zebra"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ragu",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Official repository explicitly warns under heavy development, unaudited and not for production.",
+      "sources": [
+        "https://github.com/tachyon-zcash/ragu"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": {
+        "category": "Cryptography",
+        "reason": "Official repository explicitly warns under heavy development, unaudited and not for production.",
+        "sources": [
+          "https://github.com/tachyon-zcash/ragu"
+        ],
+        "add": [
+          "prototype"
+        ],
+        "remove": []
+      }
+    },
+    {
+      "id": "redbridge",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Payments & DeFi",
+      "basis": "User-facing purpose is transferring value between Zcash and Avalanche. Keep development/prototype status separate; category does not imply a production bridge.",
+      "sources": [
+        "https://github.com/red-dev-inc/red-bridge"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": {
+        "category": "Payments & DeFi",
+        "reason": "User-facing purpose is transferring value between Zcash and Avalanche. Keep development/prototype status separate; category does not imply a production bridge.",
+        "sources": [
+          "https://github.com/red-dev-inc/red-bridge"
+        ]
+      }
+    },
+    {
+      "id": "sapling-crypto",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Rust transaction and proof primitives specific to Sapling; Cryptography is appropriately specific.",
+      "sources": [
+        "https://docs.rs/sapling-crypto/latest/sapling_crypto/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "shielded-crosslink",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Proposed consensus upgrade; official page links an incentivized feature network. Protocol is scope, not mainnet status.",
+      "sources": [
+        "https://shieldedlabs.net/crosslink/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "shielded-dynamic-fees",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Official dedicated page describes proposal exploration; tag should make that status visible.",
+      "sources": [
+        "https://shieldedlabs.net/fees/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": {
+        "category": "Protocol",
+        "reason": "Official dedicated page describes proposal exploration; tag should make that status visible.",
+        "sources": [
+          "https://shieldedlabs.net/fees/"
+        ],
+        "add": [
+          "Proposed upgrade"
+        ],
+        "remove": [],
+        "website": "https://shieldedlabs.net/fees/"
+      }
+    },
+    {
+      "id": "shielded-nsm",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Issuance and fee-burn protocol changes and simulations. Each ZIP must retain its independent activation state.",
+      "sources": [
+        "https://shieldedlabs.net/nsm/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "shielded-zero",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Official description is a supported infrastructure suite bundling multiple upstream components, not one independent consensus implementation.",
+      "sources": [
+        "https://shieldedlabs.net/zero/",
+        "https://github.com/ShieldedLabs/zero"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "slipstream",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable synchronization engine consumed by Zcash wallets.",
+      "sources": [
+        "https://github.com/zodl-inc/slipstream",
+        "https://zodl.com/zodl-raises-25m-in-seed-funding/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "stagex-zcash",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Build tooling and deterministic build work, even though it is shared infrastructure and targets node/wallet components.",
+      "sources": [
+        "https://codeberg.org/stagex/stagex",
+        "https://forum.zcashcommunity.com/t/bootstrapped-and-deterministic-builds-a-la-stagex/53040",
+        "https://forum.zcashcommunity.com/t/53040/3"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "swapkit-zcash",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable cross-chain SDK integration, not the exchange product itself.",
+      "sources": [
+        "https://swapkit.dev",
+        "https://github.com/swapkit/SwapKit",
+        "https://z.cash/ecosystem/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "tachyon-protocol",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Official site explicitly calls this a proposed scalability upgrade requiring community approval before activation.",
+      "sources": [
+        "https://tachyon.z.cash/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "thorswap-metro",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "Current payments tag is too broad: source scope is swap interfaces and Metro wallet integration. Shared SwapKit is not wholly owned/funded by this scope.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/32",
+        "https://github.com/swapkit/SwapKit",
+        "https://app.thorswap.finance/"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "unstoppable-wallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet type is correct. Canonicalize multichain/multi-chain duplicate; funding program is a separate facet.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/7",
+        "https://github.com/horizontalsystems/unstoppable-wallet-ios",
+        "https://unstoppable.money"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "unstoppable-zcash-kit",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "A light-client SDK fork, distinct from the Unstoppable end-user wallet.",
+      "sources": [
+        "https://github.com/horizontalsystems/ZcashLightClientKit",
+        "https://github.com/orgs/horizontalsystems/repositories"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "valar-private-voting",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Governance",
+      "basis": "Application-specific private coinholder voting system. With the root-approved Governance area, classify the system by voter purpose; its SDK, circuits and PIR components require their own repository-purpose classifications.",
+      "sources": [
+        "https://github.com/valargroup/vote-sdk"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": {
+        "category": "Governance",
+        "reason": "Application-specific private coinholder voting system. With the root-approved Governance area, classify the system by voter purpose; its SDK, circuits and PIR components require their own repository-purpose classifications.",
+        "sources": [
+          "https://github.com/valargroup/vote-sdk"
+        ]
+      }
+    },
+    {
+      "id": "valargroup-ironwood-integration",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Application covers consensus integration, migration and activation work; protocol engineering, separate from audit reimbursement.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/64"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "vizor-wallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet type is correct. Keystone is an integration name; coinholder-voting is an optional capability, not the primary work area.",
+      "sources": [
+        "https://vizor.cash/",
+        "https://github.com/chainapsis/vizor-wallet",
+        "https://github.com/chainapsis/vizor-wallet/releases",
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66",
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/66#issuecomment-5300129591"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "webzjs",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable browser library plus MetaMask integration. A renewal decision does not determine the technical area.",
+      "sources": [
+        "https://chainsafe.github.io/WebZjs/",
+        "https://forum.zcashcommunity.com/t/webzjs-browser-library-and-browser-wallet-maintenance/49717"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ywallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Historical/current chain support must remain explicit: reviewed record says Zcash support deprecated. Do not promote its historical Zcash tags as current compatibility.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/43061/3",
+        "https://forum.zcashcommunity.com/t/ywallet-maintenance-and-minor-improvements/45041",
+        "https://forum.zcashcommunity.com/t/ywallet-warp-sync/42620?u=decentralistdan",
+        "https://forum.zcashcommunity.com/t/orchard-and-ua-for-ywallet/43061",
+        "https://github.com/hhanh00/zwallet/commit/865dc0e533276d3426c3778f82082cefc1612fec",
+        "https://ywallet.app"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "z3",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Integration stack combines independently owned node, indexer and wallet components; Infrastructure fits the aggregate.",
+      "sources": [
+        "https://github.com/ZcashFoundation/z3",
+        "https://zfnd.org/wp-content/uploads/2026/08/Zcash-Foundation-Q2-2026-Report.pdf"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zaddr-wasm-parser",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Stateless reusable address API; requires no wallet keys, node or wallet state.",
+      "sources": [
+        "https://github.com/ruzcash/zaddr-wasm-parser"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zaino",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Chain indexer and RPC/compact-block service, not a consensus validator or signing wallet.",
+      "sources": [
+        "https://zingolabs.github.io/zaino/",
+        "https://forum.zcashcommunity.com/t/complete-zaino/50708",
+        "https://forum.zcashcommunity.com/t/zaino-the-zallet-release/52155"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zair",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Developer tools",
+      "basis": "Purpose-based primary classification: reusable airdrop CLI/SDK; the proof primitives remain discoverable as secondary tags.",
+      "sources": [
+        "https://github.com/equilibriumco/zair"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "medium-high",
+      "changes": {
+        "category": "Developer tools",
+        "reason": "Purpose-based primary classification: reusable airdrop CLI/SDK; the proof primitives remain discoverable as secondary tags.",
+        "sources": [
+          "https://github.com/equilibriumco/zair"
+        ],
+        "add": [
+          "cryptography",
+          "cli",
+          "sdk"
+        ],
+        "remove": []
+      }
+    },
+    {
+      "id": "zakura",
+      "kind": "project",
+      "before": "Nodes",
+      "classification": "Nodes",
+      "basis": "Full consensus node. Valar/Project Tachyon are affiliations, not functional tags.",
+      "sources": [
+        "https://zakura.com/",
+        "https://github.com/zakura-core/zakura",
+        "https://zakura.com/announcements/introducing-zakura/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zakura-common",
+      "kind": "project",
+      "before": "Cryptography",
+      "classification": "Cryptography",
+      "basis": "Official announcement identifies a cryptography and protocol-library collection, distinct from the separate wallet-libraries repository.",
+      "sources": [
+        "https://zakura.com/announcements/zakura-common/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zakura-wallet-libraries",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Wallet-layer crates forked onto Zakura cryptography; separate from Zakura's consensus node.",
+      "sources": [
+        "https://github.com/zakura-core/wallet-libraries",
+        "https://zakura.com/announcements/zakura-common/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zallet",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Wallets",
+      "basis": "Official README explicitly identifies a full-node Zcash wallet, separate from consensus. It is not intended as a reusable Rust library.",
+      "sources": [
+        "https://github.com/zcash/zallet"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": {
+        "category": "Wallets",
+        "reason": "Official README explicitly identifies a full-node Zcash wallet, separate from consensus. It is not intended as a reusable Rust library.",
+        "sources": [
+          "https://github.com/zcash/zallet"
+        ]
+      }
+    },
+    {
+      "id": "zbi",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Cluster/controller/repository-service infrastructure. Historical and current-operation uncertainty belong in lifecycle/evidence fields.",
+      "sources": [
+        "https://github.com/zbitech",
+        "https://forum.zcashcommunity.com/t/40514/29",
+        "https://github.com/zbitech/k8s-cluster"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-android-sdk",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Native Android integration SDK, not an end-user application.",
+      "sources": [
+        "https://github.com/zcash/zcash-android-wallet-sdk",
+        "https://zfnd.org/zcash-foundation-assumes-stewardship-of-core-zcash-community-assets/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-coin-voting",
+      "kind": "project",
+      "before": "Community",
+      "classification": "Governance",
+      "basis": "Concrete primary-category mismatch: this is client/server/library voting software, not a community. If no Governance category is introduced use Infrastructure with governance tags.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/coin-voting-2-0/49177",
+        "https://forum.zcashcommunity.com/t/grant-application-hanh-maintenance-and-improvements-to-coin-voting/52350",
+        "https://hhanh00.github.io/zcv/"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": {
+        "category": "Governance",
+        "reason": "Concrete primary-category mismatch: this is client/server/library voting software, not a community. If no Governance category is introduced use Infrastructure with governance tags.",
+        "sources": [
+          "https://forum.zcashcommunity.com/t/coin-voting-2-0/49177",
+          "https://forum.zcashcommunity.com/t/grant-application-hanh-maintenance-and-improvements-to-coin-voting/52350",
+          "https://hhanh00.github.io/zcv/"
+        ]
+      }
+    },
+    {
+      "id": "zcash-cold-wallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Retain wallet scope with CLI/offline signer subtype. Historical lifecycle and grant provenance are separate axes.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/38664/39",
+        "https://forum.zcashcommunity.com/t/38664/5",
+        "https://forum.zcashcommunity.com/t/cold-wallet/38664/",
+        "https://github.com/hhanh00/zcash-cold-wallet"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-devtool",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Developer CLI explicitly intended for prototyping Zcash functionality. Existing empty tags omit its discoverable purpose.",
+      "sources": [
+        "https://github.com/zcash/zcash-devtool"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-ika",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Libraries & SDKs",
+      "basis": "Installable npm package exports wallet/signing/transaction functions. Maintainer states Ika cannot sign Orchard; add transparent scope rather than implying general shielded custody.",
+      "sources": [
+        "https://github.com/Frontier-Compute/zcash-ika"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": {
+        "category": "Libraries & SDKs",
+        "reason": "Installable npm package exports wallet/signing/transaction functions. Maintainer states Ika cannot sign Orchard; add transparent scope rather than implying general shielded custody.",
+        "sources": [
+          "https://github.com/Frontier-Compute/zcash-ika"
+        ],
+        "add": [
+          "signing-sdk",
+          "split-key-custody",
+          "transparent-transactions"
+        ]
+      }
+    },
+    {
+      "id": "zcash-ledger-hanh",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Historical Hanh integration is distinct from current LedgerHQ work. Do not collapse identities by brand.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/shielded-support-for-ledger-hardware-wallets-nanos-nanox/44113",
+        "https://github.com/hhanh00/zcash-ledger"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-network-school-kazakhstan",
+      "kind": "project",
+      "before": "Education",
+      "classification": "Education",
+      "basis": "Primary application describes events, onboarding and community support. Its application form Category Security is not a reliable product taxonomy; planned outcomes are not measured adoption.",
+      "sources": [
+        "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/431"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-parsers",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable address and F4Jumble implementations; do not classify the aggregate as wallet software.",
+      "sources": [
+        "https://github.com/MarcoEzekiel/go-zcashaddress",
+        "https://forum.zcashcommunity.com/t/47647/3",
+        "https://forum.zcashcommunity.com/t/47647/11"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-router-sdk",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Core routing and account packages consumed by other applications; example UI does not change the primary SDK identity.",
+      "sources": [
+        "https://github.com/nufi-official/zcash-router-sdk"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-stack",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Deployment stack for running node/indexer/lightwallet services, with workshop material as a supporting facet.",
+      "sources": [
+        "https://github.com/zecrocks/zcash-stack"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-swift-sdk",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Native Swift wallet SDK with Rust FFI; no category change indicated.",
+      "sources": [
+        "https://github.com/zcash/zcash-swift-wallet-sdk",
+        "https://zfnd.org/zcash-foundation-assumes-stewardship-of-core-zcash-community-assets/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-test-vectors",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Fixtures for validating implementations. Existing empty tags omit its purpose.",
+      "sources": [
+        "https://github.com/zcash/zcash-test-vectors"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-testnet-infrastructure",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Scoped testnet/explorer infrastructure program; testnet-in-a-box is one component and also overlaps historical ECC work.",
+      "sources": [
+        "https://github.com/zcash/zcash-explorer",
+        "https://forum.zcashcommunity.com/t/block-explorer-testnet-infrastructure/47656",
+        "https://forum.zcashcommunity.com/t/block-explorer-testnet-infrastructure-2025/51451"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-uniffi",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable UniFFI wrapper; demonstration apps do not make the umbrella an end-user wallet.",
+      "sources": [
+        "https://equilibriumco.github.io/uniffi-zcash-lib/",
+        "https://forum.zcashcommunity.com/t/43468/10",
+        "https://forum.zcashcommunity.com/t/zcash-uniffi-library-addenda-resubmission/44904/8"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-wallet-formats",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "The checked artifact is a survey supporting possible interchange formats, not an adopted standard.",
+      "sources": [
+        "https://github.com/zingolabs/zcash-wallet-formats"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": {
+        "category": "Research",
+        "reason": "The checked artifact is a survey supporting possible interchange formats, not an adopted standard.",
+        "sources": [
+          "https://github.com/zingolabs/zcash-wallet-formats"
+        ],
+        "add": [
+          "wallet-format-survey"
+        ],
+        "remove": [
+          "Standards"
+        ]
+      }
+    },
+    {
+      "id": "zcash-walletd",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Wallets",
+      "basis": "Maintainer explicitly calls this a shielded REST wallet using viewing keys. It watches invoices for payment gateways and does not hold spending keys; record that distinction.",
+      "sources": [
+        "https://github.com/hhanh00/zcash-walletd"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": {
+        "category": "Wallets",
+        "reason": "Maintainer explicitly calls this a shielded REST wallet using viewing keys. It watches invoices for payment gateways and does not hold spending keys; record that distinction.",
+        "sources": [
+          "https://github.com/hhanh00/zcash-walletd"
+        ]
+      }
+    },
+    {
+      "id": "zcash-wasm-benchmark",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Isolated benchmarks assess browser-wallet feasibility; this is neither a complete wallet nor a production SDK.",
+      "sources": [
+        "https://github.com/ChainSafe/zcash-wasm-benchmark"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcash-zips",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Specifications and proposals; the category describes protocol governance scope, not collective acceptance or deployment.",
+      "sources": [
+        "https://zips.z.cash/"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcashd",
+      "kind": "project",
+      "before": "Nodes",
+      "classification": "Nodes",
+      "basis": "Consensus daemon with an embedded wallet. Retired/archived/ECC tags are lifecycle/affiliation metadata rather than purpose.",
+      "sources": [
+        "https://github.com/zcash/zcash",
+        "https://electriccoin.co/blog/ecc-transparency-report-for-q4-2024/"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcashex",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable RPC client component, separate from the complete Nighthawk explorer program.",
+      "sources": [
+        "https://github.com/nighthawk-apps/zcashex",
+        "https://github.com/nighthawk-apps"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zcashnames",
+      "kind": "project",
+      "before": "Identity",
+      "classification": "Identity",
+      "basis": "Identity/name-resolution classification is appropriate. Replace vague protocol tag with name-service to avoid implying base consensus ownership; proposal approval does not prove launch.",
+      "sources": [
+        "https://github.com/zcashme/zns-whitepaper",
+        "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737/15",
+        "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737/16",
+        "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737",
+        "https://www.zcashnames.com"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": {
+        "category": "Identity",
+        "reason": "Identity/name-resolution classification is appropriate. Replace vague protocol tag with name-service to avoid implying base consensus ownership; proposal approval does not prove launch.",
+        "sources": [
+          "https://github.com/zcashme/zns-whitepaper",
+          "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737/15",
+          "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737/16",
+          "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737",
+          "https://www.zcashnames.com"
+        ],
+        "add": [
+          "name-service"
+        ],
+        "remove": [
+          "protocol"
+        ]
+      }
+    },
+    {
+      "id": "zcashtocash",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "Payments is appropriate; no DeFi-specific capability established. Coordinator identity must not be mistaken for the service operator.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/60",
+        "https://zcashto.cash"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zebra",
+      "kind": "project",
+      "before": "Nodes",
+      "classification": "Nodes",
+      "basis": "Independent consensus node; Zcash Foundation is affiliation metadata.",
+      "sources": [
+        "https://zebra.zfnd.org/",
+        "https://github.com/ZcashFoundation",
+        "https://zfnd.org/wp-content/uploads/2026/08/Zcash-Foundation-Q2-2026-Report.pdf"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zebra-batch-equivalence",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Test harness compares batch/single verification; targets cryptographic security but is not itself a cryptographic primitive.",
+      "sources": [
+        "https://github.com/robustfengbin/zebra-batch-equivalence",
+        "https://forum.zcashcommunity.com/t/56308/4",
+        "https://forum.zcashcommunity.com/t/56308/6"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zebra-fuzzing",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Fuzzing targets/corpora/CI artifacts are developer verification tools, not the node itself.",
+      "sources": [
+        "https://github.com/robustfengbin/zebra-fuzz-m3",
+        "https://forum.zcashcommunity.com/t/54972/14",
+        "https://forum.zcashcommunity.com/t/54972/15"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zebra-security-research",
+      "kind": "project",
+      "before": "Research",
+      "classification": "Research",
+      "basis": "Two researcher bounty scopes concern vulnerability discovery and disclosure, distinct from Zebra-team remediation.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/58",
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/54"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zec-bounties",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Community",
+      "basis": "Recommended primary work-area refinement: platform coordinates community bounties/submissions; ZEC payment is secondary. Payments & DeFi is not evidence that it is a DeFi protocol.",
+      "sources": [
+        "https://github.com/ZecHub/zec-bounties",
+        "https://github.com/ZecHub",
+        "https://bounties.zechub.wiki/"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": {
+        "category": "Community",
+        "reason": "Recommended primary work-area refinement: platform coordinates community bounties/submissions; ZEC payment is secondary. Payments & DeFi is not evidence that it is a DeFi protocol.",
+        "sources": [
+          "https://github.com/ZecHub/zec-bounties",
+          "https://github.com/ZecHub",
+          "https://bounties.zechub.wiki/"
+        ],
+        "add": [
+          "contributor-tooling"
+        ]
+      }
+    },
+    {
+      "id": "zecd",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Wallets",
+      "basis": "Wallet server handles seeds/addresses/signing and syncs as a light client against Zebra/Zakura; it is explicitly not a consensus node or indexer.",
+      "sources": [
+        "https://github.com/zecrocks/zecd"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": {
+        "category": "Wallets",
+        "reason": "Wallet server handles seeds/addresses/signing and syncs as a light client against Zebra/Zakura; it is explicitly not a consensus node or indexer.",
+        "sources": [
+          "https://github.com/zecrocks/zecd"
+        ]
+      }
+    },
+    {
+      "id": "zecdev-frost-uniffi",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Bindings around FROST consumed by other languages. Its prototype status is lifecycle metadata, not a different primary function.",
+      "sources": [
+        "https://github.com/zecdev/frost-uniffi-sdk",
+        "https://github.com/zecdev"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecdev-payment-uris",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Reusable payment URI parsers/builders, not a merchant payment service.",
+      "sources": [
+        "https://www.zecdev.org/",
+        "https://github.com/zecdev/zcash-kotlin-payment-uri",
+        "https://github.com/zecdev"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecdev-payment-vectors",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Reference conformance fixtures shared by payment URI libraries.",
+      "sources": [
+        "https://github.com/zecdev/zcash-zip321-test-vectors",
+        "https://github.com/zecdev"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecdev-resources",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Resources and migration dashboards primarily address builders/operators; Education overlaps but current Developer tools is defensible.",
+      "sources": [
+        "https://www.zecdev.org/",
+        "https://github.com/zecdev/zecdev.github.io"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "medium",
+      "changes": null
+    },
+    {
+      "id": "zechub",
+      "kind": "community",
+      "before": "Community (history projection; no category field in COMMUNITIES)",
+      "classification": "Community (history projection; no category field in COMMUNITIES)",
+      "basis": "The community-owned education DAO: wiki, bounties, and the umbrella funding regional ambassadors from its own treasury. Merge explicitly with project zechub; child products keep separate identities.",
+      "sources": [
+        "https://zechub.wiki/",
+        "https://forum.zcashcommunity.com/t/53686",
+        "https://forum.zcashcommunity.com/t/56030",
+        "https://x.com/zechub",
+        "https://www.instagram.com/itszechub/",
+        "https://www.tiktok.com/@itszechub",
+        "https://www.youtube.com/@zechub",
+        "https://discord.gg/zcash",
+        "https://bsky.app/profile/zechub.bsky.social",
+        "https://zechub.substack.com",
+        "https://linktr.ee/zechub",
+        "https://zechub.wiki"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zechub",
+      "kind": "project",
+      "before": "Education",
+      "classification": "Education",
+      "basis": "Explicitly the same identity as COMMUNITIES.zechub: include once, preserving both source sets. EduZEC and Zec Bounties stay separate related products.",
+      "sources": [
+        "https://zechub.wiki/",
+        "https://forum.zcashcommunity.com/t/zechub-open-source-education-for-zcash/43761",
+        "https://github.com/ZecHub/zechub",
+        "https://forum.zcashcommunity.com/t/zechub-proposal-2024/46077?u=decentralistdan",
+        "https://forum.zcashcommunity.com/t/zechub-an-education-hub-for-zcash-2024-continued/47947",
+        "https://forum.zcashcommunity.com/t/zechub-2025-an-education-hub-for-zcash/49429",
+        "https://forum.zcashcommunity.com/t/zechub-2026/53686",
+        "https://zechub.org"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zeckit",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Local devnet/regtest and CI toolkit; a funding/context distinction should not change function.",
+      "sources": [
+        "https://github.com/zecdev/ZecKit",
+        "https://forum.zcashcommunity.com/t/52472/5",
+        "https://forum.zcashcommunity.com/t/grant-application-zecdev-launchpad-one-command-zebra-devnet-reusable-ci/52472"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecpages",
+      "kind": "project",
+      "before": "Community",
+      "classification": "Community",
+      "basis": "Official README calls it a social publishing proof-of-concept; not a community organization. Historical is lifecycle. Existing subscriptions tag is not substantiated by the inspected README, so remove/hold pending source.",
+      "sources": [
+        "https://github.com/michaelharms6010/zecpages",
+        "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/4",
+        "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/",
+        "https://zecpages.com"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": {
+        "category": "Community",
+        "reason": "Official README calls it a social publishing proof-of-concept; not a community organization. Historical is lifecycle. Existing subscriptions tag is not substantiated by the inspected README, so remove/hold pending source.",
+        "sources": [
+          "https://github.com/michaelharms6010/zecpages",
+          "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/4",
+          "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/",
+          "https://zecpages.com"
+        ],
+        "remove": [
+          "subscriptions"
+        ],
+        "add": [
+          "social"
+        ]
+      }
+    },
+    {
+      "id": "zecpages-faucet",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Faucet supports development/testing rather than economic payment processing.",
+      "sources": [
+        "https://github.com/michaelharms6010/zcash-faucet",
+        "https://forum.zcashcommunity.com/t/38857/1",
+        "https://forum.zcashcommunity.com/t/38857/10"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecping",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Developer tools",
+      "basis": "Executable diagnostic client measures remote server responses; it is not itself a lightwallet server. Monitoring is a secondary infrastructure capability.",
+      "sources": [
+        "https://github.com/zecrocks/zecping"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "medium",
+      "changes": {
+        "category": "Developer tools",
+        "reason": "Executable diagnostic client measures remote server responses; it is not itself a lightwallet server. Monitoring is a secondary infrastructure capability.",
+        "sources": [
+          "https://github.com/zecrocks/zecping"
+        ],
+        "add": [
+          "cli",
+          "diagnostics",
+          "monitoring"
+        ],
+        "remove": [
+          "lightwallet-server"
+        ]
+      }
+    },
+    {
+      "id": "zecrocks",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Umbrella hosted-infrastructure program, overlapping explicitly listed Zcash Stack, zecping and Hosh components.",
+      "sources": [
+        "https://zec.rocks",
+        "https://forum.zcashcommunity.com/t/47080/39",
+        "https://forum.zcashcommunity.com/t/47080/40"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecwallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Family record overlaps lite/CLI component repositories deliberately. Link parent/components, but never add release/funding totals across overlapping identities.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/42134/17",
+        "https://forum.zcashcommunity.com/t/42134/44",
+        "https://forum.zcashcommunity.com/t/42134/50",
+        "https://forum.zcashcommunity.com/t/42134/53",
+        "https://forum.zcashcommunity.com/t/zecwallet-infra-funding-for-increased-traffic/38643",
+        "https://forum.zcashcommunity.com/t/zecwallet-lightclient-protocol-research-and-development/38973/2",
+        "https://forum.zcashcommunity.com/t/zecwallet-and-orchard/42134?u=decentralistdan",
+        "https://github.com/ZcashFoundation/zecwallet",
+        "https://www.zecwallet.co"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecwallet-light-cli",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Not a clear category error: README is a usable CLI wallet and library. Keep Wallets rollup with library/CLI subtype; repository engineering view can use Libraries & SDKs. Archived status separate.",
+      "sources": [
+        "https://github.com/adityapk00/zecwallet-light-cli"
+      ],
+      "verification": "primary source read during this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zecwallet-lite",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet is correct, with explicit archived lifecycle; do not present as a current recommended wallet.",
+      "sources": [
+        "https://github.com/adityapk00/zecwallet-lite"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zeeder",
+      "kind": "project",
+      "before": "Infrastructure",
+      "classification": "Infrastructure",
+      "basis": "Peer discovery service supports full nodes but does not itself perform consensus validation.",
+      "sources": [
+        "https://github.com/ZcashFoundation/zeeder",
+        "https://github.com/ZcashFoundation",
+        "https://zfnd.org/wp-content/uploads/2026/08/Zcash-Foundation-Q2-2026-Report.pdf"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zenith",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet classification fits full-node/RPC product. external-git belongs in source provenance.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/46523/14",
+        "https://forum.zcashcommunity.com/t/46523/41",
+        "https://forum.zcashcommunity.com/t/zenith-full-node-wallet/46523",
+        "https://git.vergara.tech/Vergara_Tech/zenith"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zewif",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Aggregate includes a format, libraries and the Zmigrate CLI; the program-level Developer tools primary area is defensible. Format standards and reusable libraries are overlapping facets.",
+      "sources": [
+        "https://github.com/BlockchainCommons/zewif",
+        "https://github.com/BlockchainCommons/zmigrate"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "medium",
+      "changes": null
+    },
+    {
+      "id": "zexcavator",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Recovery/extraction utility rather than a wallet used for everyday balance management and spending.",
+      "sources": [
+        "https://github.com/zingolabs/zexcavator"
+      ],
+      "verification": "live-primary-source",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zgo",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "Payments classification fits; no reason to label DeFi. external-git is provenance.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/vergara-technologies-2024-grant-application/46206",
+        "https://forum.zcashcommunity.com/t/zgo-migration-to-zebra-grant-application/53225",
+        "https://forum.zcashcommunity.com/t/zgo-the-zcash-register/41885/8",
+        "https://forum.zcashcommunity.com/t/zgo-the-zcash-register/41885?u=decentralistdan",
+        "https://git.vergara.tech/Vergara_Tech/zgo",
+        "https://git.vergara.tech/Vergara_Tech/zgo-backend",
+        "https://zgo.cash"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "ziggurat",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Test/visualization framework for network behavior; not a production consensus node.",
+      "sources": [
+        "https://github.com/runziggurat/zcash",
+        "https://forum.zcashcommunity.com/t/41201/15",
+        "https://forum.zcashcommunity.com/t/ziggurat-3-0/43350"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zingo-pc",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet classification correct; Zingo Labs belongs in owner and PC in product/platform scope; link family without duplicate financial totals.",
+      "sources": [
+        "https://github.com/zingolabs/zingo-pc"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zingo-regchest",
+      "kind": "project",
+      "before": "Developer tools",
+      "classification": "Developer tools",
+      "basis": "Local containerized testing environment used by integration tests.",
+      "sources": [
+        "https://github.com/zingolabs/zingo-regchest",
+        "https://github.com/zingolabs/zingo-mobile"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zingo-wallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet classification correct. Remove redundant shielded and shielded-wallet tags; Zingo Labs owner and community-grant funding are separate facets.",
+      "sources": [
+        "https://forum.zcashcommunity.com/t/43945/20",
+        "https://forum.zcashcommunity.com/t/43945/49",
+        "https://github.com/zingolabs/zingo-mobile"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zingolib",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Primary library exposes wallet functions for app consumption; bundled CLI does not make it primarily an app.",
+      "sources": [
+        "https://github.com/zingolabs/zingolib",
+        "https://forum.zcashcommunity.com/t/42706/3",
+        "https://forum.zcashcommunity.com/t/42706/29"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zkool",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet classification correct. YWallet-successor is product relationship/history rather than capability; capability support remains scoped to sources.",
+      "sources": [
+        "https://github.com/hhanh00/zkool2"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zodl-core-protocol",
+      "kind": "project",
+      "before": "Protocol",
+      "classification": "Protocol",
+      "basis": "Application narrows scope to consensus security, Zallet and protocol work; distinct from the consumer wallet and broad shared-repository ownership.",
+      "sources": [
+        "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/33"
+      ],
+      "verification": "primary source read on 2026-10-05",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zodl-wallet",
+      "kind": "project",
+      "before": "Wallets",
+      "classification": "Wallets",
+      "basis": "Wallet classification correct. Normalize casing; Formerly Zashi is an alias/history badge, not a work category.",
+      "sources": [
+        "https://zodl.com/about/",
+        "https://support.zodl.com/article/14-how-do-i-obtain-support-for-zodl",
+        "https://github.com/zodl-inc",
+        "https://zodl.com/zodl-raises-25m-in-seed-funding/",
+        "https://zodl.com/"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zodl-wallet-sdks",
+      "kind": "project",
+      "before": "Libraries & SDKs",
+      "classification": "Libraries & SDKs",
+      "basis": "Mobile SDK components; product affiliation does not make these the ZODL wallet app.",
+      "sources": [
+        "https://github.com/zodl-inc",
+        "https://support.zodl.com/article/14-how-do-i-obtain-support-for-zodl"
+      ],
+      "verification": "recorded-primary-metadata",
+      "confidence": "high",
+      "changes": null
+    },
+    {
+      "id": "zpay",
+      "kind": "project",
+      "before": "Payments & DeFi",
+      "classification": "Payments & DeFi",
+      "basis": "Payment facilitator/adapters are payment infrastructure, not a wallet or evidence of a DeFi exchange. Retain narrowly sourced tags without claiming adoption.",
+      "sources": [
+        "https://github.com/gustavovalverde/zpay"
+      ],
+      "verification": "recorded description and reviewed source inventory; source not refetched this audit",
+      "confidence": "high",
+      "changes": null
+    }
+  ],
+  "followUps": [
+    {
+      "id": "cipherscan",
+      "kind": "current-brand-and-canonical-repository",
+      "detail": "cipherscan.app redirects to zecblock.com; Kenbak/cipherscan redirects to Kenbak/zecblock. Preserve historical grant title and stable project ID while reviewing current display name/aliases. Do not create a duplicate funding identity.",
+      "sources": [
+        "https://cipherscan.app/",
+        "https://zecblock.com/",
+        "https://github.com/Kenbak/cipherscan",
+        "https://github.com/Kenbak/zecblock",
+        "https://forum.zcashcommunity.com/t/cipherscan-2026-privacy-intelligence-for-zcash/54151"
+      ]
+    },
+    {
+      "id": "zcash-ika",
+      "kind": "capability-scope",
+      "detail": "Current maintainer README says the Ika signing path supports Zcash transparent transactions and not Orchard signing. Do not inherit a generic privacy/shielded custody claim from upstream topics.",
+      "sources": [
+        "https://github.com/Frontier-Compute/zcash-ika"
+      ]
+    },
+    {
+      "id": "shielded-zero",
+      "kind": "canonical-source-follow-up",
+      "detail": "Official project page now links Zero Software Stack plus zero-indexer, while registry still maps zero and zero-zb. Follow redirect and alias handling before replacing stored repository IDs. This audit does not mutate collection mappings.",
+      "sources": [
+        "https://shieldedlabs.net/zero/",
+        "https://github.com/ShieldedLabs/zero"
+      ]
+    }
+  ],
+  "repositoryReviews": {
+    "auditDate": "2026-10-05",
+    "scope": "Repository purpose overrides for the two voting project families and the Zair-linked Namada fork. This does not change repository identity, grants or organization ownership.",
+    "policy": "Project primary area and repository implementation purpose are separate axes. Governance belongs to the voting project families; implementation repositories retain their own function and may carry governance as a secondary tag. No family capability is inferred for every member repository.",
+    "entries": [
+      {
+        "repositoryId": "R_kgDORklo4w",
+        "repository": "valargroup/vote-sdk",
+        "category": "Infrastructure",
+        "tags": [
+          "voting-chain",
+          "governance",
+          "CometBFT",
+          "API"
+        ],
+        "rationale": "Despite the SDK name, the README describes a Cosmos/CometBFT application-specific voting chain with the svoted chain binary, validator startup, REST endpoints and an ABCI vote module. Its repository purpose is voting infrastructure, not a general Zcash node or merely a client SDK.",
+        "sourceUrl": "https://github.com/valargroup/vote-sdk",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/valargroup/vote-sdk"
+        ],
+        "confidence": "high",
+        "evidenceMode": "current-primary-live-checked"
+      },
+      {
+        "repositoryId": "R_kgDORc1myQ",
+        "repository": "valargroup/voting-circuits",
+        "category": "Cryptography",
+        "tags": [
+          "voting-circuits",
+          "zero-knowledge",
+          "Halo2",
+          "governance"
+        ],
+        "rationale": "The README explicitly identifies the circuit-only layer: delegation, vote and share-reveal proofs. Wallets normally use a higher-level crate; this repository implements cryptographic circuits.",
+        "sourceUrl": "https://github.com/valargroup/voting-circuits",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/valargroup/voting-circuits"
+        ],
+        "confidence": "high",
+        "evidenceMode": "current-primary-live-checked"
+      },
+      {
+        "repositoryId": "R_kgDORh8tMQ",
+        "repository": "valargroup/vote-nullifier-pir",
+        "category": "Infrastructure",
+        "tags": [
+          "PIR",
+          "nullifier-service",
+          "private-queries",
+          "governance"
+        ],
+        "rationale": "The workspace synchronizes nullifiers, builds a proof dataset and serves encrypted PIR queries. It includes cryptographic and client libraries, but the documented end-to-end deliverable is a data-retrieval service with a production deployment runbook.",
+        "sourceUrl": "https://github.com/valargroup/vote-nullifier-pir",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/valargroup/vote-nullifier-pir"
+        ],
+        "confidence": "high",
+        "evidenceMode": "current-primary-live-checked"
+      },
+      {
+        "repositoryId": "R_kgDOQmGxmQ",
+        "repository": "hhanh00/zcv",
+        "category": "Libraries & SDKs",
+        "tags": [
+          "coin-weighted-voting",
+          "Rust",
+          "client-server",
+          "governance"
+        ],
+        "rationale": "The current workspace has one member, zcvlib, whose manifest describes it as a Rust library for coin-weighted voting. It provides reusable client/server features and creator, voter, counter and CometBFT binaries. Library is the primary published unit; installation documentation also covers its voting validator server.",
+        "sourceUrl": "https://github.com/hhanh00/zcv/blob/main/zcvlib/Cargo.toml",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/hhanh00/zcv/blob/main/zcvlib/Cargo.toml",
+          "https://github.com/hhanh00/zcv/blob/main/Cargo.toml",
+          "https://github.com/hhanh00/zcv/blob/main/install.md"
+        ],
+        "confidence": "medium",
+        "evidenceMode": "current-primary-live-checked"
+      },
+      {
+        "repositoryId": "R_kgDOQMmtHA",
+        "repository": "hhanh00/zcash-vote-docker",
+        "category": "Infrastructure",
+        "tags": [
+          "deployment",
+          "containers",
+          "voting-servers",
+          "CometBFT"
+        ],
+        "rationale": "The README builds Docker images and runs coordinator/validator services and their CometBFT election chain. This is deployment infrastructure for voting, not wallet or generic application code.",
+        "sourceUrl": "https://github.com/hhanh00/zcash-vote-docker/blob/main/README.md",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/hhanh00/zcash-vote-docker/blob/main/README.md"
+        ],
+        "confidence": "high",
+        "evidenceMode": "current-primary-live-checked"
+      },
+      {
+        "repositoryId": "MDEwOlJlcG9zaXRvcnkzNzc5MDMwMTc=",
+        "repository": "hhanh00/zcash-sync",
+        "category": "Libraries & SDKs",
+        "tags": [
+          "wallet-library",
+          "synchronization",
+          "FFI",
+          "RPC"
+        ],
+        "rationale": "Cargo declares the zcash-warpsync package and warp_api_ffi rlib, with Dart/native bindings and optional wallet/RPC binaries. README methods include wallet creation, balances, history and payments. Voting is one consumer, not its primary purpose.",
+        "sourceUrl": "https://github.com/hhanh00/zcash-sync/blob/master/Cargo.toml",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/hhanh00/zcash-sync/blob/master/Cargo.toml",
+          "https://github.com/hhanh00/zcash-sync/blob/master/README.md"
+        ],
+        "confidence": "high",
+        "evidenceMode": "current-primary-live-checked"
+      },
+      {
+        "repositoryId": "R_kgDORdJDIw",
+        "repository": "equilibriumco/namada",
+        "category": "Nodes",
+        "tags": [
+          "Namada",
+          "proof-of-stake",
+          "interchain"
+        ],
+        "rationale": "This is a fork of the general Namada Layer-1 codebase. The README documents installing a node, client and wallet and describes CometBFT consensus, MASP and IBC. Its relationship to Zair does not turn the full node repository into a proof or airdrop library. Tags explicitly identify Namada, so it is not presented as a Zcash consensus node.",
+        "sourceUrl": "https://github.com/equilibriumco/namada/blob/main/README.md",
+        "checkedAt": "2026-10-05",
+        "sourceUrls": [
+          "https://github.com/equilibriumco/namada/blob/main/README.md"
+        ],
+        "confidence": "high",
+        "evidenceMode": "current-primary-live-checked"
+      }
+    ],
+    "optionalUnchanged": [
+      {
+        "repositoryId": "R_kgDOQU-D3Q",
+        "repository": "equilibriumco/zair",
+        "category": "Cryptography",
+        "judgment": "Retain for this patch",
+        "reason": "Mixed zero-knowledge airdrop workspace with CLI, SDK and Sapling/Orchard circuits. Developer tools is a defensible alternative at repository level, but Cryptography remains supported by the proof-generation and private-claim scope. The clear misclassification is the general Namada fork, not necessarily Zair itself.",
+        "sourceUrl": "https://github.com/equilibriumco/zair",
+        "checkedAt": "2026-10-05",
+        "evidenceMode": "current-primary-live-checked"
+      }
+    ],
+    "limitations": [
+      "Classifications identify repository purpose, not security, production readiness or financial eligibility.",
+      "hhanh00/zcv has both a library and server binaries; Libraries & SDKs is recommended from the current manifest. Infrastructure would be a reasonable alternative if the catalog prioritizes its deployed server over its published library.",
+      "Repository names and canonical URLs are not changed by this audit."
+    ]
+  }
+}

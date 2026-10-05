@@ -387,6 +387,103 @@
       "rationale": "Rust client bindings for the Ledger Zcash application, separate from the device wallet application.",
       "sourceUrl": "https://github.com/Zondax/ledger-zcash-rs",
       "checkedAt": "2026-09-08"
+    },
+    {
+      "repositoryId": "R_kgDORklo4w",
+      "repository": "valargroup/vote-sdk",
+      "category": "Infrastructure",
+      "tags": [
+        "voting-chain",
+        "governance",
+        "CometBFT",
+        "API"
+      ],
+      "rationale": "Despite the SDK name, the README describes a Cosmos/CometBFT application-specific voting chain with the svoted chain binary, validator startup, REST endpoints and an ABCI vote module. Its repository purpose is voting infrastructure, not a general Zcash node or merely a client SDK.",
+      "sourceUrl": "https://github.com/valargroup/vote-sdk",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "repositoryId": "R_kgDORc1myQ",
+      "repository": "valargroup/voting-circuits",
+      "category": "Cryptography",
+      "tags": [
+        "voting-circuits",
+        "zero-knowledge",
+        "Halo2",
+        "governance"
+      ],
+      "rationale": "The README explicitly identifies the circuit-only layer: delegation, vote and share-reveal proofs. Wallets normally use a higher-level crate; this repository implements cryptographic circuits.",
+      "sourceUrl": "https://github.com/valargroup/voting-circuits",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "repositoryId": "R_kgDORh8tMQ",
+      "repository": "valargroup/vote-nullifier-pir",
+      "category": "Infrastructure",
+      "tags": [
+        "PIR",
+        "nullifier-service",
+        "private-queries",
+        "governance"
+      ],
+      "rationale": "The workspace synchronizes nullifiers, builds a proof dataset and serves encrypted PIR queries. It includes cryptographic and client libraries, but the documented end-to-end deliverable is a data-retrieval service with a production deployment runbook.",
+      "sourceUrl": "https://github.com/valargroup/vote-nullifier-pir",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "repositoryId": "R_kgDOQmGxmQ",
+      "repository": "hhanh00/zcv",
+      "category": "Libraries & SDKs",
+      "tags": [
+        "coin-weighted-voting",
+        "Rust",
+        "client-server",
+        "governance"
+      ],
+      "rationale": "The current workspace has one member, zcvlib, whose manifest describes it as a Rust library for coin-weighted voting. It provides reusable client/server features and creator, voter, counter and CometBFT binaries. Library is the primary published unit; installation documentation also covers its voting validator server.",
+      "sourceUrl": "https://github.com/hhanh00/zcv/blob/main/zcvlib/Cargo.toml",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "repositoryId": "R_kgDOQMmtHA",
+      "repository": "hhanh00/zcash-vote-docker",
+      "category": "Infrastructure",
+      "tags": [
+        "deployment",
+        "containers",
+        "voting-servers",
+        "CometBFT"
+      ],
+      "rationale": "The README builds Docker images and runs coordinator/validator services and their CometBFT election chain. This is deployment infrastructure for voting, not wallet or generic application code.",
+      "sourceUrl": "https://github.com/hhanh00/zcash-vote-docker/blob/main/README.md",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "repositoryId": "MDEwOlJlcG9zaXRvcnkzNzc5MDMwMTc=",
+      "repository": "hhanh00/zcash-sync",
+      "category": "Libraries & SDKs",
+      "tags": [
+        "wallet-library",
+        "synchronization",
+        "FFI",
+        "RPC"
+      ],
+      "rationale": "Cargo declares the zcash-warpsync package and warp_api_ffi rlib, with Dart/native bindings and optional wallet/RPC binaries. README methods include wallet creation, balances, history and payments. Voting is one consumer, not its primary purpose.",
+      "sourceUrl": "https://github.com/hhanh00/zcash-sync/blob/master/Cargo.toml",
+      "checkedAt": "2026-10-05"
+    },
+    {
+      "repositoryId": "R_kgDORdJDIw",
+      "repository": "equilibriumco/namada",
+      "category": "Nodes",
+      "tags": [
+        "Namada",
+        "proof-of-stake",
+        "interchain"
+      ],
+      "rationale": "This is a fork of the general Namada Layer-1 codebase. The README documents installing a node, client and wallet and describes CometBFT consensus, MASP and IBC. Its relationship to Zair does not turn the full node repository into a proof or airdrop library. Tags explicitly identify Namada, so it is not presented as a Zcash consensus node.",
+      "sourceUrl": "https://github.com/equilibriumco/namada/blob/main/README.md",
+      "checkedAt": "2026-10-05"
     }
   ],
   "organizations": [
@@ -2116,10 +2213,11 @@
         "Transaction fees",
         "Fee market",
         "Research",
-        "Rust"
+        "Rust",
+        "Proposed upgrade"
       ],
       "description": "Research and implementation work on market-driven Zcash transaction fee mechanics.",
-      "website": "https://shieldedlabs.net/projects/",
+      "website": "https://shieldedlabs.net/fees/",
       "repositories": [
         "ShieldedLabs/zebra-dynamic-fees",
         "ShieldedLabs/fees-monolith"
@@ -2148,9 +2246,20 @@
         {
           "title": "Shielded Labs — organization and independent funding",
           "url": "https://shieldedlabs.net/"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://shieldedlabs.net/fees/"
         }
       ],
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Official dedicated page describes proposal exploration; tag should make that status visible.",
+        "sourceUrls": [
+          "https://shieldedlabs.net/fees/"
+        ]
+      }
     },
     {
       "id": "ecc-hackworks",
@@ -2832,7 +2941,9 @@
       "organizationId": null,
       "category": "Research",
       "tags": [
-        "formal-verification"
+        "cryptography",
+        "mathematical-exposition",
+        "bulletproofs"
       ],
       "description": "Ariel Gabizon’s planned mathematical exposition of the Bulletproofs argument used in Ironwood verification, beginning with a short paper and LaTeX source. This grant is separate from the machine-checked verification award.",
       "website": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438",
@@ -2871,7 +2982,14 @@
       "logo": null,
       "relatedProjectIds": [
         "ironwood-verification"
-      ]
+      ],
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Do not present a planned human-readable proof exposition as a separate machine-checked verification implementation.",
+        "sourceUrls": [
+          "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/438"
+        ]
+      }
     },
     {
       "id": "keystone-zcash",
@@ -3746,7 +3864,7 @@
       "id": "valar-private-voting",
       "name": "Private coinholder voting",
       "organizationId": "valar-group",
-      "category": "Developer tools",
+      "category": "Governance",
       "tags": [
         "Coinholder voting",
         "Zero knowledge",
@@ -3788,9 +3906,20 @@
         {
           "title": "Introducing Zakura — private ZEC donation funding — July 15, 2026",
           "url": "https://zakura.com/announcements/introducing-zakura/"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://github.com/valargroup/vote-sdk"
         }
       ],
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Application-specific private coinholder voting system. With the root-approved Governance area, classify the system by voter purpose; its SDK, circuits and PIR components require their own repository-purpose classifications.",
+        "sourceUrls": [
+          "https://github.com/valargroup/vote-sdk"
+        ]
+      }
     },
     {
       "id": "qedit-zsa",
@@ -3969,7 +4098,8 @@
         "Proof-carrying data",
         "Rust",
         "Research",
-        "Tachyon"
+        "Tachyon",
+        "prototype"
       ],
       "description": "Rust proof-carrying-data framework developed in Project Tachyon's GitHub organization.",
       "website": "https://github.com/tachyon-zcash/ragu",
@@ -3996,15 +4126,26 @@
         {
           "title": "Introducing Zakura — private ZEC donation funding — July 15, 2026",
           "url": "https://zakura.com/announcements/introducing-zakura/"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://github.com/tachyon-zcash/ragu"
         }
       ],
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Official repository explicitly warns under heavy development, unaudited and not for production.",
+        "sourceUrls": [
+          "https://github.com/tachyon-zcash/ragu"
+        ]
+      }
     },
     {
       "id": "redbridge",
       "name": "red·bridge",
       "organizationId": "red-dev-inc",
-      "category": "Infrastructure",
+      "category": "Payments & DeFi",
       "tags": [
         "bridge",
         "avalanche",
@@ -4072,9 +4213,20 @@
         {
           "title": "Project scope or funding evidence",
           "url": "https://forum.zcashcommunity.com/t/zcash-elastic-subnet-bridge-on-avalanche/44220/110"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://github.com/red-dev-inc/red-bridge"
         }
       ],
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "User-facing purpose is transferring value between Zcash and Avalanche. Keep development/prototype status separate; category does not imply a production bridge.",
+        "sourceUrls": [
+          "https://github.com/red-dev-inc/red-bridge"
+        ]
+      }
     },
     {
       "id": "zingo-regchest",
@@ -4924,12 +5076,15 @@
       "id": "zair",
       "name": "Zair: ZEC-NAM Airdrop Tools",
       "organizationId": "equilibriumco",
-      "category": "Cryptography",
+      "category": "Developer tools",
       "tags": [
         "namada",
         "airdrop",
         "zero-knowledge",
-        "cross-chain"
+        "cross-chain",
+        "cryptography",
+        "cli",
+        "sdk"
       ],
       "description": "Zcash airdrop proof tools and a Namada integration fork developed by Eiger/Equilibrium. Grant scope and prototype claims are distinct from deployment of any distribution.",
       "website": "https://github.com/equilibriumco/zair",
@@ -4970,9 +5125,20 @@
         {
           "title": "Project scope or funding evidence",
           "url": "https://forum.zcashcommunity.com/t/grant-application-zec-nam-shielded-airdrop-protocol/52759"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://github.com/equilibriumco/zair"
         }
       ],
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Purpose-based primary classification: reusable airdrop CLI/SDK; the proof primitives remain discoverable as secondary tags.",
+        "sourceUrls": [
+          "https://github.com/equilibriumco/zair"
+        ]
+      }
     },
     {
       "id": "zakura",
@@ -5112,7 +5278,7 @@
     {
       "id": "zallet",
       "name": "Zallet",
-      "category": "Infrastructure",
+      "category": "Wallets",
       "organizationId": "zcash-core",
       "tags": [
         "RPC wallet",
@@ -5146,7 +5312,14 @@
         }
       ],
       "stage": "beta",
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Official README explicitly identifies a full-node Zcash wallet, separate from consensus. It is not intended as a reusable Rust library.",
+        "sourceUrls": [
+          "https://github.com/zcash/zallet"
+        ]
+      }
     },
     {
       "id": "zcash-parsers",
@@ -5396,7 +5569,7 @@
       "id": "zcash-coin-voting",
       "name": "Zcash Coin Voting",
       "organizationId": "hhanh00",
-      "category": "Community",
+      "category": "Governance",
       "tags": [
         "governance",
         "coinholder-voting",
@@ -5450,9 +5623,22 @@
         {
           "title": "Project scope or funding evidence",
           "url": "https://forum.zcashcommunity.com/t/grant-application-hanh-maintenance-and-improvements-to-coin-voting/52350"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://hhanh00.github.io/zcv/"
         }
       ],
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Concrete primary-category mismatch: this is client/server/library voting software, not a community. If no Governance category is introduced use Infrastructure with governance tags.",
+        "sourceUrls": [
+          "https://forum.zcashcommunity.com/t/coin-voting-2-0/49177",
+          "https://forum.zcashcommunity.com/t/grant-application-hanh-maintenance-and-improvements-to-coin-voting/52350",
+          "https://hhanh00.github.io/zcv/"
+        ]
+      }
     },
     {
       "id": "zcash-cold-wallet",
@@ -5538,12 +5724,15 @@
       "id": "zcash-ika",
       "name": "Zcash Ika Integration",
       "organizationId": "frontier-compute",
-      "category": "Developer tools",
+      "category": "Libraries & SDKs",
       "tags": [
         "MPC",
         "ZIP-244",
         "multichain",
-        "agent-tooling"
+        "agent-tooling",
+        "signing-sdk",
+        "split-key-custody",
+        "transparent-transactions"
       ],
       "description": "Zcash transaction and split-key custody integration using Ika, with additional Bitcoin and EVM support.",
       "website": "https://github.com/Frontier-Compute/zcash-ika",
@@ -5561,7 +5750,14 @@
         "status": "unassessed",
         "events": []
       },
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Installable npm package exports wallet/signing/transaction functions. Maintainer states Ika cannot sign Orchard; add transparent scope rather than implying general shielded custody.",
+        "sourceUrls": [
+          "https://github.com/Frontier-Compute/zcash-ika"
+        ]
+      }
     },
     {
       "id": "zcash-zips",
@@ -5655,7 +5851,7 @@
         "names",
         "resolver",
         "wallet-integration",
-        "protocol"
+        "name-service"
       ],
       "description": "Human-readable Zcash name registry, verification, minting, and resolver components. The approved 2026 infrastructure grant is not itself proof of production launch.",
       "website": "https://www.zcashnames.com",
@@ -5699,10 +5895,29 @@
         {
           "title": "Project scope or funding evidence",
           "url": "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://github.com/zcashme/zns-whitepaper"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://www.zcashnames.com"
         }
       ],
       "stage": "in_development",
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Identity/name-resolution classification is appropriate. Replace vague protocol tag with name-service to avoid implying base consensus ownership; proposal approval does not prove launch.",
+        "sourceUrls": [
+          "https://github.com/zcashme/zns-whitepaper",
+          "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737/15",
+          "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737/16",
+          "https://forum.zcashcommunity.com/t/grant-proposal-zcash-name-service/55737",
+          "https://www.zcashnames.com"
+        ]
+      }
     },
     {
       "id": "zcash-network-school-kazakhstan",
@@ -6126,7 +6341,7 @@
         "wallet-interoperability",
         "research",
         "Zingo Labs",
-        "Standards"
+        "wallet-format-survey"
       ],
       "description": "Wallet-format survey and interoperability work for Zcash wallet migration.",
       "website": "https://github.com/zingolabs/zcash-wallet-formats",
@@ -6144,13 +6359,20 @@
         "status": "unassessed",
         "events": []
       },
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "The checked artifact is a survey supporting possible interchange formats, not an adopted standard.",
+        "sourceUrls": [
+          "https://github.com/zingolabs/zcash-wallet-formats"
+        ]
+      }
     },
     {
       "id": "zcash-walletd",
       "name": "Zcash Walletd",
       "organizationId": "hhanh00",
-      "category": "Infrastructure",
+      "category": "Wallets",
       "tags": [
         "REST",
         "view-only",
@@ -6180,6 +6402,10 @@
         {
           "title": "Project scope or funding evidence",
           "url": "https://forum.zcashcommunity.com/t/grant-application-btcpayserver-orchard-and-ua/51773"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://github.com/hhanh00/zcash-walletd"
         }
       ],
       "funding": {
@@ -6215,7 +6441,14 @@
         ],
         "scopeNote": "Approval applies to the named proposal and its documented scope, not every repository component or the whole organization. Approval is not proof of payment, acceptance, delivery, deployment, or current support."
       },
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Maintainer explicitly calls this a shielded REST wallet using viewing keys. It watches invoices for payment gateways and does not hold spending keys; record that distinction.",
+        "sourceUrls": [
+          "https://github.com/hhanh00/zcash-walletd"
+        ]
+      }
     },
     {
       "id": "zcashd",
@@ -6595,7 +6828,7 @@
       "id": "zecd",
       "name": "zecd",
       "organizationId": "zecrocks",
-      "category": "Infrastructure",
+      "category": "Wallets",
       "tags": [
         "wallet-server",
         "JSON-RPC",
@@ -6618,7 +6851,14 @@
         "status": "unassessed",
         "events": []
       },
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Wallet server handles seeds/addresses/signing and syncs as a light client against Zebra/Zakura; it is explicitly not a consensus node or indexer.",
+        "sourceUrls": [
+          "https://github.com/zecrocks/zecd"
+        ]
+      }
     },
     {
       "id": "zecdev-payment-uris",
@@ -6833,11 +7073,12 @@
       "id": "zec-bounties",
       "name": "ZecHub Bounties",
       "organizationId": "zechub",
-      "category": "Payments & DeFi",
+      "category": "Community",
       "tags": [
         "bounties",
         "community",
-        "ZEC-payments"
+        "ZEC-payments",
+        "contributor-tooling"
       ],
       "description": "Open-source bounty platform with native ZEC payments.",
       "website": "https://bounties.zechub.wiki/",
@@ -6852,6 +7093,10 @@
         {
           "title": "ZecHub project inventory",
           "url": "https://github.com/ZecHub"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://bounties.zechub.wiki/"
         }
       ],
       "funding": {
@@ -6859,7 +7104,16 @@
         "status": "unassessed",
         "events": []
       },
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Recommended primary work-area refinement: platform coordinates community bounties/submissions; ZEC payment is secondary. Payments & DeFi is not evidence that it is a DeFi protocol.",
+        "sourceUrls": [
+          "https://github.com/ZecHub/zec-bounties",
+          "https://github.com/ZecHub",
+          "https://bounties.zechub.wiki/"
+        ]
+      }
     },
     {
       "id": "zeckit",
@@ -6949,8 +7203,8 @@
       "tags": [
         "publishing",
         "shielded-memos",
-        "subscriptions",
-        "historical"
+        "historical",
+        "social"
       ],
       "description": "Zcash memo-based community publishing and directory software. Historical source and grant approval are established; current subscription operations are unverified.",
       "website": "https://zecpages.com",
@@ -6994,10 +7248,24 @@
         {
           "title": "Project scope or funding evidence",
           "url": "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/"
+        },
+        {
+          "title": "Purpose and classification source",
+          "url": "https://zecpages.com"
         }
       ],
       "stage": "historical_operation_unverified",
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Official README calls it a social publishing proof-of-concept; not a community organization. Historical is lifecycle. Existing subscriptions tag is not substantiated by the inspected README, so remove/hold pending source.",
+        "sourceUrls": [
+          "https://github.com/michaelharms6010/zecpages",
+          "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/4",
+          "https://forum.zcashcommunity.com/t/1-year-of-zecpages-servers/38823/",
+          "https://zecpages.com"
+        ]
+      }
     },
     {
       "id": "zecpages-faucet",
@@ -7055,11 +7323,13 @@
       "id": "zecping",
       "name": "zecping",
       "organizationId": "zecrocks",
-      "category": "Infrastructure",
+      "category": "Developer tools",
       "tags": [
         "gRPC",
-        "lightwallet-server",
-        "zec.rocks"
+        "zec.rocks",
+        "cli",
+        "diagnostics",
+        "monitoring"
       ],
       "description": "Measures response times of Zaino and lightwalletd endpoints.",
       "website": "https://github.com/zecrocks/zecping",
@@ -7077,7 +7347,14 @@
         "status": "unassessed",
         "events": []
       },
-      "logo": null
+      "logo": null,
+      "classificationReview": {
+        "checkedAt": "2026-10-05",
+        "rationale": "Executable diagnostic client measures remote server responses; it is not itself a lightwallet server. Monitoring is a secondary infrastructure capability.",
+        "sourceUrls": [
+          "https://github.com/zecrocks/zecping"
+        ]
+      }
     },
     {
       "id": "zecwallet-light-cli",

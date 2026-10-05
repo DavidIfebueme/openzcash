@@ -18,6 +18,7 @@ export const CATEGORY_THEMES = {
   Identity: { ink: "#be123c", tint: "#fff1f2", border: "#fecdd3", accent: "#f43f5e", icon: "M3 4h18v16H3z M17 9h1 M16 13h2 M10 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6 M6 18v-1a4 4 0 0 1 8 0v1" },
   Community: { ink: "#be185d", tint: "#fdf2f8", border: "#fbcfe8", accent: "#ec4899", icon: "M9 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6 M3 21v-4a6 6 0 0 1 12 0v4 M16 3a3 3 0 0 1 0 6 M18 12a5 5 0 0 1 3 5v4" },
   Education: { ink: "#92400e", tint: "#fffbeb", border: "#fde68a", accent: "#d97706", icon: "M12 6c-3-3-6-3-10-2v15c4-1 7-1 10 2 3-3 6-3 10-2V4c-4-1-7-1-10 2Z M12 6v15" },
+  Governance: { ink: "#854d0e", tint: "#fefce8", border: "#fde68a", accent: "#ca8a04", icon: "M4 9h16v12H4z M8 9V3h8v6 M8 5l2 2 4-4 M8 14h8" },
   Research: { ink: "#0e7490", tint: "#ecfeff", border: "#a5f3fc", accent: "#06b6d4", icon: "M9 3h6 M10 3v6L4 19a1 1 0 0 0 1 2h14a1 1 0 0 0 1-2L14 9V3 M7 15h10" },
   Historical: { ink: "#713f12", tint: "#fefce8", border: "#fef08a", accent: "#a16207", icon: "M3 3h18v5H3z M5 8v13h14V8 M9 12h6" },
   Other: { ink: "#57534e", tint: "#f5f5f4", border: "#e7e5e4", accent: "#78716c", icon: "M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z" },
