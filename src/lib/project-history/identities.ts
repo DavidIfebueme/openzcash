@@ -1,8 +1,16 @@
 import type { Catalog } from "@/lib/ecosystem/types";
+import { safeExternalUrl } from "@/lib/ecosystem/catalog";
+import type { CommunityLinks } from "@/lib/communities/data";
 import { COMMUNITIES, COMMUNITIES_VERIFIED_ON } from "@/lib/communities/data";
 import { recipientLedgerKeys } from "@/lib/zcg/recipient-aliases";
 import { DAO_PROPOSALS_VERIFIED_ON, ZECHUB_DAO_PROPOSALS, daoProposalUrl } from "@/lib/communities/dao-proposals";
 import type { HistoryIdentity } from "./types";
+
+const communityLinkLabels: Partial<Record<keyof CommunityLinks, string>> = {
+  x: "X", telegram: "Telegram", discord: "Discord", youtube: "YouTube", instagram: "Instagram",
+  tiktok: "TikTok", facebook: "Facebook", linkedin: "LinkedIn", whatsapp: "WhatsApp", substack: "Substack",
+  medium: "Medium", bluesky: "Bluesky", linktree: "Linktree", site: "Website",
+};
 
 /** Explicit catalog identities only. Search can suggest; it never associates money. */
 export function historyIdentities(catalog: Catalog): HistoryIdentity[] {
@@ -24,6 +32,16 @@ export function historyIdentities(catalog: Catalog): HistoryIdentity[] {
       checkedAt: COMMUNITIES_VERIFIED_ON,
     };
     identity.communityId = community.id;
+    // Preserve the community catalog's reviewed public links. Profile URLs are
+    // identity references, not extracted posts, reports or proof of delivery.
+    identity.referenceSources = Object.entries(community.links).flatMap(([key, value]) => {
+      const label = communityLinkLabels[key as keyof CommunityLinks];
+      const url = safeExternalUrl(value);
+      return label && url ? [{ label: `${community.name} · ${label}`, url, observedAt: COMMUNITIES_VERIFIED_ON }] : [];
+    });
+    identity.referenceSources.push(...community.forumTopics.filter(topic => Number.isSafeInteger(topic.id) && topic.id > 0).map(topic => ({
+      label: topic.title, url: `https://forum.zcashcommunity.com/t/${topic.id}`, observedAt: COMMUNITIES_VERIFIED_ON,
+    })));
     identity.recipientKeys = community.zcg.recipient ? recipientLedgerKeys(community.zcg.recipient) : [];
     identity.applicationTopics = community.forumTopics.filter(topic => topic.kind === "application").map(topic => topic.id);
     identity.reportTopics = community.forumTopics.filter(topic => topic.kind === "report").map(({ id, title }) => ({ id, title }));

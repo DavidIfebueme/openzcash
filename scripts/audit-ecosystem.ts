@@ -2,7 +2,7 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { createHash } from "node:crypto";
-import { validateCatalog } from "../src/lib/ecosystem/catalog";
+import { safeExternalUrl, validateCatalog } from "../src/lib/ecosystem/catalog";
 import { isPreviewRelease } from "../src/lib/ecosystem/releases";
 import { historyIdentities } from "../src/lib/project-history/identities";
 import { buildProjectHistory, prepareHistoryBindings } from "../src/lib/project-history/build";
@@ -32,6 +32,12 @@ const records = identities.map(identity => {
   if (missingRepositories.length) issues.push(identity.id + ": unresolved repositories " + missingRepositories.join(", "));
   const history = buildProjectHistory(identity, identities, finance, catalog.snapshot.collectedAt, reviewed, now, index);
   const facts = projectInsights(history);
+  const sourceUrls = new Set(history.sources.map(source => source.url));
+  const omittedRegistryUrls = [...new Set((identity.project?.sources ?? []).flatMap(source => {
+    const url = safeExternalUrl(source.url);
+    return url && !sourceUrls.has(url) ? [url] : [];
+  }))];
+  if (omittedRegistryUrls.length) issues.push(identity.id + ": omitted safe registry sources " + omittedRegistryUrls.join(", "));
   return { id: identity.id, name: identity.name, category: identity.category, communityId: identity.communityId,
     identityReviewedAt: identity.checkedAt, repositories: identity.repositories.map(repo => ({
       id: repo.id, name: repo.fullName, url: repo.url, archived: repo.archived, fork: repo.fork,
@@ -42,8 +48,9 @@ const records = identities.map(identity => {
       unlistedReleaseRecords: repo.activity?.unlistedReleases?.length ?? 0,
     })), missingRepositories, grants: history.grants.map(grant => ({ id: grant.id, title: grant.title, program: grant.program,
       status: grant.status, statusBasis: grant.statusBasis, sharedWith: grant.sharedWith, source: grant.source, ledgerEntries: grant.milestones.length })),
+    sources: history.sources, omittedRegistryUrls,
     reportLinks: history.reportLinks, latestWork: facts.latestWork, reviewedSources: history.reviews,
-    counts: { grants: facts.grants, paidEntries: facts.paidEntries, publishedArtifacts: facts.publishedArtifacts, reportSources: facts.reportSources,
+    counts: { grants: facts.grants, paidEntries: facts.paidEntries, publishedArtifacts: facts.publishedArtifacts, reportSources: facts.reportSources, publicWorkSources: facts.publicWorkSources,
       acceptedEntries: facts.acceptedEntries, integrations: facts.integrations, usageObservations: facts.usageObservations },
     gaps: history.gaps,
   };
@@ -68,6 +75,12 @@ const summary = { auditedAt: now.toISOString(), repositoryCutoff: catalog.snapsh
   registryReviewedAt: catalog.registry.checkedAt, financeImportedAt: finance.importedAt, financeAvailable: { proposals: finance.proposalsAvailable, payments: finance.paymentsAvailable },
   identities: records.length, projects: catalog.registry.projects.length, communities: records.filter(row => row.communityId).length,
   repositories: catalog.snapshot.repositories.length, collectionProblems: catalog.snapshot.problems.length,
+  identitiesWithSources: records.filter(row => row.sources.length).length,
+  identitiesWithoutSources: records.filter(row => !row.sources.length).length,
+  omittedRegistryUrls: records.reduce((sum, row) => sum + row.omittedRegistryUrls.length, 0),
+  noDatedWork: records.filter(row => !row.latestWork).length,
+  noPublicWork: records.filter(row => !row.counts.publicWorkSources).length,
+  repositoryHistories: records.filter(row => row.repositories.length).length,
   identitiesWithoutGitHub: records.filter(row => !row.repositories.length).length, identitiesWithReportLinks: records.filter(row => row.reportLinks.length).length,
   ambiguousGrantViews: records.flatMap(row => row.grants).filter(grant => grant.statusBasis === "ambiguous").length,
   unlistedReleaseRecords: catalog.snapshot.repositories.reduce((sum, repo) => sum + (repo.activity?.unlistedReleases?.length ?? 0), 0),
@@ -77,7 +90,8 @@ const report = { summary, limits: [
   "This audits source freshness, identity mappings and assembled evidence; it does not certify every project claim, grant delivery or adoption.",
   "GitHub release markers and version tags do not prove stable deployments. App Store versions are platform-specific reviewed additions.",
   "Financial rows are the explicitly supplied public mirror export, not a new ledger import or an independent settlement audit.",
-  "Non-GitHub projects and undated community reports require their own source reviews. A missing record is not zero work or zero funding."
+  "Non-GitHub projects and undated community reports require their own source reviews. A missing record is not zero work or zero funding.",
+  "Source-directory links are identity and research references. Website, social profile, repository push and archive links do not count as dated work or milestone acceptance. Missing dated work is reported, not an audit failure."
 ], newRepositories, unmappedRecentApprovedProposals, changedReleaseMarkers: changed, records };
 const output = option("--output");
 if (output) { await mkdir(dirname(resolve(output)), { recursive: true }); await writeFile(resolve(output), JSON.stringify(report, null, 2) + "\n"); }

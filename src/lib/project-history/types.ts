@@ -7,11 +7,19 @@ export type HistoryIdentity = {
   website: string; project: Project | null; communityId: string | null;
   recipientKeys: string[]; applicationTopics: number[];
   reportTopics: { id: number; title: string }[];
+  /** Reviewed public identity/reference links, not work evidence. */
+  referenceSources?: Source[];
   /** Reviewed DAO proposal references only; no payment inference or mixed totals. */
   daoFundingSources?: { ref: string; title: string; url: string; createdAt: string; period: string; reviewedAt: string }[];
   repositories: Repository[]; checkedAt: string;
 };
 export type Source = { label: string; url: string; observedAt: string | null };
+/** References establish source coverage, not publication, delivery or acceptance. */
+export type HistorySource = Source & { kind: "website" | "repository" | "reference" | "funding" | "report" | "publication" };
+export type HistoryRepository = {
+  name: string; url: string; archived: boolean; lastPushedAt: string | null;
+  source: Source; activityUrl: string | null;
+};
 export type ProposalRecord = {
   id: string; program: Program; title: string; status: string;
   submittedDate: string | null; decisionDate: string | null;
@@ -43,6 +51,7 @@ export type GrantHistory = {
   statusBasis: "published_proposal" | "dated_catalog" | "ledger_only" | "ambiguous";
   sharedWith: { id: string; name: string }[];
   requestedUsdCents: string | null;
+  requestedAmountReview?: { basis: "fixed" | "cap"; summary: string; source: Source };
   // A requested amount or ledger budget does not establish an approved award.
   approvedUsdCents: null;
   budgetUsdCents: Amount; paidBudgetUsdCents: Amount; recordedZecZat: Amount;
@@ -57,5 +66,6 @@ export type ProjectHistory = {
   grants: GrantHistory[]; timeline: HistoryEvent[]; gaps: string[];
   reviews: (ReviewedEvidence & { supersededBy: string | null; linked: boolean })[];
   reportLinks: { title: string; url: string }[];
+  sources: HistorySource[]; repositories: HistoryRepository[];
   notes: string[];
 };

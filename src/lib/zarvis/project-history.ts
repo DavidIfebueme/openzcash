@@ -37,7 +37,8 @@ export async function lookupProjectHistory(raw: unknown, signal: AbortSignal): P
       kind: "project_history", ...history,
       insights: projectInsights(history),
       reviews: history.reviews.filter(review => review.linked && !review.supersededBy).slice(0, 8),
-      counts: { grants: history.grants.length, events: events.length,
+      sources: history.sources.slice(0, 20), repositories: history.repositories.slice(0, 10),
+      counts: { sources: history.sources.length, repositories: history.repositories.length, grants: history.grants.length, events: events.length,
         publishedReleases: history.timeline.filter(event => event.kind === "release").length,
         paidEntries: history.coverage.paymentsAvailable ? new Set(history.grants.flatMap(grant => grant.milestones.filter(item => item.paymentRecorded).map(item => item.id))).size : null,
         reviewedDeliveries: history.timeline.filter(event => event.evidence === "reviewed_delivery").length },
@@ -46,7 +47,7 @@ export async function lookupProjectHistory(raw: unknown, signal: AbortSignal): P
         amountCoverage: { budget: grant.budgetUsdCents, paidBudget: grant.paidBudgetUsdCents, paidZec: grant.recordedZecZat },
         milestoneCount: grant.milestones.length, milestones: grant.milestones.slice(0, 5).map(item => ({ ...item, deliverable: item.deliverable?.slice(0, 500) ?? null })) })),
       timeline: events.slice(0, 15), gaps: history.gaps.slice(0, 12),
-      excerpt: { grantsShown: Math.min(10, history.grants.length), eventsShown: Math.min(15, events.length), milestonesPerGrantLimit: 5,
+      excerpt: { sourcesShown: Math.min(20, history.sources.length), repositoriesShown: Math.min(10, history.repositories.length), grantsShown: Math.min(10, history.grants.length), eventsShown: Math.min(15, events.length), milestonesPerGrantLimit: 5,
         month: parsed.data.month, financialBasis: "all-time associated grants; never sum excerpts or shared grants", completeRecordUrl: url },
     };
     return { content: JSON.stringify({ data, sourceUrl: url }), source: { title: `${history.project.name} · project history`, url, retrievedAt: history.assembledAt } };

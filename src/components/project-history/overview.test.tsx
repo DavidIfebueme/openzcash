@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import { buildProjectHistory } from "@/lib/project-history/build";
 import type { FinanceRecords, HistoryIdentity, ProjectHistory } from "@/lib/project-history/types";
 import { HistoryOverview } from "./overview";
+import { SourceDirectory } from "./source-directory";
+import { RequestedAmount } from "./requested-amount";
 
 const source = { label: "Public source", url: "https://example.org/record", observedAt: "2026-10-04" };
 const identity: HistoryIdentity = { id: "alpha", name: "Alpha", description: "Fixture", category: "Wallets", website: "https://example.org", project: null, communityId: null, recipientKeys: ["alpha"], applicationTopics: [], reportTopics: [], repositories: [], checkedAt: "2026-10-04" };
@@ -39,5 +41,44 @@ describe("evaluation brief evidence boundaries", () => {
     expect(html).toContain("Payments unavailable");
     expect(html).not.toContain("0 paid entries");
     expect(html).not.toContain("<time");
+  });
+});
+
+
+describe("visible source coverage", () => {
+  it("exposes existing references without inventing a dated publication", () => {
+    const history = record();
+    const html = render(history);
+    expect(html).toContain("Project sources available");
+    expect(html).toContain('href="https://example.org/"');
+    expect(html).toContain('href="#history-sources"');
+    expect(html).not.toContain("This record has no dated work source yet.");
+    expect(html).not.toContain("<time");
+    const directory = renderToStaticMarkup(<SourceDirectory history={history} />);
+    expect(directory).toContain("Project sources");
+    expect(directory).toContain("1 linked source");
+    expect(directory).toContain('href="https://example.org/"');
+  });
+  it("keeps all original links accessible beyond the compact source list", () => {
+    const history = record();
+    history.sources = Array.from({ length: 12 }, (_, index) => ({ ...source, label: `Report ${index}`, url: `https://example.org/report/${index}`, kind: "report" as const }));
+    const html = renderToStaticMarkup(<SourceDirectory history={history} />);
+    expect(html).toContain("Show 4 more sources");
+    for (const item of history.sources) expect(html).toContain(`href="${item.url}"`);
+  });
+  it("labels caps with a separate primary source and keeps unknown requests unquantified", () => {
+    const history = record({ payments: [{ id: "row-1", project: "Shared grant", program: "zcg", recipientKey: "alpha", milestone: "1", deliverable: null, isPaid: true, paidDate: "2026-09-28", budgetUsdCents: "250000", recordedZecZat: "200000000", source }] });
+    const grant = history.grants[0];
+    grant.statusBasis = "published_proposal";
+    let html = renderToStaticMarkup(<dl><RequestedAmount grant={grant} /></dl>);
+    expect(html).toContain("Not in ledger");
+    expect(html).not.toContain("$0.00");
+    grant.requestedUsdCents = "16800000";
+    grant.requestedAmountReview = { basis: "cap", summary: "Annual ceiling, not guaranteed spending.", source };
+    html = renderToStaticMarkup(<dl><RequestedAmount grant={grant} /></dl>);
+    expect(html).toContain("Requested cap · USD");
+    expect(html).toContain("$168,000.00");
+    expect(html).toContain("Annual ceiling, not guaranteed spending.");
+    expect(html).toContain('href="https://example.org/record"');
   });
 });

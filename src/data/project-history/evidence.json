@@ -52,6 +52,97 @@
       "reviewNote": "Queried Apple’s official lookup endpoint for app 6776591245 with country=us. Checked trackName, version=0.0.50 and currentVersionReleaseDate=2026-10-03T07:44:57Z. The linked listing is https://apps.apple.com/us/app/vizor-zcash-wallet/id6776591245. Compared with the independent chainapsis/vizor-wallet desktop release 0.0.59 published 2026-10-03T08:52:01Z; did not merge platform versions.",
       "milestoneIds": [],
       "supersedes": null
+    },
+    {
+      "id": "webzjs-library-phase-report-2024-10-18",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "Library phase completion reported",
+      "summary": "ChainSafe reported its browser-library milestones complete and linked code, documentation and a demonstration wallet. The demonstration carried explicit security limitations.",
+      "date": "2024-10-18",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/24",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Maintainer Wollum-ChainSafe reports original grant milestones complete, while describing the demonstration as unsafe for significant funds. This is a team claim, not independent milestone acceptance.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "webzjs-snap-launch-report-2025-08-06",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "MetaMask Snap availability reported",
+      "summary": "ChainSafe announced the Snap was live and that maintenance would begin. This historical announcement does not establish current compatibility.",
+      "date": "2025-08-06",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/48",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read ColinSchwarz’s dated launch update and linked ZCG announcement. No current support, measured adoption, independent audit outcome or grant acceptance is inferred.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "webzjs-august-maintenance-report-2025-09-04",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "August maintenance report published",
+      "summary": "The team reported viewing-key and installation prompts, local build tooling, origin checks, account-data changes and connection fixes.",
+      "date": "2025-09-04",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/49",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read the maintainer’s August work summary published September 4. Subsequent reports of connection problems mean the fix claim is not treated as independently verified resolution.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "webzjs-october-maintenance-report-2025-11-06",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "October maintenance report published",
+      "summary": "ChainSafe reported test and Snap-manifest checks, publishing improvements and ongoing address-handling work.",
+      "date": "2025-11-06",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/51",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read the maintainer report published November 6 for October activity. Address-handling changes are described as ongoing, not completed. No milestone acceptance is stated.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "webzjs-nu61-blocked-report-2026-01-05",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "NU6.1 compatibility work remained incomplete",
+      "summary": "The team reported unresolved NU6.1 compatibility work and warned that some Snap functions could fail.",
+      "date": "2026-01-05",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/52",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read the November and December status update published January 5. Preserve this reported limitation alongside later progress, without presenting it as the present operating state.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "webzjs-nu61-update-report-2026-02-13",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "NU6.1 update and transaction history reported",
+      "summary": "ChainSafe reported a live NU6.1 Snap update, transaction history, pending-balance tracking, recovery improvements and network retries.",
+      "date": "2026-02-13",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/58",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read ColinSchwarz’s January work report published February 13. Metamask publication and resolution are maintainer claims; neither funded-milestone acceptance nor current network compatibility is inferred.",
+      "milestoneIds": [],
+      "supersedes": null
+    },
+    {
+      "id": "webzjs-february-march-report-2026-04-13",
+      "projectId": "webzjs",
+      "kind": "team_reported",
+      "title": "Wallet storage and reliability improvements reported",
+      "summary": "ChainSafe reported wallet-storage additions, faster note lookup, balance fixes and safer error handling for February and March.",
+      "date": "2026-04-13",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-browser-wallet-library/47897/64",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read the maintainer’s February and March report published April 13. The date is publication, not inferred from repository pushedAt. This source does not accept specific paid milestones or verify later network compatibility.",
+      "milestoneIds": [],
+      "supersedes": null
     }
   ]
 }

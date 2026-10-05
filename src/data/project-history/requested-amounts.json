@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "entries": [
+    {
+      "id": "webzjs-browser-library-2024-request",
+      "projectId": "webzjs",
+      "program": "zcg",
+      "grantTitle": "WebZjs - ZCash Browser Wallet Library",
+      "amountUsdCents": "15000000",
+      "basis": "fixed",
+      "summary": "The revised ZCG request was USD 150,000. A separate MetaMask matching contribution is not included in this grant request.",
+      "sourceUrl": "https://forum.zcashcommunity.com/t/zcash-community-grants-meeting-minutes-7-22-2024/48437/1",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read the official July 22, 2024 ZCG meeting minutes, published July 30, which describe a USD 150,000 proposal. This is the revised request, not the earlier April draft of USD 253,000. The separate MetaMask USD 150,000 contribution is not added to the ZCG requested amount."
+    },
+    {
+      "id": "webzjs-maintenance-2025-request-cap",
+      "projectId": "webzjs",
+      "program": "zcg",
+      "grantTitle": "Chainsafe Systems",
+      "amountUsdCents": "16800000",
+      "basis": "cap",
+      "summary": "The application sets a maximum of USD 168,000: USD 350 per hour, up to 40 hours a month for 12 months. Estimated use was 30 hours a month.",
+      "sourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/2",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read Requested Grant Amount, Total Budget and the hourly terms in the official application. USD 168,000 is the 480-hour annual ceiling, not a guaranteed payment or fixed spend. The linked forum clarification distinguishes USD 126,000 of planned work from the USD 168,000 cap."
+    },
+    {
+      "id": "webzjs-maintenance-2026-request-cap",
+      "projectId": "webzjs",
+      "program": "zcg",
+      "grantTitle": "ChainSafe #3 - Zcash Metamask Snap and Webzjs maintenance renewal",
+      "amountUsdCents": "16800000",
+      "basis": "cap",
+      "summary": "The renewal requested an annual ceiling of USD 168,000 at USD 350 per hour, capped at 40 hours a month. This requested ceiling does not imply approval.",
+      "sourceUrl": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/272",
+      "reviewedAt": "2026-10-04",
+      "reviewNote": "Read the official renewal application submitted April 13, 2026. Its USD 168,000 request uses the same USD 350 hourly rate and maximum 480 annual hours. Kept the cap separate from the later rejection recorded by ZCG; no approved award or payment is inferred."
+    }
+  ]
+}

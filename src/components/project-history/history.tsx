@@ -8,6 +8,8 @@ import { displayDate } from "@/lib/ecosystem/catalog";
 import { RepositoryFreshness } from "./freshness";
 import { HistoryOverview } from "./overview";
 import { SourceLink } from "./source-link";
+import { SourceDirectory } from "./source-directory";
+import { RequestedAmount } from "./requested-amount";
 import styles from "./history.module.css";
 
 const evidenceLabels: Record<HistoryEvent["evidence"], string> = {
@@ -63,13 +65,13 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
           {events.length > limit && <button className={styles.more} onClick={() => setLimit(limit + 15)}>Show more records</button>}
         </>}
         {tab === "funding" && <>
-          <details className={styles.inlineGuide}><summary>How to read these amounts</summary><p>Requested amounts, decisions and paid entries are separate. The ledger has no distinct approved-amount field. USD is the historical budget; ZEC is the recorded disbursement, not a current valuation or independent settlement verification.</p></details>
+          <details className={styles.inlineGuide}><summary>How to read these amounts</summary><p>Requested amounts, decisions and paid entries are separate. Where the ledger omits a request, a reviewed proposal may supply it with its own source. A requested cap is a maximum, not guaranteed spending. The ledger has no distinct approved-amount field. USD is the historical budget; ZEC is the recorded disbursement, not a current valuation or independent settlement verification.</p></details>
           {history.grants.map(grant => <article className={styles.grant} key={grant.id} id={grant.id}>
             <div className={styles.grantTop}><span className={styles.eyebrow}>{grant.program === "zcg" ? "ZCG" : "Coinholder Grants"}</span><span className={styles.badge}>{grant.statusBasis === "ambiguous" ? "Identity needs review" : `${grant.statusBasis === "dated_catalog" ? "Catalog: " : ""}${grant.status.replaceAll("_", " ")}`}</span></div>
             <h3>{grant.title}</h3>{grant.statusBasis === "ambiguous" && <p className={styles.shared}>Amounts withheld until the exact award is identified.</p>}
             {grant.sharedWith.length > 0 && <p className={styles.shared}>Shared award context with {grant.sharedWith.map((project, index) => <span key={project.id}>{index > 0 && ", "}<Link href={`/ecosystem/history/${project.id}`}>{project.name}</Link></span>)}. These amounts are not an allocation to this component.</p>}
             <dl className={styles.amounts}>
-              <div><dt>Requested · USD</dt><dd>{historyAmount(grant.requestedUsdCents)}</dd></div>
+              <RequestedAmount grant={grant} />
               <div><dt>Ledger budget · USD</dt><dd><AmountValue amount={grant.budgetUsdCents} /></dd></div>
               <div><dt>Paid entries · USD budget</dt><dd><AmountValue amount={grant.paidBudgetUsdCents} /></dd></div>
               <div><dt>Recorded paid ZEC</dt><dd><AmountValue amount={grant.recordedZecZat} unit="ZEC" /></dd></div>
@@ -103,6 +105,7 @@ export function ProjectHistoryView({ history }: { history: ProjectHistory }) {
       </section>
     </div></div>
     <section id="history-sources" className={styles.sourcePanel} aria-label="Sources and methodology">
+      <SourceDirectory history={history} />
       <details className={styles.sourceDisclosure}>
         <summary>Source dates & methodology</summary>
         <div className={styles.aside}>

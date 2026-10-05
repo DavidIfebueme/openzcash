@@ -276,3 +276,29 @@
 .featuredWork .versionTitle { font-size: clamp(30px, 3.3vw, 44px); letter-spacing: -.035em; }
 .repositoryName { font-size: 11px; line-height: 1.5; color: var(--text-muted); margin-top: 7px; }
 .directoryPage .hero h1 { font-size: clamp(28px, 3vw, 36px); }
+
+/* Source coverage is visible even when a project has no GitHub releases. */
+.primarySources { display: flex; align-items: baseline; flex-wrap: wrap; gap: 10px 16px; padding-top: 16px; margin-top: 20px; border-top: 1px solid var(--border); }
+.primarySources > span { width: 100%; font-size: 10px; color: var(--text-muted); }
+.primarySources a { font-size: 11px; overflow-wrap: anywhere; }
+.sourceDirectory { flex-basis: 100%; min-width: 0; padding-top: 18px; }
+.sourceDirectoryHeading { display: flex; align-items: baseline; gap: 12px; justify-content: space-between; }
+.sourceDirectoryHeading h2 { margin: 0; font-size: 15px; font-weight: 650; }
+.sourceDirectoryHeading span, .sourceDirectory > p { color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+.sourceDirectory > p { margin: 8px 0 14px; }
+.sourceList { list-style: none; margin: 0; padding: 0; }
+.sourceList li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: baseline; padding: 11px 0; border-top: 1px solid var(--border); }
+.sourceList li > span { color: var(--text-muted); font-size: 11px; }
+.sourceList a { font-size: 12px; overflow-wrap: anywhere; }
+.sourceMore summary { cursor: pointer; padding: 14px 0; min-height: 44px; color: var(--accent-fg); font-size: 12px; }
+.amountBasis { margin-top: 8px; max-width: 360px; }
+.amountBasis summary, .requestScope { font-size: 11px; color: var(--accent-fg); cursor: pointer; line-height: 1.5; }
+.amountBasis p { margin: 7px 0; font-size: 11px; line-height: 1.6; color: var(--text-muted); }
+.amountBasis a { font-size: 11px; }
+.requestScope { display: inline-block; margin-top: 8px; }
+.amounts .missingAmount, .scopeRow .missingAmount { font-size: 15px; font-weight: 500; color: var(--text-muted); }
+@container history (max-width: 600px) {
+  .sourceList li { grid-template-columns: 75px minmax(0, 1fr); gap: 10px; }
+  .sourceDirectoryHeading { flex-wrap: wrap; gap: 6px; }
+  .primarySources { gap: 12px; }
+}

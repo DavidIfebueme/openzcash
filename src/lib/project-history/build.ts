@@ -3,6 +3,11 @@ import { isPreviewRelease } from "@/lib/ecosystem/releases";
 import { safeExternalUrl } from "@/lib/ecosystem/catalog";
 import type { ReviewedEvidence } from "./evidence";
 import { historyAmount } from "./format";
+import { projectSourceContext } from "./sources";
+import requestedAmountsData from "@/data/project-history/requested-amounts.json";
+import { findReviewedRequestedAmount, requestedAmountsSchema, type ReviewedRequestedAmount } from "./requested-amounts";
+
+const reviewedRequests = requestedAmountsSchema.parse(requestedAmountsData).entries;
 import type { Amount, FinanceRecords, GrantHistory, HistoryEvent, HistoryIdentity, Program, ProjectHistory, Source } from "./types";
 
 const normalize = (text: string) => text.trim().replace(/\s+/g, " ").toLowerCase();
@@ -58,7 +63,7 @@ export function prepareHistoryBindings(identities: HistoryIdentity[], finance: F
 
 export function buildProjectHistory(identity: HistoryIdentity, identities: HistoryIdentity[], finance: FinanceRecords,
   repositorySnapshotAt: string, reviewed: ReviewedEvidence[] = [], now = new Date(),
-  index = prepareHistoryBindings(identities, finance)): ProjectHistory {
+  index = prepareHistoryBindings(identities, finance), requestedAmounts: readonly ReviewedRequestedAmount[] = reviewedRequests): ProjectHistory {
   const linked = index.byIdentity.get(identity.id) ?? bindings(identity, finance);
   const { ownership } = index;
   const timeline: HistoryEvent[] = [], grants: GrantHistory[] = [], gaps: string[] = [];
@@ -81,6 +86,8 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
     const paid = payments.filter(row => row.isPaid);
     const status = ambiguous ? "identity-unresolved" : proposal?.status ?? binding.status;
     const grantSource = proposal?.source ?? binding.source;
+    const requestReview = !ambiguous && proposal?.requestedUsdCents == null
+      ? findReviewedRequestedAmount({ projectId: identity.id, program: binding.program, title: binding.title }, now.toISOString().slice(0, 10), requestedAmounts) : null;
     const milestones = payments.map(row => ({
       id: row.id, title: row.milestone || "Ledger milestone", deliverable: row.deliverable,
       paymentRecorded: row.isPaid, paidDate: validDate(row.paidDate), source: row.source,
@@ -93,7 +100,8 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
     grants.push({ id, title: binding.title, program: binding.program, status,
       statusBasis: ambiguous ? "ambiguous" : proposal ? "published_proposal" : binding.status === "ledger-recorded" ? "ledger_only" : "dated_catalog",
       sharedWith: (ownership.get(bindingKey) ?? []).filter(item => item.id !== identity.id),
-      requestedUsdCents: proposal?.requestedUsdCents ?? null, approvedUsdCents: null,
+      requestedUsdCents: proposal?.requestedUsdCents ?? requestReview?.amountUsdCents ?? null, approvedUsdCents: null,
+      ...(requestReview ? { requestedAmountReview: { basis: requestReview.basis, summary: requestReview.summary, source: source("Requested amount source", requestReview.sourceUrl, requestReview.reviewedAt) } } : {}),
       budgetUsdCents: sumAmounts(payments.map(row => row.budgetUsdCents)),
       paidBudgetUsdCents: sumAmounts(paid.map(row => row.budgetUsdCents)),
       recordedZecZat: sumAmounts(paid.map(row => row.recordedZecZat)),
@@ -195,6 +203,7 @@ export function buildProjectHistory(identity: HistoryIdentity, identities: Histo
     schemaVersion: 1, project: { id: identity.id, name: identity.name, description: identity.description, category: identity.category, website: identity.website, communityId: identity.communityId },
     assembledAt: now.toISOString(), registryCheckedAt: identity.checkedAt, repositorySnapshotAt, ledgerImportedAt: finance.importedAt,
     coverage: { proposalsAvailable: finance.proposalsAvailable, paymentsAvailable: finance.paymentsAvailable, releasesComplete: false },
+    ...projectSourceContext(identity, grants, reviews, repositorySnapshotAt),
     grants, timeline, gaps, reviews, reportLinks: identity.reportTopics.map(topic => ({ title: topic.title, url: `https://forum.zcashcommunity.com/t/${topic.id}` })),
     notes: [
       "Requested USD, approved status, ledger budgets and recorded ZEC payments are distinct. The current ledger has no separate authoritative approved-amount field.",

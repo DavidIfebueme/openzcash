@@ -14,7 +14,7 @@ const data: ProjectHistory = {
   schemaVersion: 1, project: { id: "alpha", name: "Alpha", category: "Infrastructure", description: "Synthetic project", website: "https://example.org", communityId: null },
   assembledAt: "2026-10-02T00:00:00Z", registryCheckedAt: "2026-09-08", repositorySnapshotAt: "2026-09-08", ledgerImportedAt: null,
   coverage: { proposalsAvailable: false, paymentsAvailable: false, releasesComplete: false }, grants: [], timeline: [],
-  gaps: ["No milestone acceptance evidence is linked."], reviews: [], reportLinks: [], notes: ["Missing is not zero."],
+  gaps: ["No milestone acceptance evidence is linked."], reviews: [], reportLinks: [], sources: [], repositories: [], notes: ["Missing is not zero."],
 };
 beforeEach(() => {
   vi.clearAllMocks();
