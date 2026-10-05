@@ -25,7 +25,7 @@ describe("grouped ecosystem navigation", () => {
   it("opens the correct ancestors on direct organization and nested-page visits", () => {
     const org = render("/zf");
     expect(org).toContain('aria-label="Collapse Ecosystem"');
-    expect(org).toContain('role="group" aria-label="Teams &amp; organizations"');
+    expect(org).toContain('role="group" aria-label="Organizations"');
     expect(linkTag(org, '/zf')).toContain('aria-current="page"');
     expect(org.match(/href="\/zf"/g)).toHaveLength(1);
     const page = render("/zechub/copilot");
@@ -45,7 +45,7 @@ describe("grouped ecosystem navigation", () => {
     expect(compact).not.toContain('href="/zcg/fpf"');
     expect(compact).toContain('href="/arborist"');
     const expanded = render("/zcg/fpf");
-    expect(expanded).toContain('role="group" aria-label="Teams &amp; organizations"');
+    expect(expanded).toContain('role="group" aria-label="Organizations"');
     expect(linkTag(expanded, '/zcg/fpf')).toContain('aria-current="page"');
     expect(expanded.match(/href="\/zcg\/fpf"/g)).toHaveLength(1);
     expect(expanded.indexOf('href="/communities"')).toBeLessThan(expanded.indexOf('class="rd-side-org-group"'));

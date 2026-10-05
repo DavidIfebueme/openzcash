@@ -103,11 +103,11 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
                   aria-controls={groupOpen ? `nav-${app.id}-organizations` : undefined}
                   onClick={() => onToggle(groupId, containsCurrentOrganization)}
                 >
-                  <span>Teams &amp; organizations</span>
+                  <span>Organizations</span>
                   <Glyph d={GLYPH.chevron} size={12} />
                 </button>
                 {groupOpen ? (
-                  <div id={`nav-${app.id}-organizations`} className="rd-side-org-list" role="group" aria-label="Teams & organizations">
+                  <div id={`nav-${app.id}-organizations`} className="rd-side-org-list" role="group" aria-label="Organizations">
                     {organizations.map((child) => renderApp(child, true))}
                   </div>
                 ) : null}
