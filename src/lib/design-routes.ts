@@ -37,6 +37,8 @@ export type AppDef = {
   icon: string;
   /** Inner pages, in reading order. */
   pages: AppPage[];
+  /** Reading order when inner pages and direct child apps are interleaved. */
+  navigationOrder?: string[];
   /** Expanded in the sidebar by default (the visitor can still collapse it). */
   open?: boolean;
   /** Share of every block reward that funds the app, shown beside its name. */
@@ -128,10 +130,11 @@ export const APPS: AppDef[] = [
     href: "/ecosystem",
     sub: "Projects, teams & organizations",
     icon: "ecosystem",
+    navigationOrder: ["/wallets", "/ecosystem/history", "/communities", "/development", "/arborist"],
     pages: [
       { href: "/wallets", label: "Wallets", mark: "/logos/glyphs/wallets.png" },
-      { href: "/development", label: "Development", mark: "/logos/glyphs/development.png" },
       { href: "/ecosystem/history", label: "Project histories", mark: "/logos/glyphs/grants.png" },
+      { href: "/development", label: "Development", mark: "/logos/glyphs/development.png" },
       { href: "/ecosystem/history/z3", label: "Z3 stack", mark: "/logos/glyphs/z3.png", hidden: true, palette: true },
     ],
   },
@@ -200,8 +203,15 @@ export function parentAppOf(app: AppDef): AppDef | undefined {
 }
 
 /** Apps grouped beneath this app, in navigation order. */
-export function childAppsOf(app: AppDef): AppDef[] {
-  return APPS.filter((candidate) => candidate.parentId === app.id);
+export function childAppsOf(app: AppDef, apps: AppDef[] = APPS): AppDef[] {
+  const children = apps.filter((candidate) => candidate.parentId === app.id);
+  if (app.id !== "ecosystem") return children;
+  return children.sort((a, b) => {
+    const aDirect = a.parentGroup === "pages", bDirect = b.parentGroup === "pages";
+    if (aDirect !== bDirect) return aDirect ? -1 : 1;
+    if (aDirect) return (app.navigationOrder?.indexOf(a.href) ?? -1) - (app.navigationOrder?.indexOf(b.href) ?? -1);
+    return a.label.localeCompare(b.label, "en", { sensitivity: "base" });
+  });
 }
 
 /** Detail routes and the list page they belong to. */

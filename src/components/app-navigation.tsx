@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { type AppDef, type Place, overviewEntry } from "@/lib/design-routes";
+import { type AppDef, type Place, childAppsOf, overviewEntry } from "@/lib/design-routes";
 import { AppMark, GLYPH, Glyph, PageMark } from "./app-marks";
 
 type Props = {
@@ -15,8 +15,17 @@ type Props = {
 /** The desktop sidebar and phone Apps drawer share one hierarchy. */
 export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
-    const children = apps.filter((child) => child.parentId === app.id);
+    const children = childAppsOf(app, apps);
+    const showCounts = app.id !== "ecosystem" && app.parentId !== "ecosystem";
     const directChildren = children.filter((child) => child.parentGroup === "pages");
+    const destinations = [
+      ...app.pages.filter((page) => !page.hidden).map((page) => ({ kind: "page" as const, href: page.href, page })),
+      ...directChildren.map((child) => ({ kind: "app" as const, href: child.href, app: child })),
+    ];
+    if (app.navigationOrder) {
+      const order = new Map(app.navigationOrder.map((href, index) => [href, index]));
+      destinations.sort((a, b) => (order.get(a.href) ?? Infinity) - (order.get(b.href) ?? Infinity));
+    }
     const organizations = children.filter((child) => child.parentGroup !== "pages");
     const containsCurrentOrganization = organizations.some((child) => child.id === place?.app.id);
     const isCurrentApp = place?.app.id === app.id;
@@ -48,7 +57,7 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
                 <span className="sr-only">, {app.share.label}</span>
               </small>
             ) : null}
-            {counts[app.href] ? <small className="tnum">{counts[app.href]}</small> : null}
+            {showCounts && counts[app.href] ? <small className="tnum">{counts[app.href]}</small> : null}
           </Link>
           {expandable ? (
             <button
@@ -71,8 +80,10 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
                 <span className="rd-side-label">{overview.label}</span>
               </Link>
             ) : null}
-            {app.pages.filter((page) => !page.hidden).map((page) => (
-              <Link
+            {destinations.map((destination) => {
+              if (destination.kind === "app") return renderApp(destination.app, true);
+              const page = destination.page;
+              return <Link
                 key={page.href}
                 href={page.href}
                 className="rd-side-item rd-side-page"
@@ -80,10 +91,9 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
               >
                 <PageMark mark={page.mark} href={page.href} />
                 <span className="rd-side-label">{page.label}</span>
-                {counts[page.href] ? <small className="tnum">{counts[page.href]}</small> : null}
-              </Link>
-            ))}
-            {directChildren.map((child) => renderApp(child, true))}
+                {showCounts && counts[page.href] ? <small className="tnum">{counts[page.href]}</small> : null}
+              </Link>;
+            })}
             {organizations.length ? (
               <div className="rd-side-org-group">
                 <button

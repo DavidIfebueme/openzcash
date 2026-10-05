@@ -3,13 +3,25 @@ import { describe, expect, it } from "vitest";
 import { APPS, placeOf } from "@/lib/design-routes";
 import { AppNavigation } from "./app-navigation";
 
-const render = (path: string, openApps: Record<string, boolean> = {}) => renderToStaticMarkup(
-  <AppNavigation apps={APPS.filter((app) => !app.hidden)} place={placeOf(path)} counts={{}} openApps={openApps} onOpen={() => {}} onToggle={() => {}} />,
+const render = (path: string, openApps: Record<string, boolean> = {}, counts: Record<string, string> = {}) => renderToStaticMarkup(
+  <AppNavigation apps={APPS.filter((app) => !app.hidden)} place={placeOf(path)} counts={counts} openApps={openApps} onOpen={() => {}} onToggle={() => {}} />,
 );
 
 const linkTag = (html: string, href: string) => html.match(new RegExp(`<a\\b[^>]*href="${href}"[^>]*>`))?.[0] ?? "";
 
 describe("grouped ecosystem navigation", () => {
+  it("interleaves direct destinations in reading order and keeps organization names alphabetical", () => {
+    const html = render("/communities", { "ecosystem:organizations": true }, { "/ecosystem": "127", "/development": "579", "/communities": "27", "/arborist": "133" });
+    const links = ["/wallets", "/ecosystem/history", "/communities", "/development", "/arborist", "/zcg/fpf", "/shielded-labs", "/tachyon", "/zakura", "/zf", "/zechub", "/zodl"];
+    links.forEach((href, i) => {
+      expect(html.split(`href="${href}"`)).toHaveLength(2);
+      if (i) expect(html.indexOf(`href="${href}"`)).toBeGreaterThan(html.indexOf(`href="${links[i - 1]}"`));
+    });
+    expect(html).not.toMatch(/<small class="tnum">(?:127|579|27|133)<\/small>/);
+    expect(linkTag(html, "/communities")).toContain('aria-current="page"');
+    expect(html).toContain("12% of every block reward");
+    expect(html).toContain("8% of every block reward");
+  });
   it("opens the correct ancestors on direct organization and nested-page visits", () => {
     const org = render("/zf");
     expect(org).toContain('aria-label="Collapse Ecosystem"');

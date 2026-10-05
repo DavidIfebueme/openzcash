@@ -20,7 +20,7 @@ describe("the navigation hierarchy", () => {
     const ecosystem = appOf("ecosystem");
     const organizations = childAppsOf(ecosystem);
     expect(organizations.map((app) => app.id)).toEqual([
-      "arborist", "communities", "fpf", "zf", "zodl", "shielded-labs", "zakura", "tachyon", "zechub",
+      "communities", "arborist", "fpf", "shielded-labs", "tachyon", "zakura", "zf", "zechub", "zodl",
     ]);
     for (const app of organizations) {
       expect(parentAppOf(app)).toBe(ecosystem);
