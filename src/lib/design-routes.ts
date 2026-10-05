@@ -138,7 +138,7 @@ export const APPS: AppDef[] = [
   { id: "zec-observatory", label: "ZEC Observatory", href: "/zec-observatory", sub: "Markets, DeFi liquidity & holdings", icon: "chart", pages: [] },
   { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
   { id: "lockbox", label: "Lockbox", href: "/lockbox", sub: "Live funding", logo: "/logos/marks/lockbox.png", icon: "shield", pages: [], hidden: true },
-  { id: "arborist", label: "Arborist Calls", href: "/arborist", sub: "Protocol call archive", logo: "/logos/arborist.png", icon: "sigma", pages: [] },
+  { id: "arborist", parentId: "ecosystem", parentGroup: "pages", label: "Arborist Calls", href: "/arborist", sub: "Protocol call archive", logo: "/logos/arborist.png", icon: "sigma", pages: [] },
   { id: "communities", parentId: "ecosystem", parentGroup: "pages", label: "Communities", href: "/communities", sub: "Global groups · live", logo: "/logos/communities.png", icon: "users", pages: [] },
   {
     id: "fpf",
