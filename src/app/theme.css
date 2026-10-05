@@ -1161,9 +1161,9 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 
 /* A distinct, readable disclosure within the Ecosystem hierarchy. */
 .rd-side-org-group {
-  margin-top: 7px;
-  padding-top: 7px;
-  border-top: 1px solid var(--line);
+  margin-bottom: 7px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--line);
 }
 .rd-side-org-heading {
   display: flex;

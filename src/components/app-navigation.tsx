@@ -75,26 +75,6 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
         </div>
         {open ? (
           <div id={`nav-${app.id}`} className="rd-side-pages">
-            {overview ? (
-              <Link href={overview.href} className="rd-side-item rd-side-page" aria-current={appActive ? "page" : undefined}>
-                <PageMark mark={overview.mark} href={overview.href} />
-                <span className="rd-side-label">{overview.label}</span>
-              </Link>
-            ) : null}
-            {destinations.map((destination) => {
-              if (destination.kind === "app") return renderApp(destination.app, true);
-              const page = destination.page;
-              return <Link
-                key={page.href}
-                href={page.href}
-                className="rd-side-item rd-side-page"
-                aria-current={place?.page?.href === page.href || place?.detail?.parent.href === page.href ? "page" : undefined}
-              >
-                <PageMark mark={page.mark} href={page.href} />
-                <span className="rd-side-label">{page.label}</span>
-                {showCounts && counts[page.href] ? <small className="tnum">{counts[page.href]}</small> : null}
-              </Link>;
-            })}
             {organizations.length ? (
               <div className="rd-side-org-group">
                 <button
@@ -115,6 +95,26 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
                 ) : null}
               </div>
             ) : null}
+            {overview ? (
+              <Link href={overview.href} className="rd-side-item rd-side-page" aria-current={appActive ? "page" : undefined}>
+                <PageMark mark={overview.mark} href={overview.href} />
+                <span className="rd-side-label">{overview.label}</span>
+              </Link>
+            ) : null}
+            {destinations.map((destination) => {
+              if (destination.kind === "app") return renderApp(destination.app, true);
+              const page = destination.page;
+              return <Link
+                key={page.href}
+                href={page.href}
+                className="rd-side-item rd-side-page"
+                aria-current={place?.page?.href === page.href || place?.detail?.parent.href === page.href ? "page" : undefined}
+              >
+                <PageMark mark={page.mark} href={page.href} />
+                <span className="rd-side-label">{page.label}</span>
+                {showCounts && counts[page.href] ? <small className="tnum">{counts[page.href]}</small> : null}
+              </Link>;
+            })}
           </div>
         ) : null}
       </div>

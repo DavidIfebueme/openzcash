@@ -12,11 +12,14 @@ const linkTag = (html: string, href: string) => html.match(new RegExp(`<a\\b[^>]
 describe("grouped ecosystem navigation", () => {
   it("interleaves direct destinations in reading order and keeps the curated organization order", () => {
     const html = render("/communities", { "ecosystem:organizations": true }, { "/ecosystem": "127", "/development": "579", "/communities": "27", "/arborist": "133" });
-    const links = ["/wallets", "/ecosystem/history", "/communities", "/development", "/arborist", "/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl"];
+    const links = ["/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl", "/wallets", "/ecosystem/history", "/communities", "/development", "/arborist"];
     links.forEach((href, i) => {
       expect(html.split(`href="${href}"`)).toHaveLength(2);
       if (i) expect(html.indexOf(`href="${href}"`)).toBeGreaterThan(html.indexOf(`href="${links[i - 1]}"`));
     });
+    const ecosystem = html.slice(html.indexOf('id="nav-ecosystem"'));
+    expect(ecosystem.indexOf('class="rd-side-org-group"')).toBeLessThan(ecosystem.indexOf('>Overview</span>'));
+    expect(ecosystem.indexOf('href="/zodl"')).toBeLessThan(ecosystem.indexOf('>Overview</span>'));
     expect(html).not.toMatch(/<small class="tnum">(?:127|579|27|133)<\/small>/);
     expect(linkTag(html, "/communities")).toContain('aria-current="page"');
     expect(html).toContain("12% of every block reward");
@@ -48,7 +51,7 @@ describe("grouped ecosystem navigation", () => {
     expect(expanded).toContain('role="group" aria-label="Organizations"');
     expect(linkTag(expanded, '/zcg/fpf')).toContain('aria-current="page"');
     expect(expanded.match(/href="\/zcg\/fpf"/g)).toHaveLength(1);
-    expect(expanded.indexOf('href="/communities"')).toBeLessThan(expanded.indexOf('class="rd-side-org-group"'));
+    expect(expanded.indexOf('class="rd-side-org-group"')).toBeLessThan(expanded.indexOf('href="/communities"'));
     expect(expanded).not.toContain('src="/logos/marks/ecosystem.png"');
   });
 });
