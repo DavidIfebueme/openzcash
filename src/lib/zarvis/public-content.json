@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "0b1643465bd0849f",
+  "sourceRevision": "d86e842fa3347809",
   "sourceFiles": 55,
   "documents": [
     {
@@ -211,7 +211,7 @@
       "id": "src/app/ecosystem/page.tsx:0",
       "url": "https://openzcash.org/ecosystem",
       "title": "ecosystem",
-      "text": "Ecosystem · OpenZcash\nExplore Zcash projects, maintainers, public code and source-linked funding history."
+      "text": "Ecosystem · OpenZcash\nInspect Zcash ecosystem activity, recent releases and evidence coverage. Explore source-linked project records, communities and organizations."
     },
     {
       "id": "src/app/wallets/page.tsx:0",

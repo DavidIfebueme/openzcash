@@ -6,6 +6,7 @@ import { Card, Stat } from "@/components/ui";
 import { OrgHeader } from "@/components/org-header";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { ecosystemCatalogFilters, updateEcosystemCatalogSearch } from "@/lib/ecosystem/overview-route";
 import type {
   Catalog,
   ClassifiedRepository,
@@ -569,38 +570,44 @@ export function EcosystemExplorer({
   catalog: Catalog;
   mode: Mode;
 }) {
+  const isDevelopment = mode === "development";
   const repositories = useMemo(() => classifyRepositories(catalog), [catalog]);
-  const [query, setQuery] = useState("");
-  const [category, setCategory] = useState("");
-  const [organization, setOrganization] = useState("");
-  const [funding, setFunding] = useState("");
+  const [localQuery, setQuery] = useState("");
+  const [localCategory, setCategory] = useState("");
+  const [localOrganization, setOrganization] = useState("");
+  const [localFunding, setFunding] = useState("");
   const [lifecycle, setLifecycle] = useState("");
   const [period, setPeriod] = useState(30);
   const [page, setPage] = useState(1);
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [projectId, setProjectId] = useState<string | null>(null);
+  const [localProjectId, setProjectId] = useState<string | null>(null);
   const methodologyRef = useRef<HTMLDetailsElement>(null);
-  // The URL is the source of truth for what the menu opens: `?org=zodl`
-  // filters to an organisation and shows its record above the results,
-  // `?project=zakura` filters to a project. Applied after hydration, so server
-  // and client markup begin identically, and again on every client
-  // navigation, so ZODL → Zakura → Tachyon never keeps a stale panel open.
+  // Ecosystem filters follow the URL directly, including insight shortcuts
+  // and browser back/forward. Development retains its local filter controls.
   // Null outside the app router (static renders in tests).
   const searchParams = useSearchParams() as ReturnType<typeof useSearchParams> | null;
   const projectParam = searchParams?.get("project") ?? null;
   const orgParam = searchParams?.get("org") ?? null;
   const registryProjects = catalog.registry.projects;
   const registryOrganizations = catalog.registry.organizations;
+  const catalogFilters = ecosystemCatalogFilters(searchParams, catalog.registry);
+  const query = isDevelopment ? localQuery : catalogFilters.query;
+  const category = isDevelopment ? localCategory : catalogFilters.category;
+  const organization = isDevelopment ? localOrganization : catalogFilters.organization;
+  const funding = isDevelopment ? localFunding : catalogFilters.funding;
+  const projectId = isDevelopment ? localProjectId : catalogFilters.projectId;
+  const catalogSearch = isDevelopment ? "" : searchParams?.toString() ?? "";
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelection(null);
+    setPage(1);
+    if (!isDevelopment) return;
     const projectRecord = projectParam
       ? registryProjects.find((item) => item.id === projectParam)
       : undefined;
     const organizationRecord = orgParam
       ? registryOrganizations.find((item) => item.id === orgParam)
       : undefined;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelection(null);
-    setPage(1);
     if (organizationRecord) {
       setOrganization(organizationRecord.id);
       setProjectId(null);
@@ -608,15 +615,14 @@ export function EcosystemExplorer({
       setOrganization("");
       setProjectId(projectRecord.id);
     } else {
-      // Plain /ecosystem (the menu's Ecosystem entry): no record preselected.
+      // Plain /development: no record preselected.
       setOrganization("");
       setProjectId(null);
     }
-  }, [projectParam, orgParam, registryProjects, registryOrganizations]);
+  }, [projectParam, orgParam, catalogSearch, isDevelopment, registryProjects, registryOrganizations]);
   const activeOrganization = !isDevelopmentMode(mode)
     ? registryOrganizations.find((item) => item.id === organization)
     : undefined;
-  const isDevelopment = mode === "development";
   const filters = {
     query,
     category,
@@ -694,8 +700,15 @@ export function EcosystemExplorer({
   const selectedProject = catalog.registry.projects.find(
     (project) => project.id === projectId,
   );
-  const update = (setter: (value: string) => void, value: string) => {
-    setter(value);
+  const update = (setter: (value: string) => void, value: string, key?: "q" | "category" | "org" | "funding") => {
+    if (isDevelopment) setter(value);
+    else if (key) {
+      const search = updateEcosystemCatalogSearch(window.location.search, { [key]: value });
+      const href = `${window.location.pathname}?${search}${window.location.hash}`;
+      // Typing replaces the current search; discrete filters can be undone with Back.
+      if (key === "q") window.history.replaceState(null, "", href);
+      else window.history.pushState(null, "", href);
+    }
     setPage(1);
   };
   function clearFilters() {
@@ -706,7 +719,12 @@ export function EcosystemExplorer({
     setLifecycle("");
     setProjectId(null);
     setPage(1);
-    if (window.location.search)
+    if (!isDevelopment) {
+      const search = updateEcosystemCatalogSearch(window.location.search, {
+        q: "", category: "", org: "", funding: "", project: "",
+      });
+      window.history.pushState(null, "", `${window.location.pathname}?${search}${window.location.hash}`);
+    } else if (window.location.search)
       window.history.replaceState(null, "", window.location.pathname);
   }
   function navigateProject(project: Project) {
@@ -735,6 +753,7 @@ export function EcosystemExplorer({
 
   return (
     <div className={styles.explorer}>
+      {!isDevelopment && <Link href="/ecosystem" className={styles.textButton}>← Ecosystem overview</Link>}
       <OrgHeader
         name={isDevelopment ? "Development" : "Ecosystem"}
         logo="/logos/ecosystem/zcash.png"
@@ -747,10 +766,10 @@ export function EcosystemExplorer({
           <div className={styles.headerActions}>
             <nav className={styles.tabs} aria-label="Ecosystem apps">
               <Link
-                href="/ecosystem"
+                href={isDevelopment ? "/ecosystem" : "/ecosystem?view=catalog"}
                 aria-current={!isDevelopment ? "page" : undefined}
               >
-                Ecosystem
+                {isDevelopment ? "Ecosystem" : "Project catalog"}
               </Link>
               <Link
                 href="/development"
@@ -821,7 +840,7 @@ export function EcosystemExplorer({
           <input
             type="search"
             value={query}
-            onChange={(event) => update(setQuery, event.target.value)}
+            onChange={(event) => update(setQuery, event.target.value, "q")}
             placeholder={
               isDevelopment ? "Search repositories…" : "Search projects…"
             }
@@ -832,7 +851,7 @@ export function EcosystemExplorer({
         </label>
         <select
           value={category}
-          onChange={(event) => update(setCategory, event.target.value)}
+          onChange={(event) => update(setCategory, event.target.value, "category")}
           aria-label="Filter by purpose"
         >
           <option value="">All categories</option>
@@ -844,7 +863,7 @@ export function EcosystemExplorer({
         </select>
         <select
           value={organization}
-          onChange={(event) => update(setOrganization, event.target.value)}
+          onChange={(event) => update(setOrganization, event.target.value, "org")}
           aria-label={
             isDevelopment
               ? "Filter by GitHub owner"
@@ -868,7 +887,7 @@ export function EcosystemExplorer({
         </select>
         <select
           value={funding}
-          onChange={(event) => update(setFunding, event.target.value)}
+          onChange={(event) => update(setFunding, event.target.value, "funding")}
           aria-label="Filter by funding"
         >
           <option value="">All funding</option>
@@ -1181,7 +1200,7 @@ export function EcosystemExplorer({
       )}
 
       {!isDevelopment && (
-        <details className={styles.methodology}>
+        <details id="organizations" className={styles.methodology}>
           <summary>Organizations & funding</summary>
           <p>
             Funding models change over time. Explore the source-backed record
