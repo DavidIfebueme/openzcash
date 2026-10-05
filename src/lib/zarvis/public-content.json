@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "d86e842fa3347809",
+  "sourceRevision": "28b8c19d6a6de857",
   "sourceFiles": 55,
   "documents": [
     {
@@ -127,7 +127,7 @@
       "id": "src/app/zcg/investments/page.tsx:1",
       "url": "https://openzcash.org/zcg/investments",
       "title": "zcg · investments",
-      "text": "Half of the initial ZEC was exchanged for CACAO to form the pair. The pool rebalances as the relative prices change. This comparison includes accrued earnings and excludes any withdrawn assets.\n·\nInside the position\nCurrent allocation\nZEC\nCACAO\nPercentages by USD value. ZEC at\n; CACAO at\n(\n).\nThe live allocation is temporarily unavailable.\nZCG’s estimated share\nEarnings over time\nAccrued in the pool\nMonthly earnings are temporarily unavailable.\nEarnings are already included in the position value. They are not an additional treasury payout. Estimates use the member’s current units and each month’s closing pool units; they are not an audited fee statement.\nFor ZEC holders\nRead usage and returns together.\nVolume shows demand for trading through the pool. Liquidity shows how much ZEC is available to support those swaps.\nThe treasury comparison shows the cost of providing that liquidity relative to simply holding the contributed ZEC.\nPool liquidity · Maya’s USD quote\nBoth sides of the pool at Maya’s own exchange rate. This can differ from the external prices used for the ZCG position.\nCompare ZEC liquidity across venues\n→\nTransfers & custody\n2-of-3 multisig\nZCG and FPF contributions recorded in the liquidity spreadsheet\nTransfer\nDate\nUSD\nZEC/USD\nContribution records are temporarily unavailable.\n2-of-3 · Vultisig"
+      "text": "Half of the initial ZEC was exchanged for CACAO to form the pair. The pool rebalances as the relative prices change. This comparison includes accrued earnings and excludes any withdrawn assets.\n·\nInside the position\nCurrent allocation\nZEC\nCACAO\nPercentages by USD value. ZEC at\n; CACAO at\n(\n).\nThe live allocation is temporarily unavailable.\nZCG’s estimated share\nEarnings over time\nAccrued in the pool\nMonthly earnings are temporarily unavailable.\nEarnings are already included in the position value. They are not an additional treasury payout. Estimates use the member’s current units and each month’s closing pool units; they are not an audited fee statement.\nFor ZEC holders\nRead usage and returns together.\nVolume shows demand for trading through the pool. Liquidity shows how much ZEC is available to support those swaps.\nThe treasury comparison shows the cost of providing that liquidity relative to simply holding the contributed ZEC.\nPool liquidity · Maya’s USD quote\nBoth sides of the pool at Maya’s own exchange rate. This can differ from the external prices used for the ZCG position.\nExplore ZEC markets\n→\nTransfers & custody\n2-of-3 multisig\nZCG and FPF contributions recorded in the liquidity spreadsheet\nTransfer\nDate\nUSD\nZEC/USD\nContribution records are temporarily unavailable.\n2-of-3 · Vultisig"
     },
     {
       "id": "src/app/zcg/investments/page.tsx:2",
@@ -205,7 +205,7 @@
       "id": "src/app/zec-observatory/page.tsx:0",
       "url": "https://openzcash.org/zec-observatory",
       "title": "zec observatory",
-      "text": "ZEC Observatory · OpenZcash\nZcash markets, liquidity, supply and public holdings. Compare CEX and DEX spot volume, inspect tracked pools, and explore on-chain balances and institutional disclosures."
+      "text": "ZEC Observatory · OpenZcash\nZcash markets, liquidity, supply and public holdings. Compare CEX and DEX spot volume, inspect market sources, and explore on-chain balances and institutional disclosures."
     },
     {
       "id": "src/app/ecosystem/page.tsx:0",
