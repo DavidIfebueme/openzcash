@@ -101,11 +101,12 @@
 .destination p { color: var(--muted); font-size: 11px; margin-top: 5px; }
 .destination > span { color: var(--accent-ink); margin-left: auto; }
 .destination:hover h3 { color: var(--accent-ink); }
-.page .orgLabel { font-size: 12px; font-weight: 550; color: var(--muted); margin: 23px 0 14px; }
+.page .orgLabel { font-size: 14px; font-weight: 650; color: var(--ink); margin: 23px 0 14px; }
 .organizations { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
 .organizations a { display: flex; gap: 10px; min-height: 54px; padding: 12px; align-items: center; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
 .organizations img { object-fit: contain; flex-shrink: 0; }
-.organizations span { font-size: 11px; font-weight: 550; }
+.organizations a[href="/zechub"] img { background: #fff; border-radius: 50%; }
+.organizations span { font-size: 13px; font-weight: 550; }
 .organizations i { margin-left: auto; font-style: normal; color: var(--muted); }
 .organizations a:hover { border-color: var(--accent-muted); }
 .sources { margin-top: 32px; border-top: 1px solid var(--line); }

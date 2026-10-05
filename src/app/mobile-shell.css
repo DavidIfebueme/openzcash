@@ -597,13 +597,14 @@ html:has(.rd-sheet[open]) {
   }
   .rd-side-org-heading {
     min-height: 44px;
-    font-size: 12px;
+    font-size: 14px;
     padding-inline: 12px;
   }
   .rd-side-app[data-nested] > .rd-side-app-row > .rd-side-item {
     min-height: 44px;
     font-size: 14px;
   }
+  .rd-side-org-list .rd-side-app .rd-side-logo { width: 24px; height: 24px; }
   .rd-side-foot {
     flex-direction: row;
     flex-wrap: wrap;

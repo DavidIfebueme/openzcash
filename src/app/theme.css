@@ -1156,7 +1156,7 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   font-size: 13px;
 }
 
-/* Organizations are one quiet group within Ecosystem, not competing apps. */
+/* A distinct, readable disclosure within the Ecosystem hierarchy. */
 .rd-side-org-group {
   margin-top: 7px;
   padding-top: 7px;
@@ -1165,21 +1165,21 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 .rd-side-org-heading {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  gap: 9px;
   width: 100%;
-  min-height: 34px;
-  padding: 5px 8px;
+  min-height: 38px;
+  padding: 7px 10px;
   border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--side-dim);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: .015em;
+  border-radius: 7px;
+  background: var(--accent-soft);
+  color: var(--side-ink);
+  font-size: 13px;
+  font-weight: 650;
   cursor: pointer;
   text-align: left;
 }
+.rd-side-org-heading > span { flex: 1; }
+.rd-side-org-icon { width: 18px; height: 18px; color: var(--accent-ink); }
 .rd-side-org-heading:hover {
   color: var(--side-ink);
   background: var(--side-hover);
@@ -1188,12 +1188,25 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
-.rd-side-org-heading svg { flex-shrink: 0; transition: transform .15s ease; }
-.rd-side-org-heading[aria-expanded="true"] svg { transform: rotate(90deg); }
-.rd-side-org-list { display: flex; flex-direction: column; gap: 2px; padding-top: 3px; }
+.rd-side-org-heading svg { flex-shrink: 0; }
+.rd-side-org-heading > svg:last-child { transition: transform .15s ease; }
+.rd-side-org-heading[aria-expanded="true"] > svg:last-child { transform: rotate(90deg); }
+.rd-side-org-list { display: flex; flex-direction: column; gap: 2px; padding-top: 6px; }
 .rd-side-app[data-nested] > .rd-side-app-row > .rd-side-item { min-height: 31px; font-size: 12px; gap: 8px; }
 .rd-side-app[data-nested] .rd-side-logo { width: 18px; height: 18px; border-radius: 4px; }
 .rd-side-app[data-nested] .rd-side-pages { margin-left: 10px; padding-left: 10px; border-left: 1px solid var(--line); }
+.rd-side-org-list > .rd-side-app > .rd-side-app-row > .rd-side-item {
+  min-height: 36px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--side-ink);
+  gap: 10px;
+}
+.rd-side-org-list .rd-side-app .rd-side-logo { width: 22px; height: 22px; }
+.rd-shell[data-theme="dark"] .rd-side-org-list a[href="/zechub"] .rd-side-logo {
+  background: #fff;
+  border-radius: 50%;
+}
 
 /* ---------- Zero horizontal scrolling: content fits the column at every width ---------- */
 .rd-body {

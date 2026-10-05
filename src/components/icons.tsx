@@ -134,6 +134,13 @@ export const IconReceipt = svg(
   <path d="M5 3v18l2-1.2L9 21l2-1.2L13 21l2-1.2L17 21l2-1.2V3l-2 1.2L15 3l-2 1.2L11 3 9 4.2 7 3 5 4.2zM9 8h6M9 12h6" />,
 );
 
+export const IconOrganizations = svg(
+  <>
+    <rect x="5" y="3" width="14" height="18" rx="2" />
+    <path d="M9 7h1m4 0h1M9 11h1m4 0h1M10 21v-5h4v5" />
+  </>,
+);
+
 export const IconUsers = svg(
   <>
     <circle cx="9" cy="8" r="3" />

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { type AppDef, type Place, childAppsOf, overviewEntry } from "@/lib/design-routes";
 import { AppMark, GLYPH, Glyph, PageMark } from "./app-marks";
+import { IconOrganizations } from "./icons";
 
 type Props = {
   apps: AppDef[];
@@ -103,6 +104,7 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
                   aria-controls={groupOpen ? `nav-${app.id}-organizations` : undefined}
                   onClick={() => onToggle(groupId, containsCurrentOrganization)}
                 >
+                  <IconOrganizations className="rd-side-org-icon" />
                   <span>Organizations</span>
                   <Glyph d={GLYPH.chevron} size={12} />
                 </button>
