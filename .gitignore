@@ -49,3 +49,4 @@ next-env.d.ts
 /public/.well-known/skills/
 /skills/zcg-copilot/**/__pycache__/
 /tmp/
+/.cache/zarvis-models/

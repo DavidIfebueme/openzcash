@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 vi.mock("server-only", () => ({}));
 import cases from "./evaluation-cases.json";
 import { searchKnowledge } from "./knowledge";
+import { createSemanticRetriever, readBundledIndex, retrieveKnowledge } from "./semantic";
+import { loadEmbedder, modelFilesPresent } from "./semantic-model";
 import { computeScenario, scenarioAnswer, type ScenarioSnapshot } from "./scenario";
 import { mergeScenario, scenarioAssumptionsSchema } from "./scenario-input";
 import { readScenarioLink } from "@/lib/treasury/scenario-link";
@@ -26,6 +28,26 @@ describe("Retrieval evaluation — public question set, no model grading", () =>
     expect(JSON.stringify(docs).length).toBeLessThanOrEqual(5000);
   });
   it.each(["weather in Paris tomorrow", "lasagne recipe ingredients", "futebol resultado flamengo", "zzzzunknownphrasezzzz"])("abstains on unmatched subject: %s", (question) => expect(searchKnowledge(question)).toEqual([]));
+});
+/** The same set through keyword + meaning with the real model and the committed index; skipped only where the model files were never fetched (npm run knowledge:model). */
+describe.skipIf(!modelFilesPresent())("Retrieval evaluation — semantic fusion with the real index", () => {
+  const retriever = createSemanticRetriever({ index: readBundledIndex, embedder: () => loadEmbedder() });
+  it("loads the model and finds a vector for every committed chunk", async () => {
+    await retriever.warm(); expect(retriever.status()).toBe("ready");
+    await retrieveKnowledge("Zcash funding governance methodology ceremony grants treasury", 4, 5000, undefined, undefined, retriever);
+    expect(retriever.extraVectors()).toBe(0);
+  });
+  it.each(cases)("$question", async ({ question, sourceContains }) => {
+    const docs = await retrieveKnowledge(question, 4, 5000, undefined, undefined, retriever);
+    expect(docs.some((doc) => doc.url.includes(sourceContains)), docs.map((d) => d.url).join("\n")).toBe(true);
+    expect(JSON.stringify(docs).length).toBeLessThanOrEqual(5000);
+  });
+  it.each(["weather in Paris tomorrow", "lasagne recipe ingredients", "futebol resultado flamengo", "zzzzunknownphrasezzzz", "receita de lasanha", "como fazer bolo de cenoura"])("still abstains with meaning in the mix: %s", async (question) => expect(await retrieveKnowledge(question, 4, 5000, undefined, undefined, retriever)).toEqual([]));
+  it("keeps the per-question overhead small once warm", async () => {
+    const timings: number[] = [];
+    for (const { question } of cases.slice(0, 20)) { const started = performance.now(); await retrieveKnowledge(question, 4, 5000, undefined, undefined, retriever); timings.push(performance.now() - started); }
+    expect(timings.sort((a, b) => a - b)[18]).toBeLessThan(100);
+  });
 });
 describe("Treasury scenarios — independently checkable invariants", () => {
   it("uses exactly 1,050,000 ZEC for 5% of maximum supply", () => expect(computeScenario({ supplyBasis: "maximum" }, {}, snapshot).company.todayTargetZec).toBe(1050000));

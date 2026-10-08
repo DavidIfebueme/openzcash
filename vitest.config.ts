@@ -8,5 +8,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.{ts,tsx}"],
+    // Unit tests stay keyword-only and hermetic; evaluation.test.ts builds its own retriever around the real model when its files are present.
+    env: { ZARVIS_SEMANTIC: "false" },
   },
 });

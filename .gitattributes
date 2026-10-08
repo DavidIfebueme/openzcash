@@ -4,3 +4,5 @@
 /public/monthly/pdfjs/** -whitespace
 # Byte-exact copy of the finalized vote-chain summary; its SHA-256 is asserted in tests.
 /src/lib/coinholder/fixtures/*.json -text
+# Int8 embedding index of the Zarvis corpora; rebuilt by npm run knowledge:embed.
+/src/lib/zarvis/semantic-index.bin binary

@@ -1,7 +1,8 @@
 import "server-only";
 import type { Tool } from "openai/resources/responses/responses";
 import { z } from "zod";
-import { bundledZipCorpus, searchKnowledge } from "./knowledge";
+import { bundledZipCorpus } from "./knowledge";
+import { retrieveKnowledge } from "./semantic";
 import { createZipStore } from "./zip-source";
 import { zipCatalogEvidence } from "./zip-catalog";
 import { boundedRead } from "./timeout";
@@ -19,5 +20,5 @@ export async function lookupZips(args: unknown, signal: AbortSignal) {
   if (!parsed.success) return { content: JSON.stringify({ error: "Invalid ZIP lookup query." }) };
   const { corpus, stale } = await getZipCorpus(signal);
   const catalog = zipCatalogEvidence(parsed.data.query, corpus, stale);
-  return { ...catalog, content: JSON.stringify({ ...JSON.parse(catalog.content), documents: searchKnowledge(parsed.data.query, 4, 5000, corpus) }) };
+  return { ...catalog, content: JSON.stringify({ ...JSON.parse(catalog.content), documents: await retrieveKnowledge(parsed.data.query, 4, 5000, corpus) }) };
 }

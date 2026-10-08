@@ -171,7 +171,7 @@ async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], quer
   if (topic === "mining") return (await import("./mining")).readMiningSnapshot(signal);
   const request = new Request(`https://openzcash.org${links[topic]}${query ? `?search=${encodeURIComponent(query)}` : ""}`);
   switch (topic) {
-    case "site": { const { searchKnowledge, knowledgeCoverage } = await import("./knowledge"); return { coverage: knowledgeCoverage, documents: searchKnowledge(query, 5, 5000), note: "Reviewed references and static site documentation excerpts, not current account balances. Navigation labels do not establish page contents. Source revisions do not establish reporting dates." }; }
+    case "site": { const { knowledgeCoverage } = await import("./knowledge"); const { retrieveKnowledge } = await import("./semantic"); return { coverage: knowledgeCoverage, documents: await retrieveKnowledge(query, 5, 5000), note: "Reviewed references and static site documentation excerpts, not current account balances. Navigation labels do not establish page contents. Source revisions do not establish reporting dates." }; }
     case "meetings": return { meetings: await (await import("@/lib/zcg/governance-repo")).getMeetings() };
     case "elections": return { elections: await (await import("@/lib/zcg/governance-repo")).getElections() };
     case "totals": { const { grandTotal, categoryTotals } = await import("@/lib/zcg/totals-repo"); return { sheetTotals: await grandTotal(), categories: await categoryTotals(), note: "Published spreadsheet pivots, not ledger-derived annual payment totals. Do not add overlapping totals and categories." }; }

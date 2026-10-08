@@ -7,12 +7,23 @@ import { requestedZips } from "./zip-catalog";
 import type { ZipCorpus } from "./zip-source";
 import { KNOWLEDGE, terms } from "./sources";
 import { isHistoricalQuestion } from "./research-scope";
+import { contentKey, embeddingText } from "./semantic-index";
 
 export type ExternalKind = "official blog" | "community wiki" | "forum topic";
 export type KnowledgeDocument = { id: string; title: string; url: string; text: string; section?: string; reviewedOn?: string; retrievedAt?: string; sourceUpdatedOn?: string | null; publishedOn?: string | null; site?: string; snapshotNote?: string; kind: "reference" | "site documentation" | "navigation" | ExternalKind };
 /** One record of external-content.json: a blog post, a ZecHub wiki page or a forum topic's first post, written by scripts/sync-zarvis-sources.py. */
 export type ExternalSource = { id: string; kind: ExternalKind; site: string; title: string; url: string; publishedOn: string | null; retrievedAt: string; sha256: string; author: string | null; source: string | null; marker?: string | null; text: string };
 export type ExternalCorpus = { version: number; retrievedAt: string; sources: ExternalSource[] };
+/** What semantic retrieval adds to one search: a cosine per chunk (undefined when no vector exists yet) and a sink for the chunks it could not score, so they get embedded in the background. */
+export type SemanticQuery = { similarity: (doc: KnowledgeDocument, key: string) => number | undefined; missing?: (chunks: SemanticChunk[]) => void };
+export type SemanticChunk = { key: string; text: string };
+/** Bounded additive fusion, calibrated on the committed index (docs/zarvis.md, "Semantic retrieval"). E5 cosines are compressed: an unrelated question still reaches ~0.87 on one-line chunks, so meaning re-ranks chunks that have keyword evidence from `floor` up, while a chunk with no keyword evidence enters only from `entryFloor` and only when it is long enough to be about something. The weight sits around one strong title match, so an exact keyword hit still wins. */
+export const SEMANTIC_FUSION = { floor: 0.8, ceiling: 0.9, weight: 7, entryFloor: 0.86, entryMinChars: 300 } as const;
+export function semanticBonus(similarity: number | undefined, keywordEvidence: boolean, chars: number, fusion = SEMANTIC_FUSION): number {
+  if (similarity === undefined || !Number.isFinite(similarity) || similarity <= fusion.floor) return 0;
+  if (!keywordEvidence && (similarity < fusion.entryFloor || chars < fusion.entryMinChars)) return 0;
+  return fusion.weight * Math.min(1, (similarity - fusion.floor) / (fusion.ceiling - fusion.floor));
+}
 /** Bounds the offline sync enforces; the size-guard test reads the committed file against them so a drift on either side fails early. */
 export const EXTERNAL_LIMITS = { blogPostsPerSite: 40, wikiPages: 30, forumTopicsPerCategory: 30, totalJsonChars: 4_000_000, chars: { "official blog": 12_000, "community wiki": 15_000, "forum topic": 4_000 } } as const;
 const aliases: Record<string, string[]> = {
@@ -114,7 +125,7 @@ function buildSearchIndex(corpus: ZipCorpus, externalCorpus: ExternalCorpus) {
     note: `Status: ${source.status}. Created: ${source.createdOn ?? "not specified"}. Revision: ${corpus.revision.slice(0, 12)}. Repository snapshot; Created is not first-publication time, and status is not independent activation proof.`,
   }));
   const all = [...documents, ...zipDocs, ...externalChunks(externalCorpus)];
-  const normalized = all.map((doc) => ({ doc, title: new Set(searchTerms(`${doc.title} ${doc.section ?? ""}`)), tokens: new Set(searchTerms(`${doc.section ?? ""} ${doc.text}`)), length: terms(doc.text).length }));
+  const normalized = all.map((doc) => ({ doc, key: contentKey(embeddingText(doc)), title: new Set(searchTerms(`${doc.title} ${doc.section ?? ""}`)), tokens: new Set(searchTerms(`${doc.section ?? ""} ${doc.text}`)), length: terms(doc.text).length }));
   const frequency = new Map<string, number>();
   for (const doc of normalized) for (const token of doc.tokens) frequency.set(token, (frequency.get(token) ?? 0) + 1);
   const averageLength = normalized.reduce((sum, item) => sum + item.length, 0) / normalized.length;
@@ -158,7 +169,11 @@ function cachedIndex(corpus: ZipCorpus, externalCorpus: ExternalCorpus) {
   perCorpus.set(externalCorpus, built);
   return built;
 }
-export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus: ZipCorpus = bundledZipCorpus, externalCorpus: ExternalCorpus = bundledExternalCorpus): KnowledgeDocument[] {
+/** Every chunk the search ranks, keyed as the embedding index keys it; the embed script and its staleness check read this. */
+export function knowledgeChunks(corpus: ZipCorpus = bundledZipCorpus, externalCorpus: ExternalCorpus = bundledExternalCorpus): SemanticChunk[] {
+  return cachedIndex(corpus, externalCorpus).normalized.map(({ doc, key }) => ({ key, text: embeddingText(doc) }));
+}
+export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus: ZipCorpus = bundledZipCorpus, externalCorpus: ExternalCorpus = bundledExternalCorpus, semantic?: SemanticQuery): KnowledgeDocument[] {
   const searchIndex = cachedIndex(corpus, externalCorpus);
   const { normalized, frequency, averageLength, count } = searchIndex;
   const normalizedQuery = query.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
@@ -175,8 +190,11 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
   const newestPublished = news ? searchIndex.newestPublished : null;
   const forumQuestion = /\b(?:forum|forums|foruns|discourse|threads?|topicos?|discuss\w*|debate\w*)\b/.test(normalizedQuery);
   const zechub = /\bzechub\b/.test(normalizedQuery);
-  const scored = normalized.map(({ doc, title, tokens: body, length }, i) => {
+  const unscored: number[] = [];
+  const scored = normalized.map(({ doc, key, title, tokens: body, length }, i) => {
     let score = 0, matched = 0, titled = false;
+    const similarity = semantic?.similarity(doc, key);
+    if (semantic && similarity === undefined) unscored.push(i);
     for (const token of tokens) {
       const idf = Math.log(1 + (count - (frequency.get(token) ?? 0) + 0.5) / ((frequency.get(token) ?? 0) + 0.5));
       if (body.has(token)) score += idf * 2.2 / (1 + 1.2 * (0.25 + 0.75 * length / averageLength));
@@ -189,6 +207,9 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
     const nudged = (news && doc.kind === "official blog") || (forumQuestion && doc.kind === "forum topic") || (zechub && doc.kind === "community wiki");
     if (externalDoc && tokens.length >= 2 && matched < 2 && !titled) score = 0;
     else if (externalDoc && !nudged) score *= 0.7;
+    // Meaning joins after the keyword gate: a paraphrase in another language reaches the chunk, damped like its keyword score when the chunk is a dated third-party post.
+    const bonus = semanticBonus(similarity, score > 0, doc.text.length);
+    score += externalDoc && !nudged ? 0.7 * bonus : bonus;
     if (matchingConcepts.some(([id]) => id === doc.id)) score += 12;
     if (zips.some((number) => doc.url.endsWith(`zip-${String(number).padStart(4, "0")}`))) score += 30;
     if (!zips.length && score > 0) {
@@ -214,6 +235,7 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
     if (doc.kind === "navigation") score *= 0.35;
     return { doc, i, score };
   }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score || a.i - b.i);
+  if (semantic?.missing && unscored.length) semantic.missing(unscored.map((i) => ({ key: normalized[i].key, text: embeddingText(normalized[i].doc) })));
   const selected: KnowledgeDocument[] = []; const perPage = new Map<string, number>(); let used = 2;
   const biography = historical ? personHistoryDocument(query) : undefined;
   if (biography && limit > 0 && JSON.stringify(biography).length + used <= budget) {

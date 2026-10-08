@@ -3,7 +3,8 @@ import { directProjectHistoryQuery, lookupProjectHistory, projectHistoryAnswer }
 import { projectActivityMonth, lookupProjectActivity, projectActivityAnswer } from "./project-activity";
 import { lookupPublicData, lookupSchema } from "./data";
 import { queryLedger, ledgerQuerySchema, type LedgerSummary } from "./ledger";
-import { searchKnowledge } from "./knowledge";
+import type { searchKnowledge } from "./knowledge";
+import { retrieveKnowledge } from "./semantic";
 import { getZipCorpus } from "./zips";
 import { isZipQuestion, zipCatalogEvidence, latestZipAnswer, requestedZips } from "./zip-catalog";
 import { boundedRead } from "./timeout";
@@ -173,7 +174,7 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal,
     return { query, documents: [], evidence: [result], direct: compatible ? analyticsAnswer(result, lang) : undefined, computedAnswer: true, external: false };
   }
   const zip = isZipQuestion(query) ? await getZipCorpus(signal) : undefined;
-  const documents = searchKnowledge(query, 4, 5000, zip?.corpus);
+  const documents = await retrieveKnowledge(query, 4, 5000, zip?.corpus);
   if (intent?.type === "ledger") {
     const result = await lookupLedger(intent.filters, signal);
     const data = JSON.parse(result.content).data as LedgerSummary | undefined;

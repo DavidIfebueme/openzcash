@@ -4,8 +4,9 @@ import { runCanary, type CanaryResult } from "./canary";
 import { recordCanary } from "./metrics-store";
 import { sendAlert } from "./alerts";
 import { getZipCorpus } from "./zips";
+import { warmSemantic } from "./semantic";
 
-/** Warm the ZIP corpus shortly after boot so the first run does not meet a build-time snapshot. */
+/** Warm the ZIP corpus and the embedding model shortly after boot, so the first run meets neither a build-time snapshot nor a cold model. */
 export const CANARY_WARMUP_MS = 20_000;
 /** First run after boot: the data readers and migrations are settled by then. */
 export const CANARY_FIRST_RUN_MS = 3 * 60_000;
@@ -37,7 +38,7 @@ export function executeCanary(): Promise<CanaryOutcome> {
 export function startCanarySchedule(): boolean {
   if (process.env.ZARVIS_CANARY_SCHEDULE === "false") return false;
   const tick = () => { executeCanary().catch((error) => console.error("[cron] zarvis canary failed:", error instanceof Error ? error.message : error)); };
-  setTimeout(() => { getZipCorpus(AbortSignal.timeout(35_000)).catch(() => {}); }, CANARY_WARMUP_MS);
+  setTimeout(() => { getZipCorpus(AbortSignal.timeout(35_000)).catch(() => {}); warmSemantic().catch(() => {}); }, CANARY_WARMUP_MS);
   setTimeout(tick, CANARY_FIRST_RUN_MS);
   setInterval(tick, CANARY_INTERVAL_MS);
   return true;
