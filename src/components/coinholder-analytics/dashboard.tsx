@@ -98,7 +98,7 @@ export function CoinholderDashboardView({ initial }: { initial: CoinholderDashbo
       <p><span className="coin-source-dot" aria-hidden="true" />Q3 2026 · Final results</p>
       <div>
         <Link href="/coinholders/results?round=q3-2026">Results</Link>
-        <Link href="/coinholders/overview">Program overview</Link>
+        <Link href="/coinholders">Program overview</Link>
         <External href={data.source.url}>Chain summary</External>
         <details>
           <summary>Source details</summary>

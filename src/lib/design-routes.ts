@@ -87,10 +87,10 @@ export const APPS: AppDef[] = [
     share: { value: "12%", label: "12% of every block reward (ZIP 1016)" },
     icon: "grant",
     pages: [
-      { href: "/coinholders", label: "Voting activity", mark: "/logos/glyphs/insights.png" },
-      { href: "/coinholders/overview", label: "Program overview", mark: "/logos/glyphs/overview.png" },
+      { href: "/coinholders", label: "Program overview", mark: "/logos/glyphs/overview.png" },
       { href: "/coinholders/results", label: "Results", mark: "/logos/glyphs/decisions.png" },
-      // Next to the results it checks, so people find it from the menu too.
+      { href: "/coinholders/activity", label: "Voting activity", mark: "/logos/glyphs/insights.png" },
+      // Keep verification beside the results and activity it checks.
       { href: "/coinholders/verify", label: "Verify it yourself", mark: "/logos/glyphs/reconciliation.png" },
       { href: "/coinholders/fund", label: "The fund", mark: "/logos/glyphs/coinholder.png" },
       { href: "/zcg/coinholder/copilot", label: "Coinholder Copilot", mark: "/logos/glyphs/copilot.png" },

@@ -10,7 +10,7 @@ export const routes = [
   "/", "/zcg", "/zcg/methodology", "/zcg/grants", "/zcg/disbursements", "/zcg/recipients",
   "/zcg/proposals", "/zcg/schedule", "/zcg/committee", "/zcg/meetings", "/zcg/office",
   "/zcg/decisions", "/zcg/totals", "/zcg/analytics", "/zcg/reconciliation", "/zcg/budget",
-  "/zcg/stipends", "/zcg/investments", "/zcg/fpf", "/coinholders", "/coinholders/results",
+  "/zcg/stipends", "/zcg/investments", "/zcg/fpf", "/coinholders", "/coinholders/results", "/coinholders/activity",
   "/coinholders/fund", "/coinholders/verify", "/zcg/treasury-calculator", "/funding-history", "/governance",
   "/zec-observatory", "/ecosystem", "/wallets", "/development", "/news",
   "/monthly", "/lockbox", "/zf", "/zodl", "/shielded-labs", "/zakura", "/tachyon",

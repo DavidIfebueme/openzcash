@@ -1,6 +1,6 @@
 # Coinholder dashboard
 
-The **Coinholders** page at `/coinholders` includes public, read-only historical voting analytics. It uses OpenZcash’s navigation and theme, with no DAO account or community context. It does not cast votes or execute grants.
+The **Voting activity** page at `/coinholders/activity` includes public, read-only historical voting analytics. It uses OpenZcash’s navigation and theme, with no DAO account or community context. It does not cast votes or execute grants.
 
 ## Explore the Q3 2026 round
 

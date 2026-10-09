@@ -1,17 +1,17 @@
 import { PROGRAM } from "@/lib/coinholder/program";
-import { readCoinholderDashboard } from "@/lib/coinholder/analytics/server";
-import { CoinholderDashboardView } from "@/components/coinholder-analytics/dashboard";
+import { currentZecUsdQuote } from "@/lib/pricing/live-price";
 import { pageMetadata } from "@/lib/seo/page-metadata";
-import "./analytics.css";
+import { OverviewView } from "./round-view";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: `${PROGRAM.officialName} · OpenZcash`,
-  description: "Explore Q3 2026 Coinholder voting activity: recorded casts, daily revealed shares, final ZEC weights and proposal decisions, with verifiable sources.",
+  description: "The Coinholder Grants program across every round: participation, grant outcomes, voting value, funding and counting rules.",
   path: "/coinholders",
-  card: { title: "Coinholder Grants" },
+  card: { title: "Coinholder Grants", stat: "Program overview" },
 });
 
 export default async function CoinholdersPage() {
-  return <CoinholderDashboardView initial={await readCoinholderDashboard()} />;
+  const quote = await currentZecUsdQuote();
+  return <OverviewView today={quote ? { usd: quote.cents / 100, source: quote.source } : null} />;
 }

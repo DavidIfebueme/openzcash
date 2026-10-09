@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "sourceRevision": "68ba3da9cdfe7364",
-  "sourceFiles": 55,
+  "sourceRevision": "163f5a7f99862bfe",
+  "sourceFiles": 56,
   "documents": [
     {
       "id": "src/app/zcg/page.tsx:0",
@@ -151,13 +151,19 @@
       "id": "src/app/coinholders/page.tsx:0",
       "url": "https://openzcash.org/coinholders",
       "title": "coinholders",
-      "text": "Explore Q3 2026 Coinholder voting activity: recorded casts, daily revealed shares, final ZEC weights and proposal decisions, with verifiable sources.\nCoinholder Grants"
+      "text": "The Coinholder Grants program across every round: participation, grant outcomes, voting value, funding and counting rules.\nCoinholder Grants"
     },
     {
       "id": "src/app/coinholders/results/page.tsx:0",
       "url": "https://openzcash.org/coinholders/results",
       "title": "coinholders · results",
       "text": "Results"
+    },
+    {
+      "id": "src/app/coinholders/activity/page.tsx:0",
+      "url": "https://openzcash.org/coinholders/activity",
+      "title": "coinholders · activity",
+      "text": "Explore Q3 2026 Coinholder voting activity: recorded casts, daily revealed shares, final ZEC weights and proposal decisions, with verifiable sources.\nCoinholder Grants"
     },
     {
       "id": "src/app/coinholders/fund/page.tsx:0",

@@ -20,13 +20,13 @@ describe("the navigation hierarchy", () => {
     const coinholders = appOf("coinholders");
     expect(overviewEntry(coinholders)).toBeNull();
     expect(coinholders.pages).toEqual(expect.arrayContaining([
-      expect.objectContaining({ href: "/coinholders", label: "Voting activity" }),
-      expect.objectContaining({ href: "/coinholders/overview", label: "Program overview" }),
+      expect.objectContaining({ href: "/coinholders/activity", label: "Voting activity" }),
+      expect.objectContaining({ href: "/coinholders", label: "Program overview" }),
       expect.objectContaining({ href: "/coinholders/results" }),
       expect.objectContaining({ href: "/coinholders/verify" }),
       expect.objectContaining({ href: "/coinholders/fund" }),
     ]));
-    expect(backOf("/coinholders/overview")).toEqual({ href: "/coinholders", label: "Coinholder Grants" });
+    expect(backOf("/coinholders/activity")).toEqual({ href: "/coinholders", label: "Coinholder Grants" });
   });
 
   it("groups the organizations under Ecosystem while keeping their own routes and identities", () => {

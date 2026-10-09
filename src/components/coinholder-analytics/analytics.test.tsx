@@ -46,7 +46,7 @@ describe("OpenZcash Coinholder analytics", () => {
     expect([...html.matchAll(/preserveAspectRatio="none"/g)]).toHaveLength(2);
     expect(html).toContain("32,598");
     expect(html).toContain("145,620");
-    expect(html).toContain('href="/coinholders/overview"');
+    expect(html).toContain('href="/coinholders"');
     expect(html).toContain('href="/coinholders/results?round=q3-2026"');
     expect(html).not.toMatch(/Sign in|Community session|dao-app|\/communities\//);
     expect(html).not.toMatch(/NaN|Infinity/);
