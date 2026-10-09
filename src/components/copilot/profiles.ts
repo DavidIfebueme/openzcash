@@ -62,7 +62,7 @@ export const COPILOT_PROFILES: Record<CopilotSkill, CopilotProfile> = {
         { title: "Trace earlier funding", description: "Compare prior rounds and recorded payments." },
         { title: "Make your own decision", description: "Take unresolved questions to the community." },
       ],
-      links: [{ label: "Coinholder round results", href: "/coinholders" }, { label: "Funding ledger", href: "/zcg/grants" }],
+      links: [{ label: "Coinholder round results", href: "/coinholders/results" }, { label: "Funding ledger", href: "/zcg/grants" }],
     },
   },
   "zechub-copilot": {

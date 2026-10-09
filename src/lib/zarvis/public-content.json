@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "2cbd55fbe493dd55",
+  "sourceRevision": "68ba3da9cdfe7364",
   "sourceFiles": 55,
   "documents": [
     {
@@ -151,7 +151,7 @@
       "id": "src/app/coinholders/page.tsx:0",
       "url": "https://openzcash.org/coinholders",
       "title": "coinholders",
-      "text": "Coinholder Grants"
+      "text": "Explore Q3 2026 Coinholder voting activity: recorded casts, daily revealed shares, final ZEC weights and proposal decisions, with verifiable sources.\nCoinholder Grants"
     },
     {
       "id": "src/app/coinholders/results/page.tsx:0",

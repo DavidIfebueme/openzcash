@@ -181,11 +181,11 @@ describe("Program navigation", () => {
     expect(app.label).toBe("Coinholder Grants");
     expect(app.sub).toBe(PROGRAM.officialName);
     expect(app.href).toBe("/coinholders");
-    expect(app.pages.filter((p) => !p.hidden).map((p) => p.label)).toEqual(["Results", "Verify it yourself", "The fund", "Coinholder Copilot"]);
+    expect(app.pages.filter((p) => !p.hidden).map((p) => p.label)).toEqual(["Voting activity", "Program overview", "Results", "Verify it yourself", "The fund", "Coinholder Copilot"]);
     // Verify it yourself sits in the sidebar right after the results it checks.
     expect(app.pages.find((p) => p.href === "/coinholders/verify")?.hidden).toBeFalsy();
     // …but ⌘K finds it; other hidden pages stay out of the palette.
-    expect(paletteEntries(app).map((p) => p.label)).toEqual(["Overview", "Results", "Verify it yourself", "The fund", "Coinholder Copilot"]);
+    expect(paletteEntries(app).map((p) => p.label)).toEqual(["Voting activity", "Program overview", "Results", "Verify it yourself", "The fund", "Coinholder Copilot"]);
     const zcg = APPS.find((a) => a.id === "zcg")!;
     expect(paletteEntries(zcg).map((p) => p.label)).not.toContain("Stipends");
     expect(APPS.find((a) => a.id === "fpf")).toMatchObject({ sub: "Program administrator", pages: [] });
@@ -195,7 +195,7 @@ describe("Program navigation", () => {
   });
   it("lists each app's landing page as an Overview entry when the app has inner pages", () => {
     const app = (id: string) => APPS.find((a) => a.id === id)!;
-    expect(overviewEntry(app("coinholders"))).toMatchObject({ href: "/coinholders", label: "Overview" });
+    expect(overviewEntry(app("coinholders"))).toBeNull();
     expect(overviewEntry(app("zcg"))).toMatchObject({ href: "/zcg", label: "Overview" });
     // An app without inner pages is its own page: nothing to list.
     expect(overviewEntry(app("news"))).toBeNull();
@@ -205,7 +205,7 @@ describe("Program navigation", () => {
   it("places the overview, results, fund and copilot inside the program", () => {
     expect(placeOf("/coinholders")).toMatchObject({ app: { id: "coinholders" } });
     expect(placeOf("/coinholders")?.page).toBeUndefined();
-    for (const [path, label] of [["/coinholders/results", "Results"], ["/coinholders/fund", "The fund"], ["/coinholders/verify", "Verify it yourself"], ["/zcg/coinholder/copilot", "Coinholder Copilot"]]) {
+    for (const [path, label] of [["/coinholders/overview", "Program overview"], ["/coinholders/results", "Results"], ["/coinholders/fund", "The fund"], ["/coinholders/verify", "Verify it yourself"], ["/zcg/coinholder/copilot", "Coinholder Copilot"]]) {
       expect(placeOf(path)?.page?.label, path).toBe(label);
     }
     expect(placeOf("/zcg/fpf")?.app.id).toBe("fpf");

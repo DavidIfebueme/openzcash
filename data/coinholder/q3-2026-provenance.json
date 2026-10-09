@@ -1,0 +1,10 @@
+{
+  "fetchedAt": "2026-10-09T03:57:32.369Z",
+  "summaryUrl": "https://zvote.zfnd.org/shielded-vote/v1/vote-summary/2cba66eb16c7581a1692cb0b033785da0131059f645a0d2fb4dc2a5131505e01",
+  "summarySha256": "9b858326b8149de92ea6788314a714b521fb2f57215e3742ec9b35b67c6639b5",
+  "summaryBytes": 27480,
+  "metadataUrl": "https://openzcash.org/api/coinholders/verify?round=q3-2026&format=json",
+  "metadataSha256": "508fb82912ce486abfcece123f67785cca6220435f0dba90af84227a31f9aa83",
+  "metadataBytes": 18004,
+  "metadataFetchedAt": "2026-10-09T03:58:57.628Z"
+}
