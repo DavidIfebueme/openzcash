@@ -17,7 +17,7 @@ type Props = {
 export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
     const children = childAppsOf(app, apps);
-    const showCounts = app.id !== "ecosystem" && app.parentId !== "ecosystem";
+    const showCounts = app.id !== "zcg" && app.id !== "ecosystem" && app.parentId !== "ecosystem";
     const directChildren = children.filter((child) => child.parentGroup === "pages");
     const destinations = [
       ...app.pages.filter((page) => !page.hidden).map((page) => ({ kind: "page" as const, href: page.href, page })),
