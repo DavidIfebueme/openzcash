@@ -5,12 +5,12 @@ import type {
   NetworkCore,
   NetworkEmission,
   NetworkFreshness,
-  NetworkHistory,
   NetworkMining,
   NetworkPeriod,
   NetworkSnapshot,
   NetworkValuePool,
 } from "./types";
+import { getNetworkActivity } from "./zecblock";
 
 const API_URL = "https://api.zcashinfo.com/api/v1";
 const SOURCE = {
@@ -69,17 +69,6 @@ const dashboardSchema = z.object({
   recent_blocks: z.array(blockSchema).min(1),
 });
 const blocksSchema = z.object({ blocks: z.array(blockSchema).min(1) });
-const canonicalSchema = z.array(z.object({ height: amount, time: unixTime })).min(1);
-const historySchema = z.object({
-  buckets: z.array(z.object({
-    timestamp: unixTime,
-    avg_difficulty: positive,
-    avg_network_hashrate_gsols: z.number().finite().nonnegative(),
-    block_count: amount,
-    min_height: amount,
-    max_height: amount,
-  })),
-});
 const miningSchema = z.object({
   total_blocks: amount,
   pools: z.array(z.object({
@@ -230,72 +219,19 @@ function coreData(dashboard: Resource<Dashboard>, sample: Resource<z.infer<typeo
   };
 }
 
-function historyData(
-  value: Resource<z.infer<typeof historySchema>>,
-  canonical: Resource<z.infer<typeof canonicalSchema>> | null,
-  core: NetworkCore | null,
-  sample: Resource<z.infer<typeof blocksSchema>> | null,
-): NetworkHistory {
-  const points = value.data.buckets.map((point) => ({
-    time: new Date(point.timestamp * 1_000).toISOString(),
-    solrateGsols: point.avg_network_hashrate_gsols,
-    difficulty: point.avg_difficulty,
-    blocks: point.block_count,
-    minHeight: point.min_height,
-    maxHeight: point.max_height,
-    partial: false,
-  })).sort((a, b) => a.time.localeCompare(b.time));
-  const latest = points.at(-1);
-  const lastPointAt = latest?.time ?? null;
-  const widths = points.slice(1).map((point, index) =>
-    (Date.parse(point.time) - Date.parse(points[index].time)) / 1_000,
-  ).filter((width) => width > 0).sort((a, b) => a - b);
-  const bucketSeconds = widths.length ? widths[Math.floor(widths.length / 2)] : null;
-  const lastCanonical = canonical?.data.reduce((latest, block) =>
-    block.height > latest.height ? block : latest,
-  );
-  const matchingBlock = latest ? canonical?.data.find((block) => block.height === latest.maxHeight)
-    ?? sample?.data.blocks.find((block) => block.height === latest.maxHeight) : null;
-  const coverageAt = matchingBlock ? new Date(matchingBlock.time * 1_000).toISOString()
-    : core?.recentBlocks.find((block) => block.height === latest?.maxHeight)?.time ?? null;
-  const lagBlocks = latest && core ? Math.max(0, core.chainTip - latest.maxHeight) : null;
-  const maxLagMs = 15 * 60_000;
-  // Source bucket timestamps are starts. A daily bucket can look recent while
-  // canonical coverage only reaches part of that day. Check block coverage instead.
-  const stale = value.stale || !latest || !canonical || canonical.stale
-    || !lastCanonical || Date.now() - lastCanonical.time * 1_000 > maxLagMs
-    || (lagBlocks !== null && core !== null && lagBlocks * core.targetBlockSeconds * 1_000 > maxLagMs);
-  // The API has no closed-bucket or as-of flag. A later bucket in this same
-  // history reading closes its predecessor; independently refreshed canonical
-  // data cannot certify that a cached final count includes the rest of its bucket.
-  if (latest) latest.partial = true;
-  return {
-    fetchedAt: value.fetchedAt,
-    stale,
-    lastPointAt,
-    coverageAt,
-    coverageHeight: latest?.maxHeight ?? null,
-    lagBlocks,
-    bucketSeconds,
-    points,
-  };
-}
-
 export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise<NetworkSnapshot> {
   const range = RANGES[period];
-  const [dashboard, blocks, history, mining, mempool, canonical] = await Promise.all([
+  const [activity, dashboard, blocks, mining, mempool] = await Promise.all([
+    getNetworkActivity(period),
     resource("/dashboard", 30_000, dashboardSchema),
     resource("/blocks?limit=100", 30_000, blocksSchema),
-    resource(`/mining/history?range=${range}`, 120_000, historySchema),
     resource(`/mining/pools?interval=${range}`, 60_000, miningSchema),
     resource("/mempool", 30_000, mempoolSchema),
-    resource("/blocks/latest/canonical", 30_000, canonicalSchema),
   ]);
   let core: NetworkCore | null = null;
   if (dashboard) {
     try { core = coreData(dashboard, blocks); } catch { /* Invalid or unusable current-chain readings are unavailable. */ }
   }
-  const historySection = history ? historyData(history, canonical, core, blocks) : null;
   const miningSection: NetworkMining | null = mining ? {
     fetchedAt: mining.fetchedAt,
     stale: mining.stale,
@@ -308,7 +244,15 @@ export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise
     fetchedAt: mempool.fetchedAt, stale: mempool.stale,
     count: mempool.data.size, bytes: mempool.data.bytes,
   } : null;
-  const sections = { core, history: historySection, mining: miningSection, mempool: mempoolSection };
+  // Block counts and solrate share one activity feed, so count its health once.
+  const sections = {
+    core,
+    "activity.current": activity.current,
+    "activity.solrate": activity.solrate,
+    "activity.blockTime": activity.blockTime,
+    mining: miningSection,
+    mempool: mempoolSection,
+  };
   const available = Object.values(sections).filter((section) => section !== null);
   const unavailableSections = Object.entries(sections).filter(([, section]) => !section).map(([name]) => name);
   const status = available.length === 0 ? "unavailable"
@@ -318,6 +262,6 @@ export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise
     period, source: SOURCE, status,
     fetchedAt: core?.fetchedAt ?? available.map((section) => section.fetchedAt).sort().at(-1) ?? null,
     stale: !!core?.stale || status === "stale",
-    ...sections, unavailableSections,
+    core, activity, mining: miningSection, mempool: mempoolSection, unavailableSections,
   };
 }

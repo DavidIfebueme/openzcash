@@ -1,11 +1,34 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { NetworkActivity, NetworkPeriod, NetworkSeries } from "./types";
 
 vi.mock("server-only", () => ({}));
+const { activityMock } = vi.hoisted(() => ({ activityMock: vi.fn() }));
+vi.mock("./zecblock", () => ({ getNetworkActivity: activityMock }));
 
 const fetchMock = vi.fn();
 const start = new Date("2026-10-11T00:00:00Z");
 const seconds = Math.floor(start.getTime() / 1_000);
 const height = 3_513_500;
+
+function activity(period: NetworkPeriod = "day"): NetworkActivity {
+  const fetchedAt = new Date().toISOString();
+  const source = { name: "ZecBlock", url: "https://zecblock.com/", docsUrl: "https://zecblock.com/api" };
+  const series = (metric: NetworkSeries["metric"], value: number): NetworkSeries => ({
+    fetchedAt, stale: false, source, metric, windowLabel: "24-hour window",
+    observedAt: fetchedAt, coverageAt: fetchedAt, coverageHeight: height,
+    period, truncated: false, points: [{ time: fetchedAt, value, current: true }],
+  });
+  return {
+    current: { fetchedAt, stale: false, source, observedAt: fetchedAt, coverageAt: fetchedAt,
+      coverageHeight: height, windowSeconds: 86_400, solrateGsols: 31,
+      difficulty: 210_000_000, blocks24h: 1_140, averageTxsPerBlock: 4 },
+    solrate: series("solrate", 31),
+    blocks: series("blocks", 1_140),
+    blockTime: series("blockTime", 75),
+  };
+}
+
+const noActivity: NetworkActivity = { current: null, solrate: null, blocks: null, blockTime: null };
 
 function block(index = 0) {
   return {
@@ -32,13 +55,6 @@ function dashboard() {
 function apiResponse(url: string) {
   if (url.includes("/dashboard")) return dashboard();
   if (url.includes("/blocks?")) return { blocks: [block(), block(1), block(2)] };
-  if (url.includes("/blocks/latest/canonical")) return [block(1)];
-  if (url.includes("/mining/history?")) return { buckets: [
-    { timestamp: seconds - 7_200, avg_difficulty: 190_000_000,
-      avg_network_hashrate_gsols: 20.75, block_count: 48, min_height: height - 97, max_height: height - 50 },
-    { timestamp: seconds - 3_600, avg_difficulty: 190_000_000,
-      avg_network_hashrate_gsols: 20.75, block_count: 48, min_height: height - 49, max_height: height - 1 },
-  ] };
   if (url.includes("/mining/pools?")) return { total_blocks: 100, pools: [
     { pool_name: null, block_count: 40, share_percentage: 40 },
     { pool_name: "ViaBTC", block_count: 60, share_percentage: 60 },
@@ -54,6 +70,7 @@ beforeEach(() => {
   vi.useFakeTimers();
   vi.setSystemTime(start);
   fetchMock.mockReset().mockImplementation(async (url: string) => ok(apiResponse(url)));
+  activityMock.mockReset().mockImplementation(async (period: NetworkPeriod) => activity(period));
   vi.stubGlobal("fetch", fetchMock);
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
@@ -78,11 +95,17 @@ describe("Zcash network public data", () => {
     expect(snapshot.mining?.pools[0]).toEqual({ name: "ViaBTC", blocks: 60, sharePercent: 60 });
     expect(snapshot.mining?.pools[1].name).toBe("Unknown");
     expect(snapshot.mempool).toMatchObject({ count: 0, bytes: 0, stale: false });
-    expect(snapshot.history).toMatchObject({ coverageAt: new Date(start.getTime() - 75_000).toISOString(),
-      coverageHeight: height - 1, lagBlocks: 1, bucketSeconds: 3_600 });
-    expect(snapshot.history?.points.at(-1)?.partial).toBe(true);
-    expect(snapshot.history?.points[0].partial).toBe(false);
-    expect(fetchMock).toHaveBeenCalledTimes(6);
+    expect(snapshot.activity).toEqual(activity());
+    expect(snapshot.source.name).toBe("Zcash Info");
+    expect(snapshot.activity.current?.source.name).toBe("ZecBlock");
+    expect(snapshot).not.toHaveProperty("history");
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual(expect.arrayContaining([
+      "https://api.zcashinfo.com/api/v1/dashboard",
+      "https://api.zcashinfo.com/api/v1/blocks?limit=100",
+      "https://api.zcashinfo.com/api/v1/mining/pools?interval=24h",
+      "https://api.zcashinfo.com/api/v1/mempool",
+    ]));
   });
 
   it("withholds core metrics when every dashboard and sample block is stale", async () => {
@@ -141,12 +164,12 @@ describe("Zcash network public data", () => {
     const { getNetworkSnapshot } = await import("./provider");
     const [first, second] = await Promise.all([getNetworkSnapshot(), getNetworkSnapshot()]);
     expect(second).toEqual(first);
-    expect(fetchMock).toHaveBeenCalledTimes(6);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
     await getNetworkSnapshot("week");
     await getNetworkSnapshot("month");
-    expect(fetchMock).toHaveBeenCalledTimes(10);
-    expect(fetchMock.mock.calls.map(([url]) => url)).toContain("https://api.zcashinfo.com/api/v1/mining/history?range=1w");
+    expect(fetchMock).toHaveBeenCalledTimes(6);
     expect(fetchMock.mock.calls.map(([url]) => url)).toContain("https://api.zcashinfo.com/api/v1/mining/pools?interval=1m");
+    expect(activityMock.mock.calls.map(([period]) => period)).toEqual(["day", "day", "week", "month"]);
   });
 
   it("preserves the last core reading and its timestamp on failure while other sections refresh", async () => {
@@ -166,111 +189,83 @@ describe("Zcash network public data", () => {
     expect(fetchMock).toHaveBeenCalledTimes(count);
   });
 
-  it("flags an old indexer history even when its HTTP request succeeds", async () => {
-    fetchMock.mockImplementation(async (url: string) => {
-      const data = apiResponse(url);
-      if (url.includes("/mining/history?")) {
-        return ok({ buckets: [{ timestamp: seconds - 20 * 3_600,
-          avg_difficulty: 100, avg_network_hashrate_gsols: 10, block_count: 3,
-          min_height: height - 1_002, max_height: height - 1_000 }] });
-      }
-      return ok(data);
-    });
+  it("keeps the adapter's independent source windows and readings intact", async () => {
+    const reading = activity("month");
+    reading.blockTime = { ...reading.blockTime!, period: "day", truncated: true,
+      windowLabel: "Rolling 120 block intervals", coverageHeight: height - 2 };
+    activityMock.mockResolvedValue(reading);
+    const { getNetworkSnapshot } = await import("./provider");
+    const snapshot = await getNetworkSnapshot("month");
+    expect(activityMock).toHaveBeenCalledWith("month");
+    expect(snapshot.activity).toBe(reading);
+    expect(snapshot.activity.current?.solrateGsols).toBe(31);
+    expect(snapshot.activity.solrate?.points.at(-1)?.value).toBe(31);
+    expect(snapshot.activity.blockTime).toMatchObject({ period: "day", truncated: true,
+      windowLabel: "Rolling 120 block intervals", coverageHeight: height - 2 });
+    expect(snapshot.core?.difficulty).toBe(200_000_000);
+    expect(snapshot.activity.current?.difficulty).toBe(210_000_000);
+  });
+
+  it("keeps valid legacy sections when the activity source is unavailable", async () => {
+    activityMock.mockResolvedValue(noActivity);
     const { getNetworkSnapshot } = await import("./provider");
     const snapshot = await getNetworkSnapshot();
-    expect(snapshot.status).toBe("partial");
+    expect(snapshot).toMatchObject({ status: "partial", stale: false, activity: noActivity,
+      unavailableSections: ["activity.current", "activity.solrate", "activity.blockTime"] });
     expect(snapshot.core?.stale).toBe(false);
-    expect(snapshot.history).toMatchObject({ stale: true, fetchedAt: start.toISOString(),
-      lastPointAt: new Date(start.getTime() - 20 * 3_600_000).toISOString() });
+    expect(snapshot.mining?.stale).toBe(false);
+    expect(snapshot.mempool).toMatchObject({ count: 0, bytes: 0, stale: false });
   });
 
-  it("detects stalled daily history across every period using indexed block time and marks the last count partial", async () => {
-    const indexedTime = seconds - 21 * 3_600;
-    const indexedHeight = height - 1_000;
-    fetchMock.mockImplementation(async (url: string) => {
-      if (url.includes("/blocks/latest/canonical")) return ok([{ height: indexedHeight, time: indexedTime }]);
-      if (url.includes("/mining/history?")) return ok({ buckets: [
-        { timestamp: seconds - 2 * 86_400, avg_difficulty: 100,
-          avg_network_hashrate_gsols: 10, block_count: 1_152,
-          min_height: indexedHeight - 1_346, max_height: indexedHeight - 195 },
-        { timestamp: seconds - 86_400, avg_difficulty: 100,
-          avg_network_hashrate_gsols: 10, block_count: 195,
-          min_height: indexedHeight - 194, max_height: indexedHeight },
-      ] });
-      return ok(apiResponse(url));
-    });
-    const { getNetworkSnapshot } = await import("./provider");
-    for (const period of ["day", "week", "month"] as const) {
-      const snapshot = await getNetworkSnapshot(period);
-      expect(snapshot.status).toBe("partial");
+  it.each(["current", "solrate", "blockTime"] as const)(
+    "reports a stale activity %s reading without marking fresh core data stale", async (section) => {
+      const reading = activity();
+      reading[section]!.stale = true;
+      reading[section]!.fetchedAt = new Date(start.getTime() - 20 * 3_600_000).toISOString();
+      activityMock.mockResolvedValue(reading);
+      const { getNetworkSnapshot } = await import("./provider");
+      const snapshot = await getNetworkSnapshot();
+      expect(snapshot).toMatchObject({ status: "partial", stale: false, unavailableSections: [] });
       expect(snapshot.core?.stale).toBe(false);
-      expect(snapshot.history).toMatchObject({ stale: true, bucketSeconds: 86_400,
-        coverageAt: new Date(indexedTime * 1_000).toISOString(), coverageHeight: indexedHeight, lagBlocks: 1_000 });
-      expect(snapshot.history?.points[0].partial).toBe(false);
-      expect(snapshot.history?.points.at(-1)).toMatchObject({ partial: true, blocks: 195 });
-    }
+      expect(snapshot.activity[section]).toBe(reading[section]);
+      expect(snapshot.activity[section]?.stale).toBe(true);
+    },
+  );
+
+  it("counts the shared solrate and block count feed only once in source health", async () => {
+    const reading = activity();
+    reading.solrate = null;
+    reading.blocks = null;
+    activityMock.mockResolvedValue(reading);
+    const { getNetworkSnapshot } = await import("./provider");
+    expect(await getNetworkSnapshot()).toMatchObject({ status: "partial",
+      unavailableSections: ["activity.solrate"] });
   });
 
-  it("does not certify the final bucket using an independent canonical reading", async () => {
-    fetchMock.mockImplementation(async (url: string) => {
-      if (url.includes("/mining/history?")) return ok({ buckets: [
-        { timestamp: seconds - 7_320, avg_difficulty: 100,
-          avg_network_hashrate_gsols: 10, block_count: 48, min_height: height - 100, max_height: height - 51 },
-        { timestamp: seconds - 3_720, avg_difficulty: 100,
-          avg_network_hashrate_gsols: 10, block_count: 48, min_height: height - 50, max_height: height - 2 },
-      ] });
-      return ok(apiResponse(url));
-    });
+  it("retains fresh activity when every legacy endpoint fails on a cold cache", async () => {
+    fetchMock.mockRejectedValue(new Error("offline"));
     const { getNetworkSnapshot } = await import("./provider");
     const snapshot = await getNetworkSnapshot();
-    expect(snapshot.history).toMatchObject({ stale: false, lagBlocks: 2,
-      coverageAt: new Date(block(2).time * 1_000).toISOString() });
-    expect(snapshot.history?.points.at(-1)?.partial).toBe(true);
+    expect(snapshot).toMatchObject({ status: "partial", fetchedAt: start.toISOString(),
+      core: null, mining: null, mempool: null, unavailableSections: ["core", "mining", "mempool"] });
+    expect(snapshot.activity).toEqual(activity());
   });
 
-  it("does not promote a cached partial bucket when canonical data refreshes first", async () => {
+  it("reports cached feed loss as stale when every remaining section is stale", async () => {
+    const reading = activity();
     const { getNetworkSnapshot } = await import("./provider");
-    const first = await getNetworkSnapshot();
-    expect(first.history?.points.at(-1)?.partial).toBe(true);
-    vi.setSystemTime(new Date(start.getTime() + 31_000));
-    fetchMock.mockImplementation(async (url: string) => {
-      if (url.includes("/blocks/latest/canonical")) return ok([{ ...block(), time: seconds + 1 }]);
-      if (url.includes("/mining/history?")) {
-        const previousHistory = apiResponse(url);
-        if (!("buckets" in previousHistory) || !Array.isArray(previousHistory.buckets)) {
-          throw new Error("Expected history fixture");
-        }
-        return ok({ buckets: [
-          ...previousHistory.buckets,
-          { timestamp: seconds, avg_difficulty: 190_000_000,
-            avg_network_hashrate_gsols: 20.75, block_count: 1, min_height: height, max_height: height },
-        ] });
-      }
-      return ok(apiResponse(url));
-    });
-    const cached = await getNetworkSnapshot();
-    expect(cached.history?.fetchedAt).toBe(first.history?.fetchedAt);
-    expect(cached.history?.points).toEqual(first.history?.points);
-    expect(fetchMock.mock.calls.filter(([url]) => url.includes("/mining/history?")).length).toBe(1);
-
-    vi.setSystemTime(new Date(start.getTime() + 121_000));
-    const refreshed = await getNetworkSnapshot();
-    expect(refreshed.history?.points.at(-2)?.partial).toBe(false);
-    expect(refreshed.history?.points.at(-1)?.partial).toBe(true);
-    expect(fetchMock.mock.calls.filter(([url]) => url.includes("/mining/history?")).length).toBe(2);
-  });
-
-  it("does not infer a bucket width from a single point or invent an unmatched coverage timestamp", async () => {
-    fetchMock.mockImplementation(async (url: string) => {
-      if (url.includes("/mining/history?")) return ok({ buckets: [
-        { timestamp: seconds - 3_600, avg_difficulty: 100,
-          avg_network_hashrate_gsols: 10, block_count: 48, min_height: height - 52, max_height: height - 4 },
-      ] });
-      return ok(apiResponse(url));
-    });
-    const { getNetworkSnapshot } = await import("./provider");
-    expect((await getNetworkSnapshot()).history).toMatchObject({ coverageAt: null, bucketSeconds: null,
-      coverageHeight: height - 4, lagBlocks: 4, points: [{ partial: true }] });
+    const initial = await getNetworkSnapshot();
+    vi.setSystemTime(new Date(start.getTime() + 130_000));
+    fetchMock.mockRejectedValue(new Error("offline"));
+    for (const section of Object.values(reading)) if (section) section.stale = true;
+    activityMock.mockResolvedValue(reading);
+    const snapshot = await getNetworkSnapshot();
+    expect(snapshot).toMatchObject({ status: "stale", stale: true, fetchedAt: initial.fetchedAt,
+      unavailableSections: [] });
+    expect(snapshot.core).toEqual({ ...initial.core, stale: true });
+    expect(snapshot.mining).toEqual({ ...initial.mining, stale: true });
+    expect(snapshot.mempool).toEqual({ ...initial.mempool, stale: true });
+    expect(snapshot.activity).toBe(reading);
   });
 
   it("returns missing sections without fabricated metrics and rejects malformed core values", async () => {
@@ -285,7 +280,7 @@ describe("Zcash network public data", () => {
       unavailableSections: ["core", "mempool"] });
     fetchMock.mockRejectedValue(new Error("offline"));
     vi.setSystemTime(new Date(start.getTime() + 130_000));
-    expect(await getNetworkSnapshot()).toMatchObject({ status: "stale", core: null, mempool: null });
+    expect(await getNetworkSnapshot()).toMatchObject({ status: "partial", core: null, mempool: null });
   });
 
   it("retains extra future value pools without assuming they are private or hiding their balances", async () => {
@@ -319,8 +314,10 @@ describe("Zcash network public data", () => {
 
   it("reports complete cold-cache feed loss as unavailable", async () => {
     fetchMock.mockRejectedValue(new Error("offline"));
+    activityMock.mockResolvedValue(noActivity);
     const { getNetworkSnapshot } = await import("./provider");
     expect(await getNetworkSnapshot()).toMatchObject({ status: "unavailable", fetchedAt: null,
-      core: null, history: null, mining: null, mempool: null });
+      core: null, activity: noActivity, mining: null, mempool: null,
+      unavailableSections: ["core", "activity.current", "activity.solrate", "activity.blockTime", "mining", "mempool"] });
   });
 });

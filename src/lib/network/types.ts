@@ -5,6 +5,48 @@ export type NetworkFreshness = {
   stale: boolean;
 };
 
+export type NetworkSource = { name: string; url: string; docsUrl: string };
+export type NetworkMetric = "solrate" | "blockTime" | "blocks";
+
+export type NetworkSeriesPoint = {
+  time: string;
+  /** Null samples remain gaps, never interpolated as source observations. */
+  value: number | null;
+  current: boolean;
+};
+
+export type NetworkSeries = NetworkFreshness & {
+  source: NetworkSource;
+  metric: NetworkMetric;
+  windowLabel: string;
+  observedAt: string | null;
+  coverageAt: string | null;
+  coverageHeight: number | null;
+  /** The actual available range, which may differ by metric. */
+  period: NetworkPeriod;
+  truncated: boolean;
+  points: NetworkSeriesPoint[];
+};
+
+export type NetworkCurrent = NetworkFreshness & {
+  source: NetworkSource;
+  observedAt: string;
+  coverageAt: string;
+  coverageHeight: number;
+  windowSeconds: number;
+  solrateGsols: number | null;
+  difficulty: number;
+  blocks24h: number;
+  averageTxsPerBlock: number | null;
+};
+
+export type NetworkActivity = {
+  current: NetworkCurrent | null;
+  solrate: NetworkSeries | null;
+  blocks: NetworkSeries | null;
+  blockTime: NetworkSeries | null;
+};
+
 export type NetworkValuePool = {
   id: string;
   name: string;
@@ -59,29 +101,6 @@ export type NetworkCore = NetworkFreshness & {
   emission: NetworkEmission;
 };
 
-export type NetworkHistoryPoint = {
-  time: string;
-  solrateGsols: number;
-  difficulty: number;
-  blocks: number;
-  minHeight: number;
-  maxHeight: number;
-  /** A bucket that has not been proven complete must not imply an activity drop. */
-  partial: boolean;
-};
-
-export type NetworkHistory = NetworkFreshness & {
-  /** Last bucket start; this is not the time through which the source indexed. */
-  lastPointAt: string | null;
-  /** Exact timestamp of the last block included, when another fetched block confirms it. */
-  coverageAt: string | null;
-  coverageHeight: number | null;
-  lagBlocks: number | null;
-  /** Inferred from returned bucket starts; never assumed from the requested period. */
-  bucketSeconds: number | null;
-  points: NetworkHistoryPoint[];
-};
-
 export type NetworkMining = NetworkFreshness & {
   totalBlocks: number;
   pools: { name: string; blocks: number; sharePercent: number }[];
@@ -99,7 +118,7 @@ export type NetworkSnapshot = {
   fetchedAt: string | null;
   stale: boolean;
   core: NetworkCore | null;
-  history: NetworkHistory | null;
+  activity: NetworkActivity;
   mining: NetworkMining | null;
   mempool: NetworkMempool | null;
   unavailableSections: string[];

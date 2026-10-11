@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { useThemeColor } from "@/components/use-theme-color";
 import { NetworkIcon } from "./network-icons";
-import type { NetworkCore, NetworkHistory, NetworkHistoryPoint, NetworkPeriod, NetworkSnapshot } from "@/lib/network/types";
+import type { NetworkCore, NetworkSeries, NetworkSeriesPoint, NetworkMetric, NetworkPeriod, NetworkSnapshot } from "@/lib/network/types";
 import { newBlockHashes } from "@/lib/network/updates";
 import { AnimatedValue } from "./network-motion";
 import { ExplorerPicker } from "./explorer-picker";
@@ -52,18 +52,17 @@ function Freshness({ fetchedAt, stale, now }: { fetchedAt: string; stale: boolea
   return stale ? <span className={s.sectionState}>Delayed · {age(fetchedAt, now)}</span> : null;
 }
 
-type ChartMetric = "solrateGsols" | "difficulty" | "blocks";
-const metricNames: Record<ChartMetric, string> = { solrateGsols: "Solrate", difficulty: "Difficulty", blocks: "Blocks" };
+const metricNames: Record<NetworkMetric, string> = { solrate: "Solrate", blockTime: "Block time", blocks: "Blocks · 24h" };
 
-function NetworkChart({ history, metric, now }: { history: NetworkHistory; metric: ChartMetric; now: number }) {
+function NetworkChart({ history, metric, now }: { history: NetworkSeries; metric: NetworkMetric; now: number }) {
   const gradientId = useId().replaceAll(":", "");
   const [hovered, setHovered] = useState<number | null>(null);
   const [width, setWidth] = useState(600);
   const chartRef = useRef<SVGSVGElement>(null);
   const endpointRef = useRef<SVGCircleElement>(null);
   const previousEndpoint = useRef<string | null>(null);
-  const lastPoint = history.points.at(-1)!;
-  const endpointIdentity = `${lastPoint.time}:${lastPoint[metric]}`;
+  const lastPoint = history.points.find((point) => point.current) ?? history.points.at(-1)!;
+  const endpointIdentity = `${lastPoint.time}:${lastPoint.value}`;
   useEffect(() => {
     const changed = previousEndpoint.current !== null && previousEndpoint.current !== endpointIdentity;
     previousEndpoint.current = endpointIdentity;
@@ -82,26 +81,31 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
     return () => observer.disconnect();
   }, []);
   const points = history.points;
-  const values = points.map((p) => p[metric]);
+  const values = points.flatMap((p) => p.value == null ? [] : [p.value]);
   const low = Math.min(...values) * .9;
   const high = Math.max(...values) * 1.06;
   const span = Math.max(high - low, 1);
   const left = 46, right = width - 10, top = 10, bottom = 91;
   const firstTime = Date.parse(points[0].time), lastTime = Date.parse(points.at(-1)!.time);
   const timeSpan = Math.max(lastTime - firstTime, 1);
-  const x = (point: NetworkHistoryPoint) => left + (Date.parse(point.time) - firstTime) / timeSpan * (right - left);
-  const y = (point: NetworkHistoryPoint) => bottom - (point[metric] - low) / span * (bottom - top);
-  const line = points.map((point, index) => `${index === 0 ? "M" : "L"}${x(point)},${y(point)}`).join(" ");
-  const selected = hovered === null ? points.at(-1)! : points[Math.min(hovered, points.length - 1)];
-  const valueLabel = (value: number) => metric === "solrateGsols" ? `${decimal.format(value)} GSol/s` : metric === "difficulty" ? short.format(value) : `${number.format(value)} blocks`;
+  const x = (point: NetworkSeriesPoint) => left + (Date.parse(point.time) - firstTime) / timeSpan * (right - left);
+  const y = (point: NetworkSeriesPoint) => bottom - ((point.value ?? low) - low) / span * (bottom - top);
+  const segments: NetworkSeriesPoint[][] = [];
+  let segment: NetworkSeriesPoint[] = [];
+  for (const point of points) {
+    if (point.value == null) { if (segment.length) segments.push(segment); segment = []; }
+    else segment.push(point);
+  }
+  if (segment.length) segments.push(segment);
+  const lineFor = (part: NetworkSeriesPoint[]) => part.map((point, index) => `${index === 0 ? "M" : "L"}${x(point)},${y(point)}`).join(" ");
+  const selected = hovered === null ? lastPoint : points[Math.min(hovered, points.length - 1)];
+  const valueLabel = (value: number | null) => value == null ? "—" : metric === "solrate" ? `${decimal.format(value)} GSol/s` : metric === "blockTime" ? `${decimal.format(value)} sec` : `${number.format(value)} blocks`;
   const timeLabel = (time: string) => new Date(time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" });
-  const daily = history.bucketSeconds === 86_400;
-  const intervalLabel = metric === "blocks" ? "interval total" : daily ? "daily avg." : history.bucketSeconds === 3_600 ? "hourly avg." : "interval avg.";
-  const selectedDate = daily ? `${new Date(selected.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })} UTC` : `${timeLabel(selected.time)} UTC`;
+  const selectedDate = selected.current ? "Latest" : `${timeLabel(selected.time)} UTC`;
   return <>
-    <div className={s.chartSummary} aria-live="polite" aria-atomic="true"><strong>{valueLabel(selected[metric])}</strong><small>{selectedDate} · {intervalLabel}{selected.partial ? " · partial" : ""}</small></div>
+    <div className={s.chartSummary} aria-live="polite" aria-atomic="true"><strong>{valueLabel(selected.value)}</strong><small>{selectedDate} · {history.windowLabel}</small></div>
     <svg ref={chartRef} className={s.chart} viewBox={`0 0 ${width} 120`} role="img" tabIndex={0}
-      aria-label={`${metricNames[metric]} history with ${points.length} data points. Latest ${valueLabel(points.at(-1)![metric])}. Use left and right arrows to explore.`}
+      aria-label={`${metricNames[metric]} history with ${points.length} data points. Latest ${valueLabel(lastPoint.value)}. Use left and right arrows to explore.`}
       onPointerMove={(event) => {
         const matrix = event.currentTarget.getScreenCTM();
         if (!matrix) return;
@@ -110,18 +114,17 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
         points.forEach((point, index) => { if (Math.abs(x(point) - position) < Math.abs(x(points[closest]) - position)) closest = index; });
         setHovered(closest);
       }} onPointerLeave={() => setHovered(null)} onBlur={() => setHovered(null)}
-      onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); setHovered((previous) => Math.max(0, Math.min(points.length - 1, (previous ?? points.length - 1) + (event.key === "ArrowLeft" ? -1 : 1)))); } }}>
+      onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); setHovered((previous) => Math.max(0, Math.min(points.length - 1, (previous ?? points.indexOf(lastPoint)) + (event.key === "ArrowLeft" ? -1 : 1)))); } }}>
       <defs><linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--accent)" stopOpacity=".2" /><stop offset="100%" stopColor="var(--accent)" stopOpacity="0" /></linearGradient></defs>
       {[0, 1, 2, 3].map((tick) => { const value = low + span * tick / 3; const at = bottom - (bottom - top) * tick / 3; return <g key={tick}><line className={s.chartGrid} x1={left} x2={right} y1={at} y2={at} /><text x="0" y={at + 3}>{short.format(value)}</text></g>; })}
-      <path d={`${line} L${x(points.at(-1)!)},${bottom} L${left},${bottom} Z`} fill={`url(#${gradientId})`} />
-      <path className={s.chartLine} d={line} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinejoin="round" />
-      <circle ref={endpointRef} className={s.chartEndpoint} style={{ visibility: hovered === null ? "visible" : "hidden" }} cx={x(lastPoint)} cy={y(lastPoint)} r="4" fill="var(--accent)" />
-      {points.length < 12 && points.map((point) => <circle key={point.time} cx={x(point)} cy={y(point)} r="3" fill="var(--accent)" />)}
-      {hovered !== null && <g><line x1={x(selected)} x2={x(selected)} y1={top} y2={bottom} stroke="var(--muted)" strokeDasharray="3 4" /><circle cx={x(selected)} cy={y(selected)} r="4" fill="var(--accent)" stroke="var(--panel)" strokeWidth="2" /></g>}
+      {segments.map((part) => <g key={part[0].time}><path d={`${lineFor(part)} L${x(part.at(-1)!)},${bottom} L${x(part[0])},${bottom} Z`} fill={`url(#${gradientId})`} /><path className={s.chartLine} d={lineFor(part)} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinejoin="round" /></g>)}
+      {lastPoint.value != null && <circle ref={endpointRef} className={s.chartEndpoint} style={{ visibility: hovered === null ? "visible" : "hidden" }} cx={x(lastPoint)} cy={y(lastPoint)} r="4" fill="var(--accent)" />}
+      {points.length < 12 && points.filter((point) => point.value != null).map((point) => <circle key={point.time} cx={x(point)} cy={y(point)} r="3" fill="var(--accent)" />)}
+      {hovered !== null && <g><line x1={x(selected)} x2={x(selected)} y1={top} y2={bottom} stroke="var(--muted)" strokeDasharray="3 4" />{selected.value != null && <circle cx={x(selected)} cy={y(selected)} r="4" fill="var(--accent)" stroke="var(--panel)" strokeWidth="2" />}</g>}
       <text x={left} y="115">{new Date(points[0].time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
       <text x={right} y="115" textAnchor="end">{new Date(points.at(-1)!.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
     </svg>
-    <div className={s.caption}><span>{metric === "blocks" ? "Completed intervals" : "Historical averages"}</span><span className={history.stale ? s.sectionState : undefined}>{history.coverageAt ? `Source data ends ${age(history.coverageAt, now)}` : history.lagBlocks != null ? `${number.format(history.lagBlocks)} blocks behind` : "Coverage unavailable"}</span></div>
+    <div className={s.caption}><span>{history.truncated ? "Limited coverage" : metric === "blockTime" ? "Observed block intervals" : "Daily samples + latest"}</span><span className={history.stale ? s.sectionState : undefined}>{history.observedAt ? `${history.stale ? "Last reading" : "Updated"} ${age(history.observedAt, now)}` : "Update time unavailable"}</span></div>
   </>;
 }
 
@@ -145,7 +148,7 @@ function PrivacyPools({ core, now }: { core: NetworkCore; now: number }) {
 export function NetworkDashboard() {
   const [data, setData] = useState<NetworkSnapshot | null>(null);
   const [period, setPeriod] = useState<NetworkPeriod>("week");
-  const [metric, setMetric] = useState<ChartMetric>("solrateGsols");
+  const [metric, setMetric] = useState<NetworkMetric>("solrate");
   const [theme, setTheme] = useState<"dark" | "light">("light");
   const root = useRef<HTMLDivElement>(null);
   useThemeColor(root, theme);
@@ -201,8 +204,12 @@ export function NetworkDashboard() {
   }, []);
 
   const core = data?.core;
-  const history = data?.period === period ? data.history : null;
-  const chartHistory = history && metric === "blocks" ? { ...history, points: history.points.filter((point) => !point.partial) } : history;
+  const activity = data?.activity;
+  const current = activity?.current;
+  const selectedSeries = activity?.[metric];
+  const chartHistory = selectedSeries?.period === period ? selectedSeries : null;
+  const blockTime = activity?.blockTime;
+  const currentBlockTime = blockTime?.points.find((point) => point.current)?.value;
   const mining = data?.period === period ? data.mining : null;
   const mempool = data?.mempool;
   const clock = now;
@@ -222,9 +229,10 @@ export function NetworkDashboard() {
   const blockPace = core?.averageBlockSeconds != null && core.averageBlockSeconds > 0 && core.targetBlockSeconds > 0
     ? (core.targetBlockSeconds / core.averageBlockSeconds - 1) * 100 : null;
   const coreDelayed = !!core && (core.stale || old || error);
-  const historyDelayed = !!history && (history.stale || coreDelayed || error);
+  const currentDelayed = !!current && (current.stale || error || now - Date.parse(current.fetchedAt) > 120_000);
+  const blockTimeDelayed = !!blockTime && (blockTime.stale || error || now - Date.parse(blockTime.fetchedAt) > 120_000);
 
-  const periods = <div className={s.periods} aria-label="History period">{(Object.keys(periodLabels) as NetworkPeriod[]).map((p) => <button key={p} onClick={() => { if (p !== period) { setLoading(true); setPeriod(p); } }} aria-pressed={period === p} aria-label={`Show ${periodNames[p]} history`}>{periodLabels[p]}</button>)}</div>;
+  const periods = <div className={s.periods} aria-label="History period">{(Object.keys(periodLabels) as NetworkPeriod[]).filter((p) => metric !== "blockTime" || p !== "month").map((p) => <button key={p} onClick={() => { if (p !== period) { setLoading(true); setPeriod(p); } }} aria-pressed={period === p} aria-label={`Show ${periodNames[p]} history`}>{periodLabels[p]}</button>)}</div>;
 
   return <div ref={root} className={s.root} data-theme={theme} data-motion-paused={error || old}>
     <header className={s.header}><div className={s.headerInner}>
@@ -257,17 +265,16 @@ export function NetworkDashboard() {
         </Card>
 
         <Card title="Network" icon={<NetworkIcon name="network" />} className={s.activity} action={periods}>
-          {core ? <div className={s.networkSnapshot} data-motion-paused={core.stale || old || error}>
+          {current || blockTime ? <div className={s.networkSnapshot} data-motion-paused={currentDelayed || blockTimeDelayed}>
             <div className={`${s.stats} ${s.networkStats}`}>
-              <Stat label="Solrate GSol/s"><AnimatedValue value={core.solrateGsols} /></Stat>
-              <Stat label="Difficulty"><AnimatedValue value={core.difficulty} format={short} /></Stat>
-              <Stat label="Block time · s">{core.averageBlockSeconds != null ? <AnimatedValue value={core.averageBlockSeconds} /> : "—"}</Stat>
-              <Stat label="Txs / block"><AnimatedValue value={core.averageTxsPerBlock} /></Stat>
+              <Stat label="Difficulty · latest">{current ? <AnimatedValue value={current.difficulty} format={short} /> : "—"}</Stat>
+              <Stat label="Block time · s">{currentBlockTime != null ? <AnimatedValue value={currentBlockTime} /> : "—"}</Stat>
+              <Stat label="Txs / block">{current?.averageTxsPerBlock != null ? <AnimatedValue value={current.averageTxsPerBlock} /> : "—"}</Stat>
             </div>
-            <div className={s.caption}><span>Recent {core.sampleBlocks} blocks · difficulty: latest</span><Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} /></div>
-          </div> : <Empty loading={loading} />}
-          <div className={s.chartTabs} aria-label="Chart metric">{(Object.keys(metricNames) as ChartMetric[]).map((key) => <button key={key} aria-pressed={key === metric} onClick={() => setMetric(key)}>{metricNames[key]}</button>)}</div>
-          {chartHistory && chartHistory.points.length >= 2 ? <NetworkChart key={`${period}-${metric}`} history={{ ...chartHistory, stale: chartHistory.stale || error }} metric={metric} now={clock} /> : <Empty loading={loading} href="https://zcashinfo.com/#network-stats" message={history && metric === "blocks" ? "Not enough completed intervals yet." : undefined} />}
+            <div className={s.caption}><span>Txs: 24h · {blockTime?.windowLabel ?? "Block time unavailable"}</span>{(currentDelayed || blockTimeDelayed) && <span className={s.sectionState}>Last available reading</span>}</div>
+          </div> : <Empty loading={loading} href="https://zecblock.com/network" />}
+          <div className={s.chartTabs} aria-label="Chart metric">{(Object.keys(metricNames) as NetworkMetric[]).map((key) => <button key={key} aria-pressed={key === metric} onClick={() => { setMetric(key); if (key === "blockTime" && period === "month") { setLoading(true); setPeriod("week"); } }}>{metricNames[key]}</button>)}</div>
+          {chartHistory && chartHistory.points.filter((point) => point.value != null).length >= 1 ? <NetworkChart key={`${chartHistory.source.name}-${period}-${metric}`} history={{ ...chartHistory, stale: chartHistory.stale || error || now - Date.parse(chartHistory.fetchedAt) > 120_000 }} metric={metric} now={clock} /> : <Empty loading={loading} href="https://zecblock.com/network" />}
         </Card>
 
         <Card id="privacy" title="Privacy" icon={<NetworkIcon name="privacy" />} className={s.privacy} motionPaused={core?.stale ?? false} action={<External href="https://zcashinfo.com/#value-pool-distribution">Pools</External>}>
@@ -324,28 +331,28 @@ export function NetworkDashboard() {
           <div className={s.insightHeading}><NetworkIcon name="mining" /><h3>Block pace</h3></div>
           <strong>{blockPace != null ? <>{pct(Math.abs(blockPace))}<span className={s.insightUnit}>{blockPace > 0 ? " faster" : blockPace < 0 ? " slower" : " · on target"}</span></> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · ${core.targetBlockSeconds}s target${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small>
         </div>
-        <div className={s.insight} data-motion-paused={historyDelayed}>
-          <div className={s.insightHeading}><NetworkIcon name="network" /><h3>Chart data lag</h3></div>
-          <strong>{history?.lagBlocks != null ? <>{number.format(history.lagBlocks)}<span className={s.insightUnit}> blocks</span></> : "—"}</strong><small>{history?.coverageHeight != null ? `History through ${number.format(history.coverageHeight)}${coreDelayed ? " · delayed reading" : ""}` : "Coverage unavailable"}</small>
+        <div className={s.insight} data-motion-paused={currentDelayed}>
+          <div className={s.insightHeading}><NetworkIcon name="network" /><h3>Blocks · last 24h</h3></div>
+          <strong>{current ? <AnimatedValue value={current.blocks24h} format={number} /> : "—"}</strong><small>{current ? currentDelayed ? "Last available reading" : "Rolling 24h window" : "Awaiting source"}</small>
         </div>
       </section>
 
       <footer className={s.footer}>
         <div className={s.footerTop}>
-          <div className={s.sourceLink}><NetworkIcon name="globe" /><span>Powered by <a href="https://zcashinfo.com/" target="_blank" rel="noreferrer">Zcash Info</a></span><span className={s.footerDivider} aria-hidden="true" /><External href="https://api.zcashinfo.com/docs">API docs</External></div>
+          <div className={s.sourceLink}><NetworkIcon name="globe" /><span>Public network data</span></div>
           <div className={s.footerActions}>
             <button className={s.insightsToggle} aria-expanded={insightsExpanded} aria-controls="network-insights" onClick={() => setInsightsExpanded(!insightsExpanded)}><NetworkIcon name="activity" />{insightsExpanded ? "Less insights" : "More insights"}<NetworkIcon name="chevron" /></button>
             <button aria-expanded={notesExpanded} aria-controls="data-notes" onClick={() => setNotesExpanded(!notesExpanded)}>Data notes<NetworkIcon name="chevron" /></button>
           </div>
         </div>
       <div className={s.dataNotes} id="data-notes" hidden={!notesExpanded}>
-        <p><strong>Freshness.</strong> Readings refresh every 30 seconds. Charts use the source&apos;s confirmed history, which can trail recent blocks. Chart data lag measures this gap in blocks; it does not mean the network has stopped. Coverage time is shown only when the last historical block&apos;s timestamp is known. Block charts exclude incomplete intervals.</p>
-        <p><strong>Network.</strong> Top metrics use the latest {core?.sampleBlocks ?? 100} blocks; chart values average the dated historical interval, so the two solrate readings cover different periods. Transaction counts include coinbase. Difficulty is from the latest block.{core && <> The block target is {core.targetBlockSeconds} seconds. This sample contains {number.format(Math.round(core.averageTxsPerBlock * core.sampleBlocks))} transactions, with an average difficulty of {short.format(core.averageDifficulty)}.</>}</p>
+        <p><strong>Freshness.</strong> Readings refresh every 30 seconds. See the <a href="https://zecblock.com/docs" target="_blank" rel="noreferrer">network API</a> and <a href="https://api.zcashinfo.com/docs" target="_blank" rel="noreferrer">chain data API</a> for source documentation. Source observation times are preserved when a request fails. Upstream caches can add a few minutes.</p>
+        <p><strong>Network.</strong> Solrate estimates work over a full rolling 24-hour window. The chart ends at the latest available estimate. Earlier solrate and block-count samples end at midnight UTC; gaps remain missing. Transactions per block use the same 24h count and include coinbase. Difficulty is current; block time averages 120 intervals and has up to 7 days of history.</p>
         <p><strong>Privacy.</strong> Shielded share uses all reported pool balances, including Lockbox. It measures ZEC holdings, not people or private transactions.</p>
         <p><strong>Mining.</strong> Distribution is the share of sampled blocks. Pool attribution is inferred by the explorer; unknown miners may share a group.</p>
         <p><strong>Supply.</strong> Reported on-chain supply differs from market circulating supply. Miner subsidy excludes fees. Halving estimates use the current block target and schedule.</p>
         <p><strong>Fees & mempool.</strong> Fees average the latest {core?.sampleBlocks ?? 100} blocks. Pending transactions reflect the explorer’s mempool view.</p>
-        <p><strong>Insights.</strong> Transaction counts use the full block sample; average block size uses the recent blocks returned by the source. Each window is shown below its reading. Block pace compares observed block frequency with the source&apos;s target. Historical coverage refers to the selected range and may intentionally trail the live tip.</p>
+        <p><strong>Insights.</strong> Transaction counts use the full block sample; average block size uses the recent blocks returned by the source. Each window is shown below its reading. Block pace compares observed block frequency with the source&apos;s target. Blocks in the last 24 hours use a full rolling window.</p>
       </div>
       </footer>
     </main>

@@ -117,7 +117,7 @@
 .feeStat .stat > strong { font-size: 24px; }
 .mempool .panelFooter { justify-content: center; }
 .networkSnapshot { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
-.networkStats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.networkStats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .networkStats .stat, .mempool .stats .stat { justify-content: center; align-self: stretch; padding: 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel-hover); }
 .networkStats .statLabel, .mempool .stats .statLabel { display: flex; align-items: center; justify-content: center; min-height: 36px; }
 .networkStats .statLabel { margin-bottom: 2px; }
@@ -214,7 +214,7 @@
   .tableWrap { flex: initial; }
   .table td { height: 34px; }
   .privacy { order: 2; } .mempool { order: 3; } .mining { order: 4; } .supply { order: 5; } .halving { order: 6; }
-  .networkStats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .networkStats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .poolLegend { grid-template-columns: 1fr; }
   .insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dataNotes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -249,8 +249,8 @@
   .table .poolIdentity { gap: 4px; }
   .table .poolLogo { width: 20px; height: 20px; border-radius: 4px; }
   .table .poolLogo img, .table .poolLogo svg { width: 18px; height: 18px; }
-  .networkStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .networkStats .stat > strong { font-size: 24px; }
+  .networkStats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .networkStats .stat > strong { font-size: clamp(16px, 4.7vw, 22px); }
   .poolLegend { gap: 10px 20px; }
   .chartSummary { flex-wrap: wrap; gap: 3px 12px; }
   .activity .cardHeader { gap: 4px; }
