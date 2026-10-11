@@ -86,7 +86,7 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
   const low = Math.min(...values) * .9;
   const high = Math.max(...values) * 1.06;
   const span = Math.max(high - low, 1);
-  const left = 46, right = width - 10, top = 10, bottom = 101;
+  const left = 46, right = width - 10, top = 10, bottom = 91;
   const firstTime = Date.parse(points[0].time), lastTime = Date.parse(points.at(-1)!.time);
   const timeSpan = Math.max(lastTime - firstTime, 1);
   const x = (point: NetworkHistoryPoint) => left + (Date.parse(point.time) - firstTime) / timeSpan * (right - left);
@@ -95,9 +95,12 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
   const selected = hovered === null ? points.at(-1)! : points[Math.min(hovered, points.length - 1)];
   const valueLabel = (value: number) => metric === "solrateGsols" ? `${decimal.format(value)} GSol/s` : metric === "difficulty" ? short.format(value) : `${number.format(value)} blocks`;
   const timeLabel = (time: string) => new Date(time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" });
+  const daily = history.bucketSeconds === 86_400;
+  const intervalLabel = metric === "blocks" ? "interval total" : daily ? "daily avg." : history.bucketSeconds === 3_600 ? "hourly avg." : "interval avg.";
+  const selectedDate = daily ? `${new Date(selected.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })} UTC` : `${timeLabel(selected.time)} UTC`;
   return <>
-    <div className={s.chartSummary} aria-live="polite" aria-atomic="true"><strong>{valueLabel(selected[metric])}</strong><small>{hovered === null ? `Latest interval${selected.partial ? " · incomplete" : ""}` : `${timeLabel(selected.time)} UTC${selected.partial ? " · incomplete" : ""}`}</small></div>
-    <svg ref={chartRef} className={s.chart} viewBox={`0 0 ${width} 130`} role="img" tabIndex={0}
+    <div className={s.chartSummary} aria-live="polite" aria-atomic="true"><strong>{valueLabel(selected[metric])}</strong><small>{selectedDate} · {intervalLabel}{selected.partial ? " · partial" : ""}</small></div>
+    <svg ref={chartRef} className={s.chart} viewBox={`0 0 ${width} 120`} role="img" tabIndex={0}
       aria-label={`${metricNames[metric]} history with ${points.length} data points. Latest ${valueLabel(points.at(-1)![metric])}. Use left and right arrows to explore.`}
       onPointerMove={(event) => {
         const matrix = event.currentTarget.getScreenCTM();
@@ -115,10 +118,10 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
       <circle ref={endpointRef} className={s.chartEndpoint} style={{ visibility: hovered === null ? "visible" : "hidden" }} cx={x(lastPoint)} cy={y(lastPoint)} r="4" fill="var(--accent)" />
       {points.length < 12 && points.map((point) => <circle key={point.time} cx={x(point)} cy={y(point)} r="3" fill="var(--accent)" />)}
       {hovered !== null && <g><line x1={x(selected)} x2={x(selected)} y1={top} y2={bottom} stroke="var(--muted)" strokeDasharray="3 4" /><circle cx={x(selected)} cy={y(selected)} r="4" fill="var(--accent)" stroke="var(--panel)" strokeWidth="2" /></g>}
-      <text x={left} y="125">{new Date(points[0].time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
-      <text x={right} y="125" textAnchor="end">{new Date(points.at(-1)!.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
+      <text x={left} y="115">{new Date(points[0].time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
+      <text x={right} y="115" textAnchor="end">{new Date(points.at(-1)!.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
     </svg>
-    <div className={s.caption}><span>{metric === "solrateGsols" ? "Estimated solrate" : metric === "blocks" ? "Completed intervals only" : "Average difficulty"}</span><span className={history.stale ? s.sectionState : undefined}>{history.stale ? "Delayed · " : history.coverageAt ? "Indexed " : "Latest bucket "}{age(history.coverageAt ?? history.lastPointAt, now)}</span></div>
+    <div className={s.caption}><span>{metric === "blocks" ? "Completed intervals" : "Historical averages"}</span><span className={history.stale ? s.sectionState : undefined}>{history.coverageAt ? `Source data ends ${age(history.coverageAt, now)}` : history.lagBlocks != null ? `${number.format(history.lagBlocks)} blocks behind` : "Coverage unavailable"}</span></div>
   </>;
 }
 
@@ -261,7 +264,7 @@ export function NetworkDashboard() {
               <Stat label="Block time · s">{core.averageBlockSeconds != null ? <AnimatedValue value={core.averageBlockSeconds} /> : "—"}</Stat>
               <Stat label="Txs / block"><AnimatedValue value={core.averageTxsPerBlock} /></Stat>
             </div>
-            <div className={s.caption}><span>{core.sampleBlocks}-block estimates · difficulty: latest</span><Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} /></div>
+            <div className={s.caption}><span>Recent {core.sampleBlocks} blocks · difficulty: latest</span><Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} /></div>
           </div> : <Empty loading={loading} />}
           <div className={s.chartTabs} aria-label="Chart metric">{(Object.keys(metricNames) as ChartMetric[]).map((key) => <button key={key} aria-pressed={key === metric} onClick={() => setMetric(key)}>{metricNames[key]}</button>)}</div>
           {chartHistory && chartHistory.points.length >= 2 ? <NetworkChart key={`${period}-${metric}`} history={{ ...chartHistory, stale: chartHistory.stale || error }} metric={metric} now={clock} /> : <Empty loading={loading} href="https://zcashinfo.com/#network-stats" message={history && metric === "blocks" ? "Not enough completed intervals yet." : undefined} />}
@@ -275,7 +278,7 @@ export function NetworkDashboard() {
           {mempool ? <><div className={s.stats}>
             <Stat label="Pending transactions"><AnimatedValue value={mempool.count} format={number} /></Stat>
             <Stat label="Total size">{bytes(mempool.bytes)}</Stat>
-          </div><div className={s.feeStat}><Stat label="Average fees / block" note={`${core?.sampleBlocks ?? 100}-block sample`}>{core?.averageFeesZecPerBlock != null ? precise.format(core.averageFeesZecPerBlock) : "—"}<small> ZEC</small></Stat></div><div className={s.panelFooter}><span className={s.queueState} data-clear={mempool.count === 0}><span className={s.statusDot} />{mempool.count === 0 ? "No pending transactions reported" : "Awaiting confirmation"}</span>{core && <Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} />}</div></> : <Empty loading={loading} />}
+          </div><div className={s.feeStat}><Stat label={`Average fees / block · ${core?.sampleBlocks ?? 100} blocks`}>{core?.averageFeesZecPerBlock != null ? precise.format(core.averageFeesZecPerBlock) : "—"}<small> ZEC</small></Stat></div><div className={s.panelFooter}><span className={s.queueState} data-clear={mempool.count === 0}><span className={s.statusDot} />{mempool.count === 0 ? "No pending transactions reported" : "Awaiting confirmation"}</span>{core && <Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} />}</div></> : <Empty loading={loading} />}
         </Card>
 
         <Card id="mining" title="Mining pools" icon={<NetworkIcon name="mining" />} className={s.mining} motionPaused={mining?.stale ?? false} action={<span className={s.sectionMeta}>{periodLabels[period]} · block share</span>}>
@@ -310,20 +313,20 @@ export function NetworkDashboard() {
 
       <section id="network-insights" className={s.insights} data-expanded={insightsExpanded} aria-label="Network insights">
         <div className={s.insight} data-motion-paused={coreDelayed}>
-          <span className={s.insightIcon}><NetworkIcon name="activity" /></span>
-          <div><h3>Transactions sampled</h3><strong>{core ? <AnimatedValue value={Math.round(core.averageTxsPerBlock * core.sampleBlocks)} format={number} /> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · includes coinbase${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small></div>
+          <div className={s.insightHeading}><NetworkIcon name="activity" /><h3>Transactions sampled</h3></div>
+          <strong>{core ? <AnimatedValue value={Math.round(core.averageTxsPerBlock * core.sampleBlocks)} format={number} /> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · includes coinbase${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small>
         </div>
         <div className={s.insight} data-motion-paused={coreDelayed}>
-          <span className={s.insightIcon}><NetworkIcon name="blocks" /></span>
-          <div><h3>Average block size</h3><strong>{averageBlockBytes != null ? bytes(averageBlockBytes) : "—"}</strong><small>{core ? `${core.recentBlocks.length} recent blocks${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small></div>
+          <div className={s.insightHeading}><NetworkIcon name="blocks" /><h3>Average block size</h3></div>
+          <strong>{averageBlockBytes != null ? bytes(averageBlockBytes) : "—"}</strong><small>{core ? `${core.recentBlocks.length} recent blocks${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small>
         </div>
         <div className={s.insight} data-motion-paused={coreDelayed}>
-          <span className={s.insightIcon}><NetworkIcon name="mining" /></span>
-          <div><h3>Block pace</h3><strong>{blockPace != null ? <>{pct(Math.abs(blockPace))}<span className={s.insightUnit}>{blockPace > 0 ? " faster" : blockPace < 0 ? " slower" : " · on target"}</span></> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · ${core.targetBlockSeconds}s target${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small></div>
+          <div className={s.insightHeading}><NetworkIcon name="mining" /><h3>Block pace</h3></div>
+          <strong>{blockPace != null ? <>{pct(Math.abs(blockPace))}<span className={s.insightUnit}>{blockPace > 0 ? " faster" : blockPace < 0 ? " slower" : " · on target"}</span></> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · ${core.targetBlockSeconds}s target${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small>
         </div>
         <div className={s.insight} data-motion-paused={historyDelayed}>
-          <span className={s.insightIcon}><NetworkIcon name="network" /></span>
-          <div><h3>History behind live tip</h3><strong>{history?.lagBlocks != null ? <>{number.format(history.lagBlocks)}<span className={s.insightUnit}> blocks</span></> : "—"}</strong><small>{history?.coverageHeight != null ? `${periodLabels[period]} · through ${number.format(history.coverageHeight)}${historyDelayed ? " · delayed" : ""}` : "Coverage unavailable"}</small></div>
+          <div className={s.insightHeading}><NetworkIcon name="network" /><h3>Chart data lag</h3></div>
+          <strong>{history?.lagBlocks != null ? <>{number.format(history.lagBlocks)}<span className={s.insightUnit}> blocks</span></> : "—"}</strong><small>{history?.coverageHeight != null ? `History through ${number.format(history.coverageHeight)}${coreDelayed ? " · delayed reading" : ""}` : "Coverage unavailable"}</small>
         </div>
       </section>
 
@@ -336,8 +339,8 @@ export function NetworkDashboard() {
           </div>
         </div>
       <div className={s.dataNotes} id="data-notes" hidden={!notesExpanded}>
-        <p><strong>Freshness.</strong> Readings refresh every 30 seconds. History uses the source&apos;s confirmed blocks and can lag the live tip; its coverage is shown in the chart. Block charts exclude incomplete intervals.</p>
-        <p><strong>Network.</strong> Current averages use the latest {core?.sampleBlocks ?? 100} blocks and include coinbase transactions. Difficulty is from the latest block.{core && <> The block target is {core.targetBlockSeconds} seconds. This sample contains {number.format(Math.round(core.averageTxsPerBlock * core.sampleBlocks))} transactions, with an average difficulty of {short.format(core.averageDifficulty)}.</>}</p>
+        <p><strong>Freshness.</strong> Readings refresh every 30 seconds. Charts use the source&apos;s confirmed history, which can trail recent blocks. Chart data lag measures this gap in blocks; it does not mean the network has stopped. Coverage time is shown only when the last historical block&apos;s timestamp is known. Block charts exclude incomplete intervals.</p>
+        <p><strong>Network.</strong> Top metrics use the latest {core?.sampleBlocks ?? 100} blocks; chart values average the dated historical interval, so the two solrate readings cover different periods. Transaction counts include coinbase. Difficulty is from the latest block.{core && <> The block target is {core.targetBlockSeconds} seconds. This sample contains {number.format(Math.round(core.averageTxsPerBlock * core.sampleBlocks))} transactions, with an average difficulty of {short.format(core.averageDifficulty)}.</>}</p>
         <p><strong>Privacy.</strong> Shielded share uses all reported pool balances, including Lockbox. It measures ZEC holdings, not people or private transactions.</p>
         <p><strong>Mining.</strong> Distribution is the share of sampled blocks. Pool attribution is inferred by the explorer; unknown miners may share a group.</p>
         <p><strong>Supply.</strong> Reported on-chain supply differs from market circulating supply. Miner subsidy excludes fees. Halving estimates use the current block target and schedule.</p>

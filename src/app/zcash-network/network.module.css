@@ -113,13 +113,18 @@
 .panelFooter { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-top: 1px solid var(--line); padding-top: 10px; margin-top: 12px; min-height: 25px; }
 .blocks .panelFooter { margin-top: 0; }
 .arrivalLabel { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: var(--gold); }
-.feeStat { margin: 12px 0; padding-top: 12px; border-top: 1px solid var(--line); }
+.feeStat { margin-top: 8px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel-hover); }
 .feeStat .stat > strong { font-size: 24px; }
 .mempool .panelFooter { justify-content: center; }
-.networkSnapshot { padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--line); }
+.networkSnapshot { padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
 .networkStats { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.networkStats .stat, .mempool .stats .stat { justify-content: center; align-self: stretch; padding: 6px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel-hover); }
+.networkStats .statLabel, .mempool .stats .statLabel { display: flex; align-items: center; justify-content: center; min-height: 36px; }
 .networkStats .statLabel { margin-bottom: 2px; }
-.networkStats .stat > strong { font-size: clamp(20px, 1.65vw, 24px); }
+.networkStats .stat > strong { font-size: clamp(20px, 1.5vw, 22px); }
+.networkSnapshot > .caption { margin-top: 6px; }
+.mempool .stats { gap: 8px; }
+.mempool .stats .stat > strong { font-size: clamp(22px, 1.7vw, 26px); }
 .queueState { color: var(--gold); display: flex; align-items: center; gap: 7px; font-size: 11px; }
 .queueState[data-clear="true"] { color: var(--muted); }
 .poolDistribution { display: flex; height: 6px; gap: 1px; overflow: hidden; margin: 14px 0; }
@@ -154,22 +159,21 @@
 .detailRows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .detailRows dt { color: var(--muted); }
 .detailRows dd, .mono { font-family: var(--font-geist-mono), monospace; font-weight: 500; font-size: 12px; text-align: right; }
-.chartTabs { display: flex; gap: 16px; margin-bottom: 6px; }
+.chartTabs { display: flex; gap: 16px; margin-bottom: 4px; }
 .chartTabs button { color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; padding: 3px 0; border-bottom: 2px solid transparent; }
 .chartTabs button[aria-pressed="true"] { color: var(--gold); border-color: var(--accent); }
 .chartSummary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; min-height: 26px; }
-.chartSummary strong { font-family: var(--font-geist-mono), monospace; font-size: 20px; font-weight: 500; letter-spacing: -.5px; }
+.chartSummary strong { font-family: var(--font-geist-mono), monospace; font-size: 20px; font-weight: 500; line-height: 1.3; letter-spacing: -.5px; }
 .chartSummary small { color: var(--dim); font-size: 11px; }
-.chart { width: 100%; height: 130px; display: block; overflow: visible; outline: none; margin-top: 4px; }
+.chart { width: 100%; height: 120px; display: block; overflow: visible; outline: none; margin-top: 2px; }
+.chart + .caption { margin-top: 6px; }
 .chart text { fill: var(--muted); font-size: 11px; font-family: var(--font-geist-mono), monospace; }
 .chartGrid { stroke: var(--line); stroke-width: 1; }
 .chartEndpoint { transform-box: fill-box; transform-origin: center; }
-.insights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 10px; padding: 8px 0; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); }
-.insight { display: flex; align-items: center; gap: 12px; min-width: 0; padding: 0 18px; }
-.insight + .insight { border-left: 1px solid var(--line); }
-.insightIcon { display: grid; place-items: center; color: var(--gold); flex-shrink: 0; }
-.insightIcon svg { width: 22px; height: 22px; }
-.insight > div { min-width: 0; }
+.insights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
+.insight { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 6px 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); text-align: center; }
+.insightHeading { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 22px; }
+.insightHeading svg { width: 20px; height: 20px; color: var(--gold); }
 .insight h3 { color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.5; }
 .insight strong { display: block; margin: 2px 0; font-family: var(--font-geist-mono), monospace; font-size: 22px; font-weight: 500; line-height: 1.2; letter-spacing: -.5px; white-space: nowrap; }
 .insightUnit { margin-left: 5px; font-size: 12px; font-family: var(--font-geist), sans-serif; font-weight: 500; letter-spacing: 0; color: var(--muted); }
@@ -212,8 +216,7 @@
   .privacy { order: 2; } .mempool { order: 3; } .mining { order: 4; } .supply { order: 5; } .halving { order: 6; }
   .networkStats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .poolLegend { grid-template-columns: 1fr; }
-  .insights { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 0; }
-  .insight:nth-child(3) { border-left: 0; }
+  .insights { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dataNotes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 650px) {
@@ -252,10 +255,10 @@
   .chartSummary { flex-wrap: wrap; gap: 3px 12px; }
   .activity .cardHeader { gap: 4px; }
   .activity .periods button { padding-inline: 4px; }
-  .insights { gap: 14px 0; padding-block: 14px; }
-  .insight { padding-inline: 12px; gap: 6px; align-items: flex-start; }
-  .insightIcon { display: none; }
-  .insight h3 { min-height: 36px; }
+  .insights { gap: 8px; margin-top: 8px; }
+  .insight { padding: 12px 8px; }
+  .insightHeading { flex-direction: column; gap: 5px; }
+  .insight h3 { display: flex; align-items: center; justify-content: center; min-height: 36px; }
   .insight strong { font-size: 21px; }
   .insightUnit { font-size: 11px; }
   .footer { font-size: 11px; }
