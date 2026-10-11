@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import monthlyReadingSets from "./src/lib/monthly/reading-sets.json";
+import { participationRewrites, participationUpstream } from "./src/lib/participate/upstream";
 
 // Content Security Policy. The app loads no third-party browser assets — fonts
 // are self-hosted (next/font), the logo/favicon are same-origin, and the client
@@ -54,16 +55,22 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "off" },
 ];
 
+const participation = participationUpstream(process.env.PARTICIPATE_UPSTREAM_URL);
+
 const nextConfig: NextConfig = {
   // Don't advertise the framework/version in responses.
   poweredByHeader: false,
+  async rewrites() {
+    return participationRewrites(process.env.PARTICIPATE_UPSTREAM_URL);
+  },
   // The home is the ZCG overview. A server redirect answers before any
   // rendering (the page-level redirect would stream behind loading.tsx).
   async redirects() {
     return [
       { source: "/", destination: "/zcg", permanent: false },
       { source: "/cex-zec-dex", destination: "/zec-observatory", permanent: true },
-      { source: "/decisions", destination: "/zcg/decisions", permanent: true },
+      { source: "/decisions", destination: "/zcg/participate?view=history", permanent: true },
+      { source: "/zcg/decisions", destination: "/zcg/participate?view=history", permanent: true },
       { source: "/treasury-calculator", destination: "/zcg/treasury-calculator", permanent: true },
       { source: "/zcash10years", destination: "/ceremony/ten-years", permanent: true },
       // The coinholder program has its own home above ZCG; old links keep working.
@@ -94,6 +101,21 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
+      ...(participation ? [{
+        source: "/zcg/participate",
+        headers: [{
+          key: "Content-Security-Policy",
+          value: csp.replace("frame-src https://www.youtube-nocookie.com", "frame-src 'self' https://www.youtube-nocookie.com"),
+        }],
+      }, ...["/participate", "/participate/committee"].map(source => ({
+        source,
+        headers: [
+          { key: "Content-Security-Policy", value: csp.replace("frame-ancestors 'none'", "frame-ancestors 'self'") },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Cache-Control", value: "private, no-store" },
+          { key: "X-Robots-Tag", value: "noindex, nofollow" },
+        ],
+      }))] : []),
       ...["agent-skills", "skills"].map((directory) => ({
         source: `/.well-known/${directory}/:path*`,
         headers: [{ key: "Cache-Control", value: "public, max-age=300" }],

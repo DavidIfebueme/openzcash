@@ -44,6 +44,11 @@ export function proxy(req: NextRequest) {
   const headers = new Headers(req.headers);
   headers.set("x-pathname", pathname);
   headers.set("x-admin", "0");
+  // Backend origin checks must use the portal request, not client-supplied
+  // forwarding headers. The Participate rewrite preserves Origin unchanged.
+  headers.set("x-forwarded-host", req.nextUrl.host);
+  headers.set("x-forwarded-proto", req.nextUrl.protocol.slice(0, -1));
+  headers.delete("x-forwarded-port");
   const response = NextResponse.next({ request: { headers } });
   if (process.env.OPENZCASH_ENV === "redesign") {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");

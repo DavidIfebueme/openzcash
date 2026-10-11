@@ -13,7 +13,7 @@ const HOMES: { id: DecisionHome; who: string; what: string; href: string }[] = [
     id: "committee",
     who: "ZCG committee",
     what: "Grant verdicts",
-    href: "/zcg/decisions",
+    href: "/zcg/participate?view=history",
   },
   {
     id: "elections",

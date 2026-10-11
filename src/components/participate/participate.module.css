@@ -1,0 +1,82 @@
+.page { color: var(--ink); max-width: 1480px; margin: 0 auto; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.header { display: flex; justify-content: space-between; gap: 24px; align-items: center; min-height: 64px; margin-bottom: 20px; border-bottom: 1px solid var(--line); }
+.about { background: transparent; border: 0; color: var(--muted); font-size: 13px; cursor: pointer; padding: 10px 0 10px 12px; white-space: nowrap; }
+.tabs { display: flex; align-self: stretch; gap: 28px; }
+.tabs a { display: flex; align-items: center; font-size: 14px; padding: 12px 0; color: var(--muted); text-decoration: none; border-bottom: 2px solid transparent; white-space: nowrap; }
+.tabs a[aria-current] { color: var(--ink); border-color: var(--accent); font-weight: 600; }
+.workspace { overflow: hidden; background: var(--surface); }
+.workspaceBar { display: flex; justify-content: space-between; gap: 14px; align-items: center; padding: 12px 20px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); }
+.workspaceBar span { display: flex; align-items: center; gap: 8px; }
+.workspaceBar i { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+.workspaceBar i[data-ready="true"] { background: var(--pos); }
+.frame { display: block; width: 100%; height: max(640px, calc(100dvh - 180px)); border: 0; background: var(--surface); scroll-margin-top: 80px; }
+.footnote, .disclosure { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0; }
+.footnote { padding: 12px 20px; border-top: 1px solid var(--line); }
+.connection { padding: 20px; background: var(--surface2); font-size: 13px; }
+.connection p { margin: 0 0 10px; }
+.connection button { border: 0; background: none; color: var(--accent-ink); margin-right: 18px; cursor: pointer; }
+.history { padding-top: 10px; }
+.primary { border: 0; border-radius: 9px; background: #edbd59; color: #201a0d; padding: 14px 20px; font: inherit; font-size: 14px; font-weight: 650; cursor: pointer; display: inline-flex; gap: 28px; align-items: center; justify-content: space-between; text-decoration: none; white-space: nowrap; }
+.primary:hover { background: #f3cb7b; }
+.goldLabel { font-size: 11px; font-weight: 650; text-transform: uppercase; letter-spacing: .12em; color: #ebc77f; }
+.intro { padding: 0; border: 1px solid var(--line); border-radius: 20px; width: min(780px, calc(100vw - 36px)); max-height: calc(100dvh - 40px); margin: auto; color: var(--ink); background: var(--surface); overflow-y: auto; box-shadow: 0 32px 100px #0006; }
+.intro::backdrop { background: #0b0a09ad; backdrop-filter: blur(7px); }
+:global(html):has(.intro[open]) { overflow: hidden; }
+.introHero { position: relative; min-height: 242px; overflow: hidden; background: #17140f; color: #fff9ed; }
+.heroImage { object-fit: cover; object-position: right 56%; }
+.introHero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, #12110ff5 0%, #12110fb3 43%, #12110f00 82%); pointer-events: none; }
+.heroCopy { position: relative; z-index: 1; padding: 32px; }
+.heroCopy h2 { font-size: clamp(32px, 4.5vw, 42px); line-height: 1.08; letter-spacing: -.045em; margin: 22px 0 14px; font-weight: 600; }
+.heroCopy p { max-width: 320px; font-size: 14px; color: #d6d0c2; line-height: 1.6; margin: 0; }
+.close { position: absolute; right: 16px; top: 12px; z-index: 2; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #18151099; color: #fff9ed; font-size: 28px; font-weight: 300; cursor: pointer; }
+.introBody { padding: 0 32px 22px; }
+.proofLink { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--line); color: var(--ink); text-decoration: none; }
+.proofSummary { display: flex; align-items: center; gap: 12px; }
+.proofSummary i { flex: 0 0 7px; height: 7px; border-radius: 50%; background: var(--pos); }
+.proofSummary > span { display: grid; gap: 3px; }
+.proofSummary strong { font-size: 14px; font-weight: 600; }
+.proofSummary > span > span { font-size: 12px; color: var(--muted); }
+.proofAction { display: inline-flex; align-items: center; gap: 8px; color: var(--accent-ink); font-size: 12px; white-space: nowrap; }
+.proofLink:hover .proofAction { text-decoration: underline; text-underline-offset: 4px; }
+.introFooter { display: flex; gap: 20px; align-items: center; justify-content: space-between; margin: 24px 0 18px; }
+.introFooter > div { display: grid; gap: 4px; }
+.introFooter strong { font-size: 18px; font-weight: 600; letter-spacing: -.025em; }
+.introFooter span { font-size: 12px; color: var(--muted); }
+.introFooter .primary span { color: inherit; font-size: 20px; }
+.pilotDetails { font-size: 12px; }
+.pilotDetails summary { display: flex; align-items: center; gap: 10px; width: fit-content; min-height: 40px; color: var(--muted); cursor: pointer; list-style: none; }
+.pilotDetails summary::-webkit-details-marker { display: none; }
+.pilotDetails summary:hover { color: var(--ink); }
+.pilotDetails summary > span { font-size: 18px; line-height: 1; }
+.pilotDetails[open] summary > span { transform: rotate(45deg); }
+.pilotDetails dl { display: grid; gap: 14px; margin: 8px 0 18px; }
+.pilotDetails dl > div { display: grid; grid-template-columns: 84px 1fr; gap: 16px; line-height: 1.65; }
+.pilotDetails dt { color: var(--ink); font-weight: 600; }
+.pilotDetails dd { color: var(--muted); margin: 0; }
+.disclosure { margin-top: 8px; }
+.page :is(a, button, summary):focus-visible, .intro :is(a, button, summary):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+@media (max-width: 650px) {
+  .header { gap: 8px; min-height: 56px; margin-bottom: 12px; }
+  .about { font-size: 11px; padding: 10px 0; }
+  .tabs { gap: 18px; }
+  .tabs a { font-size: 13px; }
+  .intro { width: calc(100vw - 20px); max-height: calc(100dvh - 24px); border-radius: 15px; }
+  .introHero { min-height: 228px; }
+  .heroCopy { padding: 32px 22px 26px; }
+  .heroCopy h2 { margin-top: 24px; }
+  .heroCopy p { max-width: 230px; font-size: 13px; }
+  .heroImage { object-position: 62% center; opacity: .75; }
+  .introBody { padding: 0 22px 20px; }
+  .proofLink { gap: 8px; padding: 18px 0; }
+  .proofSummary { gap: 8px; }
+  .proofSummary strong { font-size: 13px; }
+  .proofAction { gap: 4px; font-size: 11px; }
+  .introFooter { flex-direction: column; align-items: stretch; gap: 16px; margin: 20px 0 10px; }
+  .introFooter .primary { justify-content: space-between; }
+  .pilotDetails dl > div { grid-template-columns: 1fr; gap: 2px; }
+  .goldLabel { font-size: 9px; }
+  .frame { height: max(580px, calc(100dvh - 160px)); }
+  .workspaceBar { padding: 10px 12px; font-size: 10px; }
+  .footnote { padding: 12px; font-size: 10px; }
+}

@@ -16,6 +16,10 @@ const appOf = (id: string) => {
 };
 
 describe("the navigation hierarchy", () => {
+  it("replaces the standalone Decisions menu with Participate", () => {
+    expect(appOf("zcg").pages).toContainEqual(expect.objectContaining({ href: "/zcg/participate", label: "Participate" }));
+    expect(appOf("zcg").pages.some(page => page.href === "/zcg/decisions")).toBe(false);
+  });
   it("lists voting activity and retains the Coinholder program and result routes", () => {
     const coinholders = appOf("coinholders");
     expect(overviewEntry(coinholders)).toBeNull();

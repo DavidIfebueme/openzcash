@@ -51,4 +51,14 @@ describe("retired admin routes", () => {
     }
     expect(isRetiredPath("/api/zcg/proposals-public")).toBe(false);
   });
+
+  it("replaces untrusted forwarding headers before the internal Participate rewrite", () => {
+    const response = proxy(new NextRequest("https://openzcash.org/api/account/settings", { headers: {
+      origin: "https://attacker.example", "x-forwarded-host": "attacker.example", "x-forwarded-proto": "http", "x-forwarded-port": "80",
+    } }));
+    expect(response.headers.get("x-middleware-request-x-forwarded-host")).toBe("openzcash.org");
+    expect(response.headers.get("x-middleware-request-x-forwarded-proto")).toBe("https");
+    expect(response.headers.get("x-middleware-request-x-forwarded-port")).toBeNull();
+    expect(response.headers.get("x-middleware-request-origin")).toBe("https://attacker.example");
+  });
 });

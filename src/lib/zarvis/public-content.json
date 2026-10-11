@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "8317edd15b4bd82e",
+  "sourceRevision": "7e4ff8bd97ddb59e",
   "sourceFiles": 56,
   "documents": [
     {
@@ -92,12 +92,6 @@
       "url": "https://openzcash.org/zcg/office",
       "title": "zcg · office",
       "text": "ZCG Office · OpenZcash\nA living 3D office where every ZCG proposal under review walks the floor as a zebra, in front of the committee.\nZCG Office\n3D · beta\nEach zebra is a grant proposal under review. Status changes appear the next day (Brasília time), based on GitHub and the official spreadsheet. Click a proposal to see its summary and application date. Drag to orbit, scroll to zoom. Credits: 3D model\n“Cartoon Zebra with 7 animations”\nby\nJungle Jim\n, licensed\nCC-BY 4.0\n(modified: compressed, re-scaled, instanced). Low-poly furniture by Kenney (CC0) via the open-source Claw3D project (MIT)."
-    },
-    {
-      "id": "src/app/zcg/decisions/page.tsx:0",
-      "url": "https://openzcash.org/zcg/decisions",
-      "title": "zcg · decisions",
-      "text": "Decisions · ZCG · OpenZcash\nEvery verdict the Zcash Community Grants committee has taken on a grant proposal, dated, with the minutes of that day and the grant it created.\nnumeric\nDecisions\nEvery verdict the ZCG committee has taken on a grant proposal, dated by the ZCG sheet under the site's D-1 publication rule, with the minutes of that day and the grant it created.\nZCG committee\nVerdicts\nApproved\nRejected\nLatest verdict\nEvery verdict\nFilter by outcome or search a proposal; export the view as CSV.\nVerdicts and dates come from the official ZCG sheet. Minutes are linked when a committee meeting falls on the decision day. A verdict links to the grant it created when the titles match."
     },
     {
       "id": "src/app/zcg/totals/page.tsx:0",
