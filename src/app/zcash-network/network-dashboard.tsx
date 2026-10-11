@@ -86,7 +86,7 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
   const low = Math.min(...values) * .9;
   const high = Math.max(...values) * 1.06;
   const span = Math.max(high - low, 1);
-  const left = 46, right = width - 10, top = 13, bottom = 141;
+  const left = 46, right = width - 10, top = 10, bottom = 101;
   const firstTime = Date.parse(points[0].time), lastTime = Date.parse(points.at(-1)!.time);
   const timeSpan = Math.max(lastTime - firstTime, 1);
   const x = (point: NetworkHistoryPoint) => left + (Date.parse(point.time) - firstTime) / timeSpan * (right - left);
@@ -97,7 +97,7 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
   const timeLabel = (time: string) => new Date(time).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC" });
   return <>
     <div className={s.chartSummary} aria-live="polite" aria-atomic="true"><strong>{valueLabel(selected[metric])}</strong><small>{hovered === null ? `Latest interval${selected.partial ? " · incomplete" : ""}` : `${timeLabel(selected.time)} UTC${selected.partial ? " · incomplete" : ""}`}</small></div>
-    <svg ref={chartRef} className={s.chart} viewBox={`0 0 ${width} 180`} role="img" tabIndex={0}
+    <svg ref={chartRef} className={s.chart} viewBox={`0 0 ${width} 130`} role="img" tabIndex={0}
       aria-label={`${metricNames[metric]} history with ${points.length} data points. Latest ${valueLabel(points.at(-1)![metric])}. Use left and right arrows to explore.`}
       onPointerMove={(event) => {
         const matrix = event.currentTarget.getScreenCTM();
@@ -115,8 +115,8 @@ function NetworkChart({ history, metric, now }: { history: NetworkHistory; metri
       <circle ref={endpointRef} className={s.chartEndpoint} style={{ visibility: hovered === null ? "visible" : "hidden" }} cx={x(lastPoint)} cy={y(lastPoint)} r="4" fill="var(--accent)" />
       {points.length < 12 && points.map((point) => <circle key={point.time} cx={x(point)} cy={y(point)} r="3" fill="var(--accent)" />)}
       {hovered !== null && <g><line x1={x(selected)} x2={x(selected)} y1={top} y2={bottom} stroke="var(--muted)" strokeDasharray="3 4" /><circle cx={x(selected)} cy={y(selected)} r="4" fill="var(--accent)" stroke="var(--panel)" strokeWidth="2" /></g>}
-      <text x={left} y="173">{new Date(points[0].time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
-      <text x={right} y="173" textAnchor="end">{new Date(points.at(-1)!.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
+      <text x={left} y="125">{new Date(points[0].time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
+      <text x={right} y="125" textAnchor="end">{new Date(points.at(-1)!.time).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" })}</text>
     </svg>
     <div className={s.caption}><span>{metric === "solrateGsols" ? "Estimated solrate" : metric === "blocks" ? "Completed intervals only" : "Average difficulty"}</span><span className={history.stale ? s.sectionState : undefined}>{history.stale ? "Delayed · " : history.coverageAt ? "Indexed " : "Latest bucket "}{age(history.coverageAt ?? history.lastPointAt, now)}</span></div>
   </>;
@@ -213,7 +213,6 @@ export function NetworkDashboard() {
   if (otherPools.length) miningPools.push({ name: "Other pools", blocks: otherPools.reduce((sum, pool) => sum + pool.blocks, 0), sharePercent: otherPools.reduce((sum, pool) => sum + pool.sharePercent, 0) });
   const topTwo = mining?.pools.slice(0, 2).reduce((sum, pool) => sum + pool.sharePercent, 0);
 
-  const latestBlock = core?.recentBlocks[0];
   const periods = <div className={s.periods} aria-label="History period">{(Object.keys(periodLabels) as NetworkPeriod[]).map((p) => <button key={p} onClick={() => { if (p !== period) { setLoading(true); setPeriod(p); } }} aria-pressed={period === p} aria-label={`Show ${periodNames[p]} history`}>{periodLabels[p]}</button>)}</div>;
 
   return <div ref={root} className={s.root} data-theme={theme} data-motion-paused={error || old}>
@@ -239,33 +238,29 @@ export function NetworkDashboard() {
           {core ? <>
             <div className={`${s.stats} ${s.blockStats}`}>
               <Stat label="Height"><AnimatedValue value={core.height} format={number} /></Stat>
-              <Stat label="Transactions">{latestBlock ? <AnimatedValue value={latestBlock.txCount} format={number} /> : "—"}</Stat>
-              <Stat label="Block size">{latestBlock ? bytes(latestBlock.sizeBytes) : "—"}</Stat>
               <Stat label="Mined"><time dateTime={core.lastBlockAt}>{age(core.lastBlockAt, clock)}</time></Stat>
             </div>
-            <div className={s.tableWrap}><table className={s.table}><thead><tr><th scope="col">Height</th><th scope="col">Pool</th><th scope="col">Txs</th><th scope="col" className={s.feeColumn}>Fees · ZEC</th><th scope="col">Size</th><th scope="col">Age</th></tr></thead><tbody>{core.recentBlocks.slice(0, 10).map((block) => <tr key={block.hash} data-new={arrivals.includes(block.hash)}><td><a href={`https://zecblock.com/block/${block.height}`} target="_blank" rel="noopener noreferrer">{number.format(block.height)}</a></td><td><MiningPoolIdentity name={block.pool} /></td><td>{number.format(block.txCount)}</td><td className={s.feeColumn}>{block.feesZec === null ? "—" : precise.format(block.feesZec)}</td><td>{bytes(block.sizeBytes)}</td><td><time dateTime={block.time} title={new Date(block.time).toUTCString()}>{age(block.time, clock)}</time></td></tr>)}</tbody></table></div>
+            <div className={s.tableWrap}><table className={s.table}><thead><tr><th scope="col">Height</th><th scope="col">Pool</th><th scope="col">Txs</th><th scope="col" className={s.feeColumn}>Fees · ZEC</th><th scope="col">Size</th><th scope="col">Age</th></tr></thead><tbody>{core.recentBlocks.slice(0, 5).map((block) => <tr key={block.hash} data-new={arrivals.includes(block.hash)}><td><a href={`https://zecblock.com/block/${block.height}`} target="_blank" rel="noopener noreferrer">{number.format(block.height)}</a></td><td><MiningPoolIdentity name={block.pool} /></td><td>{number.format(block.txCount)}</td><td className={s.feeColumn}>{block.feesZec === null ? "—" : precise.format(block.feesZec)}</td><td>{bytes(block.sizeBytes)}</td><td><time dateTime={block.time} title={new Date(block.time).toUTCString()}>{age(block.time, clock)}</time></td></tr>)}</tbody></table></div>
             <div className={s.panelFooter}><External href="https://zcashinfo.com/blocks">More blocks</External><Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} /></div>
           </> : <Empty loading={loading} />}
         </Card>
 
-        <Card title="Network activity" icon={<NetworkIcon name="activity" />} className={s.activity} action={periods}>
+        <Card title="Network" icon={<NetworkIcon name="network" />} className={s.activity} action={periods}>
+          {core ? <div className={s.networkSnapshot} data-motion-paused={core.stale || old || error}>
+            <div className={`${s.stats} ${s.networkStats}`}>
+              <Stat label="Solrate GSol/s"><AnimatedValue value={core.solrateGsols} /></Stat>
+              <Stat label="Difficulty"><AnimatedValue value={core.difficulty} format={short} /></Stat>
+              <Stat label="Block time · s">{core.averageBlockSeconds != null ? <AnimatedValue value={core.averageBlockSeconds} /> : "—"}</Stat>
+              <Stat label="Txs / block"><AnimatedValue value={core.averageTxsPerBlock} /></Stat>
+            </div>
+            <div className={s.caption}><span>{core.sampleBlocks}-block estimates · difficulty: latest</span><Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} /></div>
+          </div> : <Empty loading={loading} />}
           <div className={s.chartTabs} aria-label="Chart metric">{(Object.keys(metricNames) as ChartMetric[]).map((key) => <button key={key} aria-pressed={key === metric} onClick={() => setMetric(key)}>{metricNames[key]}</button>)}</div>
           {chartHistory && chartHistory.points.length >= 2 ? <NetworkChart key={`${period}-${metric}`} history={{ ...chartHistory, stale: chartHistory.stale || error }} metric={metric} now={clock} /> : <Empty loading={loading} href="https://zcashinfo.com/#network-stats" message={history && metric === "blocks" ? "Not enough completed intervals yet." : undefined} />}
         </Card>
 
         <Card id="privacy" title="Privacy" icon={<NetworkIcon name="privacy" />} className={s.privacy} motionPaused={core?.stale ?? false} action={<External href="https://zcashinfo.com/#value-pool-distribution">Pools</External>}>
           {core ? <PrivacyPools core={{ ...core, stale: core.stale || old || error }} now={clock} /> : <Empty loading={loading} />}
-        </Card>
-
-        <Card title="Network" icon={<NetworkIcon name="network" />} className={s.network} motionPaused={core?.stale ?? false} action={<span className={s.sectionMeta}>{core ? `${core.sampleBlocks}-block avg.` : ""}</span>}>
-          {core ? <><div className={s.stats}>
-            <Stat label="Estimated solrate"><AnimatedValue value={core.solrateGsols} /><small> GSol/s</small></Stat>
-            <Stat label="Difficulty" note="Latest block"><AnimatedValue value={core.difficulty} format={short} /></Stat>
-            <Stat label="Block time" note={`${core.targetBlockSeconds}s target`}>{core.averageBlockSeconds != null ? <AnimatedValue value={core.averageBlockSeconds} /> : "—"}<small> sec</small></Stat>
-            <Stat label="Txs / block" note="Including coinbase"><AnimatedValue value={core.averageTxsPerBlock} /></Stat>
-            <Stat label="Sample transactions" note={`${core.sampleBlocks} recent blocks`}>{number.format(Math.round(core.averageTxsPerBlock * core.sampleBlocks))}</Stat>
-            <Stat label="Average difficulty">{short.format(core.averageDifficulty)}</Stat>
-          </div><Freshness fetchedAt={core.fetchedAt} stale={core.stale || old || error} now={clock} /></> : <Empty loading={loading} />}
         </Card>
 
         <Card title="Mempool & fees" icon={<NetworkIcon name="mempool" />} className={s.mempool} motionPaused={mempool?.stale ?? false} action={mempool ? <span className={s.sectionMeta}>{age(mempool.fetchedAt, clock)}{mempool.stale || error ? " · delayed" : ""}</span> : undefined}>
@@ -306,15 +301,16 @@ export function NetworkDashboard() {
       </div>
       <footer className={s.footer}>
         <div className={s.sourceLink}><NetworkIcon name="globe" /><a href="https://zcashinfo.com/" target="_blank" rel="noreferrer">Data by Zcash Info</a><span>·</span><a href="https://api.zcashinfo.com/docs" target="_blank" rel="noreferrer" className={s.cardLink}>API <NetworkIcon name="external" /></a></div>
-        <Link href="/" className={s.sourceLink}><NetworkIcon name="apps" />All apps</Link>
-      </footer>
       <details className={s.dataNotes} id="data-notes"><summary>Data notes</summary><div>
         <p><strong>Freshness.</strong> Readings refresh every 30 seconds. History uses the source&apos;s confirmed blocks and can lag the live tip; its coverage is shown in the chart. Block charts exclude incomplete intervals.</p>
+        <p><strong>Network.</strong> Current averages use the latest {core?.sampleBlocks ?? 100} blocks and include coinbase transactions. Difficulty is from the latest block.{core && <> The block target is {core.targetBlockSeconds} seconds. This sample contains {number.format(Math.round(core.averageTxsPerBlock * core.sampleBlocks))} transactions, with an average difficulty of {short.format(core.averageDifficulty)}.</>}</p>
         <p><strong>Privacy.</strong> Shielded share uses all reported pool balances, including Lockbox. It measures ZEC holdings, not people or private transactions.</p>
         <p><strong>Mining.</strong> Distribution is the share of sampled blocks. Pool attribution is inferred by the explorer; unknown miners may share a group.</p>
         <p><strong>Supply.</strong> Reported on-chain supply differs from market circulating supply. Miner subsidy excludes fees. Halving estimates use the current block target and schedule.</p>
         <p><strong>Fees & mempool.</strong> Fees average the latest {core?.sampleBlocks ?? 100} blocks. Pending transactions reflect the explorer’s mempool view.</p>
       </div></details>
+        <Link href="/" className={s.sourceLink}><NetworkIcon name="apps" />All apps</Link>
+      </footer>
     </main>
   </div>;
 }
