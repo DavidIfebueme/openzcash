@@ -6,6 +6,7 @@
  */
 import type { ComponentType } from "react";
 import { ZarvisMark } from "./zarvis/zarvis-mark";
+import { NetworkIcon } from "@/app/zcash-network/network-icons";
 import type { AppDef } from "@/lib/design-routes";
 import {
   IconArrowUp,
@@ -39,6 +40,7 @@ type IconType = ComponentType<{ className?: string }>;
 
 /** Line icons by key (apps without a logo) and by route (inner pages). */
 const ICON_BY_KEY: Record<string, IconType> = {
+  network: (props) => <NetworkIcon name="network" {...props} />,
   zarvis: ZarvisMark,
   book: IconBook,
   calculator: IconCalculator,

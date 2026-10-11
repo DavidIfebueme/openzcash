@@ -1,0 +1,44 @@
+.value {
+  display: inline-block;
+  position: relative;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.characters {
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.digit,
+.symbol {
+  display: inline-block;
+  white-space: pre;
+}
+
+.digit {
+  transform-origin: 50% 65%;
+  animation: revealDigit 480ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.screenReader {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes revealDigit {
+  from { opacity: 0; transform: translateY(.18em) scale(.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .digit { animation: none; transform: none; }
+}

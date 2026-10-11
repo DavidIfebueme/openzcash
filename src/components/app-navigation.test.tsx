@@ -10,6 +10,14 @@ const render = (path: string, openApps: Record<string, boolean> = {}, counts: Re
 const linkTag = (html: string, href: string) => html.match(new RegExp(`<a\\b[^>]*href="${href}"[^>]*>`))?.[0] ?? "";
 
 describe("grouped ecosystem navigation", () => {
+  it("places the Network destination immediately after ZCG and before Ecosystem", () => {
+    const html = render("/zcash-network", { zcg: false });
+    const links = [...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map((match) => match[1]);
+    const index = links.indexOf("/zcash-network");
+    expect(index).toBeGreaterThan(0);
+    expect(links.slice(index - 1, index + 2)).toEqual(["/zcg", "/zcash-network", "/ecosystem"]);
+    expect(linkTag(html, "/zcash-network")).toContain('aria-current="page"');
+  });
   it("interleaves direct destinations in reading order and keeps the curated organization order", () => {
     const html = render("/communities", { "ecosystem:organizations": true }, { "/ecosystem": "127", "/development": "579", "/communities": "27", "/arborist": "133" });
     const links = ["/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl", "/wallets", "/ecosystem/history", "/communities", "/development", "/arborist"];

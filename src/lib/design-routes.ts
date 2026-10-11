@@ -127,6 +127,14 @@ export const APPS: AppDef[] = [
     ],
   },
   {
+    id: "zcash-network",
+    label: "Zcash Network",
+    href: "/zcash-network",
+    sub: "Blocks, mining and shielded network activity",
+    icon: "network",
+    pages: [],
+  },
+  {
     id: "ecosystem",
     label: "Ecosystem",
     href: "/ecosystem",

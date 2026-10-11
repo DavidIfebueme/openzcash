@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 import { AppShell } from "./app-shell";
 import { ZarvisProvider } from "./zarvis/zarvis-provider";
 
-/** Monthly owns its compact header so a complete PDF page fits the viewport. */
+/** Monthly and Network own compact headers and use the full viewport. */
 function isBare(pathname: string): boolean {
   return (
+    pathname === "/zcash-network" ||
     pathname === "/monthly" ||
     pathname === "/monthly-preview" ||
     pathname.startsWith("/monthly/")

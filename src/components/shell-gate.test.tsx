@@ -13,6 +13,8 @@ describe("ShellGate", () => {
     const html = render("/monthly");
     expect(html).toContain("data-probe"); expect(html).not.toContain("data-shell");
     expect(render("/monthly/2026-08")).toContain("data-probe");
+    const network = render("/zcash-network");
+    expect(network).toContain("data-probe"); expect(network).not.toContain("data-shell");
   });
   it("renders the shell around workspace pages", () => {
     const html = render("/zcg");
