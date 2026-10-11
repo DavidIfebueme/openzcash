@@ -5,8 +5,10 @@ import type { NetworkFreshness, NetworkInflation, NetworkMarket } from "./types"
 
 const EMISSION_URL = "https://api.zecblock.com/v1/network/emission?period=7d";
 const MARKET_URL = "https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=btc&include_last_updated_at=true";
+const MARKET_FALLBACK_URL = "https://api.coinpaprika.com/v1/tickers/zec-zcash?quotes=BTC";
 const EMISSION_SOURCE = { name: "ZecBlock", url: "https://zecblock.com/", docsUrl: "https://zecblock.com/docs" };
 const MARKET_SOURCE = { name: "CoinGecko", url: "https://www.coingecko.com/en/coins/zcash", docsUrl: "https://docs.coingecko.com/reference/simple-price" };
+const MARKET_FALLBACK_SOURCE = { name: "CoinPaprika", url: "https://coinpaprika.com/coin/zec-zcash/", docsUrl: "https://docs.coinpaprika.com/api-reference/tickers/get-ticker-for-a-specific-coin" };
 const TTL_MS = 10 * 60_000;
 const DAY_MS = 86_400_000;
 const FUTURE_TOLERANCE_MS = 60_000;
@@ -24,14 +26,28 @@ const emissionSchema = z.object({
     (point) => Date.parse(point.date) > Date.now() + FUTURE_TOLERANCE_MS,
   )) context.addIssue({ code: "custom", message: "Invalid daily supply observations" });
 });
+const btcValue = z.number().finite().positive().max(Number.MAX_VALUE / 100);
 const marketSchema = z.object({
-  zcash: z.object({ btc: z.number().finite().positive().max(Number.MAX_VALUE / 100), last_updated_at: integer.positive() }),
+  zcash: z.object({ btc: btcValue, last_updated_at: integer.positive() }),
 }).superRefine((value, context) => {
   const at = value.zcash.last_updated_at * 1_000;
   if (!Number.isSafeInteger(at) || at > Date.now() + FUTURE_TOLERANCE_MS) {
     context.addIssue({ code: "custom", message: "Invalid market observation time" });
   }
-});
+}).transform(({ zcash }) => ({
+  btc: zcash.btc, observedAt: new Date(zcash.last_updated_at * 1_000).toISOString(), source: MARKET_SOURCE,
+}));
+const marketFallbackSchema = z.object({
+  id: z.literal("zec-zcash"), last_updated: iso,
+  quotes: z.object({ BTC: z.object({ price: btcValue }) }),
+}).superRefine((value, context) => {
+  const at = Date.parse(value.last_updated);
+  if (at <= 0 || at > Date.now() + FUTURE_TOLERANCE_MS) {
+    context.addIssue({ code: "custom", message: "Invalid market observation time" });
+  }
+}).transform((value) => ({
+  btc: value.quotes.BTC.price, observedAt: new Date(value.last_updated).toISOString(), source: MARKET_FALLBACK_SOURCE,
+}));
 
 type Resource<T> = NetworkFreshness & { data: T; at: number };
 const cache = new Map<string, Resource<unknown>>();
@@ -109,14 +125,26 @@ function inflationData(value: Resource<z.infer<typeof emissionSchema>> | null): 
 
 function marketData(value: Resource<z.infer<typeof marketSchema>> | null): NetworkMarket | null {
   if (!value) return null;
-  const { btc, last_updated_at: seconds } = value.data.zcash;
-  const at = seconds * 1_000;
+  const { btc, observedAt, source } = value.data;
+  const at = Date.parse(observedAt);
   if (!Number.isSafeInteger(at) || at > Date.now() + FUTURE_TOLERANCE_MS) return null;
   return {
-    source: MARKET_SOURCE, fetchedAt: value.fetchedAt,
+    source, fetchedAt: value.fetchedAt,
     stale: value.stale || Date.now() - at >= TTL_MS,
     observedAt: new Date(at).toISOString(), zecBtc: btc, btcPercent: btc * 100,
   };
+}
+
+async function marketQuote(): Promise<NetworkMarket | null> {
+  const primary = marketData(await resource(MARKET_URL, marketSchema));
+  if (primary && !primary.stale) return primary;
+  const fallback = marketData(await resource(MARKET_FALLBACK_URL, marketFallbackSchema));
+  if (fallback && !fallback.stale) return fallback;
+  // During a full outage, retain the newest available observation with its
+  // original provider and timestamps, rather than relabelling it as current.
+  if (!primary) return fallback;
+  if (!fallback) return primary;
+  return Date.parse(fallback.observedAt) > Date.parse(primary.observedAt) ? fallback : primary;
 }
 
 /** Each quote retains its own source time, refresh cadence and failure state. */
@@ -124,7 +152,7 @@ export async function getNetworkEconomics(): Promise<{
   inflation: NetworkInflation | null; market: NetworkMarket | null;
 }> {
   const [emission, market] = await Promise.all([
-    resource(EMISSION_URL, emissionSchema), resource(MARKET_URL, marketSchema),
+    resource(EMISSION_URL, emissionSchema), marketQuote(),
   ]);
-  return { inflation: inflationData(emission), market: marketData(market) };
+  return { inflation: inflationData(emission), market };
 }

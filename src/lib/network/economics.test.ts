@@ -14,6 +14,9 @@ function emission() {
   ], dailyEmissionEstimate: 9_999 }, meta: { network: "mainnet", freshness: { status: "unknown" } } };
 }
 function price() { return { zcash: { btc: 0.01528339, last_updated_at: start.getTime() / 1_000 - 20 } }; }
+function fallbackPrice() {
+  return { id: "zec-zcash", last_updated: "2026-10-11T17:29:30Z", quotes: { BTC: { price: 0.0153 } } };
+}
 function response(url: string) { return url.includes("/emission?") ? emission() : price(); }
 beforeEach(() => {
   vi.resetModules(); vi.useFakeTimers(); vi.setSystemTime(start);
@@ -59,7 +62,7 @@ describe("Network economics", () => {
       inflation: { ...initial.inflation, stale: true }, market: { ...initial.market, stale: true },
     });
     await getNetworkEconomics();
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+    expect(fetchMock).toHaveBeenCalledTimes(5);
   });
 
   it("keeps inflation available when market data fails and returns null on a cold cache", async () => {
@@ -126,6 +129,69 @@ describe("Network economics", () => {
     });
     expect((await getNetworkEconomics()).inflation).toEqual({ ...first.inflation, stale: true });
   });
+
+
+  it("uses CoinPaprika's direct BTC price and observation time when CoinGecko returns 403", async () => {
+    fetchMock.mockImplementation(async (url: string) => url.includes("coingecko")
+      ? { ok: false, status: 403 } : ok(url.includes("coinpaprika") ? fallbackPrice() : emission()));
+    const { getNetworkEconomics } = await import("./economics");
+    const [first, second] = await Promise.all([getNetworkEconomics(), getNetworkEconomics()]);
+    expect(first.market).toMatchObject({ zecBtc: 0.0153, btcPercent: 1.53,
+      observedAt: "2026-10-11T17:29:30.000Z", fetchedAt: start.toISOString(), stale: false,
+      source: { name: "CoinPaprika", url: "https://coinpaprika.com/coin/zec-zcash/" } });
+    expect(second).toEqual(first);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+    expect(fetchMock.mock.calls.some(([url]) => url.endsWith("zec-zcash?quotes=BTC"))).toBe(true);
+    await getNetworkEconomics();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("prefers a fresh fallback over an available but stale primary quote", async () => {
+    fetchMock.mockImplementation(async (url: string) => ok(url.includes("coingecko")
+      ? { zcash: { ...price().zcash, last_updated_at: start.getTime() / 1_000 - 3_600 } }
+      : url.includes("coinpaprika") ? fallbackPrice() : emission()));
+    expect((await (await import("./economics")).getNetworkEconomics()).market)
+      .toMatchObject({ source: { name: "CoinPaprika" }, stale: false });
+  });
+
+  it("preserves fallback attribution and both timestamps when both sources later fail", async () => {
+    fetchMock.mockImplementation(async (url: string) => url.includes("coingecko")
+      ? { ok: false, status: 403 } : ok(url.includes("coinpaprika") ? fallbackPrice() : emission()));
+    const { getNetworkEconomics } = await import("./economics");
+    const first = await getNetworkEconomics();
+    vi.setSystemTime(new Date(start.getTime() + 11 * 60_000));
+    fetchMock.mockRejectedValue(new Error("offline"));
+    expect((await getNetworkEconomics()).market).toEqual({ ...first.market, stale: true });
+  });
+
+  it("returns no quote when both sources fail on a cold cache", async () => {
+    fetchMock.mockImplementation(async (url: string) => {
+      if (!url.includes("/emission?")) throw new Error("offline");
+      return ok(emission());
+    });
+    expect((await (await import("./economics")).getNetworkEconomics()).market).toBeNull();
+  });
+
+  it.each(["future", "invalid", "missing", "zero", "negative", "overflow", "wrong-coin"])(
+    "rejects invalid fallback %s readings without replacing a previous valid quote", async (invalid) => {
+      fetchMock.mockImplementation(async (url: string) => url.includes("coingecko")
+        ? { ok: false, status: 403 } : ok(url.includes("coinpaprika") ? fallbackPrice() : emission()));
+      const { getNetworkEconomics } = await import("./economics");
+      const first = await getNetworkEconomics();
+      vi.setSystemTime(new Date(start.getTime() + 11 * 60_000));
+      const body: Record<string, unknown> = fallbackPrice();
+      if (invalid === "future") body.last_updated = new Date(Date.now() + 3_600_000).toISOString();
+      if (invalid === "invalid") body.last_updated = "not a date";
+      if (invalid === "missing") delete body.last_updated;
+      if (invalid === "zero") body.quotes = { BTC: { price: 0 } };
+      if (invalid === "negative") body.quotes = { BTC: { price: -1 } };
+      if (invalid === "overflow") body.quotes = { BTC: { price: Number.MAX_VALUE } };
+      if (invalid === "wrong-coin") body.id = "btc-bitcoin";
+      fetchMock.mockImplementation(async (url: string) => url.includes("coingecko")
+        ? { ok: false, status: 403 } : ok(url.includes("coinpaprika") ? body : emission()));
+      expect((await getNetworkEconomics()).market).toEqual({ ...first.market, stale: true });
+    },
+  );
 
   it("keeps zero net issuance zero, including a transfer of already-issued lockbox coins", async () => {
     fetchMock.mockImplementation(async (url: string) => {
