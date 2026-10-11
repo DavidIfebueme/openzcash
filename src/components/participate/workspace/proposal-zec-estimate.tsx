@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { ZcgApprovedBudget } from "@/lib/participate/workspace/data/zcg-approved-budgets";
 import { estimateFundingZat, formatUsdPerZec, FUNDING_QUOTE_SOURCE_URL } from "@/lib/participate/workspace/domain/funding-quote";
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
-import { formatEstimatedZec, readFreshZecPrice, type PublicZecPrice } from "@/lib/participate/workspace/domain/zec-price";
+import { formatEstimatedZec, readDisplayZecPrice, type PublicZecPrice } from "@/lib/participate/workspace/domain/zec-price";
 
 type PriceState = { status: "loading" | "ready" | "unavailable"; price: PublicZecPrice | null };
 const updatedFormat = new Intl.DateTimeFormat("en-US", {
@@ -15,42 +15,57 @@ const updatedFormat = new Intl.DateTimeFormat("en-US", {
 export function useProposalZecPrice(enabled: boolean): PriceState {
   const [state, setState] = useState<PriceState>({ status: "loading", price: null });
   useEffect(() => {
+    if (!state.price) return;
+    const expiry = setTimeout(() => setState({ status: "unavailable", price: null }), Math.max(0, +new Date(state.price.expiresAt) - Date.now()));
+    return () => clearTimeout(expiry);
+  }, [state.price]);
+  useEffect(() => {
     if (!enabled) return;
     let active = true;
     let pending: AbortController | null = null;
-    let expiry: ReturnType<typeof setTimeout> | undefined;
+    let retry: ReturnType<typeof setTimeout> | undefined;
+    let failures = 0;
     async function refresh() {
       if (pending || document.visibilityState === "hidden") return;
+      clearTimeout(retry);
       const controller = new AbortController();
       pending = controller;
       const timeout = setTimeout(() => controller.abort(), 12_000);
       try {
         const response = await fetch("/api/participate/zec-price", { cache: "no-store", signal: controller.signal });
         if (!response.ok) throw new Error("Price unavailable");
-        const price = readFreshZecPrice(await response.json());
+        const price = readDisplayZecPrice(await response.json());
         if (!active) return;
-        clearTimeout(expiry);
+        failures = 0;
         setState({ status: "ready", price });
-        expiry = setTimeout(() => setState({ status: "unavailable", price: null }), +new Date(price.expiresAt) - Date.now());
       } catch {
         if (active) {
-          clearTimeout(expiry);
-          setState({ status: "unavailable", price: null });
+          failures += 1;
+          // A failed refresh does not invalidate a quote before its original expiry.
+          // The independent expiry timer still removes it during prolonged outages.
+          setState(current => {
+            try {
+              if (current.price) return { status: "ready", price: readDisplayZecPrice(current.price) };
+            } catch { /* The previous quote has genuinely expired. */ }
+            return { status: "unavailable", price: null };
+          });
         }
       } finally {
         clearTimeout(timeout);
         pending = null;
+        if (active) {
+          const delay = failures ? Math.min(15_000 * 2 ** Math.min(failures - 1, 2), 60_000) : 60_000;
+          retry = setTimeout(() => void refresh(), delay);
+        }
       }
     }
     void refresh();
-    const interval = setInterval(() => void refresh(), 60_000);
     const onVisible = () => { if (document.visibilityState === "visible") void refresh(); };
     document.addEventListener("visibilitychange", onVisible);
     return () => {
       active = false;
       pending?.abort();
-      clearTimeout(expiry);
-      clearInterval(interval);
+      clearTimeout(retry);
       document.removeEventListener("visibilitychange", onVisible);
     };
   }, [enabled]);
@@ -66,7 +81,7 @@ export function ProposalZecEstimate({ budget, state }: { budget: ZcgApprovedBudg
   let estimate: string | null = null;
   try {
     if (state.price) {
-      price = readFreshZecPrice(state.price);
+      price = readDisplayZecPrice(state.price);
       estimate = formatEstimatedZec(estimateFundingZat(BigInt(budget.usdCents), BigInt(price.rateUsdPerZecE8)));
     }
   } catch { price = null; }
@@ -93,7 +108,7 @@ export function ProposalZecEstimate({ budget, state }: { budget: ZcgApprovedBudg
         <div><dt><a href={budget.sourceUrl} target="_blank" rel="noopener noreferrer">Approved budget ↗</a></dt><dd>{formatProposalUsd(budget.usdCents)}</dd></div>
         {price ? <div><dt>1 ZEC</dt><dd>{formatUsdPerZec(price.rateUsdPerZecE8)} USD</dd></div> : null}
       </dl>
-      {price ? <><p>Total grant estimate: USD budget ÷ current ZEC price. Prior payments aren’t deducted. Each payment uses its payment-day rate.</p><div className="proposal-zec-price-source"><a href={FUNDING_QUOTE_SOURCE_URL} target="_blank" rel="noopener noreferrer">CoinGecko ↗</a><time dateTime={price.quotedAt}>{updatedFormat.format(new Date(price.quotedAt))} UTC</time></div></> : <p>A fresh price is unavailable. We check again every minute; the approved USD budget stays the same.</p>}
+      {price ? <><p>Total grant estimate: USD budget ÷ current ZEC price. Prior payments aren’t deducted. Each payment uses its payment-day rate.</p><div className="proposal-zec-price-source"><a href={FUNDING_QUOTE_SOURCE_URL} target="_blank" rel="noopener noreferrer">CoinGecko ↗</a><time dateTime={price.quotedAt}>{updatedFormat.format(new Date(price.quotedAt))} UTC</time></div></> : <p>A fresh price is unavailable. We retry automatically; the approved USD budget stays the same.</p>}
     </div> : null}
   </div>;
 }
