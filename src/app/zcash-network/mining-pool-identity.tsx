@@ -9,8 +9,8 @@ const poolLogos: Record<string, string> = {
   viabtc: "/logos/mining/viabtc.png",
   foundry: "/logos/mining/foundry.png",
   foundryusa: "/logos/mining/foundry.png",
-  f2pool: "/logos/mining/f2pool.svg",
-  luxor: "/logos/mining/luxor.ico",
+  f2pool: "/logos/mining/f2pool.png",
+  luxor: "/logos/mining/luxor.png",
   antpool: "/logos/mining/antpool.png",
   kryptex: "/logos/mining/kryptex.png",
   sluicey: "/logos/mining/sluicey.png",
@@ -24,7 +24,7 @@ export function MiningPoolIdentity({ name }: { name: string }) {
 
   return <span className={s.poolIdentity} title={name}>
     <span className={s.poolLogo} data-brand={hasLogo} aria-hidden="true">
-      {hasLogo ? <Image src={source} alt="" width={16} height={16} unoptimized onError={() => setFailedSource(source)} /> : <NetworkIcon name={name === "Other pools" ? "network" : "mining"} />}
+      {hasLogo ? <Image src={source} alt="" width={20} height={20} unoptimized onError={() => setFailedSource(source)} /> : <NetworkIcon name={name === "Other pools" ? "network" : "mining"} />}
     </span>
     <span className={s.poolName}>{name}</span>
   </span>;

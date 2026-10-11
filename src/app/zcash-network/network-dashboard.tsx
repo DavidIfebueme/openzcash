@@ -37,7 +37,7 @@ function dated(time: string) { return new Date(time).toLocaleDateString("en-US",
 function poolColor(id: string) { return poolColors[id.toLowerCase()] ?? "var(--muted)"; }
 
 function Card({ title, icon, className, children, action, id, motionPaused = false }: { title: string; icon: ReactNode; className: string; children: ReactNode; action?: ReactNode; id?: string; motionPaused?: boolean }) {
-  return <section id={id} className={`${s.card} ${className}`} data-motion-paused={motionPaused} aria-label={title}><div className={s.cardHeader}><div className={s.cardTitle}><span className={s.cardIcon}>{icon}</span><h2>{title}</h2></div>{action}</div>{children}</section>;
+  return <section id={id} className={`${s.card} ${className}`} data-motion-paused={motionPaused} aria-label={title}><div className={s.cardHeader}><div className={s.cardTitle}><span className={s.cardIcon}>{icon}</span><h2>{title}</h2></div>{action}</div><div className={s.cardBody}>{children}</div></section>;
 }
 
 function External({ href, children, className = s.cardLink }: { href: string; children: ReactNode; className?: string }) {
@@ -235,7 +235,7 @@ export function NetworkDashboard() {
       {core && !core.synced && <p className={s.notice}>Catching up: block {number.format(core.indexedHeight)} of {number.format(core.chainTip)}.</p>}
 
       <div className={s.grid}>
-        <Card id="blocks" title="Latest blocks" icon={<NetworkIcon name="blocks" />} className={s.blocks} motionPaused={core?.stale ?? false} action={<span className={s.arrivalLabel} role="status">{arrivals.length > 0 ? <><span className={s.statusDot} />+{arrivals.length} new</> : "Mainnet"}</span>}>
+        <Card id="blocks" title="Latest blocks" icon={<NetworkIcon name="blocks" />} className={s.blocks} motionPaused={core?.stale ?? false} action={<span className={s.arrivalLabel} role="status">{arrivals.length > 0 && <><span className={s.statusDot} />+{arrivals.length} new</>}</span>}>
           {core ? <>
             <div className={`${s.stats} ${s.blockStats}`}>
               <Stat label="Height"><AnimatedValue value={core.height} format={number} /></Stat>

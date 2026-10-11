@@ -18,8 +18,7 @@
 }
 
 .digit {
-  transform-origin: 50% 65%;
-  animation: revealDigit 480ms cubic-bezier(.22, 1, .36, 1) both;
+  animation: revealDigit 480ms cubic-bezier(.22, 1, .36, 1) backwards;
 }
 
 .screenReader {
@@ -35,8 +34,8 @@
 }
 
 @keyframes revealDigit {
-  from { opacity: 0; transform: translateY(.18em) scale(.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from { opacity: 0; transform: translateY(.14em); }
+  to { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
