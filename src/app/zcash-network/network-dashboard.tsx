@@ -85,7 +85,7 @@ function NetworkChart({ history, metric, now }: { history: NetworkSeries; metric
   const low = Math.min(...values) * .9;
   const high = Math.max(...values) * 1.06;
   const span = Math.max(high - low, 1);
-  const left = 46, right = width - 10, top = 10, bottom = 91;
+  const left = 10, right = width - 46, top = 10, bottom = 91;
   const firstTime = Date.parse(points[0].time), lastTime = Date.parse(points.at(-1)!.time);
   const timeSpan = Math.max(lastTime - firstTime, 1);
   const x = (point: NetworkSeriesPoint) => left + (Date.parse(point.time) - firstTime) / timeSpan * (right - left);
@@ -116,7 +116,7 @@ function NetworkChart({ history, metric, now }: { history: NetworkSeries; metric
       }} onPointerLeave={() => setHovered(null)} onBlur={() => setHovered(null)}
       onKeyDown={(event) => { if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.preventDefault(); setHovered((previous) => Math.max(0, Math.min(points.length - 1, (previous ?? points.indexOf(lastPoint)) + (event.key === "ArrowLeft" ? -1 : 1)))); } }}>
       <defs><linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--accent)" stopOpacity=".2" /><stop offset="100%" stopColor="var(--accent)" stopOpacity="0" /></linearGradient></defs>
-      {[0, 1, 2, 3].map((tick) => { const value = low + span * tick / 3; const at = bottom - (bottom - top) * tick / 3; return <g key={tick}><line className={s.chartGrid} x1={left} x2={right} y1={at} y2={at} /><text x="0" y={at + 3}>{short.format(value)}</text></g>; })}
+      {[0, 1, 2, 3].map((tick) => { const value = low + span * tick / 3; const at = bottom - (bottom - top) * tick / 3; return <g key={tick}><line className={s.chartGrid} x1={left} x2={right} y1={at} y2={at} /><text x={width - 2} y={at + 3} textAnchor="end">{short.format(value)}</text></g>; })}
       {segments.map((part) => <g key={part[0].time}><path d={`${lineFor(part)} L${x(part.at(-1)!)},${bottom} L${x(part[0])},${bottom} Z`} fill={`url(#${gradientId})`} /><path className={s.chartLine} d={lineFor(part)} fill="none" stroke="var(--accent)" strokeWidth="2" strokeLinejoin="round" /></g>)}
       {lastPoint.value != null && <circle ref={endpointRef} className={s.chartEndpoint} style={{ visibility: hovered === null ? "visible" : "hidden" }} cx={x(lastPoint)} cy={y(lastPoint)} r="4" fill="var(--accent)" />}
       {points.length < 12 && points.filter((point) => point.value != null).map((point) => <circle key={point.time} cx={x(point)} cy={y(point)} r="3" fill="var(--accent)" />)}

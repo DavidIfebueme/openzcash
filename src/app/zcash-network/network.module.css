@@ -159,7 +159,7 @@
 .detailRows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .detailRows dt { color: var(--muted); }
 .detailRows dd, .mono { font-family: var(--font-geist-mono), monospace; font-weight: 500; font-size: 12px; text-align: right; }
-.chartTabs { display: flex; gap: 16px; margin-bottom: 4px; }
+.chartTabs { display: flex; justify-content: flex-end; gap: 16px; margin-bottom: 4px; }
 .chartTabs button { color: var(--muted); font-size: 12px; font-weight: 500; cursor: pointer; padding: 3px 0; border-bottom: 2px solid transparent; }
 .chartTabs button[aria-pressed="true"] { color: var(--gold); border-color: var(--accent); }
 .chartSummary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; min-height: 26px; }
