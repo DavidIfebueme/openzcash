@@ -11,6 +11,7 @@ import type {
   NetworkValuePool,
 } from "./types";
 import { getNetworkActivity } from "./zecblock";
+import { getNetworkEconomics } from "./economics";
 
 const API_URL = "https://api.zcashinfo.com/api/v1";
 const SOURCE = {
@@ -221,8 +222,9 @@ function coreData(dashboard: Resource<Dashboard>, sample: Resource<z.infer<typeo
 
 export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise<NetworkSnapshot> {
   const range = RANGES[period];
-  const [activity, dashboard, blocks, mining, mempool] = await Promise.all([
+  const [activity, economics, dashboard, blocks, mining, mempool] = await Promise.all([
     getNetworkActivity(period),
+    getNetworkEconomics(),
     resource("/dashboard", 30_000, dashboardSchema),
     resource("/blocks?limit=100", 30_000, blocksSchema),
     resource(`/mining/pools?interval=${range}`, 60_000, miningSchema),
@@ -252,6 +254,8 @@ export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise
     "activity.blockTime": activity.blockTime,
     mining: miningSection,
     mempool: mempoolSection,
+    inflation: economics.inflation,
+    market: economics.market,
   };
   const available = Object.values(sections).filter((section) => section !== null);
   const unavailableSections = Object.entries(sections).filter(([, section]) => !section).map(([name]) => name);
@@ -262,6 +266,6 @@ export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise
     period, source: SOURCE, status,
     fetchedAt: core?.fetchedAt ?? available.map((section) => section.fetchedAt).sort().at(-1) ?? null,
     stale: !!core?.stale || status === "stale",
-    core, activity, mining: miningSection, mempool: mempoolSection, unavailableSections,
+    core, activity, ...economics, mining: miningSection, mempool: mempoolSection, unavailableSections,
   };
 }

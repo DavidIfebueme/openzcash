@@ -58,7 +58,7 @@ const statsSchema = z.object({
         tipTimestamp: unix, windows: z.object({ "24h": windowSchema }),
       }),
     }),
-    blockchain: z.object({ tx24h: integer.nullable() }),
+    blockchain: z.object({ tx24h: integer.nullable(), sizeBytes: integer.positive().nullable().optional().catch(null) }),
   }),
   meta: metaSchema,
 }).superRefine((value, context) => {
@@ -188,6 +188,7 @@ function currentData(stats: Resource<Stats> | null): NetworkCurrent | null {
     observedAt: estimate.asOf, coverageAt, coverageHeight: estimate.tipHeight,
     windowSeconds: DAY_SECONDS, solrateGsols: window.hashrate === null ? null : window.hashrate / 1e9,
     difficulty: data.mining.difficulty, blocks24h: window.blockCount, averageTxsPerBlock,
+    chainSizeBytes: data.blockchain.sizeBytes ?? null,
   };
 }
 

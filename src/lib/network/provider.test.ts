@@ -2,7 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { NetworkActivity, NetworkPeriod, NetworkSeries } from "./types";
 
 vi.mock("server-only", () => ({}));
-const { activityMock } = vi.hoisted(() => ({ activityMock: vi.fn() }));
+const { activityMock, economicsMock } = vi.hoisted(() => ({ activityMock: vi.fn(), economicsMock: vi.fn() }));
+vi.mock("./economics", () => ({ getNetworkEconomics: economicsMock }));
 vi.mock("./zecblock", () => ({ getNetworkActivity: activityMock }));
 
 const fetchMock = vi.fn();
@@ -21,10 +22,21 @@ function activity(period: NetworkPeriod = "day"): NetworkActivity {
   return {
     current: { fetchedAt, stale: false, source, observedAt: fetchedAt, coverageAt: fetchedAt,
       coverageHeight: height, windowSeconds: 86_400, solrateGsols: 31,
-      difficulty: 210_000_000, blocks24h: 1_140, averageTxsPerBlock: 4 },
+      difficulty: 210_000_000, blocks24h: 1_140, averageTxsPerBlock: 4, chainSizeBytes: 282_000_000_000 },
     solrate: series("solrate", 31),
     blocks: series("blocks", 1_140),
     blockTime: series("blockTime", 75),
+  };
+}
+
+function economics() {
+  const source = { name: "ZecBlock", url: "https://zecblock.com/", docsUrl: "https://zecblock.com/docs" };
+  const fetchedAt = new Date().toISOString();
+  return {
+    inflation: { source, fetchedAt, stale: false, day: "2026-10-10", observedAt: "2026-10-10T23:59:59Z",
+      dailyIssuanceZec: 1_800, supplyZec: 17_000_000, annualizedPercent: 3.86 },
+    market: { source: { name: "CoinGecko", url: "https://coingecko.com/", docsUrl: "https://docs.coingecko.com/" },
+      fetchedAt, stale: false, observedAt: fetchedAt, zecBtc: 0.015, btcPercent: 1.5 },
   };
 }
 
@@ -71,6 +83,7 @@ beforeEach(() => {
   vi.setSystemTime(start);
   fetchMock.mockReset().mockImplementation(async (url: string) => ok(apiResponse(url)));
   activityMock.mockReset().mockImplementation(async (period: NetworkPeriod) => activity(period));
+  economicsMock.mockReset().mockImplementation(async () => economics());
   vi.stubGlobal("fetch", fetchMock);
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
@@ -258,6 +271,10 @@ describe("Zcash network public data", () => {
     vi.setSystemTime(new Date(start.getTime() + 130_000));
     fetchMock.mockRejectedValue(new Error("offline"));
     for (const section of Object.values(reading)) if (section) section.stale = true;
+    const staleEconomics = economics();
+    staleEconomics.inflation.stale = true;
+    staleEconomics.market.stale = true;
+    economicsMock.mockResolvedValue(staleEconomics);
     activityMock.mockResolvedValue(reading);
     const snapshot = await getNetworkSnapshot();
     expect(snapshot).toMatchObject({ status: "stale", stale: true, fetchedAt: initial.fetchedAt,
@@ -312,12 +329,32 @@ describe("Zcash network public data", () => {
       nextHalvingHeight: null, blocksRemaining: null, estimatedHalvingAt: null });
   });
 
+  it("reports a missing market quote independently while retaining the latest inflation reading", async () => {
+    const reading = economics();
+    economicsMock.mockResolvedValue({ ...reading, market: null });
+    const snapshot = await (await import("./provider")).getNetworkSnapshot();
+    expect(snapshot).toMatchObject({ status: "partial", market: null, unavailableSections: ["market"] });
+    expect(snapshot.inflation).toBe(reading.inflation);
+    expect(snapshot.core?.stale).toBe(false);
+  });
+
+  it("reports stale economics without changing its timestamps or marking core data stale", async () => {
+    const reading = economics();
+    reading.market.stale = true;
+    reading.market.observedAt = "2026-10-10T23:30:00Z";
+    economicsMock.mockResolvedValue(reading);
+    const snapshot = await (await import("./provider")).getNetworkSnapshot();
+    expect(snapshot).toMatchObject({ status: "partial", stale: false, unavailableSections: [] });
+    expect(snapshot.market).toBe(reading.market);
+  });
+
   it("reports complete cold-cache feed loss as unavailable", async () => {
+    economicsMock.mockResolvedValue({ inflation: null, market: null });
     fetchMock.mockRejectedValue(new Error("offline"));
     activityMock.mockResolvedValue(noActivity);
     const { getNetworkSnapshot } = await import("./provider");
     expect(await getNetworkSnapshot()).toMatchObject({ status: "unavailable", fetchedAt: null,
       core: null, activity: noActivity, mining: null, mempool: null,
-      unavailableSections: ["core", "activity.current", "activity.solrate", "activity.blockTime", "mining", "mempool"] });
+      unavailableSections: ["core", "activity.current", "activity.solrate", "activity.blockTime", "mining", "mempool", "inflation", "market"] });
   });
 });

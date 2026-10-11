@@ -72,7 +72,7 @@
 .grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 10px; }
 .card { min-width: 0; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); padding: 12px 16px; display: flex; flex-direction: column; }
 .cardBody { display: flex; flex-direction: column; justify-content: center; flex: 1; min-width: 0; }
-.blocks .cardBody, .activity .cardBody { justify-content: flex-start; }
+.blocks .cardBody, .activity .cardBody, .privacy .cardBody { justify-content: flex-start; }
 .blocks { grid-column: 1 / 6; grid-row: 1; }
 .activity { grid-column: 6 / 10; grid-row: 1; }
 .privacy { grid-column: 10 / -1; grid-row: 1; }
@@ -81,7 +81,7 @@
 .supply { grid-column: 7 / 10; grid-row: 2; }
 .halving { grid-column: 10 / -1; grid-row: 2; }
 .cardHeader, .cardTitle { display: flex; align-items: center; }
-.cardHeader { justify-content: space-between; gap: 8px; margin-bottom: 12px; }
+.cardHeader { justify-content: space-between; gap: 8px; margin-bottom: 10px; }
 .cardTitle { gap: 9px; min-width: 0; }
 .cardIcon { width: 30px; height: 30px; flex-shrink: 0; display: grid; place-items: center; border-radius: 7px; color: var(--gold); background: color-mix(in srgb, var(--accent) 9%, var(--panel)); }
 .cardIcon svg { width: 22px; height: 22px; }
@@ -129,7 +129,16 @@
 .queueState[data-clear="true"] { color: var(--muted); }
 .poolDistribution { display: flex; height: 6px; gap: 1px; overflow: hidden; margin: 14px 0; }
 .poolDistribution > span { display: block; min-width: 0; transition: width 800ms ease; }
-.privacy .statLabel { min-height: 36px; display: grid; align-items: center; }
+.privacyStats { gap: 8px; }
+.privacyStats .stat { padding: 9px 6px; align-self: stretch; justify-content: center; border: 1px solid var(--line); border-radius: 5px; background: var(--panel-hover); }
+.privacyStats .statLabel { display: flex; align-items: center; justify-content: center; min-height: 32px; margin-bottom: 3px; line-height: 1.35; }
+.privacyStats .stat > strong { font-size: clamp(23px, 1.8vw, 28px); line-height: 1.2; }
+.privacy .poolLegend { gap: 0; }
+.privacy .legendItem { min-height: 29px; padding: 5px 0; line-height: 1.35; }
+.privacy .legendItem + .legendItem { border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent); }
+.privacy .poolDistribution { height: 7px; margin: 12px 0 8px; border-radius: 2px; }
+.privacy .legendItem strong { display: flex; align-items: baseline; gap: 5px; }
+.privacy .legendItem small { min-width: 21px; }
 .poolLegend { display: grid; grid-template-columns: 1fr; gap: 8px; }
 .legendItem { display: grid; grid-template-columns: minmax(0, 1fr) auto 48px; align-items: center; gap: 8px; font-size: 12px; }
 .poolPercent { font-family: var(--font-geist-mono), monospace; color: var(--dim); text-align: right; font-size: 11px; }
@@ -154,7 +163,11 @@
 .track { height: 5px; background: var(--track); overflow: hidden; }
 .track span { display: block; height: 100%; transition: width 650ms ease; }
 .caption { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 5px 12px; margin-top: 10px; color: var(--dim); font-size: 11px; }
-.supplyProgress { margin: 12px 0 16px; }
+.supplyProgress { margin: 10px 0; }
+.supplyStats { gap: 8px; }
+.supplyStats > div { display: flex; justify-content: center; min-width: 0; padding: 8px 4px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel-hover); }
+.supplyStats .statLabel { display: flex; align-items: center; justify-content: center; min-height: 32px; line-height: 1.35; }
+.supplyStats .stat > strong { font-size: clamp(23px, 1.7vw, 27px); line-height: 1.2; }
 .detailRows { display: flex; flex-direction: column; gap: 8px; font-size: 12px; }
 .detailRows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .detailRows dt { color: var(--muted); }
@@ -171,7 +184,7 @@
 .chartGrid { stroke: var(--line); stroke-width: 1; }
 .chartEndpoint { transform-box: fill-box; transform-origin: center; }
 .insights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 10px; }
-.insight { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 0; padding: 6px 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); text-align: center; }
+.insight { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-width: 0; padding: 6px 12px; border: 1px solid var(--line); border-radius: 5px; background: var(--panel); text-align: center; }
 .insightHeading { display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 22px; }
 .insightHeading svg { width: 20px; height: 20px; color: var(--gold); }
 .insight h3 { color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.5; }

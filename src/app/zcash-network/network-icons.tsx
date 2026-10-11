@@ -1,8 +1,10 @@
 import type { ReactNode, SVGProps } from "react";
 
-type NetworkIconName = "blocks" | "activity" | "privacy" | "network" | "mempool" | "mining" | "supply" | "halving" | "explorer" | "external" | "refresh" | "sun" | "moon" | "chevron" | "globe" | "apps";
+type NetworkIconName = "blocks" | "activity" | "privacy" | "network" | "mempool" | "mining" | "supply" | "halving" | "explorer" | "external" | "refresh" | "sun" | "moon" | "chevron" | "globe" | "apps" | "storage" | "exchange";
 
 const icons: Record<NetworkIconName, ReactNode> = {
+  storage: <><ellipse cx="12" cy="5" rx="8" ry="3" fill="currentColor" fillOpacity=".12" /><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7" /></>,
+  exchange: <><path d="M4 7h15m-4-4 4 4-4 4M20 17H5m4-4-4 4 4 4" /></>,
   blocks: <>
     <path d="m4 7.5 8 4.5v9l-8-4.5Z" fill="currentColor" fillOpacity=".14" stroke="none" />
     <path d="m12 3 8 4.5v9L12 21l-8-4.5v-9Zm-8 4.5 8 4.5 8-4.5M12 12v9" />

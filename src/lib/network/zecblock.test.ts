@@ -76,6 +76,31 @@ describe("ZecBlock public current observations", () => {
       && options.signal instanceof AbortSignal && !options.headers.authorization)).toBe(true);
   });
 
+  it("uses source bytes without copying the upstream mislabeled GiB field", async () => {
+    fetchMock.mockImplementation(async (url: string) => {
+      const body = apiResponse(url);
+      if (!url.endsWith("/stats")) return ok(body);
+      const data = stats();
+      return ok({ ...data, data: { ...data.data, blockchain: {
+        ...data.data.blockchain, sizeBytes: 282_244_954_280, sizeGB: 262.86,
+      } } });
+    });
+    expect((await (await import("./zecblock")).getNetworkActivity("day")).current?.chainSizeBytes)
+      .toBe(282_244_954_280);
+  });
+
+  it.each([undefined, -1, Number.MAX_SAFE_INTEGER + 1, "282GB"])(
+    "withholds invalid storage %s without losing network activity", async (sizeBytes) => {
+      fetchMock.mockImplementation(async (url: string) => {
+        if (!url.endsWith("/stats")) return ok(apiResponse(url));
+        const data = stats();
+        return ok({ ...data, data: { ...data.data, blockchain: { ...data.data.blockchain, sizeBytes } } });
+      });
+      expect((await (await import("./zecblock")).getNetworkActivity("day")).current)
+        .toMatchObject({ solrateGsols: 30, chainSizeBytes: null });
+    },
+  );
+
   it("filters day to its real samples and reports the supported block-time range", async () => {
     const { getNetworkActivity } = await import("./zecblock");
     const day = await getNetworkActivity("day");

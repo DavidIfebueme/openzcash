@@ -30,7 +30,7 @@ function age(time: string | null | undefined, now: number) {
   return `${Math.floor(seconds / 86400)}d ago`;
 }
 
-function bytes(value: number) { return value >= 1_000_000 ? `${decimal.format(value / 1_000_000)} MB` : `${decimal.format(value / 1000)} kB`; }
+function bytes(value: number) { return value >= 1_000_000_000_000 ? `${decimal.format(value / 1_000_000_000_000)} TB` : value >= 1_000_000_000 ? `${decimal.format(value / 1_000_000_000)} GB` : value >= 1_000_000 ? `${decimal.format(value / 1_000_000)} MB` : `${decimal.format(value / 1000)} kB`; }
 function pct(value: number) { return `${decimal.format(value)}%`; }
 function clampPercent(value: number) { return Math.max(0, Math.min(100, value)); }
 function dated(time: string) { return new Date(time).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }); }
@@ -135,9 +135,9 @@ function Stat({ label, children, note }: { label: string; children: ReactNode; n
 function PrivacyPools({ core, now }: { core: NetworkCore; now: number }) {
   const sorted = [...core.pools].sort((a, b) => Number(b.shielded) - Number(a.shielded) || b.zec - a.zec);
   return <>
-    <div className={s.stats}>
+    <div className={`${s.stats} ${s.privacyStats}`}>
       <Stat label="Shielded balance"><AnimatedValue value={core.shieldedZec} format={short} /><small> ZEC</small></Stat>
-      <Stat label="Share of pool balances"><AnimatedValue value={core.shieldedPercent} /><small>%</small></Stat>
+      <Stat label="Shielded share"><AnimatedValue value={core.shieldedPercent} /><small>%</small></Stat>
     </div>
     <div className={s.poolDistribution} role="img" aria-label={`${pct(core.shieldedPercent)} of reported pool balances are shielded`}>{sorted.map((pool) => <span key={pool.id} style={{ width: `${core.poolTotalZec > 0 ? pool.zec / core.poolTotalZec * 100 : 0}%`, background: poolColor(pool.id) }} title={`${pool.name}: ${number.format(pool.zec)} ZEC`} />)}</div>
     <div className={s.poolLegend}>{sorted.map((pool) => <div className={s.legendItem} key={pool.id}><span className={s.legendName}><span className={s.legendSwatch} style={{ background: poolColor(pool.id) }} />{pool.name}</span><strong title={`${precise.format(pool.zec)} ZEC`}>{short.format(pool.zec)} <small>ZEC</small></strong><span className={s.poolPercent}>{core.poolTotalZec > 0 ? pct(pool.zec / core.poolTotalZec * 100) : "—"}</span></div>)}</div>
@@ -217,6 +217,10 @@ export function NetworkDashboard() {
   const state = error || old ? (core ? "stale" : "unavailable") : data?.status ?? "loading";
   const stateLabels: Record<string, string> = { live: "Live", partial: "Partial data", stale: "Delayed", unavailable: "Unavailable", loading: "Connecting" };
   const emission = core?.emission;
+  const inflation = data?.inflation;
+  const market = data?.market;
+  const inflationDelayed = !!inflation && (inflation.stale || error);
+  const marketDelayed = !!market && (market.stale || error || clock - Date.parse(market.observedAt) >= 10 * 60_000);
   const namedPools = mining?.pools.filter((pool) => pool.name !== "Unknown") ?? [];
   const unknownPool = mining?.pools.find((pool) => pool.name === "Unknown");
   const miningPools = namedPools.slice(0, unknownPool ? 4 : 5);
@@ -294,7 +298,12 @@ export function NetworkDashboard() {
 
         <Card title="Supply & emission" icon={<NetworkIcon name="supply" />} className={s.supply} motionPaused={core?.stale ?? false}>
           {core ? <>
-            <Stat label="Reported on-chain supply"><AnimatedValue value={core.totalSupplyZec} format={number} /><small> ZEC</small></Stat>
+            <div className={`${s.stats} ${s.supplyStats}`}>
+              <div title={`${precise.format(core.totalSupplyZec)} ZEC reported on-chain`}><Stat label="On-chain supply"><AnimatedValue value={core.totalSupplyZec} format={short} /><small> ZEC</small></Stat></div>
+              <div data-motion-paused={inflationDelayed} title={inflation ? `${inflation.source.name} · ${inflation.day} UTC · ${precise.format(inflation.dailyIssuanceZec)} ZEC issued. Daily supply growth × 365, including Lockbox.${inflationDelayed ? " Last available reading." : ""}` : "Waiting for a complete daily supply observation"}>
+                <Stat label="Annualized inflation">{inflation ? <AnimatedValue value={inflation.annualizedPercent} /> : "—"}<small>%</small></Stat>
+              </div>
+            </div>
             <div className={s.supplyProgress}><div className={s.track}><span style={{ width: `${clampPercent(core.totalSupplyZec / 21_000_000 * 100)}%`, background: "var(--accent)" }} /></div><div className={s.caption}><span>{pct(core.totalSupplyZec / 21_000_000 * 100)} issued</span><span>21M ZEC maximum</span></div></div>
             <dl className={s.detailRows}>
               <div><dt>Block subsidy</dt><dd>{emission?.blockSubsidyZec != null ? `${precise.format(emission.blockSubsidyZec)} ZEC` : "—"}</dd></div>
@@ -319,13 +328,13 @@ export function NetworkDashboard() {
       </div>
 
       <section id="network-insights" className={s.insights} data-expanded={insightsExpanded} aria-label="Network insights">
-        <div className={s.insight} data-motion-paused={coreDelayed}>
-          <div className={s.insightHeading}><NetworkIcon name="activity" /><h3>Transactions sampled</h3></div>
-          <strong>{core ? <AnimatedValue value={Math.round(core.averageTxsPerBlock * core.sampleBlocks)} format={number} /> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · includes coinbase${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small>
+        <div className={s.insight} data-motion-paused={currentDelayed} title={current ? `Storage reported by the explorer's node · ${current.source.name} · ${current.observedAt}${averageBlockBytes != null ? `. Average size of ${core?.recentBlocks.length ?? 0} recent blocks: ${bytes(averageBlockBytes)}.` : ""}` : undefined}>
+          <div className={s.insightHeading}><NetworkIcon name="storage" /><h3>Blockchain size</h3></div>
+          <strong>{current?.chainSizeBytes != null ? bytes(current.chainSizeBytes) : "—"}</strong><small>{current?.chainSizeBytes != null ? `Node storage${currentDelayed ? " · last reading" : ""}` : "Awaiting source"}</small>
         </div>
-        <div className={s.insight} data-motion-paused={coreDelayed}>
-          <div className={s.insightHeading}><NetworkIcon name="blocks" /><h3>Average block size</h3></div>
-          <strong>{averageBlockBytes != null ? bytes(averageBlockBytes) : "—"}</strong><small>{core ? `${core.recentBlocks.length} recent blocks${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small>
+        <div className={s.insight} data-motion-paused={marketDelayed} title={market ? `${market.source.name} · Quoted ${new Date(market.observedAt).toUTCString()}. Price of one ZEC as a percentage of one BTC.` : undefined}>
+          <div className={s.insightHeading}><NetworkIcon name="exchange" /><h3>ZEC / BTC</h3></div>
+          <strong>{market ? <><AnimatedValue value={market.btcPercent} /><span className={s.insightUnit}>%</span></> : "—"}</strong><small>{market ? `${precise.format(market.zecBtc)} BTC per ZEC${marketDelayed ? " · last quote" : ""}` : "Awaiting quote"}</small>
         </div>
         <div className={s.insight} data-motion-paused={coreDelayed}>
           <div className={s.insightHeading}><NetworkIcon name="mining" /><h3>Block pace</h3></div>
@@ -346,13 +355,14 @@ export function NetworkDashboard() {
           </div>
         </div>
       <div className={s.dataNotes} id="data-notes" hidden={!notesExpanded}>
-        <p><strong>Freshness.</strong> Readings refresh every 30 seconds. See the <a href="https://zecblock.com/docs" target="_blank" rel="noreferrer">network API</a> and <a href="https://api.zcashinfo.com/docs" target="_blank" rel="noreferrer">chain data API</a> for source documentation. Source observation times are preserved when a request fails. Upstream caches can add a few minutes.</p>
+        <p><strong>Freshness.</strong> The page refreshes every 30 seconds. Market quotes are cached for up to 10 minutes; inflation uses the latest completed UTC day. See the <a href="https://zecblock.com/docs" target="_blank" rel="noreferrer">network API</a> and <a href="https://api.zcashinfo.com/docs" target="_blank" rel="noreferrer">chain data API</a> for source documentation. Source observation times are preserved when a request fails. Upstream caches can add a few minutes.</p>
         <p><strong>Network.</strong> Solrate estimates work over a full rolling 24-hour window. The chart ends at the latest available estimate. Earlier solrate and block-count samples end at midnight UTC; gaps remain missing. Transactions per block use the same 24h count and include coinbase. Difficulty is current; block time averages 120 intervals and has up to 7 days of history.</p>
         <p><strong>Privacy.</strong> Shielded share uses all reported pool balances, including Lockbox. It measures ZEC holdings, not people or private transactions.</p>
         <p><strong>Mining.</strong> Distribution is the share of sampled blocks. Pool attribution is inferred by the explorer; unknown miners may share a group.</p>
-        <p><strong>Supply.</strong> Reported on-chain supply differs from market circulating supply. Miner subsidy excludes fees. Halving estimates use the current block target and schedule.</p>
+        <p><strong>Supply & inflation.</strong> Reported on-chain supply differs from market circulating supply. Annualized inflation is the latest complete UTC day&apos;s supply increase × 365 ÷ that day&apos;s closing supply, including Deferred Lockbox issuance. It is an annualized daily reading, not a forecast. Miner subsidy excludes fees.</p>
+        <p><strong>Size & price.</strong> Blockchain size is the explorer node&apos;s reported storage in decimal GB, not a required wallet download. ZEC / BTC is the price of one ZEC divided by one BTC × 100, not market-cap dominance or a price change. <a href="https://www.coingecko.com/en/coins/zcash" target="_blank" rel="noreferrer">Market quote</a> timestamps are retained on failed refreshes.</p>
         <p><strong>Fees & mempool.</strong> Fees average the latest {core?.sampleBlocks ?? 100} blocks. Pending transactions reflect the explorer’s mempool view.</p>
-        <p><strong>Insights.</strong> Transaction counts use the full block sample; average block size uses the recent blocks returned by the source. Each window is shown below its reading. Block pace compares observed block frequency with the source&apos;s target. Blocks in the last 24 hours use a full rolling window.</p>
+        <p><strong>Insights.</strong> Average block size uses the recent blocks returned by the source. Each window is shown below its reading. Block pace compares observed block frequency with the source&apos;s target. Blocks in the last 24 hours use a full rolling window.</p>
       </div>
       </footer>
     </main>

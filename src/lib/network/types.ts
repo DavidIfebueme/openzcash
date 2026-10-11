@@ -38,6 +38,8 @@ export type NetworkCurrent = NetworkFreshness & {
   difficulty: number;
   blocks24h: number;
   averageTxsPerBlock: number | null;
+  /** Storage bytes reported by the source node; not serialized block bytes. */
+  chainSizeBytes: number | null;
 };
 
 export type NetworkActivity = {
@@ -111,6 +113,25 @@ export type NetworkMempool = NetworkFreshness & {
   bytes: number;
 };
 
+export type NetworkInflation = NetworkFreshness & {
+  source: NetworkSource;
+  /** Last completed UTC day, from consecutive consensus supply snapshots. */
+  day: string;
+  observedAt: string;
+  annualizedPercent: number;
+  /** Net issued supply change, including deferred Lockbox funds. */
+  dailyIssuanceZec: number;
+  supplyZec: number;
+};
+
+export type NetworkMarket = NetworkFreshness & {
+  source: NetworkSource;
+  observedAt: string;
+  /** BTC paid for one ZEC, distinct from market-cap dominance. */
+  zecBtc: number;
+  btcPercent: number;
+};
+
 export type NetworkSnapshot = {
   period: NetworkPeriod;
   source: { name: string; url: string; docsUrl: string };
@@ -119,6 +140,8 @@ export type NetworkSnapshot = {
   stale: boolean;
   core: NetworkCore | null;
   activity: NetworkActivity;
+  inflation: NetworkInflation | null;
+  market: NetworkMarket | null;
   mining: NetworkMining | null;
   mempool: NetworkMempool | null;
   unavailableSections: string[];
