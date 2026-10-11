@@ -148,6 +148,8 @@ export function NetworkDashboard() {
   useThemeColor(root, theme);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const [insightsExpanded, setInsightsExpanded] = useState(false);
+  const [notesExpanded, setNotesExpanded] = useState(false);
   const [arrivals, setArrivals] = useState<string[]>([]);
   const previousCore = useRef<NetworkCore | null>(null);
   const arrivalTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -212,6 +214,12 @@ export function NetworkDashboard() {
   const otherPools = namedPools.slice(unknownPool ? 4 : 5);
   if (otherPools.length) miningPools.push({ name: "Other pools", blocks: otherPools.reduce((sum, pool) => sum + pool.blocks, 0), sharePercent: otherPools.reduce((sum, pool) => sum + pool.sharePercent, 0) });
   const topTwo = mining?.pools.slice(0, 2).reduce((sum, pool) => sum + pool.sharePercent, 0);
+  const averageBlockBytes = core && core.recentBlocks.length > 0
+    ? core.recentBlocks.reduce((sum, block) => sum + block.sizeBytes, 0) / core.recentBlocks.length : null;
+  const blockPace = core?.averageBlockSeconds != null && core.averageBlockSeconds > 0 && core.targetBlockSeconds > 0
+    ? (core.targetBlockSeconds / core.averageBlockSeconds - 1) * 100 : null;
+  const coreDelayed = !!core && (core.stale || old || error);
+  const historyDelayed = !!history && (history.stale || coreDelayed || error);
 
   const periods = <div className={s.periods} aria-label="History period">{(Object.keys(periodLabels) as NetworkPeriod[]).map((p) => <button key={p} onClick={() => { if (p !== period) { setLoading(true); setPeriod(p); } }} aria-pressed={period === p} aria-label={`Show ${periodNames[p]} history`}>{periodLabels[p]}</button>)}</div>;
 
@@ -299,17 +307,43 @@ export function NetworkDashboard() {
           </> : <Empty loading={loading} />}
         </Card>
       </div>
+
+      <section id="network-insights" className={s.insights} data-expanded={insightsExpanded} aria-label="Network insights">
+        <div className={s.insight} data-motion-paused={coreDelayed}>
+          <span className={s.insightIcon}><NetworkIcon name="activity" /></span>
+          <div><h3>Transactions sampled</h3><strong>{core ? <AnimatedValue value={Math.round(core.averageTxsPerBlock * core.sampleBlocks)} format={number} /> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · includes coinbase${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small></div>
+        </div>
+        <div className={s.insight} data-motion-paused={coreDelayed}>
+          <span className={s.insightIcon}><NetworkIcon name="blocks" /></span>
+          <div><h3>Average block size</h3><strong>{averageBlockBytes != null ? bytes(averageBlockBytes) : "—"}</strong><small>{core ? `${core.recentBlocks.length} recent blocks${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small></div>
+        </div>
+        <div className={s.insight} data-motion-paused={coreDelayed}>
+          <span className={s.insightIcon}><NetworkIcon name="mining" /></span>
+          <div><h3>Block pace</h3><strong>{blockPace != null ? <>{pct(Math.abs(blockPace))}<span className={s.insightUnit}>{blockPace > 0 ? " faster" : blockPace < 0 ? " slower" : " · on target"}</span></> : "—"}</strong><small>{core ? `${core.sampleBlocks} blocks · ${core.targetBlockSeconds}s target${coreDelayed ? " · delayed" : ""}` : "Awaiting source"}</small></div>
+        </div>
+        <div className={s.insight} data-motion-paused={historyDelayed}>
+          <span className={s.insightIcon}><NetworkIcon name="network" /></span>
+          <div><h3>History behind live tip</h3><strong>{history?.lagBlocks != null ? <>{number.format(history.lagBlocks)}<span className={s.insightUnit}> blocks</span></> : "—"}</strong><small>{history?.coverageHeight != null ? `${periodLabels[period]} · through ${number.format(history.coverageHeight)}${historyDelayed ? " · delayed" : ""}` : "Coverage unavailable"}</small></div>
+        </div>
+      </section>
+
       <footer className={s.footer}>
-        <div className={s.sourceLink}><NetworkIcon name="globe" /><a href="https://zcashinfo.com/" target="_blank" rel="noreferrer">Data by Zcash Info</a><span>·</span><a href="https://api.zcashinfo.com/docs" target="_blank" rel="noreferrer" className={s.cardLink}>API <NetworkIcon name="external" /></a></div>
-      <details className={s.dataNotes} id="data-notes"><summary>Data notes</summary><div>
+        <div className={s.footerTop}>
+          <div className={s.sourceLink}><NetworkIcon name="globe" /><span>Powered by <a href="https://zcashinfo.com/" target="_blank" rel="noreferrer">Zcash Info</a></span><span className={s.footerDivider} aria-hidden="true" /><External href="https://api.zcashinfo.com/docs">API docs</External></div>
+          <div className={s.footerActions}>
+            <button className={s.insightsToggle} aria-expanded={insightsExpanded} aria-controls="network-insights" onClick={() => setInsightsExpanded(!insightsExpanded)}><NetworkIcon name="activity" />{insightsExpanded ? "Less insights" : "More insights"}<NetworkIcon name="chevron" /></button>
+            <button aria-expanded={notesExpanded} aria-controls="data-notes" onClick={() => setNotesExpanded(!notesExpanded)}>Data notes<NetworkIcon name="chevron" /></button>
+          </div>
+        </div>
+      <div className={s.dataNotes} id="data-notes" hidden={!notesExpanded}>
         <p><strong>Freshness.</strong> Readings refresh every 30 seconds. History uses the source&apos;s confirmed blocks and can lag the live tip; its coverage is shown in the chart. Block charts exclude incomplete intervals.</p>
         <p><strong>Network.</strong> Current averages use the latest {core?.sampleBlocks ?? 100} blocks and include coinbase transactions. Difficulty is from the latest block.{core && <> The block target is {core.targetBlockSeconds} seconds. This sample contains {number.format(Math.round(core.averageTxsPerBlock * core.sampleBlocks))} transactions, with an average difficulty of {short.format(core.averageDifficulty)}.</>}</p>
         <p><strong>Privacy.</strong> Shielded share uses all reported pool balances, including Lockbox. It measures ZEC holdings, not people or private transactions.</p>
         <p><strong>Mining.</strong> Distribution is the share of sampled blocks. Pool attribution is inferred by the explorer; unknown miners may share a group.</p>
         <p><strong>Supply.</strong> Reported on-chain supply differs from market circulating supply. Miner subsidy excludes fees. Halving estimates use the current block target and schedule.</p>
         <p><strong>Fees & mempool.</strong> Fees average the latest {core?.sampleBlocks ?? 100} blocks. Pending transactions reflect the explorer’s mempool view.</p>
-      </div></details>
-        <Link href="/" className={s.sourceLink}><NetworkIcon name="apps" />All apps</Link>
+        <p><strong>Insights.</strong> Transaction counts use the full block sample; average block size uses the recent blocks returned by the source. Each window is shown below its reading. Block pace compares observed block frequency with the source&apos;s target. Historical coverage refers to the selected range and may intentionally trail the live tip.</p>
+      </div>
       </footer>
     </main>
   </div>;
