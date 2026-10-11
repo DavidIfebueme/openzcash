@@ -117,7 +117,7 @@ export function Participate({ service, view = "proposals", children }: {
           <summary>How it works <span aria-hidden="true">+</span></summary>
           <dl>
             <div><dt>Participate</dt><dd>Sign in with an email code. Use free demo Zcred to comment, like or publish a public test proposal for 20 Zcred.</dd></div>
-            <div><dt>Verify</dt><dd>Open Read &amp; verify to download proposal files and receipts. New test proposals receive blockchain proof only after a separate confirmed anchor.</dd></div>
+            <div><dt>Verify</dt><dd>Open Read &amp; verify to download preserved files and available receipts. Test proposals stay in the demo; eligible applications from the official ZCG GitHub source receive separate Zcash anchors.</dd></div>
             <div><dt>Next</dt><dd>Starting with ZCG, with a vision for Coinholders, DAOs and sub-DAOs.</dd></div>
           </dl>
         </details>

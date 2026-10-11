@@ -29,6 +29,7 @@ it("distinguishes the 25 anchored mainnet records from new free demo submissions
   expect(html).toContain("Zcash mainnet");
   expect(html).toContain("1bb7383043cab4d72b7129b5e5bdc7441ac7c073af59679bb91403216b795bf1");
   expect(html).toContain("Sign in with an email code.");
-  expect(html).toContain("after a separate confirmed anchor");
+  expect(html).toContain("Test proposals stay in the demo");
+  expect(html).toContain("official ZCG GitHub source receive separate Zcash anchors");
   expect(html).not.toContain("timestamping is in preparation");
 });
