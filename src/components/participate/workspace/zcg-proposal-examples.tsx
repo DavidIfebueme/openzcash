@@ -95,7 +95,8 @@ export function ZcgVoteBar({ proposal, selection: controlledSelection, onSelecti
 
 const filters = [
   { value: "under_review", label: "Under review" },
-  { value: "approved", label: "Approved" }, { value: "rejected", label: "Rejected" }, { value: "abandoned", label: "Abandoned" }
+  { value: "approved", label: "Approved" }, { value: "rejected", label: "Rejected" }, { value: "abandoned", label: "Abandoned" },
+  { value: "closed", label: "Closed" }
 ] as const;
 type ProposalFilter = typeof filters[number]["value"];
 type ListedProposal = ZcgProposalExample | ZcgReviewProposal;
@@ -104,9 +105,7 @@ function listedOutcome(proposal: ListedProposal) {
   return proposal.outcome === "under_review" && source ? githubProposalOutcome(source) : proposal.outcome;
 }
 function listedFilter(proposal: ListedProposal): ProposalFilter {
-  const outcome = listedOutcome(proposal);
-  // Keep closures without a recorded decision discoverable, preserving their source status on the card.
-  return outcome === "closed" ? "under_review" : outcome;
+  return listedOutcome(proposal);
 }
 
 export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, renderActions, inline, toolbar, additionalRecords, additionalCount, committeeLabels = {}, filterResetKey = 0, filterTarget }: { proposals: readonly ListedProposal[]; filterResetKey?: number; filterTarget?: { recordId: string; fallback: ProposalFilter }; committeeLabels?: Record<string, string[]>; communityId?: string; archiveRecordIds?: string[]; renderActions?: (recordId: string) => ReactNode; toolbar?: ReactNode; additionalRecords?: (filter: ProposalFilter) => ReactNode; additionalCount?: (filter: ProposalFilter) => number; inline?: { isRecordOpen: (recordId: string) => boolean; toggleRecord: (recordId: string) => void; renderPanel: (recordId: string) => ReactNode } }) {
@@ -114,13 +113,15 @@ export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, 
   const target = proposals.find(proposal => proposal.id === filterTarget?.recordId);
   const targetFilter = target ? listedFilter(target) : filterTarget?.fallback ?? "under_review";
   const [selection, setSelection] = useState<{ filter: ProposalFilter; key: number }>({ filter: targetFilter, key: filterResetKey });
-  const filter = selection.key === filterResetKey ? selection.filter : targetFilter;
+  const hasClosed = proposals.some(proposal => listedFilter(proposal) === "closed") || (additionalCount?.("closed") ?? 0) > 0;
+  const selectedFilter = selection.key === filterResetKey ? selection.filter : targetFilter;
+  const filter = selectedFilter === "closed" && !hasClosed ? "under_review" : selectedFilter;
   const setFilter = (value: ProposalFilter) => setSelection({ filter: value, key: filterResetKey });
   const price = useProposalZecPrice(proposals.some(proposal => listedOutcome(proposal) === "approved" && !!zcgApprovedBudget(proposal.id)));
   const filtered = proposals.filter(proposal => listedFilter(proposal) === filter);
   return <div className="dao-zcg-examples">
     <div className="dao-proposal-tools" data-participate-tour="filters">
-      <div className="dao-filter-list" aria-label="Filter proposals">{filters.map(({ value, label }) => <button key={value} type="button" className={`dao-filter${filter === value ? " dao-filter--active" : ""}`} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</button>)}</div>
+      <div className="dao-filter-list" aria-label="Filter proposals">{filters.filter(item => item.value !== "closed" || hasClosed).map(({ value, label }) => <button key={value} type="button" className={`dao-filter${filter === value ? " dao-filter--active" : ""}`} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</button>)}</div>
       {toolbar}
     </div>
     {additionalRecords?.(filter)}

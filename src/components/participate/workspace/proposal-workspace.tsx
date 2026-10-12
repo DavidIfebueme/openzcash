@@ -20,9 +20,7 @@ import { zcgApprovedBudget } from "@/lib/participate/workspace/data/zcg-approved
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
 import { ProposalZecEstimate, useProposalZecPrice } from "@/components/participate/workspace/proposal-zec-estimate";
 function proposalFilter(proposal?: ProposalParticipation) {
-  const outcome = proposal?.sourceCapture?.proposal.outcome ?? (proposal?.abandonment ? "abandoned" : "under_review");
-  // A closure without an official verdict is not a rejection or an abandonment.
-  return outcome === "closed" ? "under_review" : outcome;
+  return proposal?.sourceCapture?.proposal.outcome ?? (proposal?.abandonment ? "abandoned" : "under_review");
 }
 
 export function ProposalWorkspace({ community, communities, viewer, board, initialProfile, initialCreditSummary, embedded = false, drafts = [], draftsUnavailable = false, initialRecordId, initialCommentId }: Omit<WorkspaceFrameProps, "children"> & { board: ProposalParticipationBoard; drafts?: SubmissionDraft[]; draftsUnavailable?: boolean; initialRecordId?: string; initialCommentId?: string }) {
