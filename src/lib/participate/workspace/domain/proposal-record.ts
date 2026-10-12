@@ -1,5 +1,6 @@
 import type { buildArchiveProof } from "@/lib/participate/workspace/archive/proof";
 import type { ProposalAbandonment } from "./proposal-submission";
+import type { SourceCapture } from "@/lib/participate/workspace/archive/source-proposals";
 
 /** Only public, verified record fields cross the lazy-reading boundary. */
 export type ProposalRecord = {
@@ -11,6 +12,7 @@ export type ProposalRecord = {
   submittedAt?: string;
   kind?: "HISTORICAL_SUMMARY" | "REVIEW_SNAPSHOT" | "NATIVE_PROPOSAL" | "SOURCE_PROPOSAL";
   application?: { applicant: string; requestedAmountUsd: string };
+  sourceCapture?: SourceCapture;
   abandonment?: ProposalAbandonment | null;
   capturedAt: string;
   markdown: string;

@@ -11,7 +11,7 @@ export type ProposalParticipation = {
   likedByMe: boolean;
   chargedBefore: boolean;
   abandonment?: ProposalAbandonment | null;
-  sourceCapture?: SourceCapture;
+  sourceCapture?: Pick<SourceCapture, "schema" | "checkedAt" | "proposal" | "source">;
 };
 export type ProposalParticipationBoard = {
   proposals: ProposalParticipation[];
