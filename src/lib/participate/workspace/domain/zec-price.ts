@@ -11,12 +11,22 @@ const priceSchema = z.object({
 /** Public market data only; never a payment quote, balance or settlement record. */
 export type PublicZecPrice = z.infer<typeof priceSchema>;
 
-function readZecPrice(input: unknown, now: Date, futureToleranceMs: number): PublicZecPrice {
+export const DISPLAY_ZEC_PRICE_TTL_MS = 60 * 60_000;
+
+/** Display estimates may use an hourly snapshot; payment quotes retain their shorter validity. */
+export function displayZecPriceExpiresAt(quotedAt: Date): Date {
+  if (!Number.isFinite(+quotedAt)) throw new Error("Invalid price time");
+  const nextDay = Date.UTC(quotedAt.getUTCFullYear(), quotedAt.getUTCMonth(), quotedAt.getUTCDate() + 1);
+  return new Date(Math.min(+quotedAt + DISPLAY_ZEC_PRICE_TTL_MS, nextDay));
+}
+
+function readZecPrice(input: unknown, now: Date, futureToleranceMs: number, display = false): PublicZecPrice {
   const price = priceSchema.parse(input);
   const quotedAt = new Date(price.quotedAt);
   const retrievedAt = new Date(price.retrievedAt);
   const expiresAt = fundingQuoteExpiresAt(quotedAt);
-  if (!Number.isFinite(+now) || +quotedAt > +now + futureToleranceMs || +expiresAt <= +now ||
+  const validUntil = display ? displayZecPriceExpiresAt(quotedAt) : expiresAt;
+  if (!Number.isFinite(+now) || +quotedAt > +now + futureToleranceMs || +validUntil <= +now ||
     Math.floor(+quotedAt / 86_400_000) !== Math.floor(+now / 86_400_000) ||
     BigInt(price.rateUsdPerZecE8) > MAX_RATE_USD_E8 || +retrievedAt < +quotedAt ||
     +retrievedAt > +now + futureToleranceMs || +retrievedAt >= +expiresAt ||
@@ -31,9 +41,9 @@ export function readFreshZecPrice(input: unknown, now = new Date()): PublicZecPr
   return readZecPrice(input, now, 0);
 }
 
-/** Browser display only: allow small clock skew, never extend the source's expiry. */
+/** Browser estimate only: hourly validity and small clock skew; preserve the original wire timestamps. */
 export function readDisplayZecPrice(input: unknown, now = new Date()): PublicZecPrice {
-  return readZecPrice(input, now, 2_000);
+  return readZecPrice(input, now, 2_000, true);
 }
 
 /** Two decimals for a compact estimate, rounded from exact zatoshis. */

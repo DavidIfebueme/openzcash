@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState } from "react";
 import type { ZcgApprovedBudget } from "@/lib/participate/workspace/data/zcg-approved-budgets";
 import { estimateFundingZat, formatUsdPerZec, FUNDING_QUOTE_SOURCE_URL } from "@/lib/participate/workspace/domain/funding-quote";
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
-import { formatEstimatedZec, readDisplayZecPrice, type PublicZecPrice } from "@/lib/participate/workspace/domain/zec-price";
+import { displayZecPriceExpiresAt, formatEstimatedZec, readDisplayZecPrice, type PublicZecPrice } from "@/lib/participate/workspace/domain/zec-price";
 
 export type PriceState = { status: "loading" | "ready" | "unavailable"; price: PublicZecPrice | null };
 const updatedFormat = new Intl.DateTimeFormat("en-US", {
@@ -16,7 +16,7 @@ export function useProposalZecPrice(enabled: boolean): PriceState {
   const [state, setState] = useState<PriceState>({ status: "loading", price: null });
   useEffect(() => {
     if (!state.price) return;
-    const expiry = setTimeout(() => setState({ status: "unavailable", price: null }), Math.max(0, +new Date(state.price.expiresAt) - Date.now()));
+    const expiry = setTimeout(() => setState({ status: "unavailable", price: null }), Math.max(0, +displayZecPriceExpiresAt(new Date(state.price.quotedAt)) - Date.now()));
     return () => clearTimeout(expiry);
   }, [state.price]);
   useEffect(() => {
@@ -25,8 +25,9 @@ export function useProposalZecPrice(enabled: boolean): PriceState {
     let pending: AbortController | null = null;
     let retry: ReturnType<typeof setTimeout> | undefined;
     let failures = 0;
+    let nextRefreshAt = 0;
     async function refresh() {
-      if (pending || document.visibilityState === "hidden") return;
+      if (pending || document.visibilityState === "hidden" || Date.now() < nextRefreshAt) return;
       clearTimeout(retry);
       const controller = new AbortController();
       pending = controller;
@@ -37,11 +38,12 @@ export function useProposalZecPrice(enabled: boolean): PriceState {
         const price = readDisplayZecPrice(await response.json());
         if (!active) return;
         failures = 0;
+        nextRefreshAt = +displayZecPriceExpiresAt(new Date(price.quotedAt));
         setState({ status: "ready", price });
       } catch {
         if (active) {
           failures += 1;
-          // A failed refresh does not invalidate a quote before its original expiry.
+          // A failed refresh does not invalidate a quote before its display expiry.
           // The independent expiry timer still removes it during prolonged outages.
           setState(current => {
             try {
@@ -54,7 +56,7 @@ export function useProposalZecPrice(enabled: boolean): PriceState {
         clearTimeout(timeout);
         pending = null;
         if (active) {
-          const delay = failures ? Math.min(15_000 * 2 ** Math.min(failures - 1, 2), 60_000) : 60_000;
+          const delay = failures ? Math.min(15_000 * 2 ** Math.min(failures - 1, 2), 60_000) : Math.max(0, nextRefreshAt - Date.now());
           retry = setTimeout(() => void refresh(), delay);
         }
       }
@@ -126,7 +128,7 @@ export function ProposalZecEstimate({ budget, state, ledgerImportedAt }: { budge
         {price ? <div><dt>1 ZEC</dt><dd>{formatUsdPerZec(price.rateUsdPerZecE8)} USD</dd></div> : null}
       </dl>
       {ledgerImportedAt ? <LedgerSync importedAt={ledgerImportedAt} /> : null}
-      {price ? <><p>Total grant estimate: USD budget ÷ current ZEC price. Prior payments aren’t deducted. Each payment uses its payment-day rate.</p><div className="proposal-zec-price-source"><a href={FUNDING_QUOTE_SOURCE_URL} target="_blank" rel="noopener noreferrer">CoinGecko ↗</a><time dateTime={price.quotedAt}>{updatedFormat.format(new Date(price.quotedAt))} UTC</time></div></> : <p>A fresh price is unavailable. We retry automatically; the approved USD budget stays the same.</p>}
+      {price ? <><p>Total grant estimate: USD budget ÷ ZEC price, refreshed hourly. Prior payments aren’t deducted. Each payment uses its payment-day rate.</p><div className="proposal-zec-price-source"><a href={FUNDING_QUOTE_SOURCE_URL} target="_blank" rel="noopener noreferrer">CoinGecko ↗</a><time dateTime={price.quotedAt}>{updatedFormat.format(new Date(price.quotedAt))} UTC</time></div></> : <p>A fresh price is unavailable. We retry automatically; the approved USD budget stays the same.</p>}
     </div> : null}
   </div>;
 }

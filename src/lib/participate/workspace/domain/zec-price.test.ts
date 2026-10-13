@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatEstimatedZec, readDisplayZecPrice, readFreshZecPrice } from "@/lib/participate/workspace/domain/zec-price";
+import { displayZecPriceExpiresAt, formatEstimatedZec, readDisplayZecPrice, readFreshZecPrice } from "@/lib/participate/workspace/domain/zec-price";
 import { zcgApprovedBudget, type ApprovedBudgetMap } from "@/lib/participate/workspace/data/zcg-approved-budgets";
 import { estimateFundingZat } from "@/lib/participate/workspace/domain/funding-quote";
 
@@ -84,10 +84,19 @@ describe("browser display clock tolerance", () => {
     const later = new Date(+now + 2_001);
     expect(() => readDisplayZecPrice({ ...input, quotedAt: later.toISOString(), retrievedAt: later.toISOString(), expiresAt: new Date(+later + 300_000).toISOString() }, now)).toThrow();
   });
-  it("provides no grace period at the original five-minute expiry", () => {
-    expect(readDisplayZecPrice(price, new Date("2026-10-10T12:04:59.999Z"))).toEqual(price);
-    expect(() => readDisplayZecPrice(price, new Date(price.expiresAt))).toThrow();
+  it("uses a one-hour display deadline without changing the five-minute payment quote", () => {
+    expect(readDisplayZecPrice(price, new Date(price.expiresAt))).toEqual(price);
+    expect(() => readFreshZecPrice(price, new Date(price.expiresAt))).toThrow();
+    expect(readDisplayZecPrice(price, new Date("2026-10-10T12:59:59.999Z"))).toEqual(price);
+    expect(displayZecPriceExpiresAt(now).toISOString()).toBe("2026-10-10T13:00:00.000Z");
+    expect(() => readDisplayZecPrice(price, new Date("2026-10-10T13:00:00.000Z"))).toThrow();
     expect(() => readDisplayZecPrice({ ...price, expiresAt: "2026-10-10T12:05:02.000Z" }, now)).toThrow();
+  });
+  it("does not renew the display window from retrieval time", () => {
+    const retrieved = { ...price, retrievedAt: "2026-10-10T12:04:00.000Z" };
+    expect(readDisplayZecPrice(retrieved, new Date("2026-10-10T12:59:59.999Z"))).toEqual(retrieved);
+    expect(() => readDisplayZecPrice(retrieved, new Date("2026-10-10T13:00:00.000Z"))).toThrow();
+    expect(displayZecPriceExpiresAt(new Date("2026-10-10T23:40:00Z")).toISOString()).toBe("2026-10-11T00:00:00.000Z");
   });
   it("neither carries an old price past UTC midnight nor accepts tomorrow's price early", () => {
     const old = { ...price, quotedAt: "2026-10-09T23:59:59.000Z", retrievedAt: "2026-10-09T23:59:59.000Z", expiresAt: "2026-10-10T00:00:00.000Z" };
