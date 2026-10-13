@@ -106,7 +106,7 @@ function RecordIcon({ section }: { section: RecordSection }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[section]} /></svg>;
 }
 
-function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void; sessionKey?: string; visible: boolean }) {
+function InlineRecord({ record, endpoint, onRevision, visible }: { record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void; sessionKey?: string; visible: boolean }) {
   const id = useId();
   const heading = useRef<HTMLElement>(null);
   const returnToHeading = useRef(false);
@@ -140,7 +140,7 @@ function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { r
   return <section className="proposal-inline-record" aria-label="Preserved proposal and verification">
     <CommitteeLabels ids={record.labels} />
     {record.abandonment ? <AbandonmentNotice value={record.abandonment} endpoint={endpoint} /> : null}
-    <header ref={heading} className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Pilot publication · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${source ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
+    <header ref={heading} className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Published on OpenZcash · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${source ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
       {record.revisions.length > 1 ? <label className="dao-comment-sort"><span className="dao-sr-only">Record revision</span><select value={record.revision} onChange={event => onRevision(Number(event.target.value))}>{record.revisions.map(item => <option key={item.revision} value={item.revision}>Revision {item.revision}{item.revision === record.revisions[0].revision ? " · Latest" : ""}</option>)}</select></label> : <span className="dao-eyebrow">Revision {record.revision}</span>}
     </header>
     <nav className="proposal-record-nav" aria-label="Record sections">

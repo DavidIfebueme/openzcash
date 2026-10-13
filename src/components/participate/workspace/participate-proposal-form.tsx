@@ -163,9 +163,9 @@ export function ParticipateProposalForm({ initial, drafts, signedIn, sandbox, ba
       </form>
       <aside className="participate-compose-aside">
         <section className="dao-panel participate-publication-card" aria-labelledby="participate-publication-title">
-          <header className="participate-publication-heading"><h2 id="participate-publication-title">Publication</h2><span className="participate-credit-badge">{sandbox ? "Demo" : "Coming soon"}</span></header>
+          <header className="participate-publication-heading"><h2 id="participate-publication-title">Publication</h2><span className="participate-credit-badge">{sandbox ? "Demo credits" : "Coming soon"}</span></header>
           <div className="participate-price"><strong>{SUBMISSION_PRICE.credits}</strong><span>Zcred</span></div>
-          <p className="participate-price-note">US${(SUBMISSION_PRICE.usdCents / 100).toFixed(2)} {sandbox ? "reference value · Free in this pilot" : "per proposal"}</p>
+          <p className="participate-price-note">US${(SUBMISSION_PRICE.usdCents / 100).toFixed(2)} {sandbox ? "reference value · Free demo credits" : "per proposal"}</p>
           <p className="participate-credit-rate">1 Zcred <span>= US${(SUBMISSION_PRICE.creditUsdCents / 100).toFixed(2)}</span></p>
           {mode !== "review" ? <><p className="participate-credit-description">Credits let you publish, comment and like. Drafts are free.</p>
           <details className="participate-credit-guide">
