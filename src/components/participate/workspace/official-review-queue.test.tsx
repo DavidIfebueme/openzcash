@@ -24,6 +24,22 @@ it("shows new applications before import without fake interactions or archive pr
   expect(html).not.toContain("Comments for zcg-github-486");
   expect(html).not.toContain("Preserved zcg-github-486");
 });
+it.each([
+  [486, "Konclave: taking the viewing key off the coordinator", ["Wallets", "Security"]],
+  [483, "CENTIREINGS Zcash Market Segmentation & Comparative Intelligence", ["Research &amp; development"]],
+  [481, "ZEC Order Pay: shielded ZEC checkout, refunds and creator payouts for service marketplaces", ["Applications", "Integration"]],
+  [480, "Skyhook and ESMASTe: Cross-chain Bridging, Messaging and Execution Layer", ["Integration", "Infrastructure"]],
+] as const)("shows OpenZcash categories for new issue %s before any source archive or ZCG label exists", (issueNumber, title, categories) => {
+  const fresh = { ...snapshot.proposals[0], issueNumber, title, url: `https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/${issueNumber}` };
+  const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+    board={{ ...board, proposals: [] }} initialOfficialProposals={{ ...snapshot, proposals: [fresh] }} />);
+  expect(html).toContain('aria-label="Proposal sectors"');
+  for (const category of categories) expect(html).toContain(`title="OpenZcash sector classification">${category}</li>`);
+  expect(html).toContain("Under review");
+  expect(html).toContain("Awaiting source import");
+  expect(html).not.toContain('aria-label="GitHub labels"');
+  expect(html).not.toContain(`Preserved zcg-github-${issueNumber}`);
+});
 it("uses current shared title, date and amount while retaining the archive and discussion identity", () => {
   const original = JSON.stringify(board);
   const html = render(snapshot);
