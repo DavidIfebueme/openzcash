@@ -106,6 +106,8 @@ function RecordIcon({ section }: { section: RecordSection }) {
 
 function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void; sessionKey?: string; visible: boolean }) {
   const id = useId();
+  const heading = useRef<HTMLElement>(null);
+  const returnToHeading = useRef(false);
   const [selected, setSelected] = useState<RecordSection>("proposal");
   const [visited, setVisited] = useState<RecordSection[]>(["proposal"]);
   const download = `${endpoint}/revisions/${record.revision}`;
@@ -119,14 +121,23 @@ function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { r
     { key: "review", title: "Signed review", detail: "Independent pilot" },
     { key: "activity", title: "Activity", detail: "Comments & likes" },
   ];
+  useEffect(() => {
+    if (!returnToHeading.current) return;
+    returnToHeading.current = false;
+    if (visible) heading.current?.scrollIntoView?.({ block: "start", behavior: "instant" });
+  }, [selected, visible]);
   function selectSection(section: RecordSection) {
+    if (section === activeSection) return;
+    // The sticky navigation may remain visible after the record heading has left
+    // the viewport. Restore that context after the shorter panel is rendered.
+    returnToHeading.current = Boolean(heading.current && heading.current.getBoundingClientRect().top < 72);
     setSelected(section);
     setVisited(previous => previous.includes(section) ? previous : [...previous, section]);
   }
   return <section className="proposal-inline-record" aria-label="Preserved proposal and verification">
     <CommitteeLabels ids={record.labels} />
     {record.abandonment ? <AbandonmentNotice value={record.abandonment} endpoint={endpoint} /> : null}
-    <header className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Pilot publication · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${source ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
+    <header ref={heading} className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Pilot publication · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${source ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
       {record.revisions.length > 1 ? <label className="dao-comment-sort"><span className="dao-sr-only">Record revision</span><select value={record.revision} onChange={event => onRevision(Number(event.target.value))}>{record.revisions.map(item => <option key={item.revision} value={item.revision}>Revision {item.revision}{item.revision === record.revisions[0].revision ? " · Latest" : ""}</option>)}</select></label> : <span className="dao-eyebrow">Revision {record.revision}</span>}
     </header>
     <nav className="proposal-record-nav" aria-label="Record sections">

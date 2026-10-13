@@ -3194,7 +3194,7 @@
 .oz-participate .proposal-inline-discussion .dao-comment-body { font-size: 14px; line-height: 1.7; }
 .oz-participate .proposal-inline-signin { margin-bottom: 18px; }
 .oz-participate .proposal-inline-state { display: flex; gap: 12px; align-items: center; padding: 24px 0; color: var(--dao-muted); font-size: 14px; }
-.oz-participate .proposal-inline-record-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 0 0 24px; }
+.oz-participate .proposal-inline-record-heading { scroll-margin-top: 80px; display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 0 0 24px; }
 .oz-participate .proposal-inline-record h3 { margin: 0; font-size: 20px; }
 .oz-participate .proposal-inline-record-heading p { color: var(--dao-muted); font-size: 12px; margin: 7px 0 0; }
 .oz-participate .proposal-inline-record > .dao-markdown { max-width: 80ch; font-size: 14px; }
