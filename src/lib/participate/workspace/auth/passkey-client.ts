@@ -36,6 +36,12 @@ export function requirePasskeyBrowser() {
   if (!window.isSecureContext || !browserSupportsWebAuthn()) throw new Error("PASSKEY_UNSUPPORTED");
 }
 
+// A synced key may exist even when this browser has never visited the site.
+export function passkeyBrowserAvailable() {
+  try { requirePasskeyBrowser(); return true; }
+  catch { return false; }
+}
+
 export async function passkeyFetch<T>(url: string, body?: unknown, method = "POST"): Promise<T> {
   const response = await fetch(url, {
     method, credentials: "same-origin", cache: "no-store",

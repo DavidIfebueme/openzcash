@@ -83,7 +83,7 @@ export function PasskeySettings({ onSavingChange, compact = false }: { onSavingC
 
   return <section className="dao-settings-content dao-passkeys" aria-label="Passkey settings">
     {compact ? null : <h3 className="dao-settings-section-title">Optional passkey</h3>}
-    <p className="dao-settings-description">{compact ? "Sign in with your fingerprint, face or device PIN." : "Add a shortcut with your fingerprint, face or device PIN after signing in by email."}</p>
+    <p className="dao-settings-description">Sign in with your fingerprint, face or device PIN. Verify your email once to add a passkey; email stays available for account recovery.</p>
     {loading ? <p role="status">Loading passkeys…</p> : loadError ? <><p className="dao-form-error" role="alert">{loadError}</p><PasskeyLocalhostLink /><button type="button" className="dao-button" onClick={() => { setLoading(true); setReload(value => value + 1); }}>Try again</button></> : !access.canManage ? <p className="dao-settings-privacy-note">Passkeys are off for the demo profile. Add one later in your own verified account.</p> : <>
       <ul className="dao-passkey-list">{keys.map(key => <li key={key.id}><PasskeyIcon /><div><strong>{key.label}</strong><small>{key.lastUsedAt ? `Last used ${new Date(key.lastUsedAt).toLocaleDateString("en", { month: "short", day: "numeric", year: "numeric" })}` : "Ready to use"}</small></div><button type="button" className="dao-text-button" disabled={pending || !access.emailAvailable} aria-label={`Remove ${key.label}`} onClick={() => begin(key)}>Remove</button></li>)}</ul>
       {!keys.length && !mode ? <p className="dao-passkey-empty">No passkeys yet.</p> : null}

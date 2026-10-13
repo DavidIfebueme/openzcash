@@ -1,5 +1,23 @@
 # Participate pilot
 
+## Member passkeys · 12 October 2026
+
+The native public workspace supports optional passkeys at `https://openzcash.org`.
+First sign in with an email code, then open **Account → Profile → Passkeys → Add passkey**.
+Adding or removing a key requires a fresh email confirmation. Future sign-ins can use
+**Continue with passkey** without another email code; email remains the recovery path.
+The login button depends on browser support, not local storage, so synchronized keys
+remain usable from another browser. No device prompt runs until the member clicks.
+Passkeys authenticate an existing account and do not grant committee permissions.
+
+Production API checks confirmed the `openzcash.org` RP, required user verification,
+401 for anonymous management and 403 for a foreign origin. The authenticated public
+profile loaded the key list and offered **Add passkey**. Real-device enrollment and
+subsequent sign-in must still be completed by the account holder; synthetic tests
+do not establish that acceptance.
+
+## Initial pilot record
+
 10 October 2026 · Local implementation · Not deployed
 
 `/zcg/participate` replaces the standalone Decisions navigation entry. Both `/decisions` and `/zcg/decisions` redirect permanently to `/zcg/participate?view=history`. The history retains the existing ZCG data, publication policy, filters, CSV export and source links. Failed history retrieval is unavailable, not zero decisions.

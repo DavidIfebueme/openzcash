@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { navigateAfterSignIn, safeAuthNext } from "@/lib/participate/workspace/auth/redirect";
 import { emailErrorMessage, emailFetch } from "@/lib/participate/workspace/auth/email-client";
-import { passkeyErrorMessage, signInWithPasskey, hasSavedPasskey } from "@/lib/participate/workspace/auth/passkey-client";
+import { passkeyErrorMessage, signInWithPasskey, passkeyBrowserAvailable } from "@/lib/participate/workspace/auth/passkey-client";
 import { useParticipateHost } from "@/components/participate/workspace/participate-bridge";
 
 const noSubscription = () => () => {};
@@ -17,7 +17,7 @@ export function WorkspaceSignInForm({ next = "/zcg/participate", errorCode, onSu
   const [pending, setPending] = useState(false);
   const [retryAt, setRetryAt] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  const savedPasskey = useSyncExternalStore(noSubscription, hasSavedPasskey, () => false);
+  const passkeyAvailable = useSyncExternalStore(noSubscription, passkeyBrowserAvailable, () => false);
   const [error, setError] = useState(errorCode ? "Sign in with a code sent to your email." : "");
   const errorRef = useRef<HTMLParagraphElement>(null);
   const codeRef = useRef<HTMLInputElement>(null);
@@ -76,7 +76,7 @@ export function WorkspaceSignInForm({ next = "/zcg/participate", errorCode, onSu
     <button type="submit" className="dao-auth-submit" disabled={pending || !options?.emailAvailable}>{!options ? "Loading…" : pending ? "Please wait…" : sent ? "Verify and continue" : "Continue with email"}</button>
     {sent ? <div className="dao-auth-code-actions"><button type="button" className="dao-text-button" disabled={pending || seconds > 0} onClick={() => void run(sendCode)}>{seconds > 0 ? `Resend in ${seconds}s` : "Resend code"}</button><button type="button" className="dao-text-button" disabled={pending} onClick={() => { setSent(false); setError(""); }}>Change email</button></div> : options && !options.emailAvailable ? <p className="dao-auth-note">{options.demoAvailable ? "Email sign-in is being set up. You can explore the participant demo." : "Email sign-in is not available yet. You can still browse proposals."}</p> : options ? <p className="dao-auth-note">New here? Your first code creates your account.</p> : null}
     {options?.demoAvailable ? <><div className="dao-auth-divider"><span>Try it first</span></div><button type="button" className="dao-auth-submit dao-auth-submit--secondary" disabled={pending} onClick={() => void run(() => enterDemo())}>Participant demo</button><p className="dao-auth-note">Propose, comment and like with free demo Zcred.</p><button type="button" className="dao-text-button" disabled title="Admin access only">Committee demo</button></> : null}
-    {savedPasskey ? <button type="button" className="dao-text-button" disabled={pending} onClick={() => void run(async () => finish(await signInWithPasskey(destination)), true)}>Use a saved passkey</button> : null}
+    {passkeyAvailable ? <button type="button" className="dao-auth-submit dao-auth-submit--secondary" disabled={pending} onClick={() => void run(async () => finish(await signInWithPasskey(destination)), true)}>Continue with passkey</button> : null}
     <details className="dao-auth-help"><summary>Have a voting invitation?</summary><p>Open your one-time invite link to access your proposal.</p></details>
   </form>;
 }
@@ -126,7 +126,7 @@ function WorkspaceSignInDialog({ next, onClose, restoreFocus }: {
     <button className="dao-auth-close" type="button" aria-label="Close sign in" onClick={onClose}><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
     <span className="dao-zcash-mark dao-auth-mark" aria-hidden="true" />
     <h2 id={`${id}-title`}>Welcome back</h2>
-    <p id={`${id}-description`} className="dao-auth-description">Your email. A code. You’re in.</p>
+    <p id={`${id}-description`} className="dao-auth-description">Use your email or a passkey you’ve already added.</p>
     <WorkspaceSignInForm next={next} onSuccess={onClose} />
   </dialog>;
 }
