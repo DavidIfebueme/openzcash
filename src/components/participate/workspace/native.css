@@ -68,3 +68,6 @@
 .oz-participate:has(.dao-theme-root[data-theme="dark"])::before {
   display: none;
 }
+
+/* Keep the amount and currency together beside long approved proposal titles. */
+.oz-participate .proposal-zec-trigger strong { white-space: nowrap; }

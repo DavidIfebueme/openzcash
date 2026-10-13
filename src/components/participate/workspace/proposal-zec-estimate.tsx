@@ -6,7 +6,7 @@ import { estimateFundingZat, formatUsdPerZec, FUNDING_QUOTE_SOURCE_URL } from "@
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
 import { formatEstimatedZec, readDisplayZecPrice, type PublicZecPrice } from "@/lib/participate/workspace/domain/zec-price";
 
-type PriceState = { status: "loading" | "ready" | "unavailable"; price: PublicZecPrice | null };
+export type PriceState = { status: "loading" | "ready" | "unavailable"; price: PublicZecPrice | null };
 const updatedFormat = new Intl.DateTimeFormat("en-US", {
   month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "UTC"
 });
@@ -72,7 +72,23 @@ export function useProposalZecPrice(enabled: boolean): PriceState {
   return state;
 }
 
-export function ProposalZecEstimate({ budget, state }: { budget: ZcgApprovedBudget; state: PriceState }) {
+const ledgerUpdatedFormat = new Intl.DateTimeFormat("en-US", {
+  month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false, timeZone: "UTC",
+});
+
+/** Only mounted inside the popover; keep its freshness current while it stays open. */
+function LedgerSync({ importedAt }: { importedAt: string }) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(timer);
+  }, []);
+  const imported = Date.parse(importedAt);
+  if (!Number.isFinite(imported)) return null;
+  return <p className="proposal-zec-ledger-sync">Ledger synced <time dateTime={importedAt}>{ledgerUpdatedFormat.format(new Date(imported))} UTC</time>{now - imported > 12 * 60 * 60 * 1000 ? <strong> · Sync delayed</strong> : null}</p>;
+}
+
+export function ProposalZecEstimate({ budget, state, ledgerImportedAt }: { budget: ZcgApprovedBudget; state: PriceState; ledgerImportedAt?: string }) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
@@ -104,10 +120,12 @@ export function ProposalZecEstimate({ budget, state }: { budget: ZcgApprovedBudg
     </button>
     {open ? <div id={id} className="proposal-zec-detail" role="region" aria-label="ZEC estimate details">
       <div className="proposal-zec-detail-heading"><strong>At today’s rate</strong><button type="button" aria-label="Close ZEC estimate" onClick={() => { setOpen(false); button.current?.focus(); }}>×</button></div>
+      <p>Official ZCG spreadsheet · {budget.sourceRows.length} funding {budget.sourceRows.length === 1 ? "entry" : "entries"}</p>
       <dl>
-        <div><dt><a href={budget.sourceUrl} target="_blank" rel="noopener noreferrer">Approved budget ↗</a></dt><dd>{formatProposalUsd(budget.usdCents)}</dd></div>
+        <div><dt><a href={budget.sourceUrl} target="_blank" rel="noopener noreferrer">Official approved budget ↗</a></dt><dd>{formatProposalUsd(budget.usdCents)}</dd></div>
         {price ? <div><dt>1 ZEC</dt><dd>{formatUsdPerZec(price.rateUsdPerZecE8)} USD</dd></div> : null}
       </dl>
+      {ledgerImportedAt ? <LedgerSync importedAt={ledgerImportedAt} /> : null}
       {price ? <><p>Total grant estimate: USD budget ÷ current ZEC price. Prior payments aren’t deducted. Each payment uses its payment-day rate.</p><div className="proposal-zec-price-source"><a href={FUNDING_QUOTE_SOURCE_URL} target="_blank" rel="noopener noreferrer">CoinGecko ↗</a><time dateTime={price.quotedAt}>{updatedFormat.format(new Date(price.quotedAt))} UTC</time></div></> : <p>A fresh price is unavailable. We retry automatically; the approved USD budget stays the same.</p>}
     </div> : null}
   </div>;

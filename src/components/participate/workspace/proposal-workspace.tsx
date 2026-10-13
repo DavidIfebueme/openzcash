@@ -16,14 +16,16 @@ import { CommitteeLabels } from "@/components/participate/workspace/committee-la
 import { ZcgProposalLabels } from "@/components/participate/workspace/zcg-proposal-labels";
 import { AbandonmentNotice, SubmissionLifecycleAction } from "@/components/participate/workspace/submission-lifecycle";
 
-import { zcgApprovedBudget } from "@/lib/participate/workspace/data/zcg-approved-budgets";
+import { zcgApprovedBudget, type ApprovedBudgetSnapshot } from "@/lib/participate/workspace/data/zcg-approved-budgets";
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
 import { ProposalZecEstimate, useProposalZecPrice } from "@/components/participate/workspace/proposal-zec-estimate";
+import { useApprovedProposalBudgets, budgetStatusText } from "./approved-proposal-budgets";
+
 function proposalFilter(proposal?: ProposalParticipation) {
   return proposal?.sourceCapture?.proposal.outcome ?? (proposal?.abandonment ? "abandoned" : "under_review");
 }
 
-export function ProposalWorkspace({ community, communities, viewer, board, initialProfile, initialCreditSummary, embedded = false, drafts = [], draftsUnavailable = false, initialRecordId, initialCommentId }: Omit<WorkspaceFrameProps, "children"> & { board: ProposalParticipationBoard; drafts?: SubmissionDraft[]; draftsUnavailable?: boolean; initialRecordId?: string; initialCommentId?: string }) {
+export function ProposalWorkspace({ community, communities, viewer, board, initialProfile, initialCreditSummary, embedded = false, drafts = [], draftsUnavailable = false, initialRecordId, initialCommentId, initialBudgets = null }: Omit<WorkspaceFrameProps, "children"> & { board: ProposalParticipationBoard; drafts?: SubmissionDraft[]; draftsUnavailable?: boolean; initialRecordId?: string; initialCommentId?: string; initialBudgets?: ApprovedBudgetSnapshot | null }) {
   const [panels, setPanels] = useState<Record<string, ProposalPanel | null>>(initialRecordId ? { [initialRecordId]: initialCommentId ? "discussion" : "record" } : {});
   const [commentTarget, setCommentTarget] = useState({ recordId: initialRecordId, id: initialCommentId, request: 0 });
   useEffect(() => {
@@ -40,7 +42,10 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
   const ids = board.proposals.map(proposal => proposal.recordId);
   const examples = [...ZCG_REVIEW_PROPOSALS, ...ZCG_PROPOSAL_EXAMPLES].filter(proposal => ids.includes(proposal.id) && !board.proposals.find(row => row.recordId === proposal.id)?.sourceCapture);
   const other = board.proposals.filter(proposal => !examples.some(example => example.id === proposal.recordId));
-  const price = useProposalZecPrice(other.some(proposal => proposal.sourceCapture?.proposal.outcome === "approved" && !!zcgApprovedBudget(proposal.recordId)));
+  const budgetState = useApprovedProposalBudgets(initialBudgets);
+  const approvedBudgets = budgetState.snapshot?.budgets ?? {};
+  const ledgerImportedAt = budgetState.snapshot?.importedAt;
+  const price = useProposalZecPrice(Object.keys(approvedBudgets).length > 0);
   function toggle(recordId: string, panel: ProposalPanel) { setPanels(previous => ({ ...previous, [recordId]: previous[recordId] === panel ? null : panel })); }
   function close(recordId: string) {
     const trigger = document.getElementById(`proposal-${panels[recordId] === "discussion" ? "comments" : "read"}-${recordId}`);
@@ -56,9 +61,9 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
     return rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
       const mine = drafts.find(draft => draft.recordId === proposal.recordId);
       const captured = proposal.sourceCapture;
-      const approvedBudget = captured?.proposal.outcome === "approved" ? zcgApprovedBudget(proposal.recordId) : null;
-      return <li className="dao-proposal-row" key={proposal.recordId}>
-        <div className="dao-proposal-card-heading"><h2 className="dao-proposal-heading"><button type="button" className="dao-proposal-title proposal-title-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>{captured?.proposal.title ?? proposal.title}</button></h2>{approvedBudget ? <div className="dao-zcg-budget" data-approved role="group" aria-label={`Previously recorded approved budget: ${formatProposalUsd(approvedBudget.usdCents)}`}><div className="dao-zcg-budget-amount"><strong>{formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "")}</strong><span>USD</span></div><span>Previously approved budget</span><ProposalZecEstimate budget={approvedBudget} state={price} /></div> : !captured ? <span className={`dao-status${proposal.abandonment ? " dao-status--abandoned" : ""}`}>{proposal.abandonment ? "Abandoned" : "Published in demo"}</span> : null}</div>
+      const approvedBudget = captured?.proposal.outcome === "approved" ? zcgApprovedBudget(approvedBudgets, proposal.recordId, captured?.source) : null;
+      return <li className={`dao-proposal-row${captured?.proposal.outcome === "approved" ? " dao-zcg-proposal" : ""}`} key={proposal.recordId}>
+        <div className="dao-proposal-card-heading dao-zcg-card-heading"><h2 className="dao-proposal-heading"><button type="button" className="dao-proposal-title proposal-title-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>{captured?.proposal.title ?? proposal.title}</button></h2>{approvedBudget ? <div className="dao-zcg-budget" data-approved role="group" aria-label={`Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}`}><div className="dao-zcg-budget-amount"><strong>{formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "")}</strong><span>USD</span></div><ProposalZecEstimate budget={approvedBudget} state={price} ledgerImportedAt={ledgerImportedAt} /></div> : captured?.proposal.outcome === "approved" ? <div className="dao-zcg-budget" role="status">{budgetStatusText(budgetState.status)}</div> : !captured ? <span className={`dao-status${proposal.abandonment ? " dao-status--abandoned" : ""}`}>{proposal.abandonment ? "Abandoned" : "Published in demo"}</span> : null}</div>
         {captured ? <><p className="dao-proposal-created">Submitted {new Date(captured.proposal.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })} · @{captured.proposal.applicant}</p><ZcgProposalLabels recordId={proposal.recordId} title={captured.proposal.title} tags={captured.proposal.tags} sourceOverride={captured.source} outcome={captured.proposal.outcome} committeeLabels={proposal.labels} /><p className="dao-proposal-created">Source checked <time dateTime={captured.checkedAt}>{new Date(captured.checkedAt).toLocaleString("en-US", { timeZone: "UTC", timeZoneName: "short" })}</time></p></> : <CommitteeLabels ids={proposal.labels} />}
         {proposal.abandonment ? <AbandonmentNotice value={proposal.abandonment} endpoint={`/api/communities/${encodeURIComponent(community.id)}/archives/${encodeURIComponent(proposal.recordId)}`} /> : null}
         <div className="dao-proposal-card-footer">{renderActions(proposal.recordId)}<button id={`proposal-read-${proposal.recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button></div>
@@ -73,7 +78,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       {embedded ? <ParticipateTour signedIn={Boolean(viewer)} canUseCredits={Boolean(viewer && viewer.canEditProfile !== false)} /> : null}
       <ProposalEconomyNotice />
       {draftsUnavailable ? <p className="proposal-economy-warning" role="status">Your proposals and drafts could not be loaded. <a className="dao-text-button" href="/zcg/participate">Try again</a></p> : null}
-      {ids.length ? <ZcgProposalExamples filterResetKey={commentTarget.request} filterTarget={commentTarget.recordId ? { recordId: commentTarget.recordId, fallback: proposalFilter(board.proposals.find(row => row.recordId === commentTarget.recordId)) } : undefined} committeeLabels={Object.fromEntries(board.proposals.map(row => [row.recordId, row.labels ?? []]))} proposals={examples} communityId={community.id} archiveRecordIds={ids} renderActions={renderActions} toolbar={toolbar} additionalRecords={additionalRecords} additionalCount={filter => nativeRecords(filter).length} inline={{ isRecordOpen: recordId => panels[recordId] === "record", toggleRecord: recordId => toggle(recordId, "record"), renderPanel }} /> : toolbar}
+      {ids.length ? <ZcgProposalExamples ledgerImportedAt={ledgerImportedAt} approvedBudgets={approvedBudgets} budgetStatus={budgetState.status} price={price} filterResetKey={commentTarget.request} filterTarget={commentTarget.recordId ? { recordId: commentTarget.recordId, fallback: proposalFilter(board.proposals.find(row => row.recordId === commentTarget.recordId)) } : undefined} committeeLabels={Object.fromEntries(board.proposals.map(row => [row.recordId, row.labels ?? []]))} proposals={examples} communityId={community.id} archiveRecordIds={ids} renderActions={renderActions} toolbar={toolbar} additionalRecords={additionalRecords} additionalCount={filter => nativeRecords(filter).length} inline={{ isRecordOpen: recordId => panels[recordId] === "record", toggleRecord: recordId => toggle(recordId, "record"), renderPanel }} /> : toolbar}
       {!ids.length ? <div className="dao-empty-state"><p>No public proposals yet.</p><Link href="/zcg/participate?view=history" className="dao-text-button">View decision history →</Link></div> : null}
     </ProposalEconomyProvider>
   </WorkspaceFrame>;

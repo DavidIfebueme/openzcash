@@ -9,9 +9,11 @@ import { ZCG_REVIEW_CHECKED_AT } from "@/lib/participate/workspace/data/zcg-revi
 import type { ZcgReviewProposal } from "@/lib/participate/workspace/domain/zcg-review";
 import { zcgSourceMetadata, ZCG_SOURCE_CHECKED_AT } from "@/lib/participate/workspace/data/zcg-source-metadata";
 import { githubProposalOutcome } from "@/lib/participate/workspace/domain/zcg-source-metadata";
-import { zcgApprovedBudget } from "@/lib/participate/workspace/data/zcg-approved-budgets";
+import { zcgApprovedBudget, type ApprovedBudgetMap, type ApprovedBudgetStatus } from "@/lib/participate/workspace/data/zcg-approved-budgets";
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
-import { ProposalZecEstimate, useProposalZecPrice } from "@/components/participate/workspace/proposal-zec-estimate";
+import { ProposalZecEstimate, type PriceState } from "@/components/participate/workspace/proposal-zec-estimate";
+
+import { budgetStatusText } from "./approved-proposal-budgets";
 
 const voteLabels = { approve: "Approve", reject: "Reject", abstain: "Abstain" };
 const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
@@ -108,7 +110,7 @@ function listedFilter(proposal: ListedProposal): ProposalFilter {
   return listedOutcome(proposal);
 }
 
-export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, renderActions, inline, toolbar, additionalRecords, additionalCount, committeeLabels = {}, filterResetKey = 0, filterTarget }: { proposals: readonly ListedProposal[]; filterResetKey?: number; filterTarget?: { recordId: string; fallback: ProposalFilter }; committeeLabels?: Record<string, string[]>; communityId?: string; archiveRecordIds?: string[]; renderActions?: (recordId: string) => ReactNode; toolbar?: ReactNode; additionalRecords?: (filter: ProposalFilter) => ReactNode; additionalCount?: (filter: ProposalFilter) => number; inline?: { isRecordOpen: (recordId: string) => boolean; toggleRecord: (recordId: string) => void; renderPanel: (recordId: string) => ReactNode } }) {
+export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, renderActions, inline, toolbar, additionalRecords, additionalCount, committeeLabels = {}, filterResetKey = 0, filterTarget, ledgerImportedAt, approvedBudgets = {}, budgetStatus = "loading", price = { status: "loading", price: null } }: { ledgerImportedAt?: string; approvedBudgets?: ApprovedBudgetMap; budgetStatus?: ApprovedBudgetStatus; price?: PriceState; proposals: readonly ListedProposal[]; filterResetKey?: number; filterTarget?: { recordId: string; fallback: ProposalFilter }; committeeLabels?: Record<string, string[]>; communityId?: string; archiveRecordIds?: string[]; renderActions?: (recordId: string) => ReactNode; toolbar?: ReactNode; additionalRecords?: (filter: ProposalFilter) => ReactNode; additionalCount?: (filter: ProposalFilter) => number; inline?: { isRecordOpen: (recordId: string) => boolean; toggleRecord: (recordId: string) => void; renderPanel: (recordId: string) => ReactNode } }) {
   const [feedback, setFeedback] = useState<(FeedbackSelection & { proposalId: string }) | null>(null);
   const target = proposals.find(proposal => proposal.id === filterTarget?.recordId);
   const targetFilter = target ? listedFilter(target) : filterTarget?.fallback ?? "under_review";
@@ -117,7 +119,6 @@ export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, 
   const selectedFilter = selection.key === filterResetKey ? selection.filter : targetFilter;
   const filter = selectedFilter === "closed" && !hasClosed ? "under_review" : selectedFilter;
   const setFilter = (value: ProposalFilter) => setSelection({ filter: value, key: filterResetKey });
-  const price = useProposalZecPrice(proposals.some(proposal => listedOutcome(proposal) === "approved" && !!zcgApprovedBudget(proposal.id)));
   const filtered = proposals.filter(proposal => listedFilter(proposal) === filter);
   return <div className="dao-zcg-examples">
     <div className="dao-proposal-tools" data-participate-tour="filters">
@@ -128,11 +129,11 @@ export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, 
     <ul className="dao-proposal-list dao-zcg-list">{filtered.map(proposal => {
       const inReview = proposal.outcome === "under_review";
       const outcome = listedOutcome(proposal);
-      const approvedBudget = outcome === "approved" ? zcgApprovedBudget(proposal.id) : null;
+      const approvedBudget = outcome === "approved" ? zcgApprovedBudget(approvedBudgets, proposal.id) : null;
       const proposalDate = inReview ? proposal.submittedAt : `${proposal.decisionDate}T12:00:00Z`;
       const participation = inReview ? null : summarizeZcgParticipation(proposal.votes);
       const votes = inReview ? null : summarizeZcgVotes(proposal.votes);
-      const budget = approvedBudget ? formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "") : proposal.requestedUsd === null ? null : dollars.format(proposal.requestedUsd);
+      const budget = approvedBudget ? formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "") : outcome === "approved" || proposal.requestedUsd === null ? null : dollars.format(proposal.requestedUsd);
       return <li key={proposal.id} className="dao-proposal-row dao-zcg-proposal">
       <div className="dao-proposal-card-heading dao-zcg-card-heading">
         <div className="dao-zcg-title-line">
@@ -142,9 +143,9 @@ export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, 
             <div className="dao-proposal-created"><time dateTime={proposalDate}>{inReview ? "Submitted " : ""}{dateFormat.format(new Date(proposalDate))}</time>{participation ? <><span aria-hidden="true">·</span><span className="dao-zcg-turnout" aria-label={`Committee turnout: ${participation.turnoutPercent}%, ${participation.recorded} of ${participation.eligible} members`} title="Turnout counts all recorded positions, including abstentions.">{participation.turnoutPercent}% turnout <span>· {participation.recorded}/{participation.eligible} members</span></span></> : null}</div>
           </div>
         </div>
-        <div className="dao-zcg-budget" data-approved={!!approvedBudget} role="group" aria-label={approvedBudget ? `Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}` : budget ? `Requested budget: ${budget} USD` : "Amount not specified"}>
-          {budget ? <div className="dao-zcg-budget-amount"><strong>{budget}</strong><span>USD{!approvedBudget ? " requested" : ""}</span></div> : <span>Amount not specified</span>}
-          {approvedBudget ? <ProposalZecEstimate budget={approvedBudget} state={price} /> : null}
+        <div className="dao-zcg-budget" data-approved={!!approvedBudget} role="group" aria-label={approvedBudget ? `Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}` : budget ? `Requested budget: ${budget} USD` : outcome === "approved" ? budgetStatusText(budgetStatus) : "Amount not specified"}>
+          {budget ? <div className="dao-zcg-budget-amount"><strong>{budget}</strong><span>USD{!approvedBudget ? " requested" : ""}</span></div> : <span>{outcome === "approved" ? budgetStatusText(budgetStatus) : "Amount not specified"}</span>}
+          {approvedBudget ? <ProposalZecEstimate budget={approvedBudget} state={price} ledgerImportedAt={ledgerImportedAt} /> : null}
         </div>
       </div>
       <ZcgProposalLabels recordId={proposal.id} title={proposal.title} tags={proposal.tags} committeeLabels={committeeLabels[proposal.id]} outcome={outcome} />
@@ -153,6 +154,6 @@ export function ZcgProposalExamples({ proposals, communityId, archiveRecordIds, 
       {inline?.renderPanel(proposal.id)}
     </li>; })}</ul>
     {filtered.length === 0 && !additionalCount?.(filter) ? <div className="dao-empty-state"><p>{filter === "abandoned" ? "No abandoned proposals." : "No matching proposals."}</p></div> : null}
-    <details className="dao-zcg-method"><summary>Sources & methodology</summary><p><strong>Labels & categories last checked:</strong> <time dateTime={ZCG_SOURCE_CHECKED_AT}>{dateFormat.format(new Date(ZCG_SOURCE_CHECKED_AT))}</time>.</p><p>Applications were captured on {dateFormat.format(new Date(ZCG_REVIEW_CHECKED_AT))}. GitHub labels and applicant categories are cross-checked with the <a href="https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues" target="_blank" rel="noopener noreferrer">official ZCG tracker ↗</a>. Terminal labels override a leftover review label in this list. These are dated snapshots; follow each source for updates.</p><p>GitHub labels retain their original names and colors. The current status stays visible; additional workflow labels are under “+ labels”. Sectors combine the applicant’s category with OpenZcash classification; hover a sector for its origin. Local committee annotations appear separately. Updating source metadata does not rewrite preserved files, create a pilot decision or confirm a payment.</p><p>The five historical decisions were checked on October 9, 2026. Support is approvals divided by the five committee seats. Turnout is the share of members with a recorded position, including abstentions. Pending applications have no vote percentage. Approved budgets were checked against the minutes on October 10, 2026; other amounts remain requests. ZEC estimates convert the entire approved budget at the current CoinGecko price, checked every minute and accepted for at most five minutes. They exclude fees and do not deduct previous payments. Each payment uses its payment-day rate; a market estimate is not a payment record.</p><p>Feedback is a summary of published minutes. Local likes and comments do not change committee votes. Public profile images come from <a href="https://openzcash.org/zcg/committee" target="_blank" rel="noopener noreferrer">OpenZcash’s committee directory ↗</a>.</p></details>
+    <details className="dao-zcg-method"><summary>Sources & methodology</summary><p><strong>Labels & categories last checked:</strong> <time dateTime={ZCG_SOURCE_CHECKED_AT}>{dateFormat.format(new Date(ZCG_SOURCE_CHECKED_AT))}</time>.</p><p>Applications were captured on {dateFormat.format(new Date(ZCG_REVIEW_CHECKED_AT))}. GitHub labels and applicant categories are cross-checked with the <a href="https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues" target="_blank" rel="noopener noreferrer">official ZCG tracker ↗</a>. Terminal labels override a leftover review label in this list. These are dated snapshots; follow each source for updates.</p><p>GitHub labels retain their original names and colors. The current status stays visible; additional workflow labels are under “+ labels”. Sectors combine the applicant’s category with OpenZcash classification; hover a sector for its origin. Local committee annotations appear separately. Updating source metadata does not rewrite preserved files, create a pilot decision or confirm a payment.</p><p>The five historical decisions were checked on October 9, 2026. Support is approvals divided by the five committee seats. Turnout is the share of members with a recorded position, including abstentions. Pending applications have no vote percentage. Approved budgets come from the official ZCG spreadsheet, summing all grant milestones. The shared ledger imports automatically every six hours; this board checks for imported changes every minute. Only unambiguous official matches receive an estimate; other amounts remain requests. ZEC estimates convert the entire approved budget at the current CoinGecko price, checked every minute and accepted for at most five minutes. They exclude fees and do not deduct previous payments. Each payment uses its payment-day rate; a market estimate is not a payment record.</p><p>Feedback is a summary of published minutes. Local likes and comments do not change committee votes. Public profile images come from <a href="https://openzcash.org/zcg/committee" target="_blank" rel="noopener noreferrer">OpenZcash’s committee directory ↗</a>.</p></details>
   </div>;
 }

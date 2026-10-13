@@ -19,6 +19,7 @@ import {
   participationCommunityId,
   participationView,
 } from "@/lib/participate/config";
+import { initialApprovedBudgets } from "@/lib/participate/approved-budgets";
 import { readDecisionHistory } from "@/lib/participate/decision-history";
 import {
   readBoard,
@@ -127,7 +128,7 @@ export default async function ParticipatePage({
   const composing = view === "proposals" && Boolean(search.compose);
   // One session read, then every other service read in parallel: a restarting
   // service costs a single timeout, not one per request.
-  const [profile, board, drafts, history, committee] = await Promise.all([
+  const [profile, board, drafts, history, committee, budgets] = await Promise.all([
     session ? readProfile(cookie) : Promise.resolve(null),
     readBoard(session ? cookie : null),
     session && view === "proposals"
@@ -138,6 +139,7 @@ export default async function ParticipatePage({
     view === "committee" || session
       ? readCommitteeWorkspace(cookie)
       : Promise.resolve(null),
+    view === "proposals" && !composing ? initialApprovedBudgets() : Promise.resolve(null),
   ]);
   // A failed draft read is not proof that a draft does not exist.
   const draftsUnavailable =
@@ -271,6 +273,7 @@ export default async function ParticipatePage({
         communities={[community]}
         viewer={viewer}
         board={board}
+        initialBudgets={budgets}
         initialProfile={profile}
         initialCreditSummary={initialCreditSummary}
         drafts={drafts ?? []}

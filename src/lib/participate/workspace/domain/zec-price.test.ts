@@ -1,16 +1,24 @@
 import { describe, expect, it } from "vitest";
 import { formatEstimatedZec, readDisplayZecPrice, readFreshZecPrice } from "@/lib/participate/workspace/domain/zec-price";
-import { zcgApprovedBudget } from "@/lib/participate/workspace/data/zcg-approved-budgets";
+import { zcgApprovedBudget, type ApprovedBudgetMap } from "@/lib/participate/workspace/data/zcg-approved-budgets";
 import { estimateFundingZat } from "@/lib/participate/workspace/domain/funding-quote";
 
+const officialSource = (issueNumber: number) => ({ issueNumber, url: `https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/${issueNumber}` });
+const budget = (usdCents: string) => ({ usdCents,
+  sourceUrl: "https://docs.google.com/spreadsheets/d/official-ledger/edit#gid=803214474&range=A889:L893",
+  proposalSourceUrl: "https://docs.google.com/spreadsheets/d/official-ledger/edit#gid=1164534734&range=A708",
+  sourceRows: [889, 890, 891, 892, 893],
+});
+// Deliberately different from the former hardcoded budgets: the current ledger wins.
+const budgets: ApprovedBudgetMap = { "424": budget("10000"), "438": budget("20000"), "405": budget("30000"), "400": budget("40000"), "454": budget("4500000") };
 const now = new Date("2026-10-10T12:00:00Z");
 const price = { rateUsdPerZecE8: "33333000000", quotedAt: now.toISOString(), retrievedAt: now.toISOString(), expiresAt: "2026-10-10T12:05:00.000Z" };
 
 describe("public ZEC estimates", () => {
-  it("retains the provider's exact rate and computes all four reviewed budgets", () => {
+  it("retains the provider's exact rate and computes a supplied approved budget", () => {
     expect(readFreshZecPrice(price, now)).toEqual(price);
-    const ids = ["zcg-graphsense-2026-09-28", "zcg-ironwood-2026-09-28", "zcg-mumbai-2026-09-14", "zcg-arabia-2026-08-31"];
-    expect(ids.map(id => formatEstimatedZec(estimateFundingZat(BigInt(zcgApprovedBudget(id)!.usdCents), 33333000000n)))).toEqual(["24.00", "24.00", "60.90", "81.00"]);
+    const approved = zcgApprovedBudget(budgets, "zcg-github-454", officialSource(454))!;
+    expect(formatEstimatedZec(estimateFundingZat(BigInt(approved.usdCents), 33333000000n))).toBe("135.00");
     expect(estimateFundingZat(800000n, 33333000000n)).toBe(2400024001n);
   });
   it.each([
@@ -30,10 +38,33 @@ describe("public ZEC estimates", () => {
     expect(formatEstimatedZec(999_500_000n)).toBe("10.00");
     expect(formatEstimatedZec(123456789012n)).toBe("1,234.57");
   });
-  it("requires a reviewed budget rather than interpreting a requested amount or arbitrary ID as approval", () => {
-    expect(zcgApprovedBudget("zcg-seedsigner-2026-09-14")).toBeNull();
-    expect(zcgApprovedBudget("unreviewed-application")).toBeNull();
-    expect(zcgApprovedBudget("constructor")).toBeNull();
+  it.each([
+    ["zcg-graphsense-2026-09-28", "424"], ["zcg-ironwood-2026-09-28", "438"],
+    ["zcg-mumbai-2026-09-14", "405"], ["zcg-arabia-2026-08-31", "400"],
+  ])("resolves legacy archive %s through its official issue metadata", (recordId, issue) => {
+    expect(zcgApprovedBudget(budgets, recordId)).toEqual(budgets[issue]);
+    expect(zcgApprovedBudget({}, recordId)).toBeNull();
+  });
+  it("uses the same official issue across preserved archive identities", () => {
+    expect(zcgApprovedBudget(budgets, "zcg-github-454", officialSource(454))).toEqual(budgets["454"]);
+    expect(zcgApprovedBudget(budgets, "preserved-source-revision-two", officialSource(454))).toEqual(budgets["454"]);
+  });
+  it("cannot infer approval from a demo title, arbitrary ID or a requested amount", () => {
+    for (const id of ["zcg-github-99999", "demo-zcg-github-454", "unreviewed-application", "constructor"]) {
+      expect(zcgApprovedBudget(budgets, id)).toBeNull();
+    }
+    expect(zcgApprovedBudget(budgets, "source-without-budget", officialSource(99999))).toBeNull();
+  });
+  it.each([
+    { issueNumber: 454, url: "https://github.com/another-owner/zcashcommunitygrants/issues/454" },
+    { issueNumber: 454, url: "https://github.com.evil.example/ZcashCommunityGrants/zcashcommunitygrants/issues/454" },
+    { issueNumber: 454, url: "https://github.com@evil.example/ZcashCommunityGrants/zcashcommunitygrants/issues/454" },
+    { ...officialSource(438), issueNumber: 454 },
+    { ...officialSource(454), issueNumber: NaN },
+  ])("rejects a nonofficial or mismatched source identity", source => {
+    expect(zcgApprovedBudget(budgets, "zcg-github-454", source)).toBeNull();
+    // A bad capture must not fall back to matching metadata for the legacy ID.
+    expect(zcgApprovedBudget(budgets, "zcg-graphsense-2026-09-28", source)).toBeNull();
   });
 });
 

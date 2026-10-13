@@ -1,29 +1,36 @@
-/** Display-only annotations, checked against ZCG minutes on 2026-10-10.
- * Keep these separate from the immutable, already-anchored proposal snapshots.
- * A total grant budget is not an outstanding balance or evidence of payment.
- */
-export type ZcgApprovedBudget = { usdCents: string; sourceUrl: string };
+import { z } from "zod/v3";
+import { zcgSourceMetadata } from "./zcg-source-metadata";
 
-const forum = "https://forum.zcashcommunity.com/t";
-const budgets: Readonly<Record<string, ZcgApprovedBudget>> = {
-  "zcg-graphsense-2026-09-28": {
-    usdCents: "800000",
-    sourceUrl: `${forum}/zcash-community-grants-zcg-meeting-minutes-9-28-2026/57928/1`
-  },
-  "zcg-ironwood-2026-09-28": {
-    usdCents: "800000",
-    sourceUrl: `${forum}/zcash-community-grants-zcg-meeting-minutes-9-28-2026/57928/2`
-  },
-  "zcg-mumbai-2026-09-14": {
-    usdCents: "2030000",
-    sourceUrl: `${forum}/zcash-community-grants-meeting-minutes-9-14-2026/57615/1`
-  },
-  "zcg-arabia-2026-08-31": {
-    usdCents: "2700000",
-    sourceUrl: `${forum}/zcash-community-grants-meeting-minutes-8-31-2026/57394/2`
-  }
-};
+const sheetUrl = z.string().url().refine(value => {
+  const url = new URL(value);
+  return url.protocol === "https:" && url.hostname === "docs.google.com" &&
+    url.pathname.startsWith("/spreadsheets/d/") && !url.username && !url.password;
+});
+const budgetSchema = z.object({
+  usdCents: z.string().regex(/^[1-9]\d{0,15}$/),
+  sourceUrl: sheetUrl,
+  proposalSourceUrl: sheetUrl,
+  sourceRows: z.array(z.number().int().positive()).min(1),
+}).strict();
+export const approvedBudgetSnapshotSchema = z.object({
+  version: z.literal(1),
+  budgets: z.record(z.string().regex(/^[1-9]\d*$/), budgetSchema),
+  importedAt: z.string().datetime(),
+}).strict();
 
-export function zcgApprovedBudget(recordId: string): ZcgApprovedBudget | null {
-  return Object.hasOwn(budgets, recordId) ? budgets[recordId] : null;
+/** Current official financial annotations, kept outside immutable proposal files. */
+export type ZcgApprovedBudget = z.infer<typeof budgetSchema>;
+export type ApprovedBudgetSnapshot = z.infer<typeof approvedBudgetSnapshotSchema>;
+export type ApprovedBudgetMap = ApprovedBudgetSnapshot["budgets"];
+export type ApprovedBudgetStatus = "loading" | "ready" | "unavailable";
+
+/** Require an official source identity; a demo title or record ID cannot claim a grant. */
+export function zcgApprovedBudget(budgets: ApprovedBudgetMap, recordId: string,
+  source?: { issueNumber: number; url: string } | null): ZcgApprovedBudget | null {
+  const identity = source ?? zcgSourceMetadata(recordId);
+  if (!identity || !Number.isSafeInteger(identity.issueNumber) || identity.issueNumber <= 0) return null;
+  const expected = `https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/${identity.issueNumber}`;
+  if (identity.url !== expected) return null;
+  const key = String(identity.issueNumber);
+  return Object.hasOwn(budgets, key) ? budgets[key] : null;
 }
