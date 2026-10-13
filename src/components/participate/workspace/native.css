@@ -71,3 +71,112 @@
 
 /* Keep the amount and currency together beside long approved proposal titles. */
 .oz-participate .proposal-zec-trigger strong { white-space: nowrap; }
+
+/* Keep each conversation together without stacking the service's list padding
+   and inline-comment padding. The same cards serve every native discussion. */
+.oz-participate .dao-discussion .dao-comment-list {
+  display: grid;
+  gap: 12px;
+  max-width: 960px;
+  margin-top: 16px;
+}
+.oz-participate .dao-discussion .dao-comment-list > li {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+.oz-participate .dao-app .dao-discussion .dao-comment {
+  --comment-avatar-size: 32px;
+  --comment-inset: 42px;
+  min-width: 0;
+  padding: 12px 14px 6px;
+  border: 1px solid var(--dao-line);
+  border-radius: 12px;
+  background: var(--dao-canvas);
+}
+.oz-participate .dao-comment .dao-comment-header {
+  display: grid;
+  grid-template-columns: var(--comment-avatar-size) minmax(0, 1fr) auto;
+  gap: 2px 10px;
+  align-items: center;
+}
+.oz-participate .dao-comment .dao-comment-avatar {
+  width: var(--comment-avatar-size);
+  height: var(--comment-avatar-size);
+}
+.oz-participate .dao-comment-header > strong { min-width: 0; line-height: 1.4; }
+.oz-participate .dao-app .dao-comment .dao-comment-permalink {
+  width: auto;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.4;
+  text-align: right;
+}
+.oz-participate .dao-discussion .dao-comment-body {
+  margin: 6px 0 0 var(--comment-inset) !important;
+  font-size: 14px;
+  line-height: 1.6;
+}
+.oz-participate .dao-discussion .dao-comment-actions {
+  gap: 4px 12px;
+  margin: 2px 0 0 var(--comment-inset);
+}
+.oz-participate .dao-discussion .dao-comment-replies {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0 30px;
+  padding-left: 18px;
+  border-left: 1px solid var(--dao-line-strong);
+}
+.oz-participate .dao-discussion .dao-comment-replies > li {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+}
+.oz-participate .dao-comment-replies > li::before {
+  content: "";
+  position: absolute;
+  top: 27px;
+  left: -19px;
+  width: 18px;
+  border-top: 1px solid var(--dao-line-strong);
+  pointer-events: none;
+}
+.oz-participate .dao-app .dao-discussion .dao-comment-replies .dao-comment {
+  --comment-avatar-size: 28px;
+  --comment-inset: 38px;
+  background: var(--dao-paper);
+}
+.oz-participate .dao-comment .dao-comment-tombstone,
+.oz-participate .dao-comment .dao-moderation-form,
+.oz-participate .dao-comment .dao-reaction-error {
+  margin: 8px 0 6px var(--comment-inset);
+}
+.oz-participate .dao-comment .dao-comment-tombstone { padding: 10px 12px; }
+
+@media (max-width: 650px) {
+  .oz-participate .dao-app .dao-discussion .dao-comment {
+    --comment-avatar-size: 28px;
+    padding: 10px 12px 4px;
+    border-radius: 10px;
+  }
+  .oz-participate .dao-comment .dao-comment-header {
+    grid-template-columns: var(--comment-avatar-size) minmax(0, 1fr);
+  }
+  .oz-participate .dao-comment .dao-comment-avatar { grid-row: 1 / 3; }
+  .oz-participate .dao-app .dao-comment .dao-comment-permalink {
+    grid-column: 2;
+    margin: 0 !important;
+    text-align: left;
+  }
+  .oz-participate .dao-discussion .dao-comment-replies {
+    margin-left: 16px;
+    padding-left: 12px;
+  }
+  .oz-participate .dao-comment-replies > li::before { left: -13px; width: 12px; top: 24px; }
+  .oz-participate .dao-discussion .dao-comment-body,
+  .oz-participate .dao-discussion .dao-comment-actions,
+  .oz-participate .dao-comment .dao-comment-tombstone,
+  .oz-participate .dao-comment .dao-moderation-form,
+  .oz-participate .dao-comment .dao-reaction-error { margin-left: 0 !important; }
+}
