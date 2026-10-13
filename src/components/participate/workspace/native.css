@@ -72,12 +72,15 @@
 /* Keep the amount and currency together beside long approved proposal titles. */
 .oz-participate .proposal-zec-trigger strong { white-space: nowrap; }
 
-/* Keep each conversation together without stacking the service's list padding
-   and inline-comment padding. The same cards serve every native discussion. */
+/* Borderless conversations: the rail follows the parent avatar and stops at
+   the last reply. Keep its geometry shared with the mobile content gutter. */
 .oz-participate .dao-discussion .dao-comment-list {
+  --thread-root-size: 32px;
+  --thread-axis: 16px;
+  --thread-branch: 26px;
+  --thread-gap: 4px;
   display: grid;
-  gap: 12px;
-  max-width: 960px;
+  gap: 16px;
   margin-top: 16px;
 }
 .oz-participate .dao-discussion .dao-comment-list > li {
@@ -86,13 +89,24 @@
   border: 0;
 }
 .oz-participate .dao-app .dao-discussion .dao-comment {
-  --comment-avatar-size: 32px;
+  --comment-avatar-size: var(--thread-root-size);
   --comment-inset: 42px;
+  position: relative;
   min-width: 0;
-  padding: 12px 14px 6px;
-  border: 1px solid var(--dao-line);
-  border-radius: 12px;
-  background: var(--dao-canvas);
+  padding: 8px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.oz-participate .dao-comment-list > li:has(> .dao-comment-replies) > .dao-comment::before {
+  content: "";
+  position: absolute;
+  left: var(--thread-axis);
+  top: calc(8px + var(--thread-root-size) + 4px);
+  bottom: 0;
+  border-left: 1px solid var(--dao-line-strong);
+  pointer-events: none;
 }
 .oz-participate .dao-comment .dao-comment-header {
   display: grid;
@@ -101,6 +115,7 @@
   align-items: center;
 }
 .oz-participate .dao-comment .dao-comment-avatar {
+  align-self: start;
   width: var(--comment-avatar-size);
   height: var(--comment-avatar-size);
 }
@@ -123,10 +138,10 @@
 }
 .oz-participate .dao-discussion .dao-comment-replies {
   display: grid;
-  gap: 8px;
-  margin: 8px 0 0 30px;
-  padding-left: 18px;
-  border-left: 1px solid var(--dao-line-strong);
+  gap: var(--thread-gap);
+  margin: var(--thread-gap) 0 0 var(--thread-axis);
+  padding-left: var(--thread-branch);
+  border: 0;
 }
 .oz-participate .dao-discussion .dao-comment-replies > li {
   position: relative;
@@ -136,29 +151,51 @@
 .oz-participate .dao-comment-replies > li::before {
   content: "";
   position: absolute;
-  top: 27px;
-  left: -19px;
-  width: 18px;
-  border-top: 1px solid var(--dao-line-strong);
+  top: calc(-1 * var(--thread-gap));
+  bottom: 0;
+  left: calc(-1 * var(--thread-branch));
+  border-left: 1px solid var(--dao-line-strong);
+  pointer-events: none;
+}
+.oz-participate .dao-comment-replies > li:last-child::before {
+  bottom: auto;
+  height: calc(var(--thread-gap) + 14px);
+}
+.oz-participate .dao-comment-replies > li::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  left: calc(-1 * var(--thread-branch));
+  width: calc(var(--thread-branch) - 6px);
+  height: 8px;
+  border-left: 1px solid var(--dao-line-strong);
+  border-bottom: 1px solid var(--dao-line-strong);
+  border-bottom-left-radius: 8px;
   pointer-events: none;
 }
 .oz-participate .dao-app .dao-discussion .dao-comment-replies .dao-comment {
   --comment-avatar-size: 28px;
   --comment-inset: 38px;
-  background: var(--dao-paper);
 }
 .oz-participate .dao-comment .dao-comment-tombstone,
 .oz-participate .dao-comment .dao-moderation-form,
 .oz-participate .dao-comment .dao-reaction-error {
   margin: 8px 0 6px var(--comment-inset);
 }
-.oz-participate .dao-comment .dao-comment-tombstone { padding: 10px 12px; }
+.oz-participate .dao-comment .dao-comment-tombstone {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
 
 @media (max-width: 650px) {
+  .oz-participate .dao-discussion .dao-comment-list {
+    --thread-root-size: 28px;
+    --thread-axis: 14px;
+    --thread-branch: 20px;
+  }
   .oz-participate .dao-app .dao-discussion .dao-comment {
-    --comment-avatar-size: 28px;
-    padding: 10px 12px 4px;
-    border-radius: 10px;
+    --comment-inset: 38px;
   }
   .oz-participate .dao-comment .dao-comment-header {
     grid-template-columns: var(--comment-avatar-size) minmax(0, 1fr);
@@ -169,14 +206,9 @@
     margin: 0 !important;
     text-align: left;
   }
-  .oz-participate .dao-discussion .dao-comment-replies {
-    margin-left: 16px;
-    padding-left: 12px;
-  }
-  .oz-participate .dao-comment-replies > li::before { left: -13px; width: 12px; top: 24px; }
   .oz-participate .dao-discussion .dao-comment-body,
   .oz-participate .dao-discussion .dao-comment-actions,
   .oz-participate .dao-comment .dao-comment-tombstone,
   .oz-participate .dao-comment .dao-moderation-form,
-  .oz-participate .dao-comment .dao-reaction-error { margin-left: 0 !important; }
+  .oz-participate .dao-comment .dao-reaction-error { margin-left: var(--comment-inset) !important; }
 }
