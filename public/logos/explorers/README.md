@@ -7,3 +7,7 @@ Official site marks checked on 2026-10-10:
 - Zcash Info: inline SVG in the header of https://zcashinfo.com/ (copied unchanged).
 
 CipherScan redirects to ZecBlock, so the selector lists one destination.
+
+ZScan mark checked on 2026-10-12:
+
+- ZScan: https://zscan.cash/brand/png/zscan-icon-512.png (official PNG from https://zscan.cash/brand; copied unchanged).

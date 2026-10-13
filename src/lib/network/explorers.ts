@@ -21,4 +21,11 @@ export const NETWORK_EXPLORERS = [
     url: "https://zcashinfo.com/",
     logo: "/logos/explorers/zcashinfo.svg",
   },
+  {
+    id: "zscan",
+    name: "ZScan",
+    domain: "zscan.cash",
+    url: "https://zscan.cash/",
+    logo: "/logos/explorers/zscan.png",
+  },
 ] as const;
