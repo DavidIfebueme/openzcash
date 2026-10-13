@@ -175,7 +175,7 @@ function InlineRecord({ record, endpoint, onRevision, visible }: { record: Propo
   </section>;
 }
 
-const sourceOutcomes = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Abandoned", closed: "Closed without a recorded verdict" };
+const sourceOutcomes = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Withdrawn", closed: "Closed without a recorded verdict" };
 const repositoryRoles = { OWNER: "Repository owner", MEMBER: "Repository member", COLLABORATOR: "Repository collaborator" };
 
 function SourceRevisionEvidence({ capture, download, issueNumber, visible }: { capture: Extract<SourceCapture, { schema: "PARTICIPATE_SOURCE_CAPTURE_V2" }> | null; download: string; issueNumber: number; visible: boolean }) {

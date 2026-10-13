@@ -56,8 +56,14 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
     if (!issue) continue;
     officialRecords.set(issue, record);
     const current = officialByIssue.get(issue);
-    if (current) officialOutcomes[record.recordId] = current.outcome;
+    // An explicit author withdrawal is not a committee rejection, even when
+    // the spreadsheet groups it under Rejected. Keep the source label visible.
+    if (source?.labels.some(label => label.name === "Grant Withdrawn by Submitter")) {
+      officialOutcomes[record.recordId] = "abandoned";
+      if (current) officialByIssue.set(issue, { ...current, outcome: "abandoned" });
+    } else if (current) officialOutcomes[record.recordId] = current.outcome;
   }
+  const officialListings = [...officialByIssue.values()];
   const officialRecordIds = new Set([...officialRecords.values()].map(record => record.recordId));
   const currentFilter = (proposal?: ProposalParticipation) => (proposal && officialOutcomes[proposal.recordId]) ?? proposalFilter(proposal);
   const ids = board.proposals.map(proposal => proposal.recordId);
@@ -78,10 +84,10 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
   const toolbar = embedded ? <div className="participate-submission-actions">{drafts.length ? <details className="participate-submission-menu"><summary>My proposals <span>{drafts.length}</span></summary><nav aria-label="My proposals">{drafts.map(draft => <div className="participate-submission-menu-item" key={draft.id}><Link href={draft.state === "DRAFT" ? `/zcg/participate?compose=${draft.id}` : `/zcg/participate?record=${draft.recordId}`}><span>{draft.payload.title || "Untitled proposal"}</span><small>{draft.state === "DRAFT" ? "Draft" : draft.state === "ABANDONED" ? "Abandoned" : draft.state === "PUBLISHED_DEMO" ? "Legacy test" : "Published"}</small></Link>{draft.state === "DRAFT" ? <SubmissionLifecycleAction draft={draft} /> : null}</div>)}</nav></details> : null}<Link href="/zcg/participate?compose=new" prefetch={false} className="dao-button dao-button--primary">+ New proposal</Link></div> : null;
   const nativeRecords = (filter: string) => other.filter(proposal => currentFilter(proposal) === filter
     && !(official && filter === "under_review" && officialRecordIds.has(proposal.recordId)));
-  const reviewCount = official?.proposals.filter(proposal => proposal.outcome === "under_review").length ?? 0;
+  const reviewCount = officialListings.filter(proposal => proposal.outcome === "under_review").length;
   const additionalRecords = (filter: string) => {
     const rows = nativeRecords(filter);
-    return <>{official && filter === "under_review" ? <OfficialReviewQueue proposals={official.proposals} records={officialRecords} renderActions={renderActions} renderPanel={renderPanel} isOpen={recordId => panels[recordId] === "record"} toggle={recordId => toggle(recordId, "record")} /> : null}{rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
+    return <>{official && filter === "under_review" ? <OfficialReviewQueue proposals={officialListings} records={officialRecords} renderActions={renderActions} renderPanel={renderPanel} isOpen={recordId => panels[recordId] === "record"} toggle={recordId => toggle(recordId, "record")} /> : null}{rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
       const mine = drafts.find(draft => draft.recordId === proposal.recordId);
       const captured = proposal.sourceCapture;
       const outcome = currentFilter(proposal);

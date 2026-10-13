@@ -7,7 +7,7 @@ import { PROPOSAL_TAGS } from "@/lib/participate/workspace/domain/proposal-tags"
 import { classifyZcgSectors, sourceCategoryTag, zcgCurrentStatusLabel, type githubProposalOutcome, type ZcgSourceMetadata } from "@/lib/participate/workspace/domain/zcg-source-metadata";
 import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
 
-const outcomeLabels = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Abandoned", closed: "Closed" };
+const outcomeLabels = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Withdrawn", closed: "Closed" };
 
 export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [], outcome, sourceOverride, categoryOverride }: { recordId: string; title: string; tags: readonly string[]; committeeLabels?: readonly string[]; outcome?: ReturnType<typeof githubProposalOutcome>; sourceOverride?: ZcgSourceMetadata; categoryOverride?: string | null }) {
   const source = sourceOverride ?? zcgSourceMetadata(recordId);

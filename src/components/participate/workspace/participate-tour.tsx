@@ -31,7 +31,7 @@ export function ParticipateTour({ signedIn, canUseCredits }: { signedIn: boolean
   useEffect(() => {
     if (hasSeenTour()) return;
     const available: TourStep[] = [
-      { target: "filters", title: "Find a proposal", description: "Switch between proposals under review, approved, rejected or abandoned." },
+      { target: "filters", title: "Find a proposal", description: "Switch between proposals under review, approved, rejected or withdrawn." },
       { target: "discussion", title: "Read, verify, discuss", description: "Open the record and sources, or expand comments below a proposal. Likes and discussions stay on this page." },
       { target: "account", title: signedIn ? canUseCredits ? "Your profile & credits" : "Your account" : "Join when you’re ready", description: signedIn
         ? canUseCredits ? "Open your profile for your name, photo, Zcred balance and settings." : "Open your account menu to view your session."

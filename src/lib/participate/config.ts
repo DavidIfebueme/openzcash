@@ -21,7 +21,7 @@ export const PROPOSAL_FILTERS = [
   { value: "under_review", label: "Under review" },
   { value: "approved", label: "Approved" },
   { value: "rejected", label: "Rejected" },
-  { value: "abandoned", label: "Abandoned" },
+  { value: "abandoned", label: "Withdrawn" },
 ] as const;
 export type ProposalFilter = (typeof PROPOSAL_FILTERS)[number]["value"];
 export function proposalFilter(raw: unknown): ProposalFilter {
