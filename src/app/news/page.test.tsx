@@ -2,7 +2,7 @@ import { isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { NewsItem } from "@/lib/news/feed";
-import { NEWS_SOURCES, newsView, type NewsSearchParams } from "@/lib/news/view";
+import { NEWS_SOURCES, newsView, hasSource, type NewsSearchParams } from "@/lib/news/view";
 
 const now = Date.parse("2026-10-05T07:00:00Z");
 const items: NewsItem[] = [
@@ -18,8 +18,9 @@ const items: NewsItem[] = [
 
 vi.mock("@/lib/news/feed", () => ({
   getNews: async () => items, nowMs: () => now, newsFetchedAt: () => now,
-  githubNewsHealth: () => [],
+  githubNewsHealth: () => [], newsUnavailableSources: () => [],
 }));
+vi.mock("@/components/source-refresh", () => ({ SourceRefresh: () => null }));
 import NewsPage from "./page";
 
 function rows(node: ReactNode): Array<{ key: string | null; title: string }> {
@@ -44,7 +45,7 @@ describe("News filters and rendered record identity", () => {
     const view = newsView(items, { source }, now);
     const tree = await page({ source });
     const html = renderToStaticMarkup(tree);
-    expect(rows(tree).map(row => row.key)).toEqual(items.filter(item => item.source === source).map(item => item.id));
+    expect(rows(tree).map(row => row.key)).toEqual(items.filter(item => hasSource(item, source)).map(item => item.id));
     expect(rows(tree)).toHaveLength(view.counts[source]);
     expect(html.match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain(`href="/news?source=${source}"`);
     if (source === "dao") expect(html).toContain("No updates match this view");
@@ -54,7 +55,7 @@ describe("News filters and rendered record identity", () => {
     const view = newsView(items, { q: "  ZeBrA  ", source: "github" }, now);
     expect(view.shown.map(item => item.id)).toEqual(["github:zebra"]);
     expect(view.totalCount).toBe(2);
-    expect(view.counts).toEqual({ forum: 1, github: 1, sheet: 0, proposal: 0, dao: 0, application: 0 });
+    expect(view.counts).toEqual({ forum: 1, github: 1, sheet: 0, proposal: 0, dao: 0 });
     const html = renderToStaticMarkup(await page({ q: "  ZeBrA  ", source: "github" }));
     expect(html).toContain('href="/news?source=forum&amp;q=ZeBrA"');
     expect(html).toContain('name="source" value="github"');

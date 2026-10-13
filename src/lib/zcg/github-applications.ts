@@ -11,12 +11,12 @@ import { readPublications, recordPublications } from "./publications-repo";
  *
  * Open issues labelled "📋 Grant Application" are the applications; the
  * "👀 Ready For ZCG Review" ones are the live proposals awaiting the committee's
- * judgement. Cached ~15 min in-process to stay well within GitHub's
+ * judgement. Cached ~5 min in-process to stay well within GitHub's
  * unauthenticated rate limit.
  */
 
 const REPO = "ZcashCommunityGrants/zcashcommunitygrants";
-const TTL_MS = 15 * 60_000;
+const TTL_MS = 5 * 60_000;
 
 export type AppStatus = ApplicationStatus;
 
@@ -48,7 +48,9 @@ interface GhIssue {
   pull_request?: unknown;
 }
 
-let fetchedAt = 0;
+type ApplicationStore = { fetchedAt: number; inflight: Promise<void> | null };
+const globalStore = globalThis as typeof globalThis & { __openZcashGrantApplications?: ApplicationStore };
+const store = globalStore.__openZcashGrantApplications ??= { fetchedAt: 0, inflight: null };
 
 async function publishedApplications(limit: number): Promise<GrantApplication[]> {
   const published = await readPublications<GrantApplication>("github-application");
@@ -77,72 +79,78 @@ function cleanTitle(t: string): string {
 
 export async function getGrantApplications(
   limit = 40,
+  { fresh = false }: { fresh?: boolean } = {},
 ): Promise<GrantApplication[]> {
+  if (store.inflight || fresh || !store.fetchedAt || Date.now() - store.fetchedAt >= TTL_MS) {
+    store.inflight ??= refreshApplications().finally(() => { store.inflight = null; });
+    try {
+      await store.inflight;
+    } catch (error) {
+      console.error("[gh-apps] issue listing failed:", error instanceof Error ? error.message : "unavailable");
+      // News keeps its last-good source and shows the failed collection. Other
+      // readers retain the existing persisted fallback and verdict policy.
+      if (fresh) throw error;
+    }
+  }
+  return publishedApplications(limit);
+}
+
+async function refreshApplications(): Promise<void> {
   const now = Date.now();
-  if (fetchedAt && now - fetchedAt < TTL_MS) return publishedApplications(limit);
-  try {
-    const arr: GhIssue[] = [];
-    // A complete snapshot is required before staging missing/closed issues.
-    // An incomplete page or transient error must never delist applications.
-    for (let page = 1; ; page++) {
-      if (page > 10) throw new Error("Incomplete application listing");
-      const url = `https://api.github.com/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=desc&page=${page}`;
-      // One retry: Railway's shared egress can land a request on an IP whose
-      // unauthenticated GitHub budget another tenant already burned.
-      let res = await fetch(url, {
+  const arr: GhIssue[] = [];
+  // A complete snapshot is required before staging missing/closed issues.
+  // An incomplete page or transient error must never delist applications.
+  for (let page = 1; ; page++) {
+    if (page > 10) throw new Error("Incomplete application listing");
+    const url = `https://api.github.com/repos/${REPO}/issues?state=open&per_page=100&sort=created&direction=desc&page=${page}`;
+    // One retry: Railway's shared egress can land a request on an IP whose
+    // unauthenticated GitHub budget another tenant already burned.
+    let res = await fetch(url, {
+      headers: ghHeaders(),
+      signal: AbortSignal.timeout(20_000),
+      cache: "no-store",
+    });
+    if (!res.ok) {
+      await new Promise((r) => setTimeout(r, 2_000));
+      res = await fetch(url, {
         headers: ghHeaders(),
         signal: AbortSignal.timeout(20_000),
         cache: "no-store",
       });
-      if (!res.ok) {
-        await new Promise((r) => setTimeout(r, 2_000));
-        res = await fetch(url, {
-          headers: ghHeaders(),
-          signal: AbortSignal.timeout(20_000),
-          cache: "no-store",
-        });
-      }
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      const batch = (await res.json()) as GhIssue[];
-      if (!Array.isArray(batch)) throw new Error("Invalid application listing");
-      arr.push(...batch);
-      if (batch.length < 100) break;
     }
-
-    const items: GrantApplication[] = arr
-      .filter((it) => !it.pull_request)
-      .map((it) => {
-        const labels = (it.labels ?? []).map((l) => l.name);
-        return { it, labels };
-      })
-      // Only real grant applications (drop meta/process issues).
-      .filter(({ it, labels }) => isGrantApplication(labels, it.title))
-      .map(({ it, labels }) => ({
-        number: it.number,
-        title: cleanTitle(it.title) || it.title,
-        url: it.html_url,
-        applicant: it.user?.login ?? "",
-        createdAt: it.created_at,
-        summary: projectSummaryFromBody(it.body),
-        status: statusFromLabels(labels),
-        comments: it.comments ?? 0,
-        amountUsd: requestedAmountFromBody(it.body),
-      }));
-
-    await getDb().transaction((tx) => recordPublications(tx, "github-application",
-      items.map((app) => ({ key: String(app.number), value: app,
-        initial: app.status === "review" ? app : null })), { complete: true }));
-    fetchedAt = now;
-  } catch (e) {
-    console.error(
-      "[gh-apps] issue listing failed:",
-      e instanceof Error ? e.message : e,
-    );
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    const batch = (await res.json()) as GhIssue[];
+    if (!Array.isArray(batch)) throw new Error("Invalid application listing");
+    arr.push(...batch);
+    if (batch.length < 100) break;
   }
-  // Read persisted publication state even after failures or a server restart.
-  return publishedApplications(limit);
+
+  const items: GrantApplication[] = arr
+    .filter((it) => !it.pull_request)
+    .map((it) => {
+      const labels = (it.labels ?? []).map((l) => l.name);
+      return { it, labels };
+    })
+    // Only real grant applications (drop meta/process issues).
+    .filter(({ it, labels }) => isGrantApplication(labels, it.title))
+    .map(({ it, labels }) => ({
+      number: it.number,
+      title: cleanTitle(it.title) || it.title,
+      url: it.html_url,
+      applicant: it.user?.login ?? "",
+      createdAt: it.created_at,
+      summary: projectSummaryFromBody(it.body),
+      status: statusFromLabels(labels),
+      comments: it.comments ?? 0,
+      amountUsd: requestedAmountFromBody(it.body),
+    }));
+
+  await getDb().transaction((tx) => recordPublications(tx, "github-application",
+    items.map((app) => ({ key: String(app.number), value: app,
+      initial: app.status === "review" ? app : null })), { complete: true }));
+  store.fetchedAt = now;
 }
 
 /** One under-review proposal, shaped for the 3D office (one zebra each).

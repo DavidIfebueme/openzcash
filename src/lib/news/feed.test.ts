@@ -8,6 +8,7 @@ const at = Date.parse("2026-10-05T05:00:00Z");
 const release = { name: "Zebra 7.0.0-rc.0", tag_name: "v7.0.0-rc.0", published_at: "2026-10-02T00:02:03Z", html_url: "https://github.com/ZcashFoundation/zebra/releases/tag/v7.0.0-rc.0", draft: false };
 beforeEach(() => {
   vi.resetModules(); vi.useFakeTimers(); vi.setSystemTime(at);
+  delete (globalThis as typeof globalThis & { __openZcashNewsFeed?: unknown }).__openZcashNewsFeed;
   delete (globalThis as typeof globalThis & { __openZcashNewsGitHub?: unknown }).__openZcashNewsGitHub;
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); vi.unstubAllEnvs(); });
@@ -63,7 +64,7 @@ describe("News partial GitHub recovery", () => {
     expect(feed.githubNewsHealth()[0].status).toBe("cached");
   });
 
-  it.each(["empty", "failed"] as const)("prunes expired non-GitHub cache after a total outage with previously %s GitHub sources", async initial => {
+  it.each(["empty", "failed"] as const)("prunes expired records when forum succeeds empty and previously %s GitHub sources fail", async initial => {
     const state = { github: initial as "live" | "failed" | "empty", forum: true };
     vi.stubGlobal("fetch", sourceFetch(state));
     const feed = await import("./feed");
@@ -72,7 +73,7 @@ describe("News partial GitHub recovery", () => {
     state.github = "failed"; state.forum = false; vi.setSystemTime(afterWindow);
     await feed.getNews();
     await vi.waitFor(async () => expect(await feed.getNews()).toEqual([]));
-    expect(feed.newsFetchedAt()).toBe(at);
+    expect(feed.newsFetchedAt()).toBe(afterWindow);
   });
 
   it("exposes a cold source failure without turning other successful news into an error", async () => {
@@ -81,4 +82,52 @@ describe("News partial GitHub recovery", () => {
     expect((await feed.getNews()).map(item => item.source)).toEqual(["forum"]);
     expect(feed.githubNewsHealth().every(source => source.status === "unavailable")).toBe(true);
   });
+});
+
+it("checks fresh forum data every five minutes without shortening the release schedule", async () => {
+  const fetcher = sourceFetch({ github: "live", forum: true });
+  vi.stubGlobal("fetch", fetcher);
+  const feed = await import("./feed");
+  await feed.getNews();
+  const count = (needle: string) => fetcher.mock.calls.filter(([url]) => String(url).includes(needle)).length;
+  expect(count("latest.json")).toBe(1);
+  await feed.getNews();
+  expect(count("latest.json")).toBe(1);
+  vi.setSystemTime(at + 5 * 60_000);
+  await feed.getNews();
+  await vi.waitFor(() => expect(feed.newsFetchedAt()).toBe(at + 5 * 60_000));
+  expect(count("latest.json")).toBe(2);
+  expect(count("/releases?")).toBe(5);
+});
+
+it("retains a failed forum independently and removes it on a successful empty response", async () => {
+  const fetcher = sourceFetch({ github: "empty", forum: true });
+  vi.stubGlobal("fetch", fetcher);
+  const feed = await import("./feed");
+  const first = await feed.getNews();
+  fetcher.mockImplementation(async input => String(input).includes("latest.json") ? Response.json({}, { status: 503 }) : Response.json([]));
+  vi.setSystemTime(at + 5 * 60_000);
+  await feed.getNews();
+  await vi.waitFor(() => expect(feed.newsUnavailableSources()).toContain("Forum"));
+  expect(await feed.getNews()).toEqual(first);
+  fetcher.mockImplementation(async input => String(input).includes("latest.json") ? Response.json({ topic_list: { topics: [] } }) : Response.json([]));
+  vi.setSystemTime(at + 10 * 60_000);
+  await feed.getNews();
+  await vi.waitFor(() => expect(feed.newsUnavailableSources()).not.toContain("Forum"));
+  expect(await feed.getNews()).toEqual([]);
+});
+
+it("runs one scheduled collector without page visits and shares it across server bundles", async () => {
+  const fetcher = sourceFetch({ github: "empty", forum: true });
+  vi.stubGlobal("fetch", fetcher);
+  const feed = await import("./feed");
+  feed.startNewsSchedule(); feed.startNewsSchedule();
+  await vi.advanceTimersByTimeAsync(5_000);
+  expect(fetcher.mock.calls.filter(([url]) => String(url).includes("latest.json"))).toHaveLength(1);
+  vi.resetModules();
+  const otherBundle = await import("./feed");
+  expect(await otherBundle.getNews()).toEqual(await feed.getNews());
+  otherBundle.startNewsSchedule();
+  await vi.advanceTimersByTimeAsync(5 * 60_000 + 15_000);
+  expect(fetcher.mock.calls.filter(([url]) => String(url).includes("latest.json"))).toHaveLength(2);
 });

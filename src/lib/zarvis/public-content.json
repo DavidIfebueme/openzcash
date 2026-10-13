@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "7e4ff8bd97ddb59e",
+  "sourceRevision": "482077efa40541cb",
   "sourceFiles": 56,
   "documents": [
     {
@@ -67,7 +67,7 @@
       "id": "src/app/zcg/proposals/page.tsx:0",
       "url": "https://openzcash.org/zcg/proposals",
       "title": "zcg · proposals",
-      "text": "ZCG Proposals · OpenZcash\nZCG and Coinholder proposal history. Status changes are published the next day (Brasília time). Approval is not evidence of payment or delivery.\nunder_review\nProposals\nSubmit a proposal ↗\nApproved\nAvg decision\nReady for review\nShowing\nApplication pipeline\nExplore the published status of each proposal. Select a verdict to narrow the records.\nAll proposals\nstatus\nmedian\nd\nin review\nrequested across\nwith an amount\npast the\nd average\nClear ✕\nRows tagged\nGitHub live\ninclude application details or decisions read from the\nZCG issue tracker ↗\n. The rest are mirrored from the spreadsheet.\nDiligence signals cover under-review applications only and use public data: GitHub account history, prior ZCG applications, a same-handle forum profile, and a title search across GitHub. Signals inform, reviewers decide.\nunder-review\nfrom the spreadsheet\nnot listed: the linked GitHub application was deleted, so there is no verifiable proposal behind\n.\nfrom the spreadsheet already\na committee decision on GitHub (issue closed and labelled). They show the GitHub verdict until the spreadsheet catches up, per the\nsource precedence rule\nCoinholder proposals of a closed round show FPF's official results as soon as they are published.\nAsk the ZCG Copilot\nExplore funded, under-review and declined proposals with links to the public evidence.\nOpen Copilot"
+      "text": "ZCG Proposals · OpenZcash\nZCG and Coinholder proposal history. Status changes are published the next day (Brasília time). Approval is not evidence of payment or delivery.\nunder_review\nProposals\nSubmit a proposal ↗\nApproved\nAvg decision\nReady for review\nShowing\nProposal pipeline\nExplore the published status of each proposal. Select a verdict to narrow the records.\nAll proposals\nstatus\nmedian\nd\nin review\nrequested across\nwith an amount\npast the\nd average\nClear ✕\nRows tagged\nGitHub live\ninclude application details or decisions read from the\nZCG issue tracker ↗\n. The rest are mirrored from the spreadsheet.\nDiligence signals cover under-review applications only and use public data: GitHub account history, prior ZCG applications, a same-handle forum profile, and a title search across GitHub. Signals inform, reviewers decide.\nunder-review\nfrom the spreadsheet\nnot listed: the linked GitHub application was deleted, so there is no verifiable proposal behind\n.\nfrom the spreadsheet already\na committee decision on GitHub (issue closed and labelled). They show the GitHub verdict until the spreadsheet catches up, per the\nsource precedence rule\nCoinholder proposals of a closed round show FPF's official results as soon as they are published.\nAsk the ZCG Copilot\nExplore funded, under-review and declined proposals with links to the public evidence.\nOpen Copilot"
     },
     {
       "id": "src/app/zcg/schedule/page.tsx:0",
@@ -247,7 +247,7 @@
       "id": "src/app/news/page.tsx:0",
       "url": "https://openzcash.org/news",
       "title": "news",
-      "text": "News · OpenZcash\nThe last seven days across the Zcash ecosystem: community forum, core GitHub releases, ZecHub DAO proposals, grant applications and new ledger entries. Refreshed hourly.\nForum\nGitHub\nSpreadsheet\nProposal\nZecHub DAO\nApplication\nNews\nnew\nAll sources\nsearch\nq\nsource\nSearch\nClear\n·\nnew in 48 hours · last 7 days\n. Older entries stay on their own pages.\nstatus\nGitHub updates are incomplete:\nof\nrepositories could not be refreshed. Previously verified releases are kept within the seven-day window.\nBrowse development activity ↗"
+      "text": "News · OpenZcash\nThe last seven days across Zcash: proposals, community discussions, releases and grant payments.\nForum\nReleases\nSpreadsheet\nProposals\nZecHub DAO\nNews\nnew\nAll sources\nsearch\nq\nsource\nSearch\nClear\nForum & proposals · every 5 min\nReleases · hourly\nSpreadsheet · every 6h\n·\nnew in 48 hours · last 7 days\n. Older entries stay on their own pages.\nstatus\nTemporarily unable to refresh\n. Showing the last available records; retrying automatically.\nGitHub updates are incomplete:\nof\nrepositories could not be refreshed. Previously verified releases are kept within the seven-day window.\nBrowse development activity ↗\n↗"
     },
     {
       "id": "src/app/monthly/page.tsx:0",

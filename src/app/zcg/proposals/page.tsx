@@ -1,3 +1,4 @@
+import { SourceRefresh } from "@/components/source-refresh";
 import { FeatureLink, SectionHeading } from "@/components/workspace";
 import Link from "next/link";
 import { Card, PageHeader, Stat } from "@/components/ui";
@@ -255,6 +256,7 @@ export default async function PropostasPage({
 
   return (
     <>
+      <SourceRefresh />
       <PageHeader
         title="Proposals"
         subtitle="ZCG and Coinholder proposal history. Status changes are published the next day (Brasília time). Approval is not evidence of payment or delivery."
@@ -296,7 +298,7 @@ export default async function PropostasPage({
       </section>
 
       <SectionHeading
-        title="Application pipeline"
+        title="Proposal pipeline"
         description="Explore the published status of each proposal. Select a verdict to narrow the records."
       />
       <nav className="ws-pipeline" aria-label="Proposal verdicts">

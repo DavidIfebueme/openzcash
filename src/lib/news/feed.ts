@@ -5,20 +5,27 @@ import { zcgDisbursements, zcgProposals } from "@/lib/db/schema";
 import { formatUsdCents } from "@/lib/zcg/format";
 import { getZechubProposals } from "@/lib/dao/zechub";
 import { getGrantApplications } from "@/lib/zcg/github-applications";
-import { titlesMatch } from "@/lib/zcg/match-titles";
+import { mergeNews } from "./merge";
+import { NEWS_REFRESH_MS } from "./config";
 import { NEWS_GITHUB_REPOSITORIES, readGitHubNews, githubNewsHealth } from "./github";
 export { githubNewsHealth } from "./github";
 
 /**
  * Cross-source "what's new" feed: the Zcash forum (Discourse), GitHub releases
  * of the core repos, and the latest rows from the ZCG spreadsheet (already
- * mirrored in our DB by the daily cron). Fetched live on the server and cached
- * hourly in-process. No DB table — "unread" is computed per-visitor from the
+ * mirrored in our DB by the accounting schedule). Public submissions and forum
+ * topics are checked every five minutes by the server, even without visitors. No DB table — "unread" is computed per-visitor from the
  * item timestamps vs a localStorage "last seen" marker.
  */
 
 export type NewsSource =
   "forum" | "github" | "sheet" | "proposal" | "dao" | "application";
+
+export type NewsReference = {
+  source: Exclude<NewsSource, "application">;
+  url: string;
+  publishedAt?: string;
+};
 
 export type NewsItem = {
   /** Source-native record identity; multiple events can share a destination URL. */
@@ -31,10 +38,9 @@ export type NewsItem = {
   /** Forum username of the original poster, when the source exposes one.
    * Lets the UI badge an item with the community that published it. */
   author?: string;
+  references?: NewsReference[];
+  program?: "zcg" | "coinholder";
 };
-
-/** Refresh cadence: the feed is re-fetched at most once an hour per instance. */
-const TTL_MS = 60 * 60_000;
 
 /**
  * How far back the feed goes. "News" means the last week: older ledger rows
@@ -42,8 +48,33 @@ const TTL_MS = 60 * 60_000;
  * turned the list into a month-long archive that contradicted its own label.
  */
 const NEWS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
-let cache: { at: number; items: NewsItem[] } | null = null;
-let inflight: Promise<NewsItem[]> | null = null;
+type FeedStore = {
+  cache: { at: number; items: NewsItem[] } | null;
+  inflight: Promise<NewsItem[]> | null;
+  sources: Map<string, { items: NewsItem[]; failed: boolean }>;
+  attemptedAt: number;
+  scheduled?: boolean;
+};
+// Instrumentation, page and summary API bundles must share one snapshot/job.
+const globalStore = globalThis as typeof globalThis & { __openZcashNewsFeed?: FeedStore };
+const store: FeedStore = globalStore.__openZcashNewsFeed ??= { cache: null, inflight: null, sources: new Map(), attemptedAt: 0 };
+
+async function readSource(key: string, read: () => Promise<NewsItem[]>): Promise<NewsItem[]> {
+  try {
+    const items = await read();
+    store.sources.set(key, { items, failed: false });
+    return items;
+  } catch {
+    const items = store.sources.get(key)?.items ?? [];
+    store.sources.set(key, { items, failed: true });
+    console.error(`[news] ${key} refresh failed; ${items.length ? "keeping last successful response" : "no previous response"}`);
+    return items;
+  }
+}
+
+export function newsUnavailableSources(): string[] {
+  return [...store.sources].filter(([, state]) => state.failed).map(([key]) => key);
+}
 
 const FORUM = "https://forum.zcashcommunity.com";
 const FORUM_MAX_AGE_MS = 120 * 24 * 60 * 60 * 1000; // surface topics from ~4 months
@@ -54,163 +85,150 @@ function iso(s: string): string {
 }
 
 async function fetchForum(): Promise<NewsItem[]> {
-  try {
-    const res = await fetch(`${FORUM}/latest.json`, {
-      headers: { accept: "application/json" },
-      signal: AbortSignal.timeout(7_000),
-      cache: "no-store",
-    });
-    if (!res.ok) return [];
-    const j = (await res.json()) as {
-      users?: Array<{ id: number; username: string }>;
-      topic_list?: {
-        topics?: Array<{
-          id: number;
-          title: string;
-          slug: string;
-          created_at: string;
-          posters?: Array<{ user_id: number }>;
-        }>;
-      };
+  const res = await fetch(`${FORUM}/latest.json`, {
+    headers: { accept: "application/json" },
+    signal: AbortSignal.timeout(7_000),
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error("Forum unavailable");
+  const j = (await res.json()) as {
+    users?: Array<{ id: number; username: string }>;
+    topic_list?: {
+      topics?: Array<{
+        id: number;
+        title: string;
+        slug: string;
+        created_at: string;
+        posters?: Array<{ user_id: number }>;
+      }>;
     };
-    const byId = new Map((j.users ?? []).map((u) => [u.id, u.username]));
-    const cutoff = Date.now() - FORUM_MAX_AGE_MS;
-    return (j.topic_list?.topics ?? [])
-      .filter((t) => t.created_at && Date.parse(t.created_at) > cutoff)
-      .map((t) => ({
-        id: `forum:${t.id}`,
-        source: "forum" as const,
-        kind: "Forum",
-        title: t.title,
-        url: `${FORUM}/t/${t.slug}/${t.id}`,
-        ts: iso(t.created_at),
-        author: byId.get(t.posters?.[0]?.user_id ?? -1),
-      }));
-  } catch {
-    return [];
-  }
+  };
+  if (!Array.isArray(j.topic_list?.topics)) throw new Error("Invalid forum response");
+  const byId = new Map((j.users ?? []).map((u) => [u.id, u.username]));
+  const cutoff = Date.now() - FORUM_MAX_AGE_MS;
+  return (j.topic_list?.topics ?? [])
+    .filter((t) => t.created_at && Date.parse(t.created_at) > cutoff)
+    .map((t) => ({
+      id: `forum:${t.id}`,
+      source: "forum" as const,
+      kind: "Forum",
+      title: t.title,
+      url: `${FORUM}/t/${t.slug}/${t.id}`,
+      ts: iso(t.created_at),
+      author: byId.get(t.posters?.[0]?.user_id ?? -1),
+    }));
 }
 
 async function fetchSheet(): Promise<NewsItem[]> {
-  try {
-    const rows = await getDb()
-      .select({
-        id: zcgDisbursements.id,
-        recipient: zcgDisbursements.recipientNameRaw,
-        usd: zcgDisbursements.amountUsdCents,
-        paid: zcgDisbursements.paidOutDate,
-        project: zcgDisbursements.project,
-      })
-      .from(zcgDisbursements)
-      .where(eq(zcgDisbursements.isPaid, true))
-      .orderBy(desc(zcgDisbursements.paidOutDate))
-      .limit(12);
-    return rows
-      .filter((r) => r.paid)
-      .map((r) => ({
-        id: `sheet:${r.id}`,
-        source: "sheet" as const,
-        kind: "ZCG ledger",
-        title: `${r.recipient ?? "Grant"} — ${formatUsdCents(r.usd ?? 0n)}`,
-        url: r.project
-          ? `/zcg/grant?g=${encodeURIComponent(r.project)}`
-          : "/zcg/disbursements",
-        ts: iso(`${r.paid}T00:00:00Z`),
-      }));
-  } catch {
-    return [];
-  }
+  const rows = await getDb()
+    .select({
+      id: zcgDisbursements.id,
+      recipient: zcgDisbursements.recipientNameRaw,
+      usd: zcgDisbursements.amountUsdCents,
+      paid: zcgDisbursements.paidOutDate,
+      project: zcgDisbursements.project,
+    })
+    .from(zcgDisbursements)
+    .where(eq(zcgDisbursements.isPaid, true))
+    .orderBy(desc(zcgDisbursements.paidOutDate))
+    .limit(12);
+  return rows
+    .filter((r) => r.paid)
+    .map((r) => ({
+      id: `sheet:${r.id}`,
+      source: "sheet" as const,
+      kind: "ZCG ledger",
+      title: `${r.recipient ?? "Grant"} — ${formatUsdCents(r.usd ?? 0n)}`,
+      url: r.project
+        ? `/zcg/grant?g=${encodeURIComponent(r.project)}`
+        : "/zcg/disbursements",
+      ts: iso(`${r.paid}T00:00:00Z`),
+    }));
 }
 
 async function fetchProposals(): Promise<NewsItem[]> {
-  try {
-    const rows = await getDb()
-      .select({
-        id: zcgProposals.id,
-        title: zcgProposals.title,
-        program: zcgProposals.program,
-        submitted: zcgProposals.submittedDate,
-        forum: zcgProposals.forumLink,
-        platform: zcgProposals.platformLink,
-      })
-      .from(zcgProposals)
-      .orderBy(desc(zcgProposals.submittedDate))
-      .limit(14);
-    return rows
-      .filter((r) => r.submitted)
-      .map((r) => ({
-        id: `proposal:${r.id}`,
-        source: "proposal" as const,
-        kind: r.program === "coinholder" ? "FPF proposal" : "ZCG proposal",
-        title: r.title,
-        url: r.forum || r.platform || "/zcg/proposals",
-        ts: iso(`${r.submitted}T00:00:00Z`),
-      }));
-  } catch {
-    return [];
-  }
+  const rows = await getDb()
+    .select({
+      id: zcgProposals.id,
+      title: zcgProposals.title,
+      program: zcgProposals.program,
+      submitted: zcgProposals.submittedDate,
+      forum: zcgProposals.forumLink,
+      platform: zcgProposals.platformLink,
+    })
+    .from(zcgProposals)
+    .orderBy(desc(zcgProposals.submittedDate))
+    .limit(14);
+  return rows
+    .filter((r) => r.submitted)
+    .map((r) => ({
+      id: `proposal:${r.id}`,
+      source: "proposal" as const,
+      kind: r.program === "coinholder" ? "FPF proposal" : "ZCG proposal",
+      program: r.program === "coinholder" ? "coinholder" as const : "zcg" as const,
+      title: r.title,
+      url: r.forum || r.platform || "/zcg/proposals",
+      ts: iso(`${r.submitted}T00:00:00Z`),
+      references: [r.platform, r.forum].filter((url): url is string => !!url).map(url => ({
+        source: url.startsWith("https://github.com/") ? "github" as const :
+          /^https:\/\/forum\.(?:zcashcommunity\.com|z\.cash)\//.test(url) ? "forum" as const : "proposal" as const,
+        url,
+      })),
+    }));
 }
 
 /** Newest ZecHub DAO proposals (DAO DAO on Juno), surfaced as news items. */
 async function fetchDao(): Promise<NewsItem[]> {
-  try {
-    const proposals = await getZechubProposals(12);
-    return proposals
-      .filter((p) => p.createdAt)
-      .map((p) => ({
-        id: `dao:${p.url}`,
-        source: "dao" as const,
-        kind: "ZecHub DAO",
-        title: `${p.ref} · ${p.title}`,
-        url: p.url,
-        ts: iso(p.createdAt),
-      }));
-  } catch {
-    return [];
-  }
+  const proposals = await getZechubProposals(12);
+  return proposals
+    .filter((p) => p.createdAt)
+    .map((p) => ({
+      id: `dao:${p.url}`,
+      source: "dao" as const,
+      kind: "ZecHub DAO",
+      title: `${p.ref} · ${p.title}`,
+      url: p.url,
+      ts: iso(p.createdAt),
+    }));
 }
 
 /** Newest ZCG grant applications (GitHub issues), surfaced first-hand. */
 async function fetchApplications(): Promise<NewsItem[]> {
-  try {
-    const apps = await getGrantApplications(15);
-    return apps.map((a) => ({
-      id: `application:${a.url}`,
-      source: "application" as const,
-      kind:
-        a.status === "review"
-          ? "Grant application · ready for review"
-          : "Grant application",
-      title: a.title,
-      url: a.url,
-      ts: iso(a.createdAt),
-    }));
-  } catch {
-    return [];
-  }
+  const apps = await getGrantApplications(40, { fresh: true });
+  return apps.map((a) => ({
+    id: `application:${a.url}`,
+    source: "application" as const,
+    kind: "ZCG proposal",
+    program: "zcg" as const,
+    title: a.title,
+    url: a.url,
+    ts: iso(a.createdAt),
+    author: a.applicant,
+  }));
 }
 
 export async function getNews(): Promise<NewsItem[]> {
   const now = Date.now();
-  if (cache && now - cache.at < TTL_MS) return cache.items;
-  if (inflight) return cache ? cache.items : inflight;
-  inflight = (async () => {
+  if (store.cache && now - store.attemptedAt < NEWS_REFRESH_MS) return store.cache.items;
+  if (store.inflight) return store.cache ? store.cache.items : store.inflight;
+  store.attemptedAt = now;
+  store.inflight = (async () => {
     try {
       return await refreshNews(now);
     } finally {
-      inflight = null;
+      store.inflight = null;
     }
   })();
-  return cache ? cache.items : inflight;
+  return store.cache ? store.cache.items : store.inflight;
 }
 
 async function refreshNews(now: number): Promise<NewsItem[]> {
   const [forum, sheet, proposals, dao, apps, ...repos] = await Promise.all([
-    fetchForum(),
-    fetchSheet(),
-    fetchProposals(),
-    fetchDao(),
-    fetchApplications(),
+    readSource("Forum", fetchForum),
+    readSource("Spreadsheet", fetchSheet),
+    readSource("Proposals mirror", fetchProposals),
+    readSource("ZecHub DAO", fetchDao),
+    readSource("GitHub proposals", fetchApplications),
     ...NEWS_GITHUB_REPOSITORIES.map(readGitHubNews),
   ]);
   // Guard against future-dated source rows (e.g. a spreadsheet typo): one item
@@ -227,38 +245,25 @@ async function refreshNews(now: number): Promise<NewsItem[]> {
     ...repos.flat(),
   ]
     .filter((i) => i.ts && i.ts <= maxTs && i.ts >= minTs)
-    .sort((a, b) => b.ts.localeCompare(a.ts))
-    .slice(0, 60);
-  // The same event often lands twice: a grant application on GitHub and its
-  // mandatory forum cross-post, or a proposal row mirrored from the sheet.
-  // Collapse those into one entry, keeping the newest (the list is already
-  // sorted newest-first) so the feed reads as events, not as sources.
-  const deduped: NewsItem[] = [];
-  for (const item of items) {
-    const dup = deduped.some(
-      (k) =>
-        k.source !== item.source &&
-        (k.title === item.title || titlesMatch(k.title, item.title)),
-    );
-    if (!dup) deduped.push(item);
-  }
+    .sort((a, b) => b.ts.localeCompare(a.ts));
+  // Merge before limiting so both source links survive at the feed boundary.
+  const merged = mergeNews(items).slice(0, 60);
+  const anySuccess = [...store.sources.values()].some(source => !source.failed) ||
+    githubNewsHealth().some(source => source.status === "live");
+  store.cache = { at: anySuccess ? now : (store.cache?.at ?? now), items: merged };
+  return merged;
+}
 
-  // Only fall back to the previous snapshot when every source failed. A
-  // genuinely quiet week must be allowed to show an empty list rather than
-  // resurrecting last week's items.
-  const allSourcesEmpty =
-    forum.length + sheet.length + proposals.length + dao.length + apps.length +
-      repos.flat().length ===
-    0;
-  if (allSourcesEmpty && cache) {
-    // GitHub has per-repository last-good reads already. Do not resurrect a
-    // release that a successful empty response removed from that source.
-    const retained = cache.items.filter(item => item.source !== "github" && item.ts >= minTs && item.ts <= maxTs);
-    cache = { at: githubNewsHealth().some(source => source.status === "live") ? now : cache.at, items: retained };
-    return retained;
-  }
-  cache = { at: now, items: deduped };
-  return deduped;
+/** The always-on web service collects independently of page visits. */
+export function startNewsSchedule(): void {
+  if (store.scheduled) return;
+  store.scheduled = true;
+  const run = () => {
+    void getNews().catch(() => console.error("[news] scheduled refresh failed"));
+  };
+  setTimeout(run, 5_000).unref();
+  // Poll the TTL frequently to avoid an almost-fresh read skipping a full cycle.
+  setInterval(run, 15_000).unref();
 }
 
 /** How far back the badge counts for a visitor with no last-seen marker. */
@@ -266,7 +271,7 @@ const FIRST_VISIT_WINDOW_MS = 48 * 3600 * 1000;
 
 /** When the in-process snapshot was taken, for the "updated" line. */
 export function newsFetchedAt(): number | null {
-  return cache?.at ?? null;
+  return store.cache?.at ?? null;
 }
 
 /**

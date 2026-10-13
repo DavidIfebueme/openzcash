@@ -7,18 +7,21 @@ import {
   getNews,
   newsFetchedAt,
   githubNewsHealth,
+  newsUnavailableSources,
   nowMs,
   type NewsItem,
   type NewsSource,
 } from "@/lib/news/feed";
 import { NewsSeen } from "@/components/news-seen";
-import { newsView, NEW_WINDOW_MS, type NewsSearchParams } from "@/lib/news/view";
+import { newsReferences } from "@/lib/news/merge";
+import { SourceRefresh } from "@/components/source-refresh";
+import { newsView, NEWS_SOURCES, NEW_WINDOW_MS, type NewsSearchParams } from "@/lib/news/view";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: "News · OpenZcash",
   description:
-    "The last seven days across the Zcash ecosystem: community forum, core GitHub releases, ZecHub DAO proposals, grant applications and new ledger entries. Refreshed hourly.",
+    "The last seven days across Zcash: proposals, community discussions, releases and grant payments.",
   path: "/news",
   card: { kicker: "The last seven days across the Zcash ecosystem" },
 });
@@ -40,11 +43,11 @@ const BY_HANDLE = new Map(
  * flip to light in the dark theme. */
 const SOURCE: Record<NewsSource, { label: string; mark: string; glyph?: boolean }> = {
   forum: { label: "Forum", mark: "/logos/marks/openzcash.png" },
-  github: { label: "GitHub", mark: "/logos/marks/github.png", glyph: true },
+  github: { label: "Releases", mark: "/logos/marks/github.png", glyph: true },
   sheet: { label: "Spreadsheet", mark: "/logos/marks/sheets.png", glyph: true },
-  proposal: { label: "Proposal", mark: "/logos/zcg.png" },
+  proposal: { label: "Proposals", mark: "/logos/zcg.png" },
   dao: { label: "ZecHub DAO", mark: "/logos/zechub.png" },
-  application: { label: "Application", mark: "/logos/zcg.png" },
+  application: { label: "Proposals", mark: "/logos/zcg.png" },
 };
 
 function rel(ts: string, now: number): string {
@@ -70,6 +73,7 @@ export default async function NewsPage({
     source.status === "cached" || source.status === "unavailable",
   );
   const showGithubWarning = githubUnavailable.length > 0 && (!source || source === "github");
+  const unavailable = newsUnavailableSources();
   const latest = items[0]?.ts ?? "";
   const newCut = now - NEW_WINDOW_MS;
   const fetchedAt = newsFetchedAt();
@@ -80,9 +84,10 @@ export default async function NewsPage({
   return (
     <>
       <NewsSeen latest={latest} />
+      <SourceRefresh />
       <PageHeader
         title="News"
-        subtitle="The last seven days across the Zcash ecosystem: community forum, core GitHub releases, ZecHub DAO proposals, grant applications and new ledger entries. Refreshed hourly."
+        subtitle="The last seven days across Zcash: proposals, community discussions, releases and grant payments."
         actions={
           newCount > 0 ? <Badge tone="rose">{newCount} new</Badge> : undefined
         }
@@ -96,14 +101,14 @@ export default async function NewsPage({
           <span>All sources</span>
           <strong>{totalCount}</strong>
         </Link>
-        {Object.entries(SOURCE).map(([key, s]) => (
+        {NEWS_SOURCES.map(key => (
           <Link
             key={key}
             href={`/news?source=${key}${q}`}
             aria-current={source === key ? "page" : undefined}
           >
-            <span>{s.label}</span>
-            <strong>{counts[key as NewsSource]}</strong>
+            <span>{SOURCE[key].label}</span>
+            <strong>{counts[key]}</strong>
           </Link>
         ))}
       </nav>
@@ -131,6 +136,8 @@ export default async function NewsPage({
         ) : null}
       </form>
 
+      <p className="ws-news-cadence">Forum &amp; proposals · every 5 min <span>Releases · hourly</span><span>Spreadsheet · every 6h</span></p>
+
       <p className="ws-news-meta">
         {shown.length === totalCount
           ? `${totalCount} updates`
@@ -140,6 +147,12 @@ export default async function NewsPage({
         {fetchedAgo ? ` · feed checked ${fetchedAgo}` : ""}. Older entries stay on
         their own pages.
       </p>
+
+      {unavailable.length > 0 ? (
+        <p role="status" className="ws-news-meta">
+          Temporarily unable to refresh {unavailable.join(", ")}. Showing the last available records; retrying automatically.
+        </p>
+      ) : null}
 
       {showGithubWarning ? (
         <p role="status" className="mb-5 rounded-xl border border-amber-300/50 bg-amber-500/5 px-4 py-3 text-sm text-stone-700">
@@ -172,13 +185,7 @@ export default async function NewsPage({
               ? (i.kind ?? s.label)
               : (i.kind ?? "");
           return (
-            <a
-              key={i.id}
-              href={i.url}
-              target={external ? "_blank" : undefined}
-              rel={external ? "noreferrer" : undefined}
-              className="ws-news-row"
-            >
+            <article key={i.id} className="ws-news-row">
               {community ? (
                 <span className="ws-news-flag" title={community.name}>
                   {community.flag}
@@ -192,14 +199,22 @@ export default async function NewsPage({
                   className={s.glyph ? "ws-news-mark ws-news-mark-glyph" : "ws-news-mark"}
                 />
               )}
-              <span className="ws-news-title">
+              <a className="ws-news-title" href={i.url} target={external ? "_blank" : undefined} rel={external ? "noreferrer" : undefined}>
                 <span>{i.title}</span>
                 {isNew ? <i className="ws-news-new" aria-label="new" /> : null}
-              </span>
+              </a>
               <span className="ws-news-kind">{kind}</span>
-              <span className="ws-news-source">{s.label}</span>
+              <nav className="ws-news-links" aria-label={`Sources for ${i.title}`}>
+                {newsReferences(i).map(ref => {
+                  const label = ref.source === "github" ? "GitHub" : ref.source === "proposal" ? "Record" : SOURCE[ref.source].label;
+                  return <a key={ref.url} href={ref.url} target={ref.url.startsWith("http") ? "_blank" : undefined} rel="noreferrer"
+                    title={ref.publishedAt ? `${label} · ${new Date(ref.publishedAt).toLocaleString("en-US", { timeZone: "UTC" })} UTC` : label}>
+                    {label}<span aria-hidden="true">↗</span>
+                  </a>;
+                })}
+              </nav>
               <span className="ws-news-date tnum">{rel(i.ts, now)}</span>
-            </a>
+            </article>
           );
         })}
       </div>

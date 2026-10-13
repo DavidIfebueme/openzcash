@@ -1,6 +1,7 @@
 import "server-only";
 import { ghHeaders } from "@/lib/zcg/github-headers";
 import type { NewsItem } from "./feed";
+import { RELEASE_REFRESH_MS } from "./config";
 
 export const NEWS_GITHUB_REPOSITORIES = [
   "ZcashFoundation/zebra", "zingolabs/zaino", "zcash/zcash",
@@ -14,7 +15,7 @@ export type NewsGitHubHealth = {
 };
 type Entry = { health: NewsGitHubHealth; items: NewsItem[] | null };
 type Store = { entries: Map<string, Entry>; inflight: Map<string, Promise<NewsItem[]>> };
-type Dependencies = { fetcher?: typeof fetch; now?: () => number; store?: Store };
+type Dependencies = { fetcher?: typeof fetch; now?: () => number; ttlMs?: number; store?: Store };
 
 function releases(value: unknown, repository: string): NewsItem[] {
   if (!Array.isArray(value)) throw new Error("GITHUB_RELEASES_UNAVAILABLE");
@@ -34,7 +35,7 @@ function releases(value: unknown, repository: string): NewsItem[] {
 }
 
 /** Each repository retains its own last good response; an explicit [] is a success. */
-export function createGitHubNewsReader({ fetcher = fetch, now = Date.now,
+export function createGitHubNewsReader({ fetcher = fetch, now = Date.now, ttlMs = RELEASE_REFRESH_MS,
   store = { entries: new Map(), inflight: new Map() },
 }: Dependencies = {}) {
   function health(): NewsGitHubHealth[] {
@@ -44,6 +45,8 @@ export function createGitHubNewsReader({ fetcher = fetch, now = Date.now,
   }
   function read(repository: string): Promise<NewsItem[]> {
     if (!NEWS_GITHUB_REPOSITORIES.some(repo => repo === repository)) return Promise.resolve([]);
+    const previous = store.entries.get(repository);
+    if (previous?.health.fetchedAt && now() - Date.parse(previous.health.fetchedAt) < ttlMs) return Promise.resolve(previous.items ?? []);
     const pending = store.inflight.get(repository);
     if (pending) return pending;
     const request = (async () => {

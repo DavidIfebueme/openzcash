@@ -11,6 +11,10 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
   if (process.env.NODE_ENV !== "production") return;
+  if (process.env.DISABLE_AUTO_REFRESH !== "true") {
+    const { startNewsSchedule } = await import("@/lib/news/feed");
+    startNewsSchedule();
+  }
   // Public policy collection has its own durable daily checkpoint.
   const { startLegalSchedule } = await import("@/lib/legal/schedule");
   startLegalSchedule();

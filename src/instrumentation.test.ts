@@ -3,6 +3,7 @@ import { register } from "./instrumentation";
 
 const jobs = vi.hoisted(() => ({
   startMarketSnapshots: vi.fn(),
+  startNewsSchedule: vi.fn(),
   startLegalSchedule: vi.fn(),
   refreshZcg: vi.fn(async () => ({
     ok: true,
@@ -18,6 +19,7 @@ const jobs = vi.hoisted(() => ({
   warmDiligence: vi.fn(async () => ({ ok: true, proposals: 0 })),
   startCanarySchedule: vi.fn(() => true),
 }));
+vi.mock("@/lib/news/feed", () => ({ startNewsSchedule: jobs.startNewsSchedule }));
 vi.mock("@/lib/legal/schedule", () => ({ startLegalSchedule: jobs.startLegalSchedule }));
 vi.mock("@/lib/markets/sources", () => ({ startMarketSnapshots: jobs.startMarketSnapshots }));
 vi.mock("@/lib/zcg/refresh", () => ({ refreshZcg: jobs.refreshZcg }));
@@ -53,6 +55,7 @@ describe("server data collection scheduling", () => {
   it("keeps a test snapshot intact across server restarts", async () => {
     vi.stubEnv("DISABLE_AUTO_REFRESH", "true");
     await register();
+    expect(jobs.startNewsSchedule).not.toHaveBeenCalled();
     // The cycle still runs, but nothing that writes to the database does.
     expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(jobs.startLegalSchedule).toHaveBeenCalledTimes(1);
@@ -71,6 +74,7 @@ describe("server data collection scheduling", () => {
   it("retains startup and recurring collection when enabled", async () => {
     vi.stubEnv("DISABLE_AUTO_REFRESH", undefined);
     await register();
+    expect(jobs.startNewsSchedule).toHaveBeenCalledTimes(1);
     expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(jobs.startLegalSchedule).toHaveBeenCalledTimes(1);
     expect(jobs.startCanarySchedule).toHaveBeenCalledTimes(1);
@@ -85,6 +89,7 @@ describe("server data collection scheduling", () => {
   it("does nothing outside the production Node runtime", async () => {
     vi.stubEnv("NODE_ENV", "test");
     await register();
+    expect(jobs.startNewsSchedule).not.toHaveBeenCalled();
     expect(jobs.startMarketSnapshots).not.toHaveBeenCalled();
     expect(jobs.startLegalSchedule).not.toHaveBeenCalled();
     expect(jobs.startCanarySchedule).not.toHaveBeenCalled();

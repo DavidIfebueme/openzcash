@@ -34,6 +34,7 @@ const at = Date.parse("2026-10-05T07:00:00Z");
 
 beforeEach(() => {
   vi.resetModules();
+  delete (globalThis as typeof globalThis & { __openZcashNewsFeed?: unknown }).__openZcashNewsFeed;
   vi.useFakeTimers();
   vi.setSystemTime(at);
   records.sheet = [];
