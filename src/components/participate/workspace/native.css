@@ -7,6 +7,18 @@
   pointer-events: none;
 }
 
+/* The portal's generic form rule has higher specificity than the workspace
+   select styles. Keep a separate lane for the revision chevron. */
+.oz-participate .proposal-inline-record-heading .dao-comment-sort {
+  flex: 0 0 auto;
+  max-width: 100%;
+}
+.rd-content .oz-participate .dao-app .proposal-inline-record .proposal-inline-record-heading .dao-comment-sort select {
+  min-inline-size: 168px;
+  max-inline-size: 100%;
+  padding-inline-end: 40px;
+}
+
 /* Dark appearance follows the OpenZcash palette (black and gold, the values of
    theme.css) instead of the service's own greys, so the workspace reads as one
    system with the shell. Literal values: the service's scoped root redefines
