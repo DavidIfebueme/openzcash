@@ -1,7 +1,7 @@
 import { z } from "zod/v3";
 import { ARCHIVE_SCHEMA, SOURCE_ARCHIVE_SCOPE, canonicalJson, sha256, utf8, decodeFile, verifyArchivePackage, digestSchema, type ArchiveManifest } from "./format";
 import { ZCG_REVIEW_SOURCE, zcgReviewProposalSchema } from "@/lib/participate/workspace/domain/zcg-review";
-import { classifyZcgSectors, zcgSourceMetadataSchema } from "@/lib/participate/workspace/domain/zcg-source-metadata";
+import { classifyZcgSectors, readZcgSourceCategory, zcgSourceMetadataSchema } from "@/lib/participate/workspace/domain/zcg-source-metadata";
 import { proposalTagsSchema } from "@/lib/participate/workspace/domain/proposal-tags";
 import { fingerprintSourceObservation, sourceEvidenceSchema, sourceIssueSchema, sourceObservationOutcome, sourceOutcomeSchema, validateSourceEvidence, type SourceEvidence } from "./source-updates";
 
@@ -53,7 +53,7 @@ export type SourceCapture = z.infer<typeof sourceCaptureSchema>;
 export async function buildSourceProposal(input: unknown, issueNumber: number, capturedAt: string, revision = 1, previousManifestHash: string | null = null) {
   const issue = issueSchema.parse(input);
   if (issue.number !== issueNumber || issue.html_url !== `${ZCG_REVIEW_SOURCE}/${issueNumber}` || new Date(issue.updated_at) > new Date(capturedAt) || new Date(issue.created_at) > new Date(issue.updated_at)) throw new Error("Source identity or timestamp mismatch");
-  const category = issue.body.match(/^###\s+Proposal Category\s*\r?\n\s*\r?\n([^\r\n]+)/im)?.[1]?.trim() || null;
+  const category = readZcgSourceCategory(issue.body);
   // Never guess money from prose. Source Markdown retains the full submitted budget.
   const source = sourceSchema.parse({ recordId: `zcg-github-${issue.number}`, issueNumber: issue.number, url: issue.html_url, title: issue.title, state: issue.state,
     updatedAt: issue.updated_at, category, labels: issue.labels.map(label => ({ ...label, color: label.color.toLowerCase(), description: label.description ?? "" })) });
@@ -79,7 +79,7 @@ export async function buildSourceUpdate(input: unknown, issueNumber: number, cap
   }
   const evidence = validateSourceEvidence(inputEvidence, issueNumber, capturedAt, issue.created_at);
   const recordId = previous?.recordId ?? `zcg-github-${issueNumber}`;
-  const category = issue.body.match(/^###\s+Proposal Category\s*\r?\n\s*\r?\n([^\r\n]+)/im)?.[1]?.trim() || null;
+  const category = readZcgSourceCategory(issue.body);
   const source = sourceSchema.parse({ recordId, issueNumber, url: issue.html_url, title: issue.title, state: issue.state,
     updatedAt: issue.updated_at, category,
     labels: issue.labels.map(label => ({ ...label, color: label.color.toLowerCase(), description: label.description ?? "" })) });
@@ -115,4 +115,12 @@ export async function verifySourceProposal(input: unknown, expectedHash: string)
     if (observationHash !== capture.observationHash) throw new Error("Source observation does not match its fingerprint");
   }
   return { ...checked, capture };
+}
+
+/** Derive display metadata from verified files without changing a preserved capture or its hashes. */
+export function sourceCaptureSummary(checked: Awaited<ReturnType<typeof verifySourceProposal>>) {
+  const { schema, checkedAt, proposal, source } = checked.capture;
+  const markdown = checked.bundle.files.find(file => file.path === "proposal.md");
+  const sourceCategory = source.category ?? (markdown ? readZcgSourceCategory(new TextDecoder("utf-8", { fatal: true }).decode(decodeFile(markdown))) : null);
+  return { sourceCapture: { schema, checkedAt, proposal, source }, sourceCategory };
 }

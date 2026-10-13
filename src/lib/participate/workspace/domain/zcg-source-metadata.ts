@@ -23,6 +23,29 @@ export const zcgSourceMetadataSchema = z.object({
 });
 export type ZcgSourceMetadata = z.infer<typeof zcgSourceMetadataSchema>["proposals"][number];
 
+/** Read the applicant's category from either official template heading, never from another section. */
+export function readZcgSourceCategory(markdown: string | null | undefined): string | null {
+  if (!markdown) return null;
+  const lines = markdown.split(/\r?\n/);
+  let fence: { character: string; length: number } | null = null;
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const marker = line.match(/^ {0,3}(`{3,}|~{3,})(.*)$/);
+    if (marker) {
+      if (!fence) fence = { character: marker[1][0], length: marker[1].length };
+      else if (marker[1][0] === fence.character && marker[1].length >= fence.length && !marker[2].trim()) fence = null;
+      continue;
+    }
+    if (fence || !/^ {0,3}###[ \t]+(?:Proposal[ \t]+)?Category[ \t]*$/i.test(line)) continue;
+    let valueIndex = index + 1;
+    while (valueIndex < lines.length && !lines[valueIndex].trim()) valueIndex++;
+    const value = lines[valueIndex]?.trim();
+    if (!value || value.length > 200 || /^(?:#{1,6}(?:\s|$)|`{3,}|~{3,})/.test(value) || /^_?No response_?$/i.test(value)) return null;
+    return value;
+  }
+  return null;
+}
+
 const categories = new Map<string, ProposalTagId>([
   ...PROPOSAL_TAGS.map(tag => [tag.label.toLowerCase(), tag.id] as [string, ProposalTagId]),
   ["non-wallet applications", "applications"], ["non wallet applications", "applications"], ["research and development", "research"]

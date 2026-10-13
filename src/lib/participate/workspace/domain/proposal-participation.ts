@@ -11,6 +11,8 @@ export type ProposalParticipation = {
   likedByMe: boolean;
   chargedBefore: boolean;
   abandonment?: ProposalAbandonment | null;
+  /** Display annotation recovered from the verified source Markdown; not an archive rewrite. */
+  sourceCategory?: string | null;
   sourceCapture?: Pick<SourceCapture, "schema" | "checkedAt" | "proposal" | "source">;
 };
 export type ProposalParticipationBoard = {

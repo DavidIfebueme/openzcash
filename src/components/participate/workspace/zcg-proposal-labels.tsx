@@ -9,10 +9,11 @@ import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-m
 
 const outcomeLabels = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Abandoned", closed: "Closed" };
 
-export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [], outcome, sourceOverride }: { recordId: string; title: string; tags: readonly string[]; committeeLabels?: readonly string[]; outcome?: ReturnType<typeof githubProposalOutcome>; sourceOverride?: ZcgSourceMetadata }) {
+export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [], outcome, sourceOverride, categoryOverride }: { recordId: string; title: string; tags: readonly string[]; committeeLabels?: readonly string[]; outcome?: ReturnType<typeof githubProposalOutcome>; sourceOverride?: ZcgSourceMetadata; categoryOverride?: string | null }) {
   const source = sourceOverride ?? zcgSourceMetadata(recordId);
-  const sectors = classifyZcgSectors(title, source?.category, tags);
-  const declared = sourceCategoryTag(source?.category);
+  const category = categoryOverride ?? source?.category;
+  const sectors = classifyZcgSectors(title, category, tags);
+  const declared = sourceCategoryTag(category);
   const names = new Set(source?.labels.map(label => label.name.toLowerCase()) ?? []);
   const local = selectedCommitteeLabels(committeeLabels).filter(label => !names.has(label.name.toLowerCase())).map(label => label.id);
   const statusLabel = outcome ? zcgCurrentStatusLabel(source, outcome) : null;
@@ -28,7 +29,7 @@ export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [],
       {!outcome ? <span className="zcg-tag-origin">Sectors</span> : null}
       <ul className="dao-proposal-tags" aria-label="Proposal sectors">{sectors.map(id => {
         const tag = PROPOSAL_TAGS.find(tag => tag.id === id)!;
-        return <li key={id} className={`dao-topic dao-topic--${tag.tone}`} title={id === declared ? `Applicant category on GitHub · ${source!.category}` : "OpenZcash sector classification"}>{tag.label}</li>;
+        return <li key={id} className={`dao-topic dao-topic--${tag.tone}`} title={id === declared ? `Applicant category on GitHub · ${category}` : "OpenZcash sector classification"}>{tag.label}</li>;
       })}</ul>
     </div> : null}
     {local.length ? <div className="zcg-tag-group"><span className="zcg-tag-origin">Committee</span><CommitteeLabels ids={local} /></div> : null}
