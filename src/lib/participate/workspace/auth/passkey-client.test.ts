@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { passkeyBrowserAvailable, signInWithPasskey } from "./passkey-client";
+import { passkeyBrowserAvailable, registerPasskey, signInWithPasskey } from "./passkey-client";
 
 const webauthn = vi.hoisted(() => ({ browserSupportsWebAuthn: vi.fn(), startAuthentication: vi.fn(), startRegistration: vi.fn() }));
 vi.mock("@simplewebauthn/browser", () => webauthn);
@@ -53,5 +53,23 @@ describe("passkey access on the public origin", () => {
     webauthn.startAuthentication.mockRejectedValue(new DOMException("Cancelled", "NotAllowedError"));
     await expect(signInWithPasskey("/zcg/participate")).rejects.toThrow("Cancelled");
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+  it("requests first-key options without a code and verifies only the device response", async () => {
+    const options = { challenge: "recent-email", rp: { id: "openzcash.org" } };
+    const credential = { id: "created-key" };
+    const fetchMock = vi.fn().mockResolvedValueOnce({ ok: true, json: async () => ({ options }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ passkey: { id: "created-key" } }) });
+    vi.stubGlobal("fetch", fetchMock); webauthn.startRegistration.mockResolvedValue(credential);
+    await registerPasskey("OpenZcash");
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toEqual({ label: "OpenZcash" });
+    expect(webauthn.startRegistration).toHaveBeenCalledWith({ optionsJSON: options });
+    expect(JSON.parse(fetchMock.mock.calls[1][1].body)).toEqual(credential);
+  });
+  it("never opens the authenticator when recent email authorization has expired", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: false, json: async () => ({ error: "PASSKEY_EMAIL_CONFIRMATION_REQUIRED" }) });
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(registerPasskey("OpenZcash")).rejects.toThrow("PASSKEY_EMAIL_CONFIRMATION_REQUIRED");
+    expect(webauthn.startRegistration).not.toHaveBeenCalled();
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 });

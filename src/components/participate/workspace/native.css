@@ -212,3 +212,32 @@
   .oz-participate .dao-comment .dao-moderation-form,
   .oz-participate .dao-comment .dao-reaction-error { margin-left: var(--comment-inset) !important; }
 }
+
+/* Keep each access step focused on one action, with the optional step easy to skip. */
+.oz-participate .dao-app .dao-auth-dialog { padding: 32px; border-radius: 20px; }
+.oz-participate .dao-app .dao-auth-dialog .dao-auth-description { margin: 10px 0 24px; line-height: 1.5; }
+.oz-participate .dao-app .dao-auth-form { gap: 16px; }
+/* The portal's typed-input rule otherwise wins over the workspace theme. */
+.oz-participate .dao-theme-root .dao-app :is(.dao-auth-form .dao-auth-field, .dao-passkey-form .dao-field) input:not([type="hidden"]) { min-height: 46px; height: auto; padding: 11px 14px; background: var(--dao-soft); color: var(--dao-ink); border-color: var(--dao-control-border); font-size: 16px; line-height: 1.5; }
+.oz-participate .dao-theme-root .dao-app :is(.dao-auth-form .dao-auth-field, .dao-passkey-form .dao-field) input::placeholder { color: var(--dao-muted); }
+.oz-participate .dao-theme-root .dao-app :is(.dao-auth-form .dao-auth-field, .dao-passkey-form .dao-field) input:focus-visible { border-color: var(--dao-accent); outline: 2px solid var(--dao-accent); outline-offset: 2px; }
+.oz-participate .dao-theme-root .dao-app :is(.dao-auth-form .dao-auth-field, .dao-passkey-form .dao-field) input:is(:autofill, :-webkit-autofill) { -webkit-text-fill-color: var(--dao-ink); box-shadow: 0 0 0 1000px var(--dao-soft) inset; }
+.oz-participate .dao-app .dao-auth-submit { min-height: 46px; border-radius: 10px; background-image: none; box-shadow: none; text-transform: none; letter-spacing: normal; }
+.oz-participate .dao-app .dao-auth-code-destination { margin: 20px 0 2px; text-align: center; font-size: 13px; overflow-wrap: anywhere; }
+.oz-participate .dao-app .dao-auth-form .dao-auth-note { margin: 0; font-size: 12px; text-align: center; }
+.oz-participate .dao-app .dao-auth-help { margin-top: 2px; text-align: center; }
+.oz-participate .dao-app .dao-auth-help summary { margin-inline: auto; }
+.oz-participate .dao-app .dao-passkey-onboarding { gap: 18px; margin-top: 0; }
+.oz-participate .dao-app .dao-passkey-onboarding .dao-field-hint,
+.oz-participate .dao-app .dao-passkey-onboarding .dao-auth-note { margin: 0; text-align: center; }
+.oz-participate .dao-app .dao-passkey-verified { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0; color: var(--dao-muted); font-size: 12px; }
+.oz-participate .dao-app .dao-passkey-onboarding .dao-passkey-actions { display: flex; flex-direction: column; gap: 4px; }
+.oz-participate .dao-app .dao-passkey-onboarding .dao-passkey-actions .dao-button--primary { order: -1; width: 100%; min-height: 46px; justify-content: center; padding: 12px 14px; border: 0; border-radius: 10px; background: var(--dao-primary-bg); color: var(--dao-primary-ink); box-shadow: none; text-transform: none; letter-spacing: normal; }
+.oz-participate .dao-app .dao-passkey-onboarding .dao-passkey-actions .dao-button--primary:hover { background: var(--dao-primary-hover); }
+.oz-participate .dao-app .dao-passkey-skip { width: 100%; min-height: 44px; justify-content: center; text-align: center; color: var(--dao-muted); font-size: 13px; text-decoration: none; }
+.oz-participate .dao-app .dao-passkey-skip:hover { color: var(--dao-ink); text-decoration: underline; text-underline-offset: 3px; }
+.oz-participate .dao-app .dao-passkey-onboarding .dao-form-error { margin: 0; }
+.oz-participate .dao-app .dao-passkey-onboarding .dao-auth-note { color: var(--dao-muted); font-size: 12px; }
+@media (max-width: 420px) {
+  .oz-participate .dao-app .dao-auth-dialog { padding: 28px 22px; }
+}

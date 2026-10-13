@@ -13,6 +13,7 @@ const messages: Record<string, string> = {
   PASSKEY_NOT_FOUND: "This passkey is no longer available. Reload your settings.",
   PASSKEY_RATE_LIMITED: "Too many attempts. Please wait before trying again.",
   PASSKEY_ACCOUNT_REQUIRED: "Sign in to your account to manage passkeys.",
+  PASSKEY_EMAIL_CONFIRMATION_REQUIRED: "Confirm your email again to create this passkey.",
   PASSKEY_EMBEDDED: "Passkeys are not available in this embedded pilot. You can still sign in by email.",
   forbidden_origin: "Open the original site address and try again.",
   unauthorized: "Sign in again to manage passkeys."
@@ -61,7 +62,7 @@ export async function signInWithPasskey(next: string) {
 
 export type PasskeySummary = { id: string; label: string; createdAt: string; lastUsedAt: string | null };
 
-export async function registerPasskey(label: string, code: string) {
+export async function registerPasskey(label: string, code?: string) {
   requirePasskeyBrowser();
   const { options } = await passkeyFetch<{ options: PublicKeyCredentialCreationOptionsJSON }>("/api/account/passkeys", { label, code });
   const credential = await startRegistration({ optionsJSON: options });

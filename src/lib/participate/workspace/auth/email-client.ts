@@ -16,10 +16,19 @@ const messages: Record<string, string> = {
 export function emailErrorMessage(error: unknown) {
   return error instanceof Error && messages[error.message] ? messages[error.message] : "Check your connection and try again.";
 }
+export class EmailRequestError extends Error {
+  constructor(message: string, public readonly retryAfter = 0) { super(message); this.name = "EmailRequestError"; }
+}
+export function emailRetryAfter(error: unknown): number {
+  return error instanceof EmailRequestError ? error.retryAfter : 0;
+}
 export async function emailFetch<T>(url: string, body?: unknown): Promise<T> {
   const response = await fetch(url, { method: body === undefined ? "GET" : "POST", credentials: "same-origin", cache: "no-store",
     ...(body === undefined ? {} : { headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }) });
   const data = await response.json().catch(() => null);
-  if (!response.ok || !data) throw new Error(data?.error ?? "EMAIL_UNAVAILABLE");
+  if (!response.ok || !data) {
+    const seconds = Number(data?.retryAfter ?? response.headers?.get("Retry-After"));
+    throw new EmailRequestError(data?.error ?? "EMAIL_UNAVAILABLE", Number.isFinite(seconds) && seconds > 0 ? Math.ceil(seconds) : 0);
+  }
   return data as T;
 }
