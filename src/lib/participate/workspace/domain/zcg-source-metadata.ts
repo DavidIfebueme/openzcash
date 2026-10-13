@@ -23,8 +23,7 @@ export const zcgSourceMetadataSchema = z.object({
 });
 export type ZcgSourceMetadata = z.infer<typeof zcgSourceMetadataSchema>["proposals"][number];
 
-/** Read the applicant's category from either official template heading, never from another section. */
-export function readZcgSourceCategory(markdown: string | null | undefined): string | null {
+function readZcgSourceField(markdown: string | null | undefined, heading: RegExp, singleValue = false): string | null {
   if (!markdown) return null;
   const lines = markdown.split(/\r?\n/);
   let fence: { character: string; length: number } | null = null;
@@ -36,14 +35,35 @@ export function readZcgSourceCategory(markdown: string | null | undefined): stri
       else if (marker[1][0] === fence.character && marker[1].length >= fence.length && !marker[2].trim()) fence = null;
       continue;
     }
-    if (fence || !/^ {0,3}###[ \t]+(?:Proposal[ \t]+)?Category[ \t]*$/i.test(line)) continue;
+    if (fence || !heading.test(line)) continue;
     let valueIndex = index + 1;
     while (valueIndex < lines.length && !lines[valueIndex].trim()) valueIndex++;
     const value = lines[valueIndex]?.trim();
     if (!value || value.length > 200 || /^(?:#{1,6}(?:\s|$)|`{3,}|~{3,})/.test(value) || /^_?No response_?$/i.test(value)) return null;
+    if (singleValue) {
+      for (let trailing = valueIndex + 1; trailing < lines.length; trailing++) {
+        if (/^ {0,3}#{1,6}(?:[ \t]|$)/.test(lines[trailing])) break;
+        if (lines[trailing].trim()) return null;
+      }
+    }
     return value;
   }
   return null;
+}
+
+/** Read the applicant's category from either official template heading, never from another section. */
+export function readZcgSourceCategory(markdown: string | null | undefined): string | null {
+  return readZcgSourceField(markdown, /^ {0,3}###[ \t]+(?:Proposal[ \t]+)?Category[ \t]*$/i);
+}
+
+/** Only the official requested-USD field; budgets, milestones and free-form money mentions are not substitutes. */
+export function readZcgSourceRequestedUsd(markdown: string | null | undefined): number | null {
+  const value = readZcgSourceField(markdown, /^ {0,3}###[ \t]+Requested Grant Amount \(USD\)[ \t]*$/i, true);
+  if (!value) return null;
+  const match = value.match(/^(?:\$[ \t]*)?((?:0|[1-9]\d*|[1-9]\d{0,2}(?:,\d{3})+)(?:\.\d{1,2})?)(?:[ \t]+USD)?$/i);
+  if (!match) return null;
+  const amount = Number(match[1].replace(/,/g, ""));
+  return Number.isFinite(amount) && amount <= 100_000_000 ? amount : null;
 }
 
 const categories = new Map<string, ProposalTagId>([

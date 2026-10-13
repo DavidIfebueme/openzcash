@@ -13,6 +13,8 @@ export type ProposalParticipation = {
   abandonment?: ProposalAbandonment | null;
   /** Display annotation recovered from the verified source Markdown; not an archive rewrite. */
   sourceCategory?: string | null;
+  /** Requested amount from the verified application field, never an approved budget. */
+  sourceRequestedUsd?: number | null;
   sourceCapture?: Pick<SourceCapture, "schema" | "checkedAt" | "proposal" | "source">;
 };
 export type ProposalParticipationBoard = {

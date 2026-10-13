@@ -46,4 +46,24 @@ describe("source category annotations", () => {
     expect(html).toContain('title="OpenZcash sector classification">Integration');
     expect(html.match(/>Wallets</g)).toHaveLength(1);
   });
+
+  it.each([[38000, "$38,000"], [38000.25, "$38,000.25"], [0, "$0"], [null, null]] as const)(
+    "shows a recovered request of %s USD without presenting it as approved", async (amount, formatted) => {
+      const checked = await buildSourceProposal(issue, 479, "2026-10-12T12:00:00.000Z");
+      const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+        initialBudgets={{ version: 1, importedAt: "2026-10-12T12:00:00.000Z", budgets: {} }}
+        board={{ canParticipate: false, participation: null, proposals: [{
+          recordId: checked.manifest.recordId, title: issue.title, sourceCapture: checked.capture,
+          sourceCategory: "Infrastructure", sourceRequestedUsd: amount,
+          commentCount: 0, likes: 0, likedByMe: false, chargedBefore: false,
+        }] }} />);
+      if (formatted !== null) {
+        expect(html).toContain(`aria-label="Requested budget: ${formatted} USD"`);
+        expect(html).toContain(`<strong>${formatted}</strong><span>USD requested</span>`);
+      } else expect(html).not.toContain("Requested budget:");
+      expect(html).not.toContain("Approved budget:");
+      expect(html).not.toContain("ZEC today");
+      expect(checked.capture.proposal.requestedUsd).toBeNull();
+    },
+  );
 });

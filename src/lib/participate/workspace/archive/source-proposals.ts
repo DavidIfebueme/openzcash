@@ -1,7 +1,7 @@
 import { z } from "zod/v3";
 import { ARCHIVE_SCHEMA, SOURCE_ARCHIVE_SCOPE, canonicalJson, sha256, utf8, decodeFile, verifyArchivePackage, digestSchema, type ArchiveManifest } from "./format";
 import { ZCG_REVIEW_SOURCE, zcgReviewProposalSchema } from "@/lib/participate/workspace/domain/zcg-review";
-import { classifyZcgSectors, readZcgSourceCategory, zcgSourceMetadataSchema } from "@/lib/participate/workspace/domain/zcg-source-metadata";
+import { classifyZcgSectors, readZcgSourceCategory, readZcgSourceRequestedUsd, zcgSourceMetadataSchema } from "@/lib/participate/workspace/domain/zcg-source-metadata";
 import { proposalTagsSchema } from "@/lib/participate/workspace/domain/proposal-tags";
 import { fingerprintSourceObservation, sourceEvidenceSchema, sourceIssueSchema, sourceObservationOutcome, sourceOutcomeSchema, validateSourceEvidence, type SourceEvidence } from "./source-updates";
 
@@ -54,11 +54,11 @@ export async function buildSourceProposal(input: unknown, issueNumber: number, c
   const issue = issueSchema.parse(input);
   if (issue.number !== issueNumber || issue.html_url !== `${ZCG_REVIEW_SOURCE}/${issueNumber}` || new Date(issue.updated_at) > new Date(capturedAt) || new Date(issue.created_at) > new Date(issue.updated_at)) throw new Error("Source identity or timestamp mismatch");
   const category = readZcgSourceCategory(issue.body);
-  // Never guess money from prose. Source Markdown retains the full submitted budget.
+  // Money comes only from the exact requested-USD field; preserve all source Markdown unchanged.
   const source = sourceSchema.parse({ recordId: `zcg-github-${issue.number}`, issueNumber: issue.number, url: issue.html_url, title: issue.title, state: issue.state,
     updatedAt: issue.updated_at, category, labels: issue.labels.map(label => ({ ...label, color: label.color.toLowerCase(), description: label.description ?? "" })) });
   const proposal = zcgReviewProposalSchema.parse({ id: source.recordId, issueNumber: issue.number, title: issue.title, applicant: issue.user.login, outcome: "under_review", state: issue.state,
-    submittedAt: issue.created_at, sourceUpdatedAt: issue.updated_at, requestedUsd: null, tags: classifyZcgSectors(issue.title, category, []), labels: source.labels.map(label => label.name), proposalUrl: issue.html_url });
+    submittedAt: issue.created_at, sourceUpdatedAt: issue.updated_at, requestedUsd: readZcgSourceRequestedUsd(issue.body), tags: classifyZcgSectors(issue.title, category, []), labels: source.labels.map(label => label.name), proposalUrl: issue.html_url });
   const capture = sourceCaptureSchema.parse({ schema: "PARTICIPATE_SOURCE_CAPTURE_V1", checkedAt: capturedAt, proposal, source });
   const inputs = [{ path: "proposal.md", mediaType: "text/markdown" as const, text: issue.body }, { path: "source.json", mediaType: "application/json" as const, text: canonicalJson(capture) }];
   const files = await Promise.all(inputs.map(async file => ({ path: file.path, mediaType: file.mediaType, bytes: utf8(file.text).length, sha256: await sha256(utf8(file.text)) })));
@@ -85,7 +85,7 @@ export async function buildSourceUpdate(input: unknown, issueNumber: number, cap
     labels: issue.labels.map(label => ({ ...label, color: label.color.toLowerCase(), description: label.description ?? "" })) });
   const proposal = sourceUpdateProposalSchema.parse({ id: recordId, issueNumber, title: issue.title, applicant: issue.user.login,
     outcome: sourceObservationOutcome(issue.state, source.labels.map(label => label.name)), state: issue.state,
-    submittedAt: issue.created_at, sourceUpdatedAt: issue.updated_at, requestedUsd: null,
+    submittedAt: issue.created_at, sourceUpdatedAt: issue.updated_at, requestedUsd: readZcgSourceRequestedUsd(issue.body),
     tags: classifyZcgSectors(issue.title, category, []), labels: source.labels.map(label => label.name), proposalUrl: issue.html_url });
   const capture = sourceCaptureV2Schema.parse({ schema: "PARTICIPATE_SOURCE_CAPTURE_V2", checkedAt: capturedAt, proposal, source,
     sourceStateReason: issue.state_reason ?? null, evidence, evidenceScope: SOURCE_EVIDENCE_SCOPE,
@@ -121,6 +121,8 @@ export async function verifySourceProposal(input: unknown, expectedHash: string)
 export function sourceCaptureSummary(checked: Awaited<ReturnType<typeof verifySourceProposal>>) {
   const { schema, checkedAt, proposal, source } = checked.capture;
   const markdown = checked.bundle.files.find(file => file.path === "proposal.md");
-  const sourceCategory = source.category ?? (markdown ? readZcgSourceCategory(new TextDecoder("utf-8", { fatal: true }).decode(decodeFile(markdown))) : null);
-  return { sourceCapture: { schema, checkedAt, proposal, source }, sourceCategory };
+  const text = markdown ? new TextDecoder("utf-8", { fatal: true }).decode(decodeFile(markdown)) : null;
+  const sourceCategory = source.category ?? readZcgSourceCategory(text);
+  const sourceRequestedUsd = proposal.requestedUsd ?? readZcgSourceRequestedUsd(text);
+  return { sourceCapture: { schema, checkedAt, proposal, source }, sourceCategory, sourceRequestedUsd };
 }

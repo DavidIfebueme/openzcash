@@ -47,7 +47,7 @@ async function renderApproved(initialBudgets: ApprovedBudgetSnapshot | null) {
   return renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
     initialRecordId={update.manifest.recordId} initialBudgets={initialBudgets}
     board={{ canParticipate: false, participation: null, proposals: [{
-      recordId: update.manifest.recordId, title: issue.title, sourceCapture: update.capture,
+      recordId: update.manifest.recordId, title: issue.title, sourceCapture: update.capture, sourceRequestedUsd: 99999,
       commentCount: 0, likes: 0, likedByMe: false, chargedBefore: false,
     }] }} />);
 }

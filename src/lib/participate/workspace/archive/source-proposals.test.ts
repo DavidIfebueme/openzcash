@@ -33,17 +33,18 @@ it("detects file tampering and links a later capture to the exact previous revis
   await expect(buildSourceProposal(issue, issue.number, capturedAt, 2, null)).rejects.toThrow();
 });
 
-it.each(["V1", "V2"])("captures the current Category heading on new %s imports", async version => {
-  const bridge = { ...issue, title: "Grant Application - Zcash Private Receive Bridge", body: "### Category\n\nInfrastructure\n\n### Project Summary\nLocal block cache." };
+it.each(["V1", "V2"])("captures category and requested amount fields on new %s imports", async version => {
+  const bridge = { ...issue, title: "Grant Application - Zcash Private Receive Bridge", body: "### Requested Grant Amount (USD)\n\n$38,000\n\n### Category\n\nInfrastructure\n\n### Project Summary\nLocal block cache." };
   const checked = version === "V1" ? await buildSourceProposal(bridge, issue.number, capturedAt)
     : await buildSourceUpdate(bridge, issue.number, capturedAt, null, { events: [], comments: [] });
   expect(checked.capture.source.category).toBe("Infrastructure");
   expect(checked.capture.proposal.tags).toEqual(["infrastructure"]);
+  expect(checked.capture.proposal.requestedUsd).toBe(38000);
   expect(new TextDecoder().decode(decodeFile(checked.bundle.files[0]))).toBe(bridge.body);
 });
 
-it.each(["V1", "V2"])("recovers the display category from a frozen %s capture without modifying its files or recorded metadata", async version => {
-  const bridge = { ...issue, title: "Grant Application - Zcash Private Receive Bridge", body: "### Category\r\n\r\nInfrastructure\r\n\r\n### Project Summary\r\nLocal block cache." };
+it.each(["V1", "V2"])("recovers display category and requested amount from a frozen %s capture without modifying its files or recorded metadata", async version => {
+  const bridge = { ...issue, title: "Grant Application - Zcash Private Receive Bridge", body: "### Requested Grant Amount (USD)\r\n\r\n$38,000\r\n\r\n### Category\r\n\r\nInfrastructure\r\n\r\n### Project Summary\r\nLocal block cache." };
   const generated = version === "V1" ? await buildSourceProposal(bridge, issue.number, capturedAt)
     : await buildSourceUpdate(bridge, issue.number, capturedAt, null, { events: [], comments: [] });
   // Reproduce the old importer: the Markdown was preserved, but it did not recognize Category.
@@ -52,6 +53,7 @@ it.each(["V1", "V2"])("recovers the display category from a frozen %s capture wi
   const capture = JSON.parse(new TextDecoder().decode(decodeFile(sourceFile)));
   capture.source.category = null;
   capture.proposal.tags = [];
+  capture.proposal.requestedUsd = null;
   const sourceText = canonicalJson(capture);
   sourceFile.data = Buffer.from(sourceText).toString("base64");
   const manifest = JSON.parse(legacy.manifest);
@@ -64,6 +66,8 @@ it.each(["V1", "V2"])("recovers the display category from a frozen %s capture wi
   const verified = await verifySourceProposal(legacy, manifestHash);
   const summary = sourceCaptureSummary(verified);
   expect(summary.sourceCategory).toBe("Infrastructure");
+  expect(summary.sourceRequestedUsd).toBe(38000);
+  expect(summary.sourceCapture.proposal.requestedUsd).toBeNull();
   expect(summary.sourceCapture.source.category).toBeNull();
   expect(summary.sourceCapture.proposal.tags).toEqual([]);
   expect(summary.sourceCapture.source.labels).toEqual(capture.source.labels);
