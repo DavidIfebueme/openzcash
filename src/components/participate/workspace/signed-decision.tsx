@@ -44,7 +44,7 @@ const messages: Record<string, string> = {
 const formatTime = (value: string) => new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
 const explain = (error: unknown) => error instanceof Error && messages[error.message] ? messages[error.message] : passkeyErrorMessage(error);
 
-export function SignedDecision({ endpoint, revision, initiallyOpen = false, onChanged }: { endpoint: string; revision: number; sessionKey?: string; initiallyOpen?: boolean; onChanged?: () => void | Promise<void> }) {
+export function SignedDecision({ endpoint, revision, initiallyOpen = false, visible = true, onChanged }: { endpoint: string; revision: number; sessionKey?: string; initiallyOpen?: boolean; visible?: boolean; onChanged?: () => void | Promise<void> }) {
   const [open, setOpen] = useState(initiallyOpen), [data, setData] = useState<State | null>(null);
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const [choice, setChoice] = useState<DecisionChoice | "">(""), [notice, setNotice] = useState("");
@@ -59,9 +59,15 @@ export function SignedDecision({ endpoint, revision, initiallyOpen = false, onCh
     catch (cause) { if (current === generation.current) { setData(null); setError(explain(cause)); } }
     finally { if (current === generation.current) setLoading(false); }
   }, [url, revision]);
-  // Parents key this disclosure by revision and session. Invalidate late fetches
-  // on unmount; loading starts in the disclosure event, not a rendering effect.
-  useEffect(() => { const guard = generation; return () => { guard.current++; }; }, []);
+  // Keep choices and rationale while switching cards, but refresh permissions on return.
+  useEffect(() => {
+    if (!open || !visible) return;
+    const guard = generation;
+    const initial = window.setTimeout(() => {
+      setEmbedded(window.self !== window.top); setLoading(true); setError(""); void refresh();
+    }, 0);
+    return () => { window.clearTimeout(initial); guard.current++; };
+  }, [open, visible, refresh]);
 
   async function create(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault(); if (inFlight.current) return;
@@ -105,7 +111,7 @@ export function SignedDecision({ endpoint, revision, initiallyOpen = false, onCh
   const untimed = round?.schema === "PARTICIPATE_DECISION_ROUND_V4";
   const fixedMajority = round?.schema === "PARTICIPATE_DECISION_ROUND_V3" || untimed;
   const reasonRequired = round?.schema === "PARTICIPATE_DECISION_ROUND_V2" || fixedMajority;
-  return <details className="signed-decision" open={open} onToggle={event => { if (event.target === event.currentTarget) { setEmbedded(window.self !== window.top); setOpen(event.currentTarget.open); if (event.currentTarget.open) { setLoading(true); setError(""); void refresh(); } } }}>
+  return <details className="signed-decision" open={open} onToggle={event => { if (event.target === event.currentTarget) setOpen(event.currentTarget.open); }}>
     <summary>Signed review <span>Pilot</span></summary>
     {open ? <div className="signed-decision-body">
       {loading ? <p role="status">Loading signed review…</p> : null}

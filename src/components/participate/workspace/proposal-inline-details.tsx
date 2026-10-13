@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { ProposalDiscussion, type DiscussionCapabilities, type DiscussionComment, type DiscussionPolicy } from "@/components/participate/workspace/proposal-discussion";
 import { ProposalMarkdown } from "@/components/participate/workspace/proposal-markdown";
 import { ArchiveFileVerifier } from "@/components/participate/workspace/archive-file-verifier";
@@ -86,30 +86,81 @@ export function ProposalInlineDetails({ communityId, recordId, active, sessionKe
       </> : active === "discussion" ? <LoadState failed={discussion.failed} retry={discussion.retry} label="Comments" /> : null}
     </div>
     <div hidden={active !== "record"}>
-      {record.value ? <>{record.failed ? <LoadState failed retry={record.retry} label="Record" /> : null}<InlineRecord record={record.value.record} endpoint={endpoint} onRevision={setRevision} /><SignedDecision key={`${record.value.record.manifestHash}:${sessionKey}`} endpoint={endpoint} revision={record.value.record.revision} sessionKey={sessionKey} /></> : active === "record" ? <LoadState failed={record.failed} retry={record.retry} label="Record" /> : null}
+      {record.value ? <>{record.failed ? <LoadState failed retry={record.retry} label="Record" /> : null}<InlineRecord record={record.value.record} endpoint={endpoint} onRevision={setRevision} sessionKey={sessionKey} visible={active === "record"} /></> : active === "record" ? <LoadState failed={record.failed} retry={record.retry} label="Record" /> : null}
     </div>
-    {active === "record" ? <ArchiveActivity endpoint={endpoint} /> : null}
   </div>;
 }
 
-function InlineRecord({ record, endpoint, onRevision }: { record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void }) {
+type RecordSection = "proposal" | "source" | "files" | "review" | "activity";
+
+function RecordIcon({ section }: { section: RecordSection }) {
+  const paths: Record<RecordSection, string> = {
+    proposal: "M7 3h7l4 4v14H7V3Zm7 0v5h4M10 12h5m-5 4h5",
+    source: "M4 6h16M4 12h16M4 18h10M7 3v6m10 0v6M7 15v6",
+    files: "M12 3 4 6v6c0 4 8 9 8 9s8-5 8-9V6l-8-3Zm-4 9 3 3 5-6",
+    review: "m4 17 11-11 3 3L7 20H4v-3Zm9-9 3 3M14 20h6",
+    activity: "M4 12h4l3-7 3 14 3-7h3",
+  };
+  return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[section]} /></svg>;
+}
+
+function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void; sessionKey?: string; visible: boolean }) {
+  const id = useId();
+  const [selected, setSelected] = useState<RecordSection>("proposal");
+  const [visited, setVisited] = useState<RecordSection[]>(["proposal"]);
   const download = `${endpoint}/revisions/${record.revision}`;
   const { proof } = record;
+  const source = record.sourceCapture?.schema === "PARTICIPATE_SOURCE_CAPTURE_V2" ? record.sourceCapture : null;
+  const activeSection = selected === "source" && !source ? "proposal" : selected;
+  const sections: { key: RecordSection; title: string; detail: string }[] = [
+    { key: "proposal", title: "Proposal", detail: "Preserved contents" },
+    ...(source ? [{ key: "source" as const, title: "Source decisions", detail: sourceOutcomes[source.proposal.outcome] }] : []),
+    { key: "files", title: "Files & proof", detail: proof.label },
+    { key: "review", title: "Signed review", detail: "Independent pilot" },
+    { key: "activity", title: "Activity", detail: "Comments & likes" },
+  ];
+  function selectSection(section: RecordSection) {
+    setSelected(section);
+    setVisited(previous => previous.includes(section) ? previous : [...previous, section]);
+  }
   return <section className="proposal-inline-record" aria-label="Preserved proposal and verification">
     <CommitteeLabels ids={record.labels} />
     {record.abandonment ? <AbandonmentNotice value={record.abandonment} endpoint={endpoint} /> : null}
-    <header className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Pilot publication · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${record.sourceCapture?.schema === "PARTICIPATE_SOURCE_CAPTURE_V2" ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
+    <header className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Pilot publication · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${source ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
       {record.revisions.length > 1 ? <label className="dao-comment-sort"><span className="dao-sr-only">Record revision</span><select value={record.revision} onChange={event => onRevision(Number(event.target.value))}>{record.revisions.map(item => <option key={item.revision} value={item.revision}>Revision {item.revision}{item.revision === record.revisions[0].revision ? " · Latest" : ""}</option>)}</select></label> : <span className="dao-eyebrow">Revision {record.revision}</span>}
     </header>
-    {record.sourceCapture?.schema === "PARTICIPATE_SOURCE_CAPTURE_V2" ? <SourceRevisionEvidence key={record.manifestHash} capture={record.sourceCapture} download={download} /> : null}
-    <ProposalMarkdown>{record.markdown.replace(/^# [^\n]+\n\n/, "")}</ProposalMarkdown>
-    <details className="proposal-inline-verification"><summary>Files & verification <span>{proof.label}</span></summary>
-      <div className="proposal-inline-proof"><div><strong>{record.fileCount} files · Fingerprint checked</strong><p>SHA-256 checks the preserved contents.</p></div><div><strong>{proof.label}</strong><p>{proof.detail}</p>{proof.evidence ? <p>Checked {date(proof.evidence.checkedAt)}</p> : null}</div></div>
-      <div className="proposal-inline-downloads"><a className="dao-button" href={download}>Download revision ↓</a><a className="dao-text-button" href={`${download}?file=proposal.md`}>Markdown ↓</a>{proof.hasReceipt ? <a className="dao-text-button" href={`${download}?file=verification.json`}>Chain receipt ↓</a> : null}</div>
-      <ArchiveFileVerifier key={record.manifestHash} manifestHash={record.manifestHash} />
-      <details className="dao-archive-details"><summary>Fingerprint & evidence</summary><dl><div><dt>Manifest SHA-256</dt><dd><code>{record.manifestHash}</code></dd></div><div><dt>Snapshot captured</dt><dd>{date(record.capturedAt)}</dd></div>{proof.evidence ? <><div><dt>Transaction</dt><dd><code>{proof.evidence.txid}</code></dd></div><div><dt>Block</dt><dd>{proof.evidence.blockHeight.toLocaleString("en-US")} · {date(proof.evidence.blockTime)}</dd></div><div><dt>Memo</dt><dd><code>{proof.evidence.memo}</code></dd></div></> : null}</dl></details>
-      <ArchiveRecoveryGuide download={download} />
-    </details>
+    <nav className="proposal-record-nav" aria-label="Record sections">
+      {sections.map(section => <button type="button" key={section.key} aria-pressed={activeSection === section.key} aria-controls={`${id}-${section.key}`} onClick={() => selectSection(section.key)}>
+        <RecordIcon section={section.key} /><span><strong>{section.title}</strong><small>{section.detail}</small></span>
+      </button>)}
+    </nav>
+    <div className="proposal-record-panel" id={`${id}-proposal`} role="region" aria-label="Proposal contents" hidden={activeSection !== "proposal"}>
+      <ProposalMarkdown>{record.markdown.replace(/^# [^\n]+\n\n/, "")}</ProposalMarkdown>
+    </div>
+    {source ? <div className="proposal-record-panel" id={`${id}-source`} role="region" aria-label="Source status and decisions" hidden={activeSection !== "source"}>
+      <SourceRevisionEvidence key={record.manifestHash} capture={source} download={download} />
+    </div> : null}
+    <div className="proposal-record-panel" id={`${id}-files`} role="region" aria-label="Files and verification" hidden={activeSection !== "files"}>
+      <div className="proposal-record-grid">
+        <section className="proposal-record-box"><header><h4>Preserved files</h4><span>{record.fileCount} files</span></header>
+          <p>Download this revision, or check a copy you already saved.</p>
+          <div className="proposal-inline-downloads"><a className="dao-button" href={download}>Download revision ↓</a><a className="dao-text-button" href={`${download}?file=proposal.md`}>Markdown ↓</a></div>
+          <ArchiveFileVerifier key={record.manifestHash} manifestHash={record.manifestHash} />
+        </section>
+        <section className="proposal-record-box"><header><h4>Blockchain proof</h4><span>{proof.label}</span></header>
+          <p>{proof.detail}</p>{proof.evidence ? <p className="proposal-record-caption">Checked {date(proof.evidence.checkedAt)}</p> : null}
+          {proof.hasReceipt ? <a className="dao-text-button" href={`${download}?file=verification.json`}>Chain receipt ↓</a> : null}
+          <details className="dao-archive-details proposal-record-fingerprint"><summary>Fingerprint & evidence</summary><dl><div><dt>Manifest SHA-256</dt><dd><code>{record.manifestHash}</code></dd></div><div><dt>Snapshot captured</dt><dd>{date(record.capturedAt)}</dd></div>{proof.evidence ? <><div><dt>Transaction</dt><dd><code>{proof.evidence.txid}</code></dd></div><div><dt>Block</dt><dd>{proof.evidence.blockHeight.toLocaleString("en-US")} · {date(proof.evidence.blockTime)}</dd></div><div><dt>Memo</dt><dd><code>{proof.evidence.memo}</code></dd></div></> : null}</dl></details>
+          <ArchiveRecoveryGuide download={download} />
+        </section>
+      </div>
+    </div>
+    <div className="proposal-record-panel proposal-record-panel--review" id={`${id}-review`} role="region" aria-label="Signed pilot review" hidden={activeSection !== "review"}>
+      {visited.includes("review") ? <SignedDecision key={`${record.manifestHash}:${sessionKey}`} endpoint={endpoint} revision={record.revision} sessionKey={sessionKey} initiallyOpen visible={visible && activeSection === "review"} /> : null}
+    </div>
+    <div className="proposal-record-panel proposal-record-panel--activity" id={`${id}-activity`} role="region" aria-label="Activity and verification" hidden={activeSection !== "activity"}>
+      {visited.includes("activity") ? <ArchiveActivity key={endpoint} endpoint={endpoint} initiallyOpen visible={visible && activeSection === "activity"} /> : null}
+    </div>
   </section>;
 }
 
@@ -117,26 +168,29 @@ const sourceOutcomes = { under_review: "Under review", approved: "Approved", rej
 const repositoryRoles = { OWNER: "Repository owner", MEMBER: "Repository member", COLLABORATOR: "Repository collaborator" };
 
 function SourceRevisionEvidence({ capture, download }: { capture: Extract<SourceCapture, { schema: "PARTICIPATE_SOURCE_CAPTURE_V2" }>; download: string }) {
-  const [eventLimit, setEventLimit] = useState(20);
-  const [commentLimit, setCommentLimit] = useState(20);
+  const [eventLimit, setEventLimit] = useState(5);
+  const [commentLimit, setCommentLimit] = useState(5);
   const events = [...capture.evidence.events].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || b.id - a.id);
   const comments = [...capture.evidence.comments].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt) || b.id - a.id);
-  return <details className="proposal-inline-verification"><summary>Source status & decisions <span>{sourceOutcomes[capture.proposal.outcome]}</span></summary>
-    <p>Preserved from the official ZCG tracker. Repository roles are source attribution, not individual committee votes.</p>
-    <p>Source updated <time dateTime={capture.proposal.sourceUpdatedAt}>{date(capture.proposal.sourceUpdatedAt)}</time> · <a href={capture.proposal.proposalUrl} target="_blank" rel="noopener noreferrer">View source ↗</a></p>
-    <details className="dao-archive-details"><summary>Status history · {events.length}</summary>
-      {events.length ? <><ol>{events.slice(0, eventLimit).map(event => <li key={event.id}>
-        <p><strong>{event.event === "labeled" ? "Label added" : event.event === "unlabeled" ? "Label removed" : event.event === "closed" ? "Issue closed" : "Issue reopened"}{event.label ? ` · ${event.label.name}` : ""}</strong><br />{event.actor ? `@${event.actor.login}` : "Actor unavailable"} · <time dateTime={event.createdAt}>{date(event.createdAt)}</time> · <a href={event.url} target="_blank" rel="noopener noreferrer">Source event ↗</a></p>
-      </li>)}</ol>{events.length > eventLimit ? <button type="button" className="dao-text-button" onClick={() => setEventLimit(limit => limit + 20)}>Show older status changes</button> : null}</> : <p>No status events in this source capture.</p>}
-    </details>
-    <details className="dao-archive-details"><summary>Source comments · {comments.length}</summary>
-      {comments.length ? <>{comments.slice(0, commentLimit).map(comment => <details className="dao-archive-details" key={comment.id}>
-        <summary>@{comment.author.login} · {repositoryRoles[comment.association]} · {date(comment.createdAt)}</summary>
-        {comment.updatedAt !== comment.createdAt ? <p>Edited at source <time dateTime={comment.updatedAt}>{date(comment.updatedAt)}</time></p> : null}
-        <ProposalMarkdown>{comment.body}</ProposalMarkdown>
-        <a href={comment.url} target="_blank" rel="noopener noreferrer">Original comment ↗</a>
-      </details>)}{comments.length > commentLimit ? <button type="button" className="dao-text-button" onClick={() => setCommentLimit(limit => limit + 20)}>Show older source comments</button> : null}</> : <p>No repository-associated comments in this source capture.</p>}
-    </details>
-    <a className="dao-text-button" href={`${download}?file=source.json`}>Download source evidence ↓</a>
-  </details>;
+  return <>
+    <div className="proposal-source-heading"><div><strong>{sourceOutcomes[capture.proposal.outcome]}</strong><p>Official source · Updated <time dateTime={capture.proposal.sourceUpdatedAt}>{date(capture.proposal.sourceUpdatedAt)}</time></p></div><a className="dao-text-button" href={capture.proposal.proposalUrl} target="_blank" rel="noopener noreferrer">View source ↗</a></div>
+    <div className="proposal-record-grid">
+      <section className="proposal-record-box"><header><h4>Status history</h4><span>{events.length} {events.length === 1 ? "change" : "changes"}</span></header>
+        {events.length ? <><ol className="proposal-source-timeline">{events.slice(0, eventLimit).map(event => <li key={event.id}>
+          <strong>{event.event === "labeled" ? "Label added" : event.event === "unlabeled" ? "Label removed" : event.event === "closed" ? "Issue closed" : "Issue reopened"}{event.label ? ` · ${event.label.name}` : ""}</strong>
+          <span>{event.actor ? `@${event.actor.login}` : "Actor unavailable"} · <time dateTime={event.createdAt}>{date(event.createdAt)}</time></span><a href={event.url} target="_blank" rel="noopener noreferrer">Source event ↗</a>
+        </li>)}</ol>{events.length > eventLimit ? <button type="button" className="dao-text-button" onClick={() => setEventLimit(limit => limit + 5)}>Show older changes ({events.length - eventLimit})</button> : null}</> : <p className="proposal-record-empty">No status changes in this capture.</p>}
+      </section>
+      <section className="proposal-record-box"><header><h4>Source comments</h4><span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span></header>
+        <p className="proposal-record-caption">Repository roles identify the source, not individual committee votes.</p>
+        {comments.length ? <>{comments.slice(0, commentLimit).map(comment => <details className="proposal-source-comment" key={comment.id}>
+          <summary><span><strong>@{comment.author.login}</strong><small>{repositoryRoles[comment.association]} · {date(comment.createdAt)}</small></span></summary>
+          {comment.updatedAt !== comment.createdAt ? <p className="proposal-record-caption">Edited at source <time dateTime={comment.updatedAt}>{date(comment.updatedAt)}</time></p> : null}
+          <ProposalMarkdown>{comment.body}</ProposalMarkdown>
+          <a className="dao-text-button" href={comment.url} target="_blank" rel="noopener noreferrer">Original comment ↗</a>
+        </details>)}{comments.length > commentLimit ? <button type="button" className="dao-text-button" onClick={() => setCommentLimit(limit => limit + 5)}>Show older comments ({comments.length - commentLimit})</button> : null}</> : <p className="proposal-record-empty">No repository-associated comments in this capture.</p>}
+      </section>
+    </div>
+    <a className="dao-text-button proposal-source-download" href={`${download}?file=source.json`}>Download source evidence ↓</a>
+  </>;
 }

@@ -10,8 +10,8 @@ type ActivityItem = { id: string; sequence: number; label: string; origin: "LIVE
 type Page = { items: ActivityItem[]; nextBefore: number | null };
 const date = (value: string) => new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
 
-export function ArchiveActivity({ endpoint }: { endpoint: string }) {
-  const [open, setOpen] = useState(false), [page, setPage] = useState<Page | null>(null);
+export function ArchiveActivity({ endpoint, initiallyOpen = false, visible = true }: { endpoint: string; initiallyOpen?: boolean; visible?: boolean }) {
+  const [open, setOpen] = useState(initiallyOpen), [page, setPage] = useState<Page | null>(null);
   const [busy, setBusy] = useState(false), [failed, setFailed] = useState(false);
   const generation = useRef(0);
   const load = useCallback(async (before?: number) => {
@@ -26,21 +26,21 @@ export function ArchiveActivity({ endpoint }: { endpoint: string }) {
     finally { if (current === generation.current) setBusy(false); }
   }, [endpoint]);
   useEffect(() => {
-    if (!open) return;
+    if (!open || !visible) return;
     const guard = generation;
     const refresh = () => { void load(); };
+    const initial = window.setTimeout(refresh, 0);
     window.addEventListener("dao:participation-updated", refresh);
-    return () => { guard.current++; window.removeEventListener("dao:participation-updated", refresh); };
-  }, [open, load]);
-  return <details className="proposal-activity" onToggle={event => {
+    return () => { window.clearTimeout(initial); guard.current++; window.removeEventListener("dao:participation-updated", refresh); };
+  }, [open, visible, load]);
+  return <details className="proposal-activity" open={open} onToggle={event => {
     if (event.target !== event.currentTarget) return;
     const next = event.currentTarget.open;
     setOpen(next);
-    if (next) void load();
   }}>
     <summary>Activity & verification</summary>
     {open ? <div className="proposal-activity-content">
-      <p className="proposal-activity-hint">Proposal history, comments and likes. Recorded events enter Zcash anchor batches.</p>
+      <p className="proposal-activity-hint">Proposal history, comments and likes. Each event shows its own verification status.</p>
       <div className="proposal-activity-tools"><a href="/verify/activity-verify.mjs" download>Download verifier ↓</a><button type="button" className="dao-text-button" onClick={() => void load()} disabled={busy}>Refresh</button></div>
       {failed ? <p role="alert">Activity could not be loaded. <button type="button" className="dao-text-button" onClick={() => void load()}>Try again</button></p> : null}
       {busy ? <p role="status">Loading activity…</p> : null}

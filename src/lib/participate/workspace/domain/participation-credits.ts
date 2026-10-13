@@ -1,7 +1,7 @@
 import { z } from "zod/v3";
 
 export type ParticipationModeValue = "FREE" | "CREDITS";
-export type CreditOperationKindValue = "PREVIEW_GRANT" | "COMMENT" | "REACTION" | "PURCHASE" | "PROPOSAL_SUBMISSION";
+export type CreditOperationKindValue = "PREVIEW_GRANT" | "ADMIN_DEMO_GRANT" | "COMMENT" | "REACTION" | "PURCHASE" | "PROPOSAL_SUBMISSION";
 export const PREVIEW_CREDIT_GRANT = 25;
 export const MAX_CREDIT_BALANCE = 1_000_000_000;
 export const MAX_PARTICIPATION_COST = 100;

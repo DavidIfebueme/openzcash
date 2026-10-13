@@ -3323,6 +3323,77 @@
   .oz-participate .dao-app .proposal-inline-discussion .dao-comment-composer textarea { font-size: 16px; }
   .oz-participate .dao-app .proposal-inline-discussion .dao-composer-footer .dao-button { width: auto; min-height: 40px; flex-shrink: 0; }
 }
+/* Keep every record section within reach, before the long proposal text. */
+.oz-participate .proposal-record-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; margin: 0 0 20px; }
+.oz-participate .proposal-record-nav > button { display: flex; align-items: flex-start; gap: 10px; min-width: 0; min-height: 80px; padding: 16px 14px; border: 1px solid var(--dao-line); border-radius: 12px; background: var(--dao-paper); color: var(--dao-muted); text-align: left; font: inherit; cursor: pointer; transition: border-color .15s, background .15s; }
+.oz-participate .proposal-record-nav > button:hover { border-color: var(--dao-accent); }
+.oz-participate .proposal-record-nav > button[aria-pressed="true"] { background: var(--dao-soft); border-color: var(--dao-accent); color: var(--dao-accent); box-shadow: inset 0 -2px 0 var(--dao-accent); }
+.oz-participate .proposal-record-nav > button:focus-visible { outline: 2px solid var(--dao-accent); outline-offset: 3px; }
+.oz-participate .proposal-record-nav svg { width: 20px; height: 20px; flex: 0 0 20px; margin-top: 1px; }
+.oz-participate .proposal-record-nav > button > span { display: grid; gap: 5px; min-width: 0; }
+.oz-participate .proposal-record-nav strong { color: var(--dao-ink); font-size: 13px; font-weight: 650; line-height: 1.35; }
+.oz-participate .proposal-record-nav small { color: var(--dao-muted); font-size: 11px; line-height: 1.45; overflow-wrap: anywhere; }
+.oz-participate .proposal-record-panel { min-width: 0; padding: 4px 0 0; }
+.oz-participate .proposal-record-panel[hidden] { display: none; }
+.oz-participate .proposal-record-panel > .dao-markdown { max-width: 85ch; font-size: 14px; }
+.oz-participate .proposal-record-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 16px; }
+.oz-participate .proposal-record-box { min-width: 0; padding: 20px; border: 1px solid var(--dao-line); border-radius: 12px; background: var(--dao-paper); font-size: 13px; line-height: 1.6; overflow-wrap: anywhere; }
+.oz-participate .proposal-record-box > header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; margin: 0 0 12px; }
+.oz-participate .proposal-record-box h4 { margin: 0; font-size: 14px; color: var(--dao-ink); font-weight: 650; }
+.oz-participate .proposal-record-box > header > span { color: var(--dao-muted); font-size: 11px; }
+.oz-participate .proposal-record-box p { margin: 0 0 16px; color: var(--dao-muted); }
+.oz-participate .proposal-record-box .proposal-record-caption, .oz-participate .proposal-record-caption { font-size: 11px; color: var(--dao-muted); line-height: 1.65; }
+.oz-participate .proposal-record-box .dao-archive-file-check { margin: 20px 0 0; padding: 18px 0 0; border-top: 1px solid var(--dao-line); background: none; border-radius: 0; }
+.oz-participate .proposal-record-box .dao-archive-file-check h3 { font-size: 14px; margin: 0 0 8px; }
+.oz-participate .proposal-record-box .dao-archive-file-check p { font-size: 12px; }
+.oz-participate .proposal-record-box .dao-archive-file-check .dao-button { min-height: 38px; font-size: 12px; }
+.oz-participate .proposal-record-box .dao-archive-details { margin-bottom: 0; }
+.oz-participate .proposal-record-box .proposal-record-fingerprint { margin-top: 12px; }
+.oz-participate .proposal-record-box .dao-archive-details > summary { font-size: 12px; }
+.oz-participate .proposal-record-box .dao-archive-details > summary:focus-visible, .oz-participate .proposal-source-comment > summary:focus-visible { outline: 2px solid var(--dao-accent); outline-offset: 3px; border-radius: 4px; }
+.oz-participate .proposal-record-box .archive-recovery-guide ol { padding-left: 18px; }
+.oz-participate .proposal-record-box .archive-recovery-guide li { margin-bottom: 12px; }
+.oz-participate .proposal-source-heading { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px 20px; margin: 0 0 16px; font-size: 13px; }
+.oz-participate .proposal-source-heading strong { font-size: 15px; }
+.oz-participate .proposal-source-heading p { color: var(--dao-muted); font-size: 11px; margin: 4px 0 0; }
+.oz-participate .proposal-source-timeline { list-style: none; margin: 0; padding: 0; }
+.oz-participate .proposal-source-timeline > li { position: relative; display: grid; gap: 4px; padding: 0 0 18px 18px; border-left: 1px solid var(--dao-line); margin-left: 4px; }
+.oz-participate .proposal-source-timeline > li::before { content: ""; position: absolute; left: -4px; top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--dao-accent); }
+.oz-participate .proposal-source-timeline > li:last-child { border-left-color: transparent; padding-bottom: 8px; }
+.oz-participate .proposal-source-timeline strong { font-size: 12px; font-weight: 600; }
+.oz-participate .proposal-source-timeline span { font-size: 11px; color: var(--dao-muted); }
+.oz-participate .proposal-source-timeline a { width: fit-content; color: var(--dao-accent); font-size: 11px; }
+.oz-participate .proposal-source-comment { border-top: 1px solid var(--dao-line); padding: 4px 0; }
+.oz-participate .proposal-source-comment > summary { display: flex; align-items: center; gap: 10px; min-height: 58px; cursor: pointer; list-style: none; }
+.oz-participate .proposal-source-comment > summary::-webkit-details-marker { display: none; }
+.oz-participate .proposal-source-comment > summary::after { content: "+"; color: var(--dao-accent); margin-left: auto; }
+.oz-participate .proposal-source-comment[open] > summary::after { content: "−"; }
+.oz-participate .proposal-source-comment > summary > span { display: grid; gap: 3px; }
+.oz-participate .proposal-source-comment > summary strong { font-size: 12px; font-weight: 600; }
+.oz-participate .proposal-source-comment > summary small { font-size: 11px; color: var(--dao-muted); }
+.oz-participate .proposal-source-comment .dao-markdown { font-size: 13px; }
+.oz-participate .proposal-record-box .proposal-record-empty { padding: 18px 0 8px; margin: 0; font-size: 12px; }
+.oz-participate .proposal-source-download { display: inline-flex; min-height: 44px; align-items: center; margin-top: 8px; font-size: 12px; }
+.oz-participate .proposal-record-panel--review > .signed-decision, .oz-participate .proposal-record-panel--activity > .proposal-activity { border: 1px solid var(--dao-line); border-radius: 12px; padding: 20px; margin: 0; background: var(--dao-paper); }
+.oz-participate .proposal-record-panel--review > .signed-decision > summary, .oz-participate .proposal-record-panel--activity > .proposal-activity > summary { display: none; }
+.oz-participate .proposal-record-panel--review .signed-decision-body, .oz-participate .proposal-record-panel--activity .proposal-activity-content { padding: 0; }
+.oz-participate .proposal-record-panel--activity .proposal-activity-tools { flex-wrap: wrap; gap: 10px 24px; }
+@media (max-width: 760px) {
+  .oz-participate .proposal-record-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .oz-participate .proposal-record-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .oz-participate .proposal-record-nav > button { min-height: 72px; padding: 12px; gap: 8px; }
+  .oz-participate .proposal-record-box, .oz-participate .proposal-record-panel--review > .signed-decision, .oz-participate .proposal-record-panel--activity > .proposal-activity { padding: 16px; }
+}
+
+@media (min-width: 1100px) {
+  .oz-participate .proposal-record-nav { position: sticky; top: 72px; z-index: 4; padding-block: 8px; margin-top: -8px; background: var(--dao-paper); }
+  .oz-participate .proposal-record-panel { scroll-margin-top: 176px; }
+}
+@media (max-width: 550px) {
+  .oz-participate .proposal-record-nav > button { min-height: 56px; padding: 10px; align-items: center; }
+  .oz-participate .proposal-record-nav small { display: none; }
+  .oz-participate .proposal-record-nav svg { width: 18px; height: 18px; flex-basis: 18px; margin-top: 0; }
+}
 
 /* ---- proposal-editor.css ---- */
 /* GitHub-inspired labels, with contrast pairs for each workspace theme. */
