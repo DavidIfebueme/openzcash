@@ -2,29 +2,20 @@ import { SourceRefresh } from "@/components/source-refresh";
 import { FeatureLink, SectionHeading } from "@/components/workspace";
 import Link from "next/link";
 import { Card, PageHeader, Stat } from "@/components/ui";
-import { listProposals, type ProposalRow } from "@/lib/zcg/proposals-repo";
+import { readPublishedProposals } from "@/lib/zcg/published-proposals";
 import { nowMs } from "@/lib/utils";
 import { formatUsdCents } from "@/lib/zcg/format";
 import { getIsAdmin } from "@/lib/auth/admin";
 import { getLinks } from "@/lib/zcg/governance-repo";
-import { ProposalsTable, type ProposalTableRow } from "./proposals-table";
+import { ProposalsTable } from "./proposals-table";
 import { cached, LEDGER_TTL_MS } from "@/lib/cache/memo";
 import {
-  getGrantApplications,
   ZCG_APPLICATIONS_REPO_URL,
 } from "@/lib/zcg/github-applications";
-import { matchProposalApplications } from "@/lib/zcg/match-proposals";
 import { getDiligence } from "@/lib/zcg/diligence";
-import {
-  getIssueAmounts,
-  getIssueDecisions,
-  getMissingIssues,
-} from "@/lib/zcg/issue-amounts";
 import { issueNumberFromLink } from "@/lib/zcg/issue-link";
 import { Synced } from "@/components/synced";
-import { publicationDay } from "@/lib/zcg/publication-policy";
 import { PROPOSAL_STATUS_LABEL } from "@/lib/zcg/status-labels";
-import { officialProposalVerdict } from "@/lib/coinholder/official-status";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 
 export const dynamic = "force-dynamic";
@@ -38,143 +29,21 @@ export const metadata = pageMetadata({
 // Verdict wording is shared with the overview changelog and the admin form.
 const STATUS_LABEL = PROPOSAL_STATUS_LABEL;
 
-function toTableRow(p: ProposalRow): ProposalTableRow {
-  // A closed coinholder round shows FPF's official results, which the
-  // spreadsheet (and its next-day publication) can still trail.
-  const status =
-    (p.program === "coinholder" ? officialProposalVerdict(p)?.status : null) ??
-    p.status;
-  return {
-    id: p.id,
-    program: p.program,
-    title: p.title,
-    platformLink: p.platformLink ?? null,
-    applicant: p.applicantsRaw ?? "",
-    submitted: p.submittedDate ?? "",
-    status,
-    statusLabel: STATUS_LABEL[status] ?? status,
-    source: "sheet",
-  };
-}
-
 export default async function PropostasPage({
   searchParams,
 }: {
   searchParams: Promise<{ status?: string }>;
 }) {
   const { status: filterRaw } = await searchParams;
-  const [isAdmin, all, links, applications] = await Promise.all([
-    getIsAdmin(),
-    cached(`listProposals:all:${publicationDay()}`, LEDGER_TTL_MS, () =>
-      listProposals({}),
-    ),
+  const [isAdmin, published, links] = await Promise.all([
+    getIsAdmin(), readPublishedProposals(),
     cached("links", LEDGER_TTL_MS, () => getLinks()),
-    getGrantApplications(40),
   ]);
+  const { all, removedCount, ghApproved, ghRejected } = published;
   const submitUrl = links.proposal_zcg ?? "#";
-
-  // Live "ready for review" grant applications, read first-hand from GitHub.
-  const ghApps = applications.filter((a) => a.status === "review");
-
-  // Public-data diligence signals, computed by the cron for the under-review
-  // set only — this is a cache-only read keyed by issue number, never network.
   const diligence = getDiligence();
-
-  // Requested amounts recovered from applications OUTSIDE the open review set
-  // (e.g. an issue GitHub already closed while the sheet still lists the row
-  // under review), plus applications deleted from GitHub (dead links).
-  // Cache-only reads, warmed by the same cron.
-  const issueAmounts = getIssueAmounts();
-  const [missingIssues, issueDecisions] = await Promise.all([
-    getMissingIssues(),
-    getIssueDecisions(),
-  ]);
-
-  // A sheet row still marked under review whose GitHub application was
-  // DELETED upstream (404) is not a real, verifiable proposal anymore — drop
-  // it from the list and the counts (a footnote below keeps this auditable).
-  const isRemovedUpstream = (r: ProposalTableRow) => {
-    if (r.program !== "zcg" || r.status !== "under_review") return false;
-    const n = issueNumberFromLink(r.platformLink);
-    return n != null && missingIssues.has(n);
-  };
-  const sheetRows = all.map(toTableRow);
-  const listedSheetRows = sheetRows.filter((r) => !isRemovedUpstream(r));
-  const removedCount = sheetRows.length - listedSheetRows.length;
-
-  // Each GitHub application is usually already mirrored in the spreadsheet's
-  // under-review bucket. Enrich the matching sheet row with a "GitHub live"
-  // badge + direct issue link instead of listing it twice; only applications
-  // with no sheet counterpart become their own new rows.
-  const matches = matchProposalApplications(listedSheetRows, ghApps);
-  const usedGh = new Set(matches.values());
-  const enrichedSheet = listedSheetRows.map((r) => {
-    const app = ghApps.find((g) => g.number === matches.get(r.id));
-    if (!app) {
-      // No open application matched — the sheet link may still point at a
-      // closed issue whose body carries the requested amount, and possibly a
-      // committee decision the spreadsheet has not recorded yet. Source
-      // hierarchy: a DECIDED source beats an undecided one (the sheet still
-      // wins whenever it has decided), so a closed+labelled issue overrides a
-      // sheet row stuck on "under review" (real case: #333 declined upstream).
-      const n =
-        r.program === "zcg" ? issueNumberFromLink(r.platformLink) : null;
-      const amt = n != null ? issueAmounts.get(n) : undefined;
-      const dec =
-        n != null && r.status === "under_review"
-          ? issueDecisions.get(n)
-          : undefined;
-      return {
-        ...r,
-        ...(amt != null ? { amountUsd: amt } : {}),
-        ...(dec
-          ? {
-              status: dec,
-              statusLabel: STATUS_LABEL[dec] ?? dec,
-              source: "github" as const,
-            }
-          : {}),
-      };
-    }
-    return {
-      ...r,
-      source: "github" as const,
-      platformLink: app.url ?? r.platformLink,
-      amountUsd: app.amountUsd,
-      diligence:
-        r.status === "under_review"
-          ? (diligence.get(app.number) ?? null)
-          : null,
-    };
-  });
-
-  const netNewGhRows: ProposalTableRow[] = ghApps
-    .filter((a) => !usedGh.has(a.number))
-    .map((a) => ({
-      id: `gh-${a.number}`,
-      program: "zcg",
-      title: a.title,
-      platformLink: a.url,
-      applicant: a.applicant ? `@${a.applicant}` : "",
-      submitted: (a.createdAt || "").slice(0, 10),
-      status: "under_review",
-      statusLabel: "Under review",
-      source: "github" as const,
-      amountUsd: a.amountUsd,
-      diligence: diligence.get(a.number) ?? null,
-    }));
-
-  const allRows = [...netNewGhRows, ...enrichedSheet];
-
-  // Rows whose verdict came from GitHub (sheet still says under review) move
-  // between funnel buckets without changing the total.
-  const ghDecided = enrichedSheet.filter(
-    (r) =>
-      r.source === "github" &&
-      issueDecisions.get(issueNumberFromLink(r.platformLink) ?? -1),
-  );
-  const ghRejected = ghDecided.filter((r) => r.status === "rejected").length;
-  const ghApproved = ghDecided.filter((r) => r.status === "approved").length;
+  const allRows = published.rows.map(row => ({ ...row, diligence: row.source === "github" && row.status === "under_review"
+    ? diligence.get(issueNumberFromLink(row.platformLink) ?? -1) ?? null : null }));
 
   // Count the same reconciled records that search and verdict filters receive.
   const statusCounts = new Map<string, number>();
@@ -286,7 +155,7 @@ export default async function PropostasPage({
         />
         <Stat
           label="Ready for review"
-          value={String(ghApps.length)}
+          value={String(statusCounts.get("under_review") ?? 0)}
           sub="Published review queue"
           tone="warn"
         />

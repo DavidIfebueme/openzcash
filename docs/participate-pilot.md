@@ -101,3 +101,14 @@ The iframe is retired. `/zcg/participate` renders the participation workspace it
 **Appearance.** Light mode keeps the service's parchment palette unchanged. Dark mode maps the service's `--dao-*` tokens to the OpenZcash palette (black canvas, gold accent, the values of `theme.css`) in `native.css`, so the workspace reads as one system with the shell; the service's grid overlay applies to light mode only.
 
 **Why.** The embed waited eight seconds per attempt for a readiness message while the service restarted after each deployment, then reported that the workspace did not open. The native screen is server-rendered with the data already in hand.
+
+
+### Shared Under review queue — 13 October 2026
+
+Participate and Proposals now read `readPublishedProposals`, which combines the published spreadsheet and GitHub application states through one reconciliation function. The existing next-day verdict policy remains in force. Requested USD, title, applicant and submission date come from that shared presentation; preserved archive packages and their hashes are unchanged.
+
+A new official GitHub application appears even before it receives the labels required by the isolated archive worker. Until imported, its card offers the source link and says “Awaiting source import”; it has no local discussion, credit charge or verification claim. The worker still requires its existing official-source review labels and signing policy. Demo submissions cannot establish official identity.
+
+`GET /api/participate/official-proposals` serves only these public listing annotations. The visible board checks this bulk endpoint once per minute, while the shared GitHub collector runs every five minutes. A failed read retains the last available list with an explicit warning. Initial source loading has a one-second ceiling so account and discussion rendering do not wait for a slow GitHub request.
+
+The source API and UI use exact official issue identities; archive revisions, discussion IDs, historical decisions and mainnet limits are preserved. Source-list updates do not import or sign anything.

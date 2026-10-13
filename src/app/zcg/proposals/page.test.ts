@@ -1,6 +1,8 @@
 import { Children, isValidElement, type ReactElement, type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("server-only", () => ({}));
+
 const state = vi.hoisted(() => ({
   proposals: [] as Record<string, unknown>[],
   applications: [] as Record<string, unknown>[],
