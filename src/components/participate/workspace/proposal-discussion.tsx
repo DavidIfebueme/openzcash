@@ -1,10 +1,11 @@
 "use client";
 
 import { CommentEmojiPicker } from "./comment-emoji-picker";
+import { commentAncestors, descendantCount, indexDiscussion, VISIBLE_REPLY_DEPTH } from "./discussion-tree";
 import { AccountAvatar } from "@/components/participate/workspace/workspace-account";
 import type { CreditScope } from "@/lib/participate/workspace/domain/credit-scope";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 
 export type DiscussionComment = {
   id: string;
@@ -50,6 +51,7 @@ export type ProposalDiscussionProps = {
   policy: DiscussionPolicy;
   loading?: boolean;
   expectedCommentCount?: number;
+  focusComment?: { id: string; request: number };
 };
 
 const ERRORS: Record<string, string> = {
@@ -62,7 +64,6 @@ const ERRORS: Record<string, string> = {
   COMMENT_NOT_FOUND: "This comment is no longer available.",
   PARENT_COMMENT_NOT_FOUND: "The comment you are replying to is no longer available.",
   DISCUSSION_READ_ONLY: "This discussion is now read only.",
-  REPLY_DEPTH_EXCEEDED: "Replies are limited to one level. Reply to the original comment.",
   COMMENT_ALREADY_HIDDEN: "This comment has already been hidden.",
   CONCURRENT_UPDATE: "The discussion changed while saving. Reload the page and review the latest record.",
   COMMENT_RATE_LIMIT: "You’ve posted several comments recently. Please wait before trying again.",
@@ -102,15 +103,24 @@ function displayDate(value: string) {
   return Number.isNaN(date.getTime()) ? "Date unavailable" : commentDate.format(date);
 }
 
+function subscribeCommentHash(callback: () => void) {
+  window.addEventListener("hashchange", callback);
+  return () => window.removeEventListener("hashchange", callback);
+}
+const readCommentHash = () => window.location.hash.startsWith("#comment-") ? window.location.hash.slice(9) : "";
+const noCommentHash = () => "";
+
 export function ProposalDiscussion(props: ProposalDiscussionProps) {
   return <DiscussionBody key={props.pollId} {...props} />;
 }
 
-function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, showBalance = true, commentsEndpoint, communityId, initialComments, capabilities: initialCapabilities, policy: initialPolicy, loading = false, expectedCommentCount }: ProposalDiscussionProps) {
+function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, showBalance = true, commentsEndpoint, communityId, initialComments, capabilities: initialCapabilities, policy: initialPolicy, loading = false, expectedCommentCount, focusComment }: ProposalDiscussionProps) {
   const router = useRouter();
   const commentsUrl = commentsEndpoint ?? `/api/polls/${encodeURIComponent(pollId)}/comments`;
   const fieldId = useId();
   const composer = useRef<HTMLTextAreaElement>(null);
+  const commentList = useRef<HTMLOListElement>(null);
+  const focusedThread = useRef("");
   const [commentUpdate, setCommentUpdate] = useState<{ source: DiscussionComment[]; items: DiscussionComment[] } | null>(null);
   const [snapshot, setSnapshot] = useState<{ source: DiscussionPolicy; sourceComments: DiscussionComment[]; value: DiscussionSnapshot } | null>(null);
   const currentSnapshot = snapshot?.source === initialPolicy && snapshot.sourceComments === initialComments ? snapshot.value : null;
@@ -133,7 +143,33 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
   const refreshSequence = useRef(0);
   const postRequest = useRef<ActionRequest | null>(null);
   const likeRequests = useRef(new Map<string, ActionRequest>());
-  const roots = useMemo(() => comments.filter((comment) => comment.parentId === null).sort((a, b) => order === "oldest" ? a.createdAt.localeCompare(b.createdAt) : b.createdAt.localeCompare(a.createdAt)), [comments, order]);
+  const tree = useMemo(() => indexDiscussion(comments, order), [comments, order]);
+  const hashComment = useSyncExternalStore(subscribeCommentHash, readCommentHash, noCommentHash);
+  const requestedId = focusComment?.id ?? hashComment;
+  const focusRequest = `${requestedId}:${focusComment?.request ?? 0}`;
+  const [threadView, setThreadView] = useState<{ request: string; rootId: string | null; focusId: string } | null>(null);
+  const requestedAncestors = commentAncestors(tree.byId, requestedId);
+  const currentView = threadView?.request === focusRequest ? threadView : null;
+  const rootId = currentView ? currentView.rootId : requestedAncestors.length > VISIBLE_REPLY_DEPTH ? requestedAncestors.at(-1)!.id : null;
+  const threadRoot = rootId ? tree.byId.get(rootId) : undefined;
+  const roots = threadRoot ? [threadRoot] : tree.roots;
+  const focusId = currentView?.focusId ?? requestedId;
+  const threadParent = threadRoot?.parentId ? tree.byId.get(threadRoot.parentId) : undefined;
+
+  useEffect(() => {
+    if (!focusId) return;
+    const stamp = `${focusRequest}:${rootId}:${focusId}`;
+    if (focusedThread.current === stamp) return;
+    const target = document.getElementById(`comment-${focusId}`);
+    if (!target || !commentList.current?.contains(target)) return;
+    focusedThread.current = stamp;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView?.({ block: "center", behavior: "auto" });
+  }, [focusId, focusRequest, rootId, comments]);
+
+  function openThread(id: string | null, target = id ?? "") {
+    setThreadView({ request: focusRequest, rootId: id, focusId: target });
+  }
   const canPost = capabilities.canPost && !policy.readOnly;
   const canModerate = capabilities.canModerate && !policy.readOnly;
   const canReact = capabilities.canReact === true && !policy.readOnly;
@@ -239,6 +275,11 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
       }
       const nextComment = result.comment;
       setComments((current) => current.some((comment) => comment.id === nextComment.id) ? current : [...current, nextComment]);
+      const ancestors = parentId ? [...commentAncestors(tree.byId, parentId), tree.byId.get(parentId)!].filter(Boolean) : [];
+      const viewRootIndex = threadRoot ? ancestors.findIndex(item => item.id === threadRoot.id) : 0;
+      const depth = ancestors.length - Math.max(0, viewRootIndex);
+      const nextRootId = !parentId ? null : viewRootIndex < 0 || depth > VISIBLE_REPLY_DEPTH ? parentId : rootId;
+      openThread(nextRootId, nextComment.id);
       setBody(""); setReplyTo(null); setNotice("Comment published.");
       postRequest.current = null;
       if (result.participation) {
@@ -310,11 +351,23 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
     }
   }
 
-  function renderComment(comment: DiscussionComment, root: boolean) {
-    return <CommentItem comment={comment} permalink={!embedded} commentsUrl={commentsUrl} canReply={root && canPost} replyDisabled={posting} canModerate={canModerate}
+  function renderComment(comment: DiscussionComment) {
+    return <CommentItem comment={comment} permalink={!embedded} commentsUrl={commentsUrl} canReply={canPost} replyDisabled={posting} canModerate={canModerate}
       canReact={canReact} reactionDisabled={busy || participationUnavailable || (creditSpendingPaused && reactionCost(comment, participation) > 0)} reactionPending={reactingId === comment.id}
       reactionCost={reactionCost(comment, participation)} reactionError={reactionErrors[comment.id]} onReact={toggleReaction} onOpenCredits={openCredits}
       onReply={reply} onUpdated={updated => setComments(current => current.map(item => item.id === updated.id ? updated : item))} />;
+  }
+
+  function renderThread(comment: DiscussionComment, depth = 0) {
+    const replies = tree.children.get(comment.id) ?? [];
+    const remaining = depth >= VISIBLE_REPLY_DEPTH ? descendantCount(tree.children, comment.id) : 0;
+    return <li key={comment.id}>
+      {renderComment(comment)}
+      {replies.length ? depth < VISIBLE_REPLY_DEPTH
+        ? <ol className="dao-comment-replies">{replies.map(child => renderThread(child, depth + 1))}</ol>
+        : <button type="button" className="dao-text-button dao-thread-continue" onClick={() => openThread(comment.id)}>Continue thread <span>· {remaining} {remaining === 1 ? "reply" : "replies"}</span><span aria-hidden="true">→</span></button>
+        : null}
+    </li>;
   }
 
   return <section className={`dao-discussion ${embedded ? "proposal-inline-discussion" : "dao-panel"}`} id={sectionId} aria-labelledby={`${fieldId}-heading`}>
@@ -347,10 +400,8 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
     {notice ? <p className="dao-notice" role="status">{notice}</p> : null}
     {creditSpendingPaused ? <p className="dao-error" role="alert">A payment needs review. Credit spending is paused.</p> : null}
     {refreshFailed ? <div className="dao-participation-refresh" role="status"><span>The latest discussion and credit balance could not be loaded.</span><button type="button" className="dao-credit-link" disabled={refreshing || busy} onClick={() => void refreshDiscussion()}>{refreshing ? "Refreshing…" : "Refresh discussion"}</button></div> : null}
-    <ol className="dao-comment-list">{roots.map(comment => <li key={comment.id}>
-      {renderComment(comment, true)}
-      {comments.some(item => item.parentId === comment.id) ? <ol className="dao-comment-replies">{comments.filter(item => item.parentId === comment.id).sort((a, b) => a.createdAt.localeCompare(b.createdAt)).map(item => <li key={item.id}>{renderComment(item, false)}</li>)}</ol> : null}
-    </li>)}</ol>
+    {threadRoot ? <nav className="dao-thread-navigation" aria-label="Conversation thread"><button type="button" className="dao-text-button" onClick={() => openThread(null, commentAncestors(tree.byId, threadRoot.id)[0]?.id ?? threadRoot.id)}>← All comments</button>{threadParent ? <button type="button" className="dao-text-button dao-thread-parent" onClick={() => openThread(threadParent.id)}>In reply to {threadParent.authorLabel}</button> : null}</nav> : null}
+    <ol ref={commentList} className="dao-comment-list">{roots.map(comment => renderThread(comment))}</ol>
     {roots.length === 0 && !embedded ? <div className="dao-discussion-empty"><p>There’s room for your perspective.</p><span>No comments have been published yet.</span></div> : null}
   </section>;
 }

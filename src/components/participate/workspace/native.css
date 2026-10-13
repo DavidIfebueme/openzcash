@@ -99,7 +99,7 @@
   background: transparent;
   box-shadow: none;
 }
-.oz-participate .dao-comment-list > li:has(> .dao-comment-replies) > .dao-comment::before {
+.oz-participate .dao-comment-list li:has(> .dao-comment-replies) > .dao-comment::before {
   content: "";
   position: absolute;
   left: var(--thread-axis);
@@ -144,6 +144,8 @@
   border: 0;
 }
 .oz-participate .dao-discussion .dao-comment-replies > li {
+  --thread-root-size: 28px;
+  --thread-axis: 14px;
   position: relative;
   min-width: 0;
   margin: 0;
@@ -177,6 +179,24 @@
   --comment-avatar-size: 28px;
   --comment-inset: 38px;
 }
+.oz-participate .dao-thread-navigation {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin-top: 14px;
+}
+.oz-participate .dao-thread-parent { color: var(--dao-muted); }
+.oz-participate .dao-thread-continue {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  margin: 4px 0 0 38px;
+  font-size: 12px;
+}
+.oz-participate .dao-thread-continue > span:first-child { color: var(--dao-muted); font-weight: 400; }
 .oz-participate .dao-comment .dao-comment-tombstone,
 .oz-participate .dao-comment .dao-moderation-form,
 .oz-participate .dao-comment .dao-reaction-error {

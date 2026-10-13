@@ -82,7 +82,7 @@ export function ProposalInlineDetails({ communityId, recordId, active, sessionKe
       {shownDiscussion ? <>
         {discussion.failed ? <LoadState failed retry={discussion.retry} label="Comments" /> : null}
         {!shownDiscussion.capabilities.canReact && !shownDiscussion.policy.readOnly ? <div className="proposal-inline-signin"><WorkspaceSignInButton label="Sign in to participate" className="dao-button" /></div> : null}
-        <ProposalDiscussion pollId={recordId} sectionId={`discussion-${recordId}`} embedded showBalance={false} commentsEndpoint={`${endpoint}/comments`} communityId={communityId} initialComments={shownDiscussion.comments} capabilities={shownDiscussion.capabilities} policy={shownDiscussion.policy} loading={!discussion.value} expectedCommentCount={preview?.commentCount} />
+        <ProposalDiscussion pollId={recordId} sectionId={`discussion-${recordId}`} embedded showBalance={false} commentsEndpoint={`${endpoint}/comments`} communityId={communityId} initialComments={shownDiscussion.comments} capabilities={shownDiscussion.capabilities} policy={shownDiscussion.policy} loading={!discussion.value} expectedCommentCount={preview?.commentCount} focusComment={active === "discussion" ? focusComment : undefined} />
       </> : active === "discussion" ? <LoadState failed={discussion.failed} retry={discussion.retry} label="Comments" /> : null}
     </div>
     <div hidden={active !== "record"}>
