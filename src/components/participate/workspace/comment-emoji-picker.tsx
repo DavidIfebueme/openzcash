@@ -5,10 +5,11 @@ import { insertCommentEmoji } from "./comment-emoji-insertion";
 import "./comment-emoji-picker.css";
 
 const EMOJI = [
+  ["ᙇ", "Zcash"], ["🛡️", "Shield"],
   ["😊", "Smile"], ["👍", "Thumbs up"], ["🙏", "Thank you"], ["❤️", "Heart"], ["🎉", "Celebrate"], ["🚀", "Rocket"],
   ["👏", "Applause"], ["💡", "Idea"], ["✅", "Check mark"], ["💪", "Strength"], ["🤝", "Handshake"], ["🙌", "Raised hands"],
   ["🎯", "Goal"], ["👀", "Eyes"], ["🤔", "Thinking"], ["💬", "Discussion"], ["🌱", "Growth"], ["🔥", "Fire"],
-  ["✨", "Sparkles"], ["🛡️", "Shield"], ["💛", "Yellow heart"], ["🐸", "Frog"], ["🦓", "Zebra"], ["😄", "Grin"],
+  ["✨", "Sparkles"], ["💛", "Yellow heart"], ["🐸", "Frog"], ["🦓", "Zebra"], ["😄", "Grin"],
 ] as const;
 
 type Props = {

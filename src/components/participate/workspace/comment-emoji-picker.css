@@ -5,7 +5,7 @@
 .oz-participate .dao-comment-emoji-panel { position: absolute; z-index: 15; left: 0; bottom: calc(100% + 8px); width: min(288px, calc(100vw - 80px)); padding: 12px; box-sizing: border-box; border: 1px solid var(--dao-line); border-radius: 12px; background: var(--dao-paper); box-shadow: 0 10px 32px var(--dao-shadow); color: var(--dao-ink); }
 .oz-participate .dao-comment-emoji-heading { display: block; margin: 0 4px 8px; color: var(--dao-muted); font: 500 11px/1.4 var(--font-body); }
 .oz-participate .dao-comment-emoji-options { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; }
-.oz-participate .dao-app .dao-comment-emoji-options button { display: grid; place-items: center; min-width: 0; min-height: 42px; padding: 4px; border: 0; border-radius: 7px; background: transparent; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 23px; line-height: 1; cursor: pointer; }
+.oz-participate .dao-app .dao-comment-emoji-options button { display: grid; place-items: center; min-width: 0; min-height: 42px; padding: 4px; border: 0; border-radius: 7px; background: transparent; color: var(--dao-ink); font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 23px; line-height: 1; cursor: pointer; }
 .oz-participate .dao-app .dao-comment-emoji-options button:hover { background: var(--dao-soft); }
 .oz-participate .dao-comment-emoji button:focus-visible { outline: 2px solid var(--dao-accent); outline-offset: 1px; }
 .oz-participate .dao-comment-emoji .dao-comment-emoji-notice { margin: 8px 4px 0; color: var(--dao-muted); font: 400 11px/1.5 var(--font-body); }
