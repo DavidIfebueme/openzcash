@@ -91,7 +91,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       const mine = drafts.find(draft => draft.recordId === proposal.recordId);
       const captured = proposal.sourceCapture;
       const outcome = currentFilter(proposal);
-      const requestedUsd = proposal.application ? Number(proposal.application.requestedAmountUsd) : captured && outcome === "under_review" ? proposal.sourceRequestedUsd ?? captured.proposal.requestedUsd : null;
+      const requestedUsd = proposal.application ? Number(proposal.application.requestedAmountUsd) : captured && outcome !== "approved" ? proposal.sourceRequestedUsd ?? captured.proposal.requestedUsd : null;
       const requestedBudget = requestedUsd == null ? null : requestedDollars.format(requestedUsd);
       const approvedBudget = outcome === "approved" ? zcgApprovedBudget(approvedBudgets, proposal.recordId, captured?.source) : null;
       return <li className={`dao-proposal-row${captured ? " dao-zcg-proposal" : ""}`} key={proposal.recordId}>

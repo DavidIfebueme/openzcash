@@ -1,7 +1,7 @@
 import React, { type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
-import { buildSourceProposal } from "@/lib/participate/workspace/archive/source-proposals";
+import { buildSourceProposal, buildSourceUpdate } from "@/lib/participate/workspace/archive/source-proposals";
 import { ProposalWorkspace } from "./proposal-workspace";
 import { ZcgProposalLabels } from "./zcg-proposal-labels";
 
@@ -66,4 +66,30 @@ describe("source category annotations", () => {
       expect(checked.capture.proposal.requestedUsd).toBeNull();
     },
   );
+
+  it.each([
+    { label: "Grant Withdrawn by Submitter", filter: "Withdrawn", body: issue.body, recovered: 19500, formatted: "$19,500" },
+    { label: "❌ Grant Declined", filter: "Rejected", body: "### Requested Grant Amount (USD)\n\n$21,000", recovered: null, formatted: "$21,000" },
+    { label: null, filter: "Closed", body: issue.body, recovered: 38000, formatted: "$38,000" },
+    { label: "Grant Withdrawn by Submitter", filter: "Withdrawn", body: issue.body, recovered: null, formatted: null },
+  ])("keeps the requested amount visible for $filter records when available ($formatted)", async ({ label, filter, body, recovered, formatted }) => {
+    const checked = await buildSourceUpdate({ ...issue, state: "closed", body,
+      labels: label ? [...issue.labels, { name: label, color: "f8782d", description: null }] : issue.labels,
+    }, issue.number, "2026-10-12T12:00:00.000Z", null, { events: [], comments: [] });
+    const before = JSON.stringify(checked.capture);
+    const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+      initialRecordId={checked.manifest.recordId}
+      initialBudgets={{ version: 1, importedAt: "2026-10-12T12:00:00.000Z", budgets: {} }}
+      board={{ canParticipate: false, participation: null, proposals: [{
+        recordId: checked.manifest.recordId, title: issue.title, sourceCapture: checked.capture,
+        sourceRequestedUsd: recovered, commentCount: 0, likes: 0, likedByMe: false, chargedBefore: false,
+      }] }} />);
+    expect(html).toContain(`aria-pressed="true">${filter}</button>`);
+    if (formatted !== null) {
+      expect(html).toContain(`aria-label="Requested budget: ${formatted} USD"`);
+      expect(html).toContain(`<strong>${formatted}</strong><span>USD requested</span>`);
+    } else expect(html).not.toContain("Requested budget:");
+    expect(html).not.toContain("Approved budget:");
+    expect(JSON.stringify(checked.capture)).toBe(before);
+  });
 });
