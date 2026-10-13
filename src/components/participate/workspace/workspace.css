@@ -2646,8 +2646,9 @@
 .oz-participate .dao-composer-heading > label { font-size: 14px; font-weight: 600; }
 .oz-participate .dao-comment-composer textarea { background: var(--dao-paper); min-height: 120px; font-size: 16px; }
 .oz-participate .dao-composer-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 16px; }
-.oz-participate .dao-composer-footer > p { color: var(--dao-muted); font-size: 12px; line-height: 1.6; }
-.oz-participate .dao-composer-footer > p > span { display: block; margin-top: 5px; font-family: var(--font-numeric); font-size: 11px; }
+.oz-participate .dao-composer-meta { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
+.oz-participate .dao-composer-meta > p { color: var(--dao-muted); font-size: 12px; line-height: 1.6; }
+.oz-participate .dao-composer-meta > p > span { display: block; margin-top: 5px; font-family: var(--font-numeric); font-size: 11px; }
 .oz-participate .dao-reply-context { margin-bottom: 14px !important; padding-left: 12px; border-left: 2px solid var(--dao-gold); color: var(--dao-muted); font-size: 13px; overflow-wrap: anywhere; }
 .oz-participate .dao-comment-list, .oz-participate .dao-comment-replies { list-style: none; margin: 0; padding: 0; }
 .oz-participate .dao-comment-list { margin-top: 28px; }
@@ -3322,6 +3323,10 @@
   .oz-participate .dao-app .proposal-inline-discussion .dao-composer-footer { flex-direction: row; }
   .oz-participate .dao-app .proposal-inline-discussion .dao-comment-composer textarea { font-size: 16px; }
   .oz-participate .dao-app .proposal-inline-discussion .dao-composer-footer .dao-button { width: auto; min-height: 40px; flex-shrink: 0; }
+  .oz-participate .dao-composer-footer { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .oz-participate .dao-composer-meta { display: contents; }
+  .oz-participate .dao-composer-meta > p { grid-column: 1 / -1; grid-row: 2; }
+  .oz-participate .dao-composer-meta > .dao-comment-emoji { justify-self: start; }
 }
 /* Keep every record section within reach, before the long proposal text. */
 .oz-participate .proposal-record-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(145px, 1fr)); gap: 10px; margin: 0 0 20px; }
@@ -4125,7 +4130,7 @@
   .oz-participate .history-topline p span { display: block; margin-top: 4px; }
   .oz-participate .history-filters { gap: 22px; }
   .oz-participate .dao-app .history-filters button { font-size: 13px; }
-  .oz-participate .history-tools { display: grid; grid-template-columns: 1fr 1fr; }
+  .oz-participate .history-tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
   .oz-participate .history-tools .dao-search { grid-column: 1/-1; width: 100%; }
   .oz-participate .dao-app .history-tools select { width: 100%; max-width: none; min-width: 0; font-size: 14px; min-height: 42px; }
   .oz-participate .history-records { padding: 0 16px; }

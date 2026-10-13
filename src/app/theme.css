@@ -2438,8 +2438,10 @@ a.rd-treasury-pool:hover .rd-treasury-name {
    background, 13px text. A field wrapped in a box (.ws-field: the table
    search, the explorer search) draws the box, and the input inside it is
    bare. Toolbar buttons match the field height. These selectors outrank the
-   legacy rules in workspace.css and redesign.css. */
-.rd-content :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select):not(.ws-field > *) {
+   legacy rules in workspace.css and redesign.css. Participate selects and
+   search fields have their own control sizes and icon padding; do not reset
+   those here. */
+.rd-content :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select):not(.ws-field > *):where(:not(.oz-participate select, .oz-participate input[type="search"])) {
   box-sizing: border-box;
   height: 36px;
   min-height: 36px;
@@ -2650,9 +2652,11 @@ a.rd-treasury-pool:hover .rd-treasury-name {
       select,
       textarea
     ):not(.ws-field > *) {
-    height: 40px;
     min-height: 40px;
     font-size: 16px;
+  }
+  .rd-content :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea):not(.ws-field > *):where(:not(.oz-participate select, .oz-participate input[type="search"])) {
+    height: 40px;
     line-height: 38px;
   }
   .rd-content textarea:not(.ws-field > *) {

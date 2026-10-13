@@ -1,5 +1,6 @@
 "use client";
 
+import { CommentEmojiPicker } from "./comment-emoji-picker";
 import { AccountAvatar } from "@/components/participate/workspace/workspace-account";
 import type { CreditScope } from "@/lib/participate/workspace/domain/credit-scope";
 import { useRouter } from "next/navigation";
@@ -333,7 +334,10 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
         {!participation.sponsored ? <button className="dao-credit-link" type="button" onClick={openCredits}>{participation.availableCredits !== null && participation.availableCredits < commentCost ? "Get Zcred" : "Credits"}</button> : null}
       </div> : null}
       <div className="dao-composer-footer">
-        <p id={`${fieldId}-hint`}>{commentsEndpoint?.includes("/archives/") ? (embedded ? "Public · Cannot be edited after publishing." : "Public and preserved for verification. Cannot be edited.") : "Published comments cannot be edited."}{!embedded || body.length > maxLength * .9 ? <span>{body.length.toLocaleString("en-US")} / {maxLength.toLocaleString("en-US")}</span> : null}</p>
+        <div className="dao-composer-meta">
+          <CommentEmojiPicker textareaRef={composer} value={body} onChange={setBody} maxLength={maxLength} disabled={posting} />
+          <p id={`${fieldId}-hint`}>{commentsEndpoint?.includes("/archives/") ? (embedded ? "Public · Cannot be edited after publishing." : "Public and preserved for verification. Cannot be edited.") : "Published comments cannot be edited."}{!embedded || body.length > maxLength * .9 ? <span>{body.length.toLocaleString("en-US")} / {maxLength.toLocaleString("en-US")}</span> : null}</p>
+        </div>
         <button type="submit" className="dao-button dao-button--primary" disabled={busy || participationUnavailable || creditSpendingPaused || !body.trim()} aria-describedby={`${fieldId}-hint`}>
           {posting ? "Publishing…" : commentCost > 0 ? `${replyTo ? "Publish reply" : "Publish"} · ${creditLabel(commentCost)}` : replyTo ? "Publish reply" : "Publish comment"}
         </button>
