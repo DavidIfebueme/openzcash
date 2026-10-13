@@ -40,7 +40,7 @@ export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: "Participate · ZCG · OpenZcash",
   description:
-    "An independent participation pilot: explore ZCG proposals, discuss ideas and build a verifiable history. Designed to grow into community governance on Zcash.",
+    "Explore ZCG proposals, publish community proposals and discuss ideas with a verifiable history. Participation uses free demo Zcred.",
   path: PARTICIPATE_PATH,
 });
 
@@ -248,6 +248,7 @@ export default async function ParticipatePage({
             drafts={drafts ?? []}
             signedIn={Boolean(session)}
             sandbox={participation?.sandbox ?? false}
+            publicationMode={board?.publicationMode ?? "demo"}
             balance={participation?.availableCredits ?? null}
             communityId={communityId}
             creditScopeId={participation?.creditScope?.id ?? ""}

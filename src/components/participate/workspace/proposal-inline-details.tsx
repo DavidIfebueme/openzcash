@@ -8,7 +8,9 @@ import { ArchiveRecoveryGuide } from "@/components/participate/workspace/archive
 import { WorkspaceSignInButton } from "@/components/participate/workspace/workspace-auth";
 import type { ProposalRecord } from "@/lib/participate/workspace/domain/proposal-record";
 import { ArchiveActivity } from "@/components/participate/workspace/archive-activity";
-import { SignedDecision } from "@/components/participate/workspace/signed-decision";
+import { GitHubComments } from "./github-comments";
+import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
+import { officialIssueNumber } from "@/lib/participate/official-proposals-model";
 import { AbandonmentNotice } from "@/components/participate/workspace/submission-lifecycle";
 import { CommitteeLabels } from "@/components/participate/workspace/committee-labels";
 import type { SourceCapture } from "@/lib/participate/workspace/archive/source-proposals";
@@ -113,12 +115,13 @@ function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { r
   const download = `${endpoint}/revisions/${record.revision}`;
   const { proof } = record;
   const source = record.sourceCapture?.schema === "PARTICIPATE_SOURCE_CAPTURE_V2" ? record.sourceCapture : null;
-  const activeSection = selected === "source" && !source ? "proposal" : selected;
+  const sourceReference = record.sourceCapture?.source ?? zcgSourceMetadata(record.recordId);
+  const sourceIssue = sourceReference ? officialIssueNumber(sourceReference.url) : null;
+  const activeSection = selected === "source" && !sourceIssue ? "proposal" : selected;
   const sections: { key: RecordSection; title: string; detail: string }[] = [
     { key: "proposal", title: "Proposal", detail: "Preserved contents" },
-    ...(source ? [{ key: "source" as const, title: "Source decisions", detail: sourceOutcomes[source.proposal.outcome] }] : []),
+    ...(sourceIssue ? [{ key: "source" as const, title: "Source & comments", detail: source ? sourceOutcomes[source.proposal.outcome] : "GitHub discussion" }] : []),
     { key: "files", title: "Files & proof", detail: proof.label },
-    { key: "review", title: "Signed review", detail: "Independent pilot" },
     { key: "activity", title: "Activity", detail: "Comments & likes" },
   ];
   useEffect(() => {
@@ -148,8 +151,8 @@ function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { r
     <div className="proposal-record-panel" id={`${id}-proposal`} role="region" aria-label="Proposal contents" hidden={activeSection !== "proposal"}>
       <ProposalMarkdown>{record.markdown.replace(/^# [^\n]+\n\n/, "")}</ProposalMarkdown>
     </div>
-    {source ? <div className="proposal-record-panel" id={`${id}-source`} role="region" aria-label="Source status and decisions" hidden={activeSection !== "source"}>
-      <SourceRevisionEvidence key={record.manifestHash} capture={source} download={download} />
+    {sourceIssue ? <div className="proposal-record-panel" id={`${id}-source`} role="region" aria-label="Source status and decisions" hidden={activeSection !== "source"}>
+      <SourceRevisionEvidence key={record.manifestHash} capture={source} download={download} issueNumber={sourceIssue} visible={visible && activeSection === "source"} />
     </div> : null}
     <div className="proposal-record-panel" id={`${id}-files`} role="region" aria-label="Files and verification" hidden={activeSection !== "files"}>
       <div className="proposal-record-grid">
@@ -166,9 +169,6 @@ function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { r
         </section>
       </div>
     </div>
-    <div className="proposal-record-panel proposal-record-panel--review" id={`${id}-review`} role="region" aria-label="Signed pilot review" hidden={activeSection !== "review"}>
-      {visited.includes("review") ? <SignedDecision key={`${record.manifestHash}:${sessionKey}`} endpoint={endpoint} revision={record.revision} sessionKey={sessionKey} initiallyOpen visible={visible && activeSection === "review"} /> : null}
-    </div>
     <div className="proposal-record-panel proposal-record-panel--activity" id={`${id}-activity`} role="region" aria-label="Activity and verification" hidden={activeSection !== "activity"}>
       {visited.includes("activity") ? <ArchiveActivity key={endpoint} endpoint={endpoint} initiallyOpen visible={visible && activeSection === "activity"} /> : null}
     </div>
@@ -178,9 +178,10 @@ function InlineRecord({ record, endpoint, onRevision, sessionKey, visible }: { r
 const sourceOutcomes = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Abandoned", closed: "Closed without a recorded verdict" };
 const repositoryRoles = { OWNER: "Repository owner", MEMBER: "Repository member", COLLABORATOR: "Repository collaborator" };
 
-function SourceRevisionEvidence({ capture, download }: { capture: Extract<SourceCapture, { schema: "PARTICIPATE_SOURCE_CAPTURE_V2" }>; download: string }) {
+function SourceRevisionEvidence({ capture, download, issueNumber, visible }: { capture: Extract<SourceCapture, { schema: "PARTICIPATE_SOURCE_CAPTURE_V2" }> | null; download: string; issueNumber: number; visible: boolean }) {
   const [eventLimit, setEventLimit] = useState(5);
   const [commentLimit, setCommentLimit] = useState(5);
+  if (!capture) return <GitHubComments issueNumber={issueNumber} visible={visible} />;
   const events = [...capture.evidence.events].sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt) || b.id - a.id);
   const comments = [...capture.evidence.comments].sort((a, b) => Date.parse(b.updatedAt) - Date.parse(a.updatedAt) || b.id - a.id);
   return <>
@@ -191,16 +192,16 @@ function SourceRevisionEvidence({ capture, download }: { capture: Extract<Source
           <strong>{event.event === "labeled" ? "Label added" : event.event === "unlabeled" ? "Label removed" : event.event === "closed" ? "Issue closed" : "Issue reopened"}{event.label ? ` · ${event.label.name}` : ""}</strong>
           <span>{event.actor ? `@${event.actor.login}` : "Actor unavailable"} · <time dateTime={event.createdAt}>{date(event.createdAt)}</time></span><a href={event.url} target="_blank" rel="noopener noreferrer">Source event ↗</a>
         </li>)}</ol>{events.length > eventLimit ? <button type="button" className="dao-text-button" onClick={() => setEventLimit(limit => limit + 5)}>Show older changes ({events.length - eventLimit})</button> : null}</> : <p className="proposal-record-empty">No status changes in this capture.</p>}
-      </section>
-      <section className="proposal-record-box"><header><h4>Source comments</h4><span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span></header>
+      <details className="proposal-source-comment"><summary>Comments preserved in this revision · {comments.length}</summary><header><h4>Captured comments</h4><span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span></header>
         <p className="proposal-record-caption">Repository roles identify the source, not individual committee votes.</p>
         {comments.length ? <>{comments.slice(0, commentLimit).map(comment => <details className="proposal-source-comment" key={comment.id}>
           <summary><span><strong>@{comment.author.login}</strong><small>{repositoryRoles[comment.association]} · {date(comment.createdAt)}</small></span></summary>
           {comment.updatedAt !== comment.createdAt ? <p className="proposal-record-caption">Edited at source <time dateTime={comment.updatedAt}>{date(comment.updatedAt)}</time></p> : null}
           <ProposalMarkdown>{comment.body}</ProposalMarkdown>
           <a className="dao-text-button" href={comment.url} target="_blank" rel="noopener noreferrer">Original comment ↗</a>
-        </details>)}{comments.length > commentLimit ? <button type="button" className="dao-text-button" onClick={() => setCommentLimit(limit => limit + 5)}>Show older comments ({comments.length - commentLimit})</button> : null}</> : <p className="proposal-record-empty">No repository-associated comments in this capture.</p>}
-      </section>
+        </details>)}{comments.length > commentLimit ? <button type="button" className="dao-text-button" onClick={() => setCommentLimit(limit => limit + 5)}>Show older comments ({comments.length - commentLimit})</button> : null}</> : <p className="proposal-record-empty">This revision contains no comments. See the current GitHub discussion alongside it.</p>}
+      </details></section>
+      <GitHubComments key={issueNumber} issueNumber={issueNumber} visible={visible} />
     </div>
     <a className="dao-text-button proposal-source-download" href={`${download}?file=source.json`}>Download source evidence ↓</a>
   </>;

@@ -16,6 +16,7 @@ const manifestBaseSchema = z.object({
 }).strict();
 export const REVIEW_ARCHIVE_SCOPE = "Public application metadata at capture time; committee decision pending. Original application and attachments are linked, not reproduced.";
 export const NATIVE_ARCHIVE_SCOPE = "Complete author-submitted Markdown and application fields. Pilot publication, not an official committee submission or decision. External links are not archived.";
+export const PUBLIC_NATIVE_ARCHIVE_SCOPE = "Complete author-submitted Markdown and application fields published on OpenZcash. Not an official committee submission or decision. External links are not archived.";
 export const SOURCE_ARCHIVE_SCOPE = "Complete public application Markdown and source metadata at capture time. Linked files and external discussions are not archived. Review status is a dated source observation, not a pilot decision.";
 export const archiveManifestSchema = z.discriminatedUnion("kind", [
   manifestBaseSchema.extend({
@@ -29,7 +30,7 @@ export const archiveManifestSchema = z.discriminatedUnion("kind", [
   manifestBaseSchema.extend({
     kind: z.literal("NATIVE_PROPOSAL"), originalDecisionDate: z.null(), submittedAt: z.string().datetime(),
     sources: z.array(z.string().url().startsWith("https://")).max(20),
-    scope: z.literal(NATIVE_ARCHIVE_SCOPE)
+    scope: z.enum([NATIVE_ARCHIVE_SCOPE, PUBLIC_NATIVE_ARCHIVE_SCOPE])
   }),
   manifestBaseSchema.extend({
     kind: z.literal("SOURCE_PROPOSAL"), originalDecisionDate: z.null(), submittedAt: z.string().datetime(),

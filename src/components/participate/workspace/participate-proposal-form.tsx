@@ -37,9 +37,9 @@ function download(text: string, filename: string) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-export function ParticipateProposalForm({ initial, drafts, signedIn, sandbox, balance, communityId, creditScopeId }: {
+export function ParticipateProposalForm({ initial, drafts, signedIn, sandbox, balance, communityId, creditScopeId, publicationMode = "demo" }: {
   initial?: SubmissionDraft; drafts: SubmissionDraft[]; signedIn: boolean; sandbox: boolean; balance: number | null;
-  communityId: string; creditScopeId: string;
+  communityId: string; creditScopeId: string; publicationMode?: "production" | "demo";
 }) {
   const router = useRouter();
   const [payload, setPayload] = useState<SubmissionPayload>(initial?.payload ?? EMPTY_SUBMISSION);
@@ -139,7 +139,7 @@ export function ParticipateProposalForm({ initial, drafts, signedIn, sandbox, ba
 
   return <div className="participate-compose">
     <div className="participate-compose-top"><Link href="/zcg/participate" className="dao-back-link" onClick={back}>← Proposals</Link><button type="button" className="dao-text-button" onClick={exportDraft}>Export .md ↗</button></div>
-    <header className="participate-compose-heading"><div><p className="dao-eyebrow">ZCG · Independent pilot</p><h1 ref={heading} tabIndex={-1}>{saved?.state === "ABANDONED" ? "Proposal abandoned" : published ? "Proposal published" : mode === "review" ? "Review your proposal" : "New proposal"}</h1><p>{saved?.state === "ABANDONED" ? "Your proposal and its history remain public." : published ? "Your public record is ready for discussion." : mode === "review" ? "Check the public version before submitting." : "An idea, a clear plan, a public record."}</p></div><span className="participate-draft-state">{saved?.state === "ABANDONED" ? "Abandoned" : published ? "Published in demo" : dirty ? "Unsaved changes" : saved ? "Draft saved" : "Private draft"}</span></header>
+    <header className="participate-compose-heading"><div><p className="dao-eyebrow">OpenZcash · Community proposals</p><h1 ref={heading} tabIndex={-1}>{saved?.state === "ABANDONED" ? "Proposal abandoned" : published ? "Proposal published" : mode === "review" ? "Review your proposal" : "New proposal"}</h1><p>{saved?.state === "ABANDONED" ? "Your proposal and its history remain public." : published ? "Your public record is ready for discussion." : mode === "review" ? "Check the public version before submitting." : "An idea, a clear plan, a public record."}</p></div><span className="participate-draft-state">{saved?.state === "ABANDONED" ? "Abandoned" : published ? saved?.state === "PUBLISHED_DEMO" ? "Legacy test proposal" : "Published" : dirty ? "Unsaved changes" : saved ? "Draft saved" : "Private draft"}</span></header>
     {saved ? <SubmissionLifecycleAction key={saved.id} draft={saved} disabled={busy} onDeleted={() => { setPayload(EMPTY_SUBMISSION); setSaved(undefined); router.replace("/zcg/participate"); }} onAbandoned={setSaved} /> : null}
     {published && saved ? <section className="dao-panel participate-published"><span className="participate-published-check" aria-hidden="true">✓</span><h2>{saved.payload.title}</h2><p>20 demo Zcred used. No real payment was made.</p>{saved.abandonment ? <AbandonmentNotice value={saved.abandonment} endpoint={`/api/communities/${encodeURIComponent(communityId)}/archives/${saved.recordId}`} /> : <p>Files preserved · Check the record for current verification</p>}<div className="dao-form-actions"><Link className="dao-button dao-button--primary" href={`/zcg/participate?record=${saved.recordId}`}>View proposal →</Link><a className="dao-button" href={`/api/communities/${encodeURIComponent(communityId)}/archives/${saved.recordId}/revisions/1`}>Download record</a></div></section> : <div className="participate-compose-grid">
       <form className="dao-panel dao-form participate-editor" noValidate onSubmit={event => { event.preventDefault(); if (canReview) void run(review); }} aria-busy={busy}>
@@ -177,19 +177,19 @@ export function ParticipateProposalForm({ initial, drafts, signedIn, sandbox, ba
             </ol>
             <p className="participate-credit-footnote">Zcred are participation credits, not voting power or a cryptocurrency.</p>
           </details></> : null}
-          {mode !== "review" || !sandbox ? <div className="participate-credit-status"><strong>{sandbox ? "Try it with free Zcred" : "Start with a free draft"}</strong><p>{sandbox ? "This demo uses free credits. No ZEC payment is needed." : "Paid publication is being prepared. Save or export your draft today."}</p></div> : null}
+          {mode !== "review" || !sandbox ? <div className="participate-credit-status"><strong>{sandbox ? "Try it with free Zcred" : "Start with a free draft"}</strong><p>{sandbox ? "Zcred are free demo credits. Your proposal and discussion are public and real." : "Paid publication is being prepared. Save or export your draft today."}</p></div> : null}
           {mode === "review" ? <div className="participate-submit-review">
-            <div className="participate-demo-disclosure" role="note"><strong>You’re publishing a test proposal</strong><p>This is an independent pilot, not an official ZCG application. Your new record will be public. It is only anchored on Zcash after a separate, confirmed transaction.</p></div>
+            <div className="participate-demo-disclosure" role="note"><strong>{publicationMode === "production" ? "Publish to the community" : "Publish a test proposal"}</strong><p>Your proposal will be public on OpenZcash. Official ZCG applications still go through GitHub. Committee review is not enabled here.</p></div>
             <dl><div><dt>Available</dt><dd>{creditBalance} demo Zcred</dd></div><div><dt>After publication</dt><dd>{Math.max(0, creditBalance - SUBMISSION_PRICE.credits)} demo Zcred</dd></div></dl>
             {sandbox && canClaimAllowance ? <button type="button" className="dao-button" disabled={busy} onClick={() => void run(claimAllowance)}>{busy ? "Adding…" : "Get 25 free Zcred"}</button> : null}
-            <label className="participate-consent"><input type="checkbox" checked={consent} disabled={busy} onChange={event => setConsent(event.target.checked)} /><span>Publish this exact version as a test in the pilot. Its text and public name will be visible to everyone.</span></label><button type="button" className="dao-button dao-button--primary" disabled={busy || !consent || creditBalance < SUBMISSION_PRICE.credits || !sandbox} onClick={() => void run(async () => {
+            <label className="participate-consent"><input type="checkbox" checked={consent} disabled={busy} onChange={event => setConsent(event.target.checked)} /><span>Publish this exact version on OpenZcash. Its text and public name will be visible to everyone and cannot be edited.</span></label><button type="button" className="dao-button dao-button--primary" disabled={busy || !consent || creditBalance < SUBMISSION_PRICE.credits || !sandbox} onClick={() => void run(async () => {
             if (!saved) return;
             publicationKey.current ||= crypto.randomUUID();
             const result = await send("POST", { id: saved.id, expectedVersion: saved.version, contentHash: saved.contentHash, priceVersion: SUBMISSION_PRICE.version, requestKey: publicationKey.current, consent: true });
             setSaved(result); setNotice(""); router.refresh();
           })}>{busy ? "Please wait…" : "Publish · 20 demo Zcred"}</button>{creditBalance < SUBMISSION_PRICE.credits && !canClaimAllowance ? <p className="dao-error">Open Credits in your profile to check your demo allowance.</p> : null}</div> : null}
         </section>
-        <details className="participate-intake-note"><summary>About this pilot</summary><p>This test proposal is public in the pilot, but is not submitted to ZCG or anchored on Zcash. Eligible applications from the official ZCG GitHub source are anchored separately.</p></details>
+        <details className="participate-intake-note"><summary>Publication & verification</summary><p>Saving a draft is private. Publishing creates a permanent community record using free demo Zcred. Automatic blockchain anchoring applies to eligible applications from the official ZCG GitHub source.</p></details>
         {myDrafts.length ? <details className="participate-my-drafts"><summary>My drafts <span>{myDrafts.length}</span></summary>{myDrafts.map(draft => <Link key={draft.id} href={`/zcg/participate?compose=${draft.id}`} onClick={back}>{draft.payload.title || "Untitled proposal"}</Link>)}</details> : null}
       </aside>
     </div>}

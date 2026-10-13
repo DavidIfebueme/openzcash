@@ -11,7 +11,7 @@ const INTRO_KEY = "openzcash-participate-intro-v1";
 
 /**
  * The portal's frame around the native workspace: the first-visit
- * introduction, the "About the pilot" entry and the pilot footnote. Without a
+ * introduction, the "About Participate" entry and the pilot footnote. Without a
  * configured service the frame keeps its own tabs and the public history.
  */
 export function Participate({
@@ -109,14 +109,14 @@ export function Participate({
             className={styles.about}
             onClick={() => setIntro(true)}
           >
-            About the pilot
+            About Participate
           </button>
         </header>
       ) : null}
       {children}
       </div>
       <p className={styles.footnote}>
-        An OpenZcash pilot. Official ZCG submissions and committee decisions
+        Community participation on OpenZcash. Official ZCG submissions and committee decisions
         follow the existing ZCG process.
       </p>
       <dialog
@@ -147,14 +147,14 @@ export function Participate({
           <button
             className={styles.close}
             type="button"
-            aria-label="Close pilot introduction"
+            aria-label="Close Participate introduction"
             onClick={enter}
           >
             ×
           </button>
           <div className={styles.heroCopy}>
             <span className={styles.goldLabel}>
-              {entered ? "About the pilot" : "OpenZcash · ZCG pilot"}
+              {entered ? "About Participate" : "OpenZcash · Participate"}
             </span>
             <h2 id="participate-intro-title">
               Participation,
@@ -189,7 +189,7 @@ export function Participate({
             </div>
             {configured ? (
               <button type="button" className={styles.primary} onClick={enter}>
-                {entered ? "Back to workspace" : "Enter the pilot"}{" "}
+                {entered ? "Back to workspace" : "Enter Participate"}{" "}
                 <span aria-hidden="true">→</span>
               </button>
             ) : (
@@ -211,16 +211,16 @@ export function Participate({
                 <dt>Participate</dt>
                 <dd>
                   Sign in with an email code. Use free demo Zcred to comment,
-                  like or publish a public test proposal for 20 Zcred.
+                  like or publish a community proposal for 20 Zcred.
                 </dd>
               </div>
               <div>
                 <dt>Verify</dt>
                 <dd>
                   Open Read &amp; verify to download preserved files and
-                  available receipts. Test proposals stay in the demo; eligible
-                  applications from the official ZCG GitHub source receive
-                  separate Zcash anchors.
+                  available receipts. Community proposals are published on OpenZcash;
+                  eligible applications from the official ZCG GitHub source
+                  are automatically anchored on Zcash.
                 </dd>
               </div>
               <div>
@@ -233,7 +233,7 @@ export function Participate({
             </dl>
           </details>
           <p className={styles.disclosure}>
-            Independent pilot · Not an official ZCG application channel.
+            Community proposals and discussions · Free demo Zcred.
           </p>
         </div>
       </dialog>

@@ -1,9 +1,10 @@
 "use client";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { OfficialProposalListing } from "@/lib/participate/official-proposals-model";
 import type { ProposalParticipation } from "@/lib/participate/workspace/domain/proposal-participation";
 import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-review-proposals";
 import { ZcgProposalLabels } from "./zcg-proposal-labels";
+import { GitHubComments } from "./github-comments";
 
 const dollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 const dates = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
@@ -16,6 +17,7 @@ export function OfficialReviewQueue({ proposals, records, renderActions, renderP
   isOpen: (recordId: string) => boolean;
   toggle: (recordId: string) => void;
 }) {
+  const [openSource, setOpenSource] = useState<number | null>(null);
   return <ul className="dao-proposal-list dao-zcg-list" aria-label="Official ZCG review queue">
     {proposals.filter(proposal => proposal.outcome === "under_review").map(proposal => {
       const record = records.get(proposal.issueNumber);
@@ -37,10 +39,10 @@ export function OfficialReviewQueue({ proposals, records, renderActions, renderP
         <div className="dao-proposal-card-footer">
           {record ? renderActions(recordId) : <span className="dao-zcg-record-label" title="Listed from the official proposal queue. Discussions and verification become available after the source archive is imported.">Awaiting source import</span>}
           <div className="dao-zcg-record-actions"><a className="dao-text-button" href={proposal.url} target="_blank" rel="noopener noreferrer">Source ↗</a>
-            {record ? <button id={`proposal-read-${recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={isOpen(recordId)} aria-controls={`proposal-panel-${recordId}`} onClick={() => toggle(recordId)}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button> : null}
+            {record ? <button id={`proposal-read-${recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={isOpen(recordId)} aria-controls={`proposal-panel-${recordId}`} onClick={() => toggle(recordId)}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button> : <button type="button" className="dao-text-button" aria-expanded={openSource === proposal.issueNumber} aria-controls={`github-comments-${proposal.issueNumber}`} onClick={() => setOpenSource(value => value === proposal.issueNumber ? null : proposal.issueNumber)}>GitHub comments <span aria-hidden="true">⌄</span></button>}
           </div>
         </div>
-        {record ? renderPanel(recordId) : null}
+        {record ? renderPanel(recordId) : openSource === proposal.issueNumber ? <div id={`github-comments-${proposal.issueNumber}`}><GitHubComments issueNumber={proposal.issueNumber} visible /></div> : null}
       </li>;
     })}
   </ul>;

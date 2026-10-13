@@ -52,7 +52,7 @@ export const abandonSubmissionSchema = z.object({
 export type ProposalAbandonment = { eventId: string; eventHash: string; reason: string; occurredAt: string };
 export type SubmissionPayload = z.infer<typeof submissionDraftSchema>;
 export type SubmissionDraft = {
-  id: string; payload: SubmissionPayload; version: number; contentHash: string; state: "DRAFT" | "PUBLISHED_DEMO" | "ABANDONED";
+  id: string; payload: SubmissionPayload; version: number; contentHash: string; state: "DRAFT" | "PUBLISHED" | "PUBLISHED_DEMO" | "ABANDONED";
   recordId: string | null; updatedAt: string;
   abandonment?: ProposalAbandonment | null;
 };

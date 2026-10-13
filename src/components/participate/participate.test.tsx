@@ -15,7 +15,7 @@ it("frames the native workspace without portal tabs and without an embedded docu
   expect(html).toContain("Workspace");
   expect(html).not.toContain("<iframe");
   expect(html).not.toContain('aria-label="Participation views"');
-  expect(html).toContain("An OpenZcash pilot.");
+  expect(html).toContain("Community participation on OpenZcash.");
 });
 
 it("keeps its own tabs and the public history when no participation service is configured", () => {
@@ -30,19 +30,19 @@ it("keeps its own tabs and the public history when no participation service is c
   expect(html).toContain("View decision history");
 });
 
-it("distinguishes the 25 anchored mainnet records from new free demo submissions in the introduction", () => {
+it("distinguishes the 25 anchored mainnet records from real community proposals and free demo credits in the introduction", () => {
   const html = renderToStaticMarkup(
     <Participate view="proposals" configured />,
   );
-  expect(html.match(/Enter the pilot/g)).toHaveLength(1);
+  expect(html.match(/Enter Participate/g)).toHaveLength(1);
   expect(html).toContain("25 proposals anchored");
   expect(html).toContain("Zcash mainnet");
   expect(html).toContain(
     "1bb7383043cab4d72b7129b5e5bdc7441ac7c073af59679bb91403216b795bf1",
   );
   expect(html).toContain("Sign in with an email code.");
-  expect(html).toContain("Test proposals stay in the demo");
+  expect(html).toContain("Community proposals are published on OpenZcash");
   expect(html).toContain(
-    "official ZCG GitHub source receive separate Zcash anchors",
+    "official ZCG GitHub source are automatically anchored on Zcash",
   );
 });
