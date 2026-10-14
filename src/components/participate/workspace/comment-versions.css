@@ -1,0 +1,25 @@
+/* Keep version controls beside their comment and inside the thread rail. */
+.oz-participate .dao-comment-edit, .oz-participate .dao-comment-withdraw, .oz-participate .dao-comment-history { margin: .45rem 0 .45rem var(--comment-inset, 40px); max-width: 58rem; }
+.oz-participate .dao-app .dao-comment .dao-comment-edit textarea { width: 100%; height: auto; min-height: 96px; padding: 12px; font-size: 16px; line-height: 1.5; resize: vertical; }
+.oz-participate .dao-app .dao-comment :is(.dao-comment-edit, .dao-comment-withdraw) .dao-comment-actions { margin: 0 !important; }
+.oz-participate .dao-comment-history > button { font-size: .75rem; }
+.oz-participate .dao-comment-history ol { list-style: none; padding: 0 0 0 1rem; margin: .6rem 0 0; border-left: 1px solid var(--dao-line); }
+.oz-participate .dao-comment-history li { padding: .55rem 0; }
+.oz-participate .dao-comment-history li > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: .35rem .8rem; font-size: .75rem; }
+.oz-participate .dao-comment-history li span { color: var(--dao-muted); }
+.oz-participate .dao-comment-history li p, .oz-participate .dao-comment-withdraw p { margin: .35rem 0 .5rem; white-space: pre-wrap; overflow-wrap: anywhere; font-size: .875rem; }
+
+
+.oz-participate .dao-app .dao-comment-edit { gap: 10px; }
+.oz-participate .dao-comment-edit .dao-field-hint { margin: 0; font-size: 12px; }
+.oz-participate .dao-app .dao-comment-edit .dao-button, .oz-participate .dao-app .dao-comment-withdraw .dao-button { min-height: 38px; padding: 8px 14px; border-radius: 9px; font-size: 12px; }
+.oz-participate .dao-app .dao-comment-edit .dao-text-button, .oz-participate .dao-app .dao-comment-withdraw .dao-text-button { min-height: 38px; padding: 8px 12px; border-radius: 9px; }
+.oz-participate .dao-comment-more { position: relative; display: inline-flex; }
+.oz-participate .dao-app .dao-comment-more-toggle { display: inline-flex; align-items: center; justify-content: center; width: 36px; min-height: 36px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--dao-muted); cursor: pointer; }
+.oz-participate .dao-app .dao-comment-more-toggle:hover, .oz-participate .dao-app .dao-comment-more-toggle[aria-expanded="true"] { background: var(--dao-soft); color: var(--dao-ink); }
+.oz-participate .dao-comment-menu { position: absolute; top: calc(100% + 4px); right: 0; z-index: 8; width: 184px; padding: 5px; border: 1px solid var(--dao-line); border-radius: 12px; background: var(--dao-paper); box-shadow: 0 8px 28px #0002; }
+.oz-participate .dao-app .dao-comment-menu > button { display: flex; align-items: center; gap: 9px; width: 100%; min-height: 40px; padding: 9px 10px; border: 0; border-radius: 8px; text-align: left; font-size: 12px; font-weight: 500; background: transparent; color: var(--dao-ink); cursor: pointer; }
+.oz-participate .dao-app .dao-comment-menu > button:hover, .oz-participate .dao-app .dao-comment-menu > button:focus-visible { background: var(--dao-soft); }
+.oz-participate .dao-app .dao-comment-menu > .dao-comment-withdraw-action { color: var(--dao-error); }
+.oz-participate .dao-comment-menu svg { flex: none; }
+@media (max-width: 600px) { .oz-participate .dao-app .dao-comment-more-toggle { min-height: 40px; width: 40px; } }

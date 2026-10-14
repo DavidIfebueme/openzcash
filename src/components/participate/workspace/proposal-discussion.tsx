@@ -1,5 +1,6 @@
 "use client";
 
+import "./comment-versions.css";
 import { CommentEmojiPicker } from "./comment-emoji-picker";
 import { commentAncestors, descendantCount, indexDiscussion, VISIBLE_REPLY_DEPTH } from "./discussion-tree";
 import { AccountAvatar } from "@/components/participate/workspace/workspace-account";
@@ -16,6 +17,11 @@ export type DiscussionComment = {
   createdAt: string;
   body: string | null;
   hidden: boolean;
+  version?: number;
+  editedAt?: string | null;
+  withdrawn?: boolean;
+  canEdit?: boolean;
+  canWithdraw?: boolean;
   moderation: { reason: string; moderatorLabel: string; hiddenAt: string } | null;
   reaction?: { count: number; likedByMe: boolean; chargedBefore: boolean };
 };
@@ -35,6 +41,7 @@ export type DiscussionParticipation = {
 export type DiscussionPolicy = {
   visibility: "INVITED_PARTICIPANTS" | "PUBLIC";
   immutable: true;
+  versioned?: boolean;
   maxLength: number;
   readOnly: boolean;
   participation?: DiscussionParticipation;
@@ -55,6 +62,10 @@ export type ProposalDiscussionProps = {
 };
 
 const ERRORS: Record<string, string> = {
+  COMMENT_VERSION_CHANGED: "This comment has a newer version. Review it before trying again.",
+  COMMENT_UNAVAILABLE: "This comment was withdrawn or hidden.",
+  COMMENT_VERSION_LIMIT: "This comment has reached its revision limit.",
+  COMMENT_UNCHANGED: "Make a change before saving.",
   unauthorized: "Sign in again to continue.",
   forbidden: "Your account does not have access to this discussion.",
   forbidden_origin: "This request could not be verified. Reload the page and try again.",
@@ -298,9 +309,9 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
   }
 
   async function toggleReaction(comment: DiscussionComment) {
-    if (actionPending.current || !canReact || comment.hidden || participationUnavailable || (creditSpendingPaused && reactionCost(comment, participation) > 0)) return;
+    if (actionPending.current || !canReact || comment.hidden || comment.withdrawn || participationUnavailable || (creditSpendingPaused && reactionCost(comment, participation) > 0)) return;
     const liked = !comment.reaction?.likedByMe;
-    const signature = JSON.stringify({ liked });
+    const signature = JSON.stringify({ liked, version: comment.version });
     let request = likeRequests.current.get(comment.id);
     if (request?.signature !== signature) {
       request = actionRequest(signature, participation);
@@ -315,7 +326,7 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
     try {
       const response = await fetch(`${commentsUrl}/${encodeURIComponent(comment.id)}/reaction`, {
         method: "POST", headers: { "content-type": "application/json" },
-        body: JSON.stringify({ liked, requestKey: request.requestKey, policyVersion: request.policyVersion })
+        body: JSON.stringify({ liked, ...(comment.version ? { version: comment.version } : {}), requestKey: request.requestKey, policyVersion: request.policyVersion })
       });
       const result = await response.json().catch(() => null) as { error?: string; comment?: DiscussionComment; participation?: DiscussionParticipation } | null;
       if (!response.ok || !result?.comment) {
@@ -324,7 +335,7 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
         setReactionErrors(current => ({ ...current, [comment.id]: {
           message: ERRORS[code] ?? "Your like could not be saved. Please try again.", needsCredits: LOW_CREDIT_ERRORS.has(code)
         } }));
-        if (POLICY_CHANGED_ERRORS.has(code)) {
+        if (POLICY_CHANGED_ERRORS.has(code) || code === "COMMENT_VERSION_CHANGED" || code === "COMMENT_UNAVAILABLE") {
           likeRequests.current.delete(comment.id);
           await refreshDiscussion();
         } else if (code === "CREDIT_PAYMENT_REVIEW") {
@@ -389,7 +400,7 @@ function DiscussionBody({ pollId, sectionId = "discussion", embedded = false, sh
       <div className="dao-composer-footer">
         <div className="dao-composer-meta">
           <CommentEmojiPicker textareaRef={composer} value={body} onChange={setBody} maxLength={maxLength} disabled={posting} />
-          <p id={`${fieldId}-hint`}>{commentsEndpoint?.includes("/archives/") ? (embedded ? "Public · Cannot be edited after publishing." : "Public and preserved for verification. Cannot be edited.") : "Published comments cannot be edited."}{!embedded || body.length > maxLength * .9 ? <span>{body.length.toLocaleString("en-US")} / {maxLength.toLocaleString("en-US")}</span> : null}</p>
+          <p id={`${fieldId}-hint`}>{commentsEndpoint?.includes("/archives/") ? (policy.versioned ? "Public · Edits stay in history." : embedded ? "Public · Cannot be edited after publishing." : "Public and preserved for verification. Cannot be edited.") : "Published comments cannot be edited."}{!embedded || body.length > maxLength * .9 ? <span>{body.length.toLocaleString("en-US")} / {maxLength.toLocaleString("en-US")}</span> : null}</p>
         </div>
         <button type="submit" className="dao-button dao-button--primary" disabled={busy || participationUnavailable || creditSpendingPaused || !body.trim()} aria-describedby={`${fieldId}-hint`}>
           {posting ? "Publishing…" : commentCost > 0 ? `${replyTo ? "Publish reply" : "Publish"} · ${creditLabel(commentCost)}` : replyTo ? "Publish reply" : "Publish comment"}
@@ -424,12 +435,78 @@ type CommentItemProps = {
   onOpenCredits: () => void;
 };
 
+function CommentActions({ canEdit, canWithdraw, disabled, onEdit, onWithdraw }: { canEdit: boolean; canWithdraw: boolean; disabled: boolean; onEdit: () => void; onWithdraw: () => void }) {
+  const [open, setOpen] = useState(false);
+  const container = useRef<HTMLDivElement>(null);
+  const id = useId();
+  useEffect(() => {
+    if (!open) return;
+    container.current?.querySelector<HTMLButtonElement>("[data-comment-action]")?.focus();
+    function outside(event: PointerEvent) { if (!container.current?.contains(event.target as Node)) setOpen(false); }
+    function escape(event: KeyboardEvent) { if (event.key === "Escape") { setOpen(false); container.current?.querySelector<HTMLButtonElement>("[aria-expanded]")?.focus(); } }
+    document.addEventListener("pointerdown", outside);
+    document.addEventListener("keydown", escape);
+    return () => { document.removeEventListener("pointerdown", outside); document.removeEventListener("keydown", escape); };
+  }, [open]);
+  return <div className="dao-comment-more" ref={container}>
+    <button className="dao-comment-more-toggle" type="button" aria-label="Comment actions" title="Comment actions" aria-expanded={open} aria-controls={open ? id : undefined} disabled={disabled} onClick={() => setOpen(!open)}><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8" /><circle cx="12" cy="12" r="1.8" /><circle cx="19" cy="12" r="1.8" /></svg></button>
+    {open ? <div className="dao-comment-menu" id={id} role="group" aria-label="Your comment">
+      {canEdit ? <button data-comment-action type="button" onClick={() => { setOpen(false); onEdit(); }}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="m15 5 4 4M4 20l4-1L20 7a2.8 2.8 0 0 0-4-4L4 15v5Z" /></svg>Edit comment</button> : null}
+      {canWithdraw ? <button data-comment-action className="dao-comment-withdraw-action" type="button" onClick={() => { setOpen(false); onWithdraw(); }}><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7m4-7v7" /></svg>Withdraw comment</button> : null}
+    </div> : null}
+  </div>;
+}
+
 function CommentItem({ comment, permalink, commentsUrl, canReply, replyDisabled, canModerate, canReact, reactionDisabled, reactionPending, reactionCost: cost, reactionError, onReply, onUpdated, onReact, onOpenCredits }: CommentItemProps) {
   const router = useRouter();
   const fieldId = useId();
   const [moderating, setModerating] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const editInput = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => { if (editing) editInput.current?.focus(); }, [editing]);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [draft, setDraft] = useState(comment.body ?? "");
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [history, setHistory] = useState<{ version: number; body: string | null; createdAt: string; likes: number }[] | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const changeRequest = useRef<{ signature: string; requestKey: string } | null>(null);
+  async function change(action: "edit" | "withdraw") {
+    if (saving || reactionPending || !comment.version || (action === "edit" ? !comment.canEdit : !comment.canWithdraw)) return;
+    const data = { version: comment.version, ...(action === "edit" ? { body: draft.trim() } : {}) };
+    const signature = JSON.stringify({ action, ...data });
+    if (changeRequest.current?.signature !== signature) changeRequest.current = { signature, requestKey: crypto.randomUUID() };
+    setSaving(true); setError(null);
+    try {
+      const response = await fetch(`${commentsUrl}/${encodeURIComponent(comment.id)}/${action}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ ...data, requestKey: changeRequest.current.requestKey }) });
+      const result = await response.json().catch(() => null) as { error?: string; comment?: DiscussionComment } | null;
+      if (!response.ok || !result?.comment) {
+        setError(ERRORS[result?.error ?? ""] ?? "Your change could not be saved. Try again.");
+        if (result?.error === "COMMENT_VERSION_CHANGED" || result?.error === "COMMENT_UNAVAILABLE") {
+          const fresh = await fetch(commentsUrl, { cache: "no-store" }).then(res => res.ok ? res.json() : null);
+          const updated = fresh?.comments?.find((item: DiscussionComment) => item.id === comment.id);
+          if (updated) onUpdated(updated);
+          setEditing(false); setWithdrawing(false); changeRequest.current = null;
+        }
+        return;
+      }
+      onUpdated(result.comment); setEditing(false); setWithdrawing(false); setHistory(null); setHistoryOpen(false); changeRequest.current = null;
+      window.dispatchEvent(new CustomEvent("dao:participation-updated", { detail: { communityId: commentsUrl.split("/communities/")[1]?.split("/")[0] } }));
+    } catch { setError("Connection interrupted. Your draft is here; retry to check the same change."); }
+    finally { setSaving(false); }
+  }
+  async function toggleHistory() {
+    if (historyOpen) { setHistoryOpen(false); return; }
+    setHistoryOpen(true); setHistoryLoading(true); setError(null);
+    try {
+      const response = await fetch(`${commentsUrl}/${encodeURIComponent(comment.id)}/history`, { cache: "no-store" });
+      const result = await response.json();
+      if (!response.ok || !Array.isArray(result.versions)) throw new Error("history");
+      setHistory(result.versions);
+    } catch { setError("History could not be loaded. Try again."); setHistoryOpen(false); }
+    finally { setHistoryLoading(false); }
+  }
   const liked = comment.reaction?.likedByMe ?? false;
   const likeCount = comment.reaction?.count ?? 0;
   const reactionLabel = `${liked ? "Remove like from" : "Like"} ${comment.authorLabel}’s comment. ${likeCount.toLocaleString("en-US")} ${likeCount === 1 ? "like" : "likes"}${cost > 0 ? `. ${creditLabel(cost)}` : ""}`;
@@ -452,16 +529,19 @@ function CommentItem({ comment, permalink, commentsUrl, canReply, replyDisabled,
 
   return <article className={`dao-comment${comment.hidden ? " dao-comment--hidden" : ""}`} id={`comment-${comment.id}`} tabIndex={-1}>
     <header className="dao-comment-header"><AccountAvatar name={comment.authorLabel} src={comment.authorAvatarUrl} className="dao-comment-avatar" /><strong>{comment.authorLabel}{comment.authorNick && comment.authorNick !== comment.authorLabel ? <small className="dao-comment-username">@{comment.authorNick}</small> : null}</strong>{permalink ? <a className="dao-comment-permalink" href={`#comment-${comment.id}`} aria-label={`Permanent link to ${comment.authorLabel}’s comment`}><time dateTime={comment.createdAt}>{displayDate(comment.createdAt)}</time></a> : <time className="dao-comment-permalink" dateTime={comment.createdAt}>{displayDate(comment.createdAt)}</time>}</header>
-    {comment.hidden ? <div className="dao-comment-tombstone"><p>Comment hidden by a moderator</p>{comment.moderation ? <><p className="dao-moderation-reason">{comment.moderation.reason}</p><span>{comment.moderation.moderatorLabel}<span aria-hidden="true"> · </span><time dateTime={comment.moderation.hiddenAt}>{displayDate(comment.moderation.hiddenAt)}</time></span></> : null}</div> : <p className="dao-comment-body">{comment.body}</p>}
-    {!comment.hidden && (canReply || canModerate || canReact || comment.reaction) ? <div className="dao-comment-actions">
+    {comment.hidden ? <div className="dao-comment-tombstone"><p>Comment hidden by a moderator</p>{comment.moderation ? <><p className="dao-moderation-reason">{comment.moderation.reason}</p><span>{comment.moderation.moderatorLabel}<span aria-hidden="true"> · </span><time dateTime={comment.moderation.hiddenAt}>{displayDate(comment.moderation.hiddenAt)}</time></span></> : null}</div> : comment.withdrawn ? <p className="dao-comment-tombstone">Comment withdrawn by author</p> : editing ? <form className="dao-comment-edit dao-form" onSubmit={event => { event.preventDefault(); void change("edit"); }}><label className="dao-sr-only" htmlFor={`${fieldId}-edit`}>Edit comment</label><textarea ref={editInput} id={`${fieldId}-edit`} maxLength={4000} rows={3} required value={draft} disabled={saving} onChange={event => setDraft(event.target.value)} /><p className="dao-field-hint">Previous versions and their likes stay in history.</p><div className="dao-comment-actions"><button className="dao-button dao-button--primary" type="submit" disabled={saving || !draft.trim() || draft.trim() === comment.body}>{saving ? "Saving…" : "Save edit"}</button><button className="dao-text-button" type="button" disabled={saving} onClick={() => { setEditing(false); setError(null); }}>Cancel</button></div></form> : <p className="dao-comment-body">{comment.body}</p>}
+    {!comment.hidden && !comment.withdrawn && !editing && (canReply || canModerate || canReact || comment.reaction) ? <div className="dao-comment-actions">
       {canReact || comment.reaction ? <button className="dao-like-button" type="button" aria-label={reactionLabel} aria-pressed={liked} aria-busy={reactionPending} style={reactionPending ? { opacity: 1, cursor: "progress" } : undefined} title={cost > 0 ? `Like · ${creditLabel(cost)}` : liked ? "Remove like" : "Like"} disabled={!canReact || reactionDisabled || saving} onClick={() => onReact(comment)}>
         <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M7 10v10H3V10h4Zm0 0 5-7c2 0 2.5 1.5 2 3l-1 4h5.8a2 2 0 0 1 2 2.4l-1.3 6A2 2 0 0 1 17.6 20H7" /></svg>
         <span className="dao-like-count" aria-hidden="true">{likeCount.toLocaleString("en-US")}</span>
         {cost > 0 ? <span className="dao-like-cost" aria-hidden="true">{creditLabel(cost)}</span> : null}
       </button> : null}
       {canReply ? <button className="dao-text-button" type="button" aria-label={`Reply to ${comment.authorLabel}`} disabled={replyDisabled} onClick={() => onReply(comment)}>Reply <span aria-hidden="true">↗</span></button> : null}
+      {comment.canEdit || comment.canWithdraw ? <CommentActions canEdit={Boolean(comment.canEdit)} canWithdraw={Boolean(comment.canWithdraw)} disabled={saving || reactionPending} onEdit={() => { setDraft(comment.body ?? ""); setEditing(true); setWithdrawing(false); setError(null); }} onWithdraw={() => { setWithdrawing(true); setError(null); }} /> : null}
       {canModerate ? <button className="dao-text-button dao-text-button--muted" type="button" aria-label={`Moderate comment by ${comment.authorLabel}`} aria-expanded={moderating} aria-controls={moderating ? `${fieldId}-moderation` : undefined} disabled={saving || reactionPending} onClick={() => { setModerating(!moderating); setError(null); }}>Moderate</button> : null}
     </div> : null}
+    {withdrawing && comment.canWithdraw ? <div className="dao-comment-withdraw"><p>Withdraw this comment? Its text stays in public history, and replies remain visible. Existing blockchain proofs cannot be erased.</p><div className="dao-comment-actions"><button className="dao-button dao-button--danger" type="button" disabled={saving || reactionPending} onClick={() => void change("withdraw")}>{saving ? "Saving…" : "Withdraw comment"}</button><button className="dao-text-button" type="button" disabled={saving} onClick={() => setWithdrawing(false)}>Cancel</button></div></div> : null}
+    {comment.version && (comment.version > 1 || comment.withdrawn) ? <div className="dao-comment-history"><button className="dao-text-button dao-text-button--muted" type="button" aria-expanded={historyOpen} disabled={historyLoading} onClick={() => void toggleHistory()}>{comment.version > 1 ? `Edited · v${comment.version} · ` : ""}{historyLoading ? "Loading history…" : historyOpen ? "Hide history" : "View history"}</button>{historyOpen && history ? <ol>{history.map(item => <li key={item.version}><div><strong>Version {item.version}{item.version === comment.version ? comment.withdrawn ? " · Withdrawn" : comment.hidden ? " · Hidden" : " · Current" : ""}</strong><span>{displayDate(item.createdAt)} · {item.likes} {item.likes === 1 ? "like" : "likes"}</span></div><p>{item.body ?? "Text hidden by moderation. Its fingerprint and proof remain recorded."}</p></li>)}</ol> : null}</div> : null}
     {reactionError && !comment.hidden ? <div className="dao-error dao-participation-error dao-reaction-error" role="alert"><span>{reactionError.message}</span>{reactionError.needsCredits ? <button type="button" className="dao-credit-link" onClick={onOpenCredits}>Get Zcred</button> : null}</div> : null}
     {moderating && canModerate && !comment.hidden ? <form id={`${fieldId}-moderation`} aria-label={`Moderate comment by ${comment.authorLabel}`} className="dao-moderation-form dao-form" onSubmit={hide}><div className="dao-field"><label htmlFor={`${fieldId}-reason`}>Reason for hiding this comment</label><textarea id={`${fieldId}-reason`} name="reason" required maxLength={500} rows={2} disabled={saving} /><p className="dao-field-hint">The reason, your name, and the date remain visible in the discussion.</p></div><div className="dao-form-actions"><button type="submit" className="dao-button dao-button--danger" disabled={saving}>{saving ? "Recording…" : "Hide comment"}</button><button className="dao-button" type="button" disabled={saving} onClick={() => setModerating(false)}>Cancel</button></div></form> : null}
     {error ? <p className="dao-error" role="alert">{error}</p> : null}
