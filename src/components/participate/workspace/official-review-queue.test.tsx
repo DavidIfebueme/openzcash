@@ -24,6 +24,11 @@ it("shows new applications before import without fake interactions or archive pr
   expect(html).toContain("Awaiting source import");
   expect(html).not.toContain("Comments for zcg-github-486");
   expect(html).not.toContain("Preserved zcg-github-486");
+  // The pending roster is visible before and after import, without implying a vote.
+  expect(html.match(/Committee review awaiting meeting minutes/g)).toHaveLength(2);
+  expect(html.match(/class="proposal-pending-member"/g)).toHaveLength(10);
+  expect(html).not.toContain('data-vote=');
+  expect(html).not.toContain("Read feedback");
 });
 it.each([
   [486, "Konclave: taking the viewing key off the coordinator", ["Wallets", "Security"]],
@@ -60,6 +65,7 @@ it("removes decided archives from the live queue and keeps their deep links in t
 it("retains the original captured board when the shared source is unavailable", () => {
   const html = render(null);
   expect(html).toContain("$8,120"); expect(html).not.toContain("Konclave");
+  expect(html).toContain("Committee review awaiting meeting minutes");
 });
 it("renders the official queue even when there are no archived proposals yet", () => {
   const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null} board={{...board, proposals: []}} initialOfficialProposals={snapshot} />);
@@ -90,6 +96,7 @@ it("opens a screened resubmission in Filtered, keeps its source discrepancy visi
   expect(html).toContain("GitHub shows Under review at the last source check.");
   expect(html).toContain("range=A729");
   expect(html).toContain("$36,000");
+  expect(html).not.toContain("Committee review awaiting meeting minutes");
   expect(html).toContain("Comments for zcg-github-489");
   expect(html).toContain("Preserved zcg-github-489");
   expect(JSON.stringify(checked.capture)).toBe(original);
@@ -112,6 +119,7 @@ it("adds the published vote card to the existing 0xramp archive without duplicat
   expect(html).toContain('aria-label="Published committee verdict"');
   expect(html).toContain("Hanh: Approve via unanimous record");
   expect(html).toContain("Paul Brigner: Approve via unanimous record");
+  expect(html).not.toContain("Committee review awaiting meeting minutes");
   expect(html.match(/Comments for zcg-github-454/g)).toHaveLength(1);
   expect(html).toContain("Preserved zcg-github-454");
   expect(html).toContain('class="proposal-card-header"');

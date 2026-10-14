@@ -6,6 +6,7 @@ import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-revie
 import { ZcgProposalLabels } from "./zcg-proposal-labels";
 import { ProposalCardHeading } from "./proposal-card-heading";
 import { GitHubComments } from "./github-comments";
+import { PendingCommitteeCard } from "./pending-committee-card";
 
 const dollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
@@ -35,6 +36,7 @@ export function OfficialReviewQueue({ proposals, records, renderActions, renderP
           </div>}
         />
         <ZcgProposalLabels recordId={recordId} title={proposal.title} tags={record?.sourceCapture?.proposal.tags ?? ZCG_REVIEW_PROPOSALS.find(row => row.id === recordId)?.tags ?? []} outcome="under_review" committeeLabels={record?.labels} sourceOverride={record?.sourceCapture?.source} categoryOverride={record?.sourceCategory} />
+        <PendingCommitteeCard />
         <div className="dao-proposal-card-footer">
           {record ? renderActions(recordId) : <span className="dao-zcg-record-label" title="Listed from the official proposal queue. Discussions and verification become available after the source archive is imported.">Awaiting source import</span>}
           <div className="dao-zcg-record-actions"><a className="dao-text-button" href={proposal.url} target="_blank" rel="noopener noreferrer">Source ↗</a>

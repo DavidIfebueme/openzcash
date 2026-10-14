@@ -16,6 +16,7 @@ import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-f
 import { ProposalZecEstimate, type PriceState } from "@/components/participate/workspace/proposal-zec-estimate";
 
 import { budgetStatusText } from "./approved-proposal-budgets";
+import { PendingCommitteeCard } from "./pending-committee-card";
 import { PublishedDecisionCard } from "./published-decision-card";
 import type { FeedbackSelection } from "./zcg-vote-bar";
 
@@ -87,7 +88,7 @@ export function ZcgProposalExamples({ officialOutcomes = {}, officialProposals =
         </div>}
       />
       <ZcgProposalLabels recordId={proposal.id} title={proposal.title} tags={proposal.tags} committeeLabels={committeeLabels[proposal.id]} outcome={outcome} />
-      {inReview ? <div className="dao-zcg-review-state"><span>{outcome === "under_review" ? "Awaiting committee decision" : outcome === "abandoned" ? "Withdrawn by the applicant on GitHub" : "Closed or decided on GitHub · See source"}</span></div> : <PublishedDecisionCard decision={proposal} selection={feedback?.proposalId === proposal.id ? feedback : null} onSelectionChange={selection => setFeedback(selection ? { ...selection, proposalId: proposal.id } : null)} />}
+      {inReview ? outcome === "under_review" ? <PendingCommitteeCard /> : <div className="dao-zcg-review-state"><span>{outcome === "abandoned" ? "Withdrawn by the applicant on GitHub" : "Closed or decided on GitHub · See source"}</span></div> : <PublishedDecisionCard decision={proposal} selection={feedback?.proposalId === proposal.id ? feedback : null} onSelectionChange={selection => setFeedback(selection ? { ...selection, proposalId: proposal.id } : null)} />}
       <div className="dao-proposal-card-footer" data-participate-tour={details ? "discussion" : undefined}>{actions ? actions(proposal.id) : <a className="dao-zcg-minutes" href={proposal.proposalUrl} target="_blank" rel="noopener noreferrer">Application ↗</a>}<div className="dao-zcg-record-actions">{inReview && actions ? <a className="dao-text-button" href={proposal.proposalUrl} target="_blank" rel="noopener noreferrer">Source ↗</a> : null}{details ? <button id={`proposal-read-${proposal.id}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={details.isRecordOpen(proposal.id)} aria-controls={`proposal-panel-${proposal.id}`} onClick={() => details.toggleRecord(proposal.id)}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button> : communityId && archiveRecordIds?.includes(proposal.id) ? <Link className="dao-text-button" href={`/communities/${encodeURIComponent(communityId)}/archives/${encodeURIComponent(proposal.id)}`}>Read & verify →</Link> : <span className="dao-zcg-record-label">{inReview ? "Committee review" : "Published decision"}</span>}</div></div>
       {details?.renderPanel(proposal.id)}
     </li>; })}</ul>
