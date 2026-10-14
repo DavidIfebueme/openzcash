@@ -2433,12 +2433,6 @@
 .oz-participate .dao-zcg-proposal { position: relative; padding: 22px 26px 12px; }
 .oz-participate .dao-zcg-proposal:focus-within, .oz-participate .dao-zcg-proposal:hover { z-index: 2; }
 .oz-participate .dao-zcg-proposal .dao-zcg-card-heading { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 20px 28px; }
-.oz-participate .dao-zcg-title-line { display: flex; align-items: center; gap: 16px; min-width: 0; }
-.oz-participate .dao-zcg-title-score { display: grid; justify-items: center; flex: 0 0 56px; color: var(--dao-positive); }
-.oz-participate .dao-zcg-title-score[data-outcome="rejected"] { color: var(--dao-error); }
-.oz-participate .dao-zcg-title-score strong { font-size: 28px; line-height: 1.15; font-weight: 650; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
-.oz-participate .dao-zcg-turnout { color: var(--dao-secondary); }
-.oz-participate .dao-zcg-turnout > span { color: var(--dao-muted); }
 .oz-participate .dao-zcg-budget { display: flex; flex-direction: column; align-items: flex-end; gap: 7px; min-width: 0; max-width: 100%; font-size: 12px; color: var(--dao-muted); }
 .oz-participate .dao-zcg-budget-amount { display: flex; align-items: baseline; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
 .oz-participate .dao-zcg-budget-amount strong { color: var(--dao-ink); font-size: 22px; font-weight: 650; line-height: 1.25; letter-spacing: -.035em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -2494,10 +2488,6 @@
   .oz-participate .dao-zcg-votes { margin-top: 16px; }
   .oz-participate .dao-zcg-legend { gap: 9px; font-size: 10px; }
   .oz-participate .dao-zcg-denominator { display: none; }
-  .oz-participate .dao-zcg-title-line { gap: 12px; }
-  .oz-participate .dao-zcg-title-score { flex-basis: 47px; }
-  .oz-participate .dao-zcg-title-score strong { font-size: 25px; }
-  .oz-participate .dao-zcg-turnout > span { display: none; }
   .oz-participate .dao-zcg-feedback { padding: 10px 13px 7px; }
   .oz-participate .dao-app .dao-zcg-feedback-heading button { width: 44px; min-height: 44px; }
   .oz-participate .dao-zcg-feedback-source a { min-height: 44px; }

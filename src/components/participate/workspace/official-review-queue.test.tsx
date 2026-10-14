@@ -114,6 +114,11 @@ it("adds the published vote card to the existing 0xramp archive without duplicat
   expect(html).toContain("Paul Brigner: Approve via unanimous record");
   expect(html.match(/Comments for zcg-github-454/g)).toHaveLength(1);
   expect(html).toContain("Preserved zcg-github-454");
+  expect(html).toContain('class="proposal-card-header"');
+  expect(html).toContain('dateTime="2026-09-29T12:00:00Z">Submitted Sep 29, 2026');
+  expect(html).toContain('dateTime="2026-10-12">Decision Oct 12, 2026');
+  expect(html).toContain('dateTime="2026-10-14T14:00:00.000Z">Source checked Oct 14, 2026 · 14:00 UTC');
+  expect(html.match(/Decision Oct 12, 2026/g)).toHaveLength(1);
   expect(JSON.stringify(checked.capture)).toBe(original);
 });
 
@@ -121,11 +126,18 @@ it("shows a documented decision before archive import without offering nonexiste
   const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
     board={{ ...board, proposals: [] }} initialRecordId="zcg-github-447"
     initialOfficialProposals={{ ...snapshot, proposals: [{ ...snapshot.proposals[0], issueNumber: 447,
-      url: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447", title: "Mexico", outcome: "approved" }] }} />);
+      url: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447", title: "Mexico", applicant: "Zcash México", submitted: "2026-09-26", outcome: "approved" }] }} />);
   expect(html).toContain("Mexico Tech Week");
   expect(html).toContain('aria-label="Published committee verdict"');
   expect(html).toContain("Meeting minutes ↗");
-  expect(html).toContain("Oct 2, 2026");
+  expect(html).toContain('class="proposal-card-header"');
+  expect(html).toContain('dateTime="2026-09-26">Submitted Sep 26, 2026');
+  expect(html).toContain("Zcash México");
+  expect(html).toContain('dateTime="2026-10-02">Decision Oct 2, 2026 (async)');
+  expect(html).toContain('dateTime="2026-10-12">Minutes Oct 12, 2026');
+  expect(html).not.toContain("Source checked");
+  expect(html).not.toContain("100% turnout");
+  expect(html).not.toContain("Committee support:");
   expect(html).not.toContain("Comments for zcg-github-447");
   expect(html).not.toContain("Preserved zcg-github-447");
   expect(html).not.toContain("proposal-read-zcg-github-447");
