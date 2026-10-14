@@ -20,6 +20,7 @@ import { wrapFocus } from "@/lib/focus-wrap";
 type Theme = "light" | "dark";
 const THEME_KEY = "oz-theme";
 const OPEN_KEY = "oz-nav-open";
+const ZCG_CLOSED_DEFAULT_KEY = "oz-zcg-closed-default-v1";
 // The light workspace is the default everywhere; dark is a per-browser choice.
 const THEME_ORDER: Theme[] = ["light", "dark"];
 /** What Tab stops on inside the open Apps sheet. */
@@ -77,7 +78,16 @@ export function AppShell({
       const t = window.localStorage.getItem(THEME_KEY) as Theme | null;
       if (t && THEME_ORDER.includes(t)) setTheme(t);
       const o = window.localStorage.getItem(OPEN_KEY);
-      if (o) setOpenApps(JSON.parse(o) as Record<string, boolean>);
+      if (o) {
+        const saved = JSON.parse(o) as Record<string, boolean>;
+        // Reset the old expanded default once; later user toggles still persist.
+        if (!window.localStorage.getItem(ZCG_CLOSED_DEFAULT_KEY)) {
+          delete saved.zcg;
+          window.localStorage.setItem(OPEN_KEY, JSON.stringify(saved));
+        }
+        setOpenApps(saved);
+      }
+      window.localStorage.setItem(ZCG_CLOSED_DEFAULT_KEY, "1");
     } catch {
       /* private mode or blocked storage: defaults apply */
     }

@@ -16,6 +16,7 @@ type Props = {
 /** The desktop sidebar and phone Apps drawer share one hierarchy. */
 export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
+    const isZcg = app.id === "zcg";
     const children = childAppsOf(app, apps);
     const showCounts = app.id !== "zcg" && app.id !== "ecosystem" && app.parentId !== "ecosystem";
     const directChildren = children.filter((child) => child.parentGroup === "pages");
@@ -33,21 +34,24 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
     const containsCurrent = children.some((child) => child.id === place?.app.id);
     const hasPages = app.pages.some((page) => !page.hidden);
     const expandable = hasPages || children.length > 0;
-    const fallbackOpen = isCurrentApp || containsCurrent || app.open === true;
+    const fallbackOpen = !isZcg && (isCurrentApp || containsCurrent || app.open === true);
     const open = expandable && (openApps[app.id] ?? fallbackOpen);
     const appActive = isCurrentApp && !place?.page;
     const overview = overviewEntry(app);
+    const headerActive = isZcg
+      ? place?.page?.href === "/zcg/participate" && !open
+      : appActive && !(overview && open);
     const groupId = `${app.id}:organizations`;
     const groupOpen = openApps[groupId] ?? containsCurrentOrganization;
     return (
       <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined}>
         <div className="rd-side-app-row">
           <Link
-            href={app.href}
+            href={isZcg ? "/zcg/participate" : app.href}
             className="rd-side-item"
-            aria-current={appActive && !(overview && open) ? "page" : undefined}
+            aria-current={headerActive ? "page" : undefined}
             title={app.sub}
-            onClick={() => onOpen(app.id)}
+            onClick={isZcg ? undefined : () => onOpen(app.id)}
             data-long={app.label.length > 18 || undefined}
           >
             <AppMark app={app} />

@@ -104,7 +104,6 @@ export const APPS: AppDef[] = [
     logo: "/logos/zcg.png",
     share: { value: "8%", label: "8% of every block reward (ZIP 1015)" },
     icon: "grant",
-    open: true,
     pages: [
       { href: "/zcg/proposals", label: "Proposals", mark: "/logos/glyphs/proposals.png" },
       { href: "/zcg/participate", label: "Participate", mark: "/logos/glyphs/decisions.png" },

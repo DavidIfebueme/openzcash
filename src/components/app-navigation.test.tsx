@@ -15,8 +15,20 @@ describe("grouped ecosystem navigation", () => {
     const links = [...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map((match) => match[1]);
     const index = links.indexOf("/zcash-network");
     expect(index).toBeGreaterThan(0);
-    expect(links.slice(index - 1, index + 2)).toEqual(["/zcg", "/zcash-network", "/ecosystem"]);
+    expect(links.slice(index - 1, index + 2)).toEqual(["/zcg/participate", "/zcash-network", "/ecosystem"]);
     expect(linkTag(html, "/zcash-network")).toContain('aria-current="page"');
+  });
+  it("starts ZCG collapsed and sends its title to Participate", () => {
+    const html = render("/zcg/participate");
+    expect(html).toContain('aria-label="Expand ZCG"');
+    expect(html).not.toContain('id="nav-zcg"');
+    expect(linkTag(html, "/zcg/participate")).toContain('aria-current="page"');
+    expect(html.match(/href="\/zcg\/participate"/g)).toHaveLength(1);
+
+    const expanded = render("/zcg/participate", { zcg: true });
+    expect(expanded).toContain('aria-label="Collapse ZCG"');
+    expect(expanded).toContain('id="nav-zcg"');
+    expect(expanded).toContain('href="/zcg/grants"');
   });
   it("interleaves direct destinations in reading order and keeps the curated organization order", () => {
     const html = render("/communities", { "ecosystem:organizations": true }, { "/ecosystem": "127", "/development": "579", "/communities": "27", "/arborist": "133" });
