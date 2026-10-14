@@ -1,7 +1,8 @@
 import { SectionHeading } from "@/components/workspace";
 import Link from "next/link";
-import { Card, PageHeader, Stat } from "@/components/ui";
-import { SourceRecordLink } from "@/components/source-record-link";
+import { PageHeader, Stat } from "@/components/ui";
+import { PaymentTable } from "./payment-table";
+import styles from "./schedule.module.css";
 import { getPaymentSchedule } from "@/lib/zcg/schedule-repo";
 import { formatUsdCents } from "@/lib/zcg/format";
 import { Synced } from "@/components/synced";
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: "Scheduled payments · OpenZcash",
   description:
-    "Approved commitments with a future payment estimate. Plan by month and project.",
+    "Upcoming and past estimates, with payment status from the imported ledger.",
   path: "/zcg/schedule",
 });
 
@@ -38,41 +39,50 @@ export default async function SchedulePage({
     <>
       <PageHeader
         title="Scheduled payments"
-        subtitle="Approved commitments with a future payment estimate. Plan by month and project."
+        subtitle="Upcoming and past estimates, with payment status from the imported ledger."
       />
+      <Synced className="mb-6" />
       <section className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <Stat
-          label="Scheduled value"
+          label="Upcoming value"
           value={
             <span className="ws-exact-amount">
               {formatUsdCents(s.totalCents)}
             </span>
           }
-          sub="sum of the payments below"
+          sub="future estimates only"
         />
         <Stat
-          label="Payments"
+          label="Upcoming entries"
           value={String(s.rows.length)}
-          sub="dated, unpaid milestones"
+          sub="payment not recorded"
         />
         <Stat
           label="Without a date"
           value={String(s.undated)}
-          sub="approved entries, outside this total"
+          sub="all categories · no estimated date"
         />
         <Stat
-          label="Past estimate"
-          value={String(s.overdue)}
-          sub="unpaid entries with an earlier date"
+          label="Past estimates · USD"
+          value={<span className="ws-exact-amount">{formatUsdCents(s.pastTotalCents)}</span>}
+          sub={<a href="#past-estimates" className="underline underline-offset-4">{s.overdue} {s.overdue === 1 ? "entry" : "entries"} · View records ↓</a>}
         />
       </section>
+      <nav className={styles.jumpLinks} aria-label="Payment schedule sections">
+        <a href="#upcoming-payments">Upcoming <span>{s.rows.length}</span></a>
+        <a href="#past-estimates">Past estimates <span>{s.overdue}</span></a>
+      </nav>
+      <p className="mb-3 text-xs text-stone-600" id="schedule-filter-help">
+        Dates filter upcoming payments. Category applies to both lists.
+      </p>
       <form
+        aria-describedby="schedule-filter-help"
         key={JSON.stringify([s.from, s.to, params.category ?? ""])}
         className="ws-filter-panel"
         method="get"
       >
         <label className="text-xs text-stone-600">
-          From
+          Upcoming from
           <input
             className="mt-2 block rounded-lg border bg-white px-3 py-2"
             type="date"
@@ -81,7 +91,7 @@ export default async function SchedulePage({
           />
         </label>
         <label className="text-xs text-stone-600">
-          To
+          Upcoming to
           <input
             className="mt-2 block rounded-lg border bg-white px-3 py-2"
             type="date"
@@ -135,81 +145,31 @@ export default async function SchedulePage({
           })}
         </nav>
       ) : null}
-      <SectionHeading
-        title="Upcoming payments"
-        count={s.rows.length}
-        description="Estimated dates, budgeted USD and the source of each approved milestone."
-      />
-      <Card className="overflow-x-auto p-0">
-        <table className="w-full text-left">
-          <thead>
-            <tr>
-              {[
-                "Estimated date",
-                "Grant / milestone",
-                "Recipient",
-                "Category",
-                "Budgeted USD",
-                "Source",
-              ].map((h) => (
-                <th className="px-4" key={h}>
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {s.rows.map((r) => (
-              <tr key={r.id} className="tbl-row border-b">
-                <td className="whitespace-nowrap px-4 tnum">
-                  {r.estimatedPayoutDate}
-                </td>
-                <td className="px-4">
-                  <Link
-                    href={`/zcg/grant?g=${encodeURIComponent(r.project!)}`}
-                    className="font-medium text-stone-900 hover:text-amber-700"
-                  >
-                    {r.project}
-                  </Link>
-                  <span className="mt-1 block text-[11px] text-stone-500">
-                    {r.milestoneLabel ?? r.deliverable ?? "Milestone"}
-                  </span>
-                </td>
-                <td className="px-4">
-                  <Link
-                    href={`/zcg/recipient?r=${encodeURIComponent(r.recipientNameRaw ?? "")}`}
-                  >
-                    {r.recipientNameRaw}
-                  </Link>
-                </td>
-                <td className="px-4">{r.category ?? "Uncategorized"}</td>
-                <td className="whitespace-nowrap px-4 font-medium text-amber-800 tnum">
-                  {formatUsdCents(r.amountUsdCents)}
-                </td>
-                <td className="px-4">
-                  <SourceRecordLink
-                    gid={r.sourceSheetGid}
-                    rowIndex={r.sourceRowIndex}
-                    importedAt={r.importedAt}
-                  />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!s.rows.length && (
-          <p className="p-8 text-center text-sm text-stone-600">
-            No approved future payments match these filters.
-          </p>
-        )}
-      </Card>
+      <section id="upcoming-payments" className={styles.section} aria-label="Upcoming payments">
+        <SectionHeading
+          title="Upcoming payments"
+          count={s.rows.length}
+          description="Estimated dates and budgeted USD for each milestone."
+        />
+        <PaymentTable rows={s.rows} label="Upcoming payments" empty="No upcoming payments match these filters." />
+      </section>
+      <section id="past-estimates" className={styles.section} aria-label="Past estimates">
+        <SectionHeading
+          title="Past estimates"
+          count={s.overdue}
+          description="The estimated date has passed; payment is not recorded in the imported ledger."
+          action={<div className={styles.pastTotal}><span>Budgeted USD</span><strong>{formatUsdCents(s.pastTotalCents)}</strong></div>}
+        />
+        <p className={styles.explanation}>These records stay visible for follow-up. An estimate is not a payment deadline or confirmation of nonpayment.</p>
+        <PaymentTable rows={s.pastRows} label="Past estimates" empty="No past estimates match this category." />
+        {s.pastExcludedAmounts > 0 && <p className="mt-3 text-xs text-stone-600">{s.pastExcludedAmounts} entries with missing or non-positive amounts are shown but excluded from this total.</p>}
+      </section>
       <p className="mt-5 text-xs leading-relaxed text-stone-600">
         Dates are estimates, not payment confirmations. Cancelled, vetoed,
         returned, test and internal entries are excluded. {s.unknownAmount}{" "}
         dated entries have an unknown amount; {s.nonpositive} have a
-        non-positive amount. Neither is counted as a future payment. Undated
-        and past estimates remain available in each grant’s original milestone
-        table. Day boundary: Brasília time. Amount rules:{" "}
+        non-positive amount. Neither is counted as a future payment. Undated estimates remain available in each grant’s original milestone
+        table. Past-estimate values are separate from upcoming totals. Day boundary: Brasília time. Amount rules:{" "}
         <Link
           href="/zcg/methodology"
           className="text-amber-700 hover:underline"
@@ -218,7 +178,6 @@ export default async function SchedulePage({
         </Link>
         .
       </p>
-      <Synced className="mt-4" />
     </>
   );
 }

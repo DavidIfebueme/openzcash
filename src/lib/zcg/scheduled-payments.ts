@@ -56,6 +56,17 @@ export function scheduledPayments<T extends ScheduleRow>(
   );
   const dated = eligible.filter((r) => validDay(r.estimatedPayoutDate));
   const future = dated.filter((r) => r.estimatedPayoutDate! >= today);
+  // Past estimates remain reviewable until payment is recorded. Date filters
+  // belong to the future schedule; the category filter applies to both lists.
+  const pastRows = dated
+    .filter((r) => r.estimatedPayoutDate! < today &&
+      (!filters.category || r.category === filters.category))
+    .sort((a, b) =>
+      b.estimatedPayoutDate!.localeCompare(a.estimatedPayoutDate!) ||
+      a.id.localeCompare(b.id));
+  const pastValuedRows = pastRows.filter(
+    (r) => r.amountUsdCents != null && r.amountUsdCents > 0n,
+  );
   const from =
     validDay(filters.from) && filters.from > today ? filters.from : today;
   const to = validDay(filters.to) ? filters.to : undefined;
@@ -91,7 +102,10 @@ export function scheduledPayments<T extends ScheduleRow>(
     totalCents: included.reduce((sum, r) => sum + r.amountUsdCents!, 0n),
     byCategory: groupBy((r) => r.category || "Uncategorized"),
     byMonth: groupBy((r) => r.estimatedPayoutDate!.slice(0, 7)),
-    overdue: dated.filter((r) => r.estimatedPayoutDate! < today).length,
+    overdue: pastRows.length,
+    pastRows,
+    pastTotalCents: pastValuedRows.reduce((sum, r) => sum + r.amountUsdCents!, 0n),
+    pastExcludedAmounts: pastRows.length - pastValuedRows.length,
     undated: eligible.length - dated.length,
     unknownAmount: selected.filter((r) => r.amountUsdCents == null).length,
     nonpositive: selected.filter(
@@ -100,7 +114,7 @@ export function scheduledPayments<T extends ScheduleRow>(
     from,
     to,
     categories: [
-      ...new Set(future.map((r) => r.category).filter((c): c is string => !!c)),
+      ...new Set(dated.map((r) => r.category).filter((c): c is string => !!c)),
     ].sort(),
   };
 }

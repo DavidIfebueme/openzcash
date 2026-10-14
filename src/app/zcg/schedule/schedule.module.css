@@ -1,0 +1,47 @@
+.jumpLinks { display: flex; flex-wrap: wrap; gap: 12px 28px; margin: 0 0 24px; }
+.jumpLinks a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 600; font-size: 14px; }
+.jumpLinks a:hover { color: var(--accent-ink); }
+.jumpLinks span { color: var(--muted); font-weight: 400; }
+.jumpLinks a:focus-visible, .table a:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+.section { scroll-margin-top: 100px; margin-top: 32px; }
+.pastTotal { display: flex; flex-direction: column; gap: 5px; text-align: right; flex-shrink: 0; }
+.pastTotal span { color: var(--muted); font-size: 12px; }
+.pastTotal strong { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+.explanation { font-size: 13px; line-height: 1.6; color: var(--muted); margin: -8px 0 18px; }
+.tableWrap { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); }
+.table { width: 100%; table-layout: fixed; text-align: left; }
+.table thead { background: var(--surface2); }
+.table th { font-size: 11px; font-weight: 600; color: var(--muted); }
+.table th, .table td { padding: 16px; }
+.table th:nth-child(1) { width: 14%; }
+.table th:nth-child(2) { width: 37%; }
+.table th:nth-child(3) { width: 15%; }
+.table th:nth-child(4) { width: 22%; }
+.table th:nth-child(5) { width: 12%; }
+.table td { border-top: 1px solid var(--line); vertical-align: top; font-size: 13px; color: var(--ink); }
+.table .date { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--muted); }
+.table .project { overflow-wrap: anywhere; }
+.project > a:first-of-type { display: block; font-size: 14px; font-weight: 600; line-height: 1.5; }
+.project > a:hover { color: var(--accent-ink); }
+.program { display: block; margin-bottom: 5px; font-size: 11px; color: var(--accent-ink); }
+.detail, .recipient { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+.table .amount { font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.status { display: inline-block; font-size: 12px; line-height: 1.5; color: var(--muted); }
+.empty { padding: 24px; border: 1px solid var(--line); border-radius: 14px; color: var(--muted); font-size: 14px; }
+@media (max-width: 900px) {
+  .section > :global(.ws-section-heading) { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .section :global(.ws-section-heading h2) { font-size: 18px; }
+  .section :global(.ws-section-heading p) { font-size: 13px; line-height: 1.5; }
+  .project > a:first-of-type { font-size: 16px; }
+  .table .amount { font-size: 15px; }
+  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
+  .table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .table tr { display: flex; flex-direction: column; padding: 20px; border-top: 1px solid var(--line); }
+  .table tr:first-child { border-top: 0; }
+  .table td { padding: 6px 0; border: 0; }
+  .table .project { order: -1; padding-top: 0; padding-bottom: 12px; }
+  .table td[data-label] { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; text-align: right; }
+  .table td[data-label]::before { content: attr(data-label); text-align: left; color: var(--muted); font-weight: 400; font-size: 12px; }
+  .pastTotal { text-align: left; }
+  .pastTotal strong { font-size: 22px; }
+}

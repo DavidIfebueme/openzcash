@@ -78,7 +78,11 @@ export default async function ZcgPage() {
   const underReview = queue ? queue.length : null;
   const liveElection = currentElection(elections);
   const next = schedule?.rows[0] ?? null;
-  const [dollars, cents] = formatUsdCents(schedule?.totalCents ?? 0n).split(".");
+  // Keep the overview total stable when an estimate passes without a payment.
+  // The schedule page retains the separate future and past populations.
+  const scheduledCents = schedule ? schedule.totalCents + schedule.pastTotalCents : 0n;
+  const scheduledCount = schedule ? schedule.rows.length + schedule.pastRows.length - schedule.pastExcludedAmounts : 0;
+  const [dollars, cents] = formatUsdCents(scheduledCents).split(".");
 
   const primaryCounts: Record<string, string> = {
     "/zcg/grants": `${s.grantCount} approved projects`,
@@ -148,14 +152,11 @@ export default async function ZcgPage() {
           {schedule ? (
             <>
               <p className="zcg-overview-schedule-value tnum">
-                {dollars}
-                <small>.{cents ?? "00"}</small>
+                {dollars}<small>.{cents ?? "00"}</small>
               </p>
               <p className="zcg-overview-schedule-note">
-                <strong>{schedule.rows.length} approved future payments</strong>
-                Unpaid milestones with an estimated date, summed from the ledger.
-                A different population from open commitments, which count every
-                unpaid milestone. View totals by month and category.
+                <strong>{scheduledCount} {scheduledCount === 1 ? "entry" : "entries"} · Payment not recorded</strong>
+                Includes upcoming and past estimates. Open the schedule for dates, status and sources.
               </p>
               {next ? (
                 <p className="zcg-overview-next">
