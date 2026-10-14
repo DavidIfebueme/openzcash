@@ -1,5 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
+import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
+import { matchesProposalFilters, proposalSectors, type ProposalFilters } from "@/lib/participate/workspace/domain/proposal-filters";
 import type { OfficialProposalListing } from "@/lib/participate/official-proposals-model";
 import type { ProposalParticipation } from "@/lib/participate/workspace/domain/proposal-participation";
 import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-review-proposals";
@@ -10,8 +12,17 @@ import { PendingCommitteeCard } from "./pending-committee-card";
 
 const dollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
-export function OfficialReviewQueue({ proposals, records, renderActions, renderPanel, isOpen, toggle }: {
+export function reviewProposalMatches(proposal: OfficialProposalListing, record: ProposalParticipation | undefined, search?: ProposalFilters) {
+  const recordId = record?.recordId ?? `zcg-github-${proposal.issueNumber}`;
+  const source = record?.sourceCapture?.source ?? zcgSourceMetadata(recordId);
+  const tags = record?.sourceCapture?.proposal.tags ?? ZCG_REVIEW_PROPOSALS.find(row => row.id === recordId)?.tags ?? [];
+  return matchesProposalFilters({ title: proposal.title, applicant: proposal.applicant, recordId, issueNumber: proposal.issueNumber,
+    sectors: proposalSectors(proposal.title, tags, record?.sourceCategory ?? source?.category) }, search);
+}
+
+export function OfficialReviewQueue({ proposals, records, search, renderActions, renderPanel, isOpen, toggle }: {
   proposals: readonly OfficialProposalListing[];
+  search?: ProposalFilters;
   records: ReadonlyMap<number, ProposalParticipation>;
   renderActions: (recordId: string) => ReactNode;
   renderPanel: (recordId: string) => ReactNode;
@@ -20,7 +31,7 @@ export function OfficialReviewQueue({ proposals, records, renderActions, renderP
 }) {
   const [openSource, setOpenSource] = useState<number | null>(null);
   return <ul className="dao-proposal-list dao-zcg-list" aria-label="Official ZCG review queue">
-    {proposals.filter(proposal => proposal.outcome === "under_review").map(proposal => {
+    {proposals.filter(proposal => proposal.outcome === "under_review" && reviewProposalMatches(proposal, records.get(proposal.issueNumber), search)).map(proposal => {
       const record = records.get(proposal.issueNumber);
       const recordId = record?.recordId ?? `zcg-github-${proposal.issueNumber}`;
       return <li key={proposal.issueNumber} className="dao-proposal-row dao-zcg-proposal" data-official-issue={proposal.issueNumber}>

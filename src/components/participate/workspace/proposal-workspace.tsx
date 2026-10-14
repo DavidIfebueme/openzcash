@@ -20,12 +20,13 @@ import { zcgApprovedBudget, type ApprovedBudgetSnapshot } from "@/lib/participat
 import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-funding";
 import { ProposalZecEstimate, useProposalZecPrice } from "@/components/participate/workspace/proposal-zec-estimate";
 import { useOfficialProposals } from "./official-proposals";
-import { OfficialReviewQueue } from "./official-review-queue";
+import { OfficialReviewQueue, reviewProposalMatches } from "./official-review-queue";
 import { officialIssueNumber, type OfficialProposalSnapshot, type ParticipateProposalOutcome } from "@/lib/participate/official-proposals-model";
 import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
 import { useApprovedProposalBudgets, budgetStatusText } from "./approved-proposal-budgets";
 import { ProposalScreeningNote } from "./proposal-screening-note";
 import { PUBLISHED_COMMITTEE_DECISIONS, publishedDecisionForIssue } from "@/lib/zcg/committee-minutes";
+import { matchesProposalFilters, proposalSectors, type ProposalFilters } from "@/lib/participate/workspace/domain/proposal-filters";
 import { ProposalCardHeading } from "./proposal-card-heading";
 import { PublishedDecisionCard } from "./published-decision-card";
 import { PendingCommitteeCard } from "./pending-committee-card";
@@ -93,12 +94,19 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
   const renderPanel = (recordId: string) => <ProposalInlineDetails communityId={community.id} recordId={recordId} active={panels[recordId] ?? null} sessionKey={viewer?.nick ?? "guest"} focusComment={commentTarget.recordId === recordId && commentTarget.id ? { id: commentTarget.id, request: commentTarget.request } : undefined} onClose={() => close(recordId)} preview={{ commentCount: board.proposals.find(proposal => proposal.recordId === recordId)?.commentCount ?? 0, canParticipate: board.canParticipate, participation: board.participation }} />;
   const renderActions = (recordId: string) => <ProposalEngagement recordId={recordId} onToggleComments={() => toggle(recordId, "discussion")} commentsOpen={panels[recordId] === "discussion"} />;
   const toolbar = embedded ? <div className="participate-submission-actions">{drafts.length ? <details className="participate-submission-menu"><summary>My proposals <span>{drafts.length}</span></summary><nav aria-label="My proposals">{drafts.map(draft => <div className="participate-submission-menu-item" key={draft.id}><Link href={draft.state === "DRAFT" ? `/zcg/participate?compose=${draft.id}` : `/zcg/participate?record=${draft.recordId}`}><span>{draft.payload.title || "Untitled proposal"}</span><small>{draft.state === "DRAFT" ? "Draft" : draft.state === "ABANDONED" ? "Abandoned" : draft.state === "PUBLISHED_DEMO" ? "Legacy test" : "Published"}</small></Link>{draft.state === "DRAFT" ? <SubmissionLifecycleAction draft={draft} /> : null}</div>)}</nav></details> : null}<Link href="/zcg/participate?compose=new" prefetch={false} className="dao-button dao-button--primary">+ New proposal</Link></div> : null;
-  const nativeRecords = (filter: string) => other.filter(proposal => currentFilter(proposal) === filter
-    && !(official && filter === "under_review" && officialRecordIds.has(proposal.recordId)));
-  const reviewCount = officialListings.filter(proposal => proposal.outcome === "under_review").length;
-  const additionalRecords = (filter: string) => {
-    const rows = nativeRecords(filter);
-    return <>{official && filter === "under_review" ? <OfficialReviewQueue proposals={officialListings} records={officialRecords} renderActions={renderActions} renderPanel={renderPanel} isOpen={recordId => panels[recordId] === "record"} toggle={recordId => toggle(recordId, "record")} /> : null}{rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
+  const nativeRecords = (filter: string, search?: ProposalFilters) => other.filter(proposal => {
+    if (currentFilter(proposal) !== filter || (official && filter === "under_review" && officialRecordIds.has(proposal.recordId))) return false;
+    const captured = proposal.sourceCapture;
+    const source = captured?.source ?? zcgSourceMetadata(proposal.recordId);
+    const title = captured?.proposal.title ?? proposal.title;
+    return matchesProposalFilters({ title, recordId: proposal.recordId, issueNumber: officialIssueNumber(source?.url),
+      applicant: captured?.proposal.applicant ?? proposal.application?.applicant,
+      sectors: captured ? proposalSectors(title, captured.proposal.tags, proposal.sourceCategory ?? source?.category) : [] }, search);
+  });
+  const reviewCount = (search?: ProposalFilters) => officialListings.filter(proposal => proposal.outcome === "under_review" && reviewProposalMatches(proposal, officialRecords.get(proposal.issueNumber), search)).length;
+  const additionalRecords = (filter: string, search: ProposalFilters) => {
+    const rows = nativeRecords(filter, search);
+    return <>{official && filter === "under_review" ? <OfficialReviewQueue search={search} proposals={officialListings} records={officialRecords} renderActions={renderActions} renderPanel={renderPanel} isOpen={recordId => panels[recordId] === "record"} toggle={recordId => toggle(recordId, "record")} /> : null}{rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
       const mine = drafts.find(draft => draft.recordId === proposal.recordId);
       const captured = proposal.sourceCapture;
       const outcome = currentFilter(proposal);
@@ -136,7 +144,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       <ProposalEconomyNotice />
       {officialState.unavailable ? <p className="proposal-economy-warning" role="status">Proposal updates are temporarily unavailable. Showing the last available list.</p> : null}
       {draftsUnavailable ? <p className="proposal-economy-warning" role="status">Your proposals and drafts could not be loaded. <a className="dao-text-button" href="/zcg/participate">Try again</a></p> : null}
-      {ids.length || official ? <ZcgProposalExamples officialProposals={officialListings} officialOutcomes={officialOutcomes} replaceReviewQueue={Boolean(official)} ledgerImportedAt={ledgerImportedAt} approvedBudgets={approvedBudgets} budgetStatus={budgetState.status} price={price} filterResetKey={commentTarget.request} filterTarget={commentTarget.recordId ? { recordId: commentTarget.recordId, fallback: currentFilter(board.proposals.find(row => row.recordId === commentTarget.recordId)) } : undefined} committeeLabels={Object.fromEntries(board.proposals.map(row => [row.recordId, row.labels ?? []]))} proposals={examples} communityId={community.id} archiveRecordIds={ids} renderActions={renderActions} toolbar={toolbar} additionalRecords={additionalRecords} additionalCount={filter => nativeRecords(filter).length + (filter === "under_review" ? reviewCount : 0)} inline={{ isRecordOpen: recordId => panels[recordId] === "record", toggleRecord: recordId => toggle(recordId, "record"), renderPanel }} /> : toolbar}
+      {ids.length || official ? <ZcgProposalExamples officialProposals={officialListings} officialOutcomes={officialOutcomes} replaceReviewQueue={Boolean(official)} ledgerImportedAt={ledgerImportedAt} approvedBudgets={approvedBudgets} budgetStatus={budgetState.status} price={price} filterResetKey={commentTarget.request} filterTarget={commentTarget.recordId ? { recordId: commentTarget.recordId, fallback: currentFilter(board.proposals.find(row => row.recordId === commentTarget.recordId)) } : undefined} committeeLabels={Object.fromEntries(board.proposals.map(row => [row.recordId, row.labels ?? []]))} proposals={examples} communityId={community.id} archiveRecordIds={ids} renderActions={renderActions} toolbar={toolbar} additionalRecords={additionalRecords} additionalCount={(filter, search) => nativeRecords(filter, search).length + (filter === "under_review" ? reviewCount(search) : 0)} inline={{ isRecordOpen: recordId => panels[recordId] === "record", toggleRecord: recordId => toggle(recordId, "record"), renderPanel }} /> : toolbar}
       {!ids.length && !official ? <div className="dao-empty-state"><p>No public proposals yet.</p><Link href="/zcg/participate?view=history" className="dao-text-button">View decision history →</Link></div> : null}
     </ProposalEconomyProvider>
   </WorkspaceFrame>;
