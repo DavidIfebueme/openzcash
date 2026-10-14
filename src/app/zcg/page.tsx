@@ -78,10 +78,9 @@ export default async function ZcgPage() {
   const underReview = queue ? queue.length : null;
   const liveElection = currentElection(elections);
   const next = schedule?.rows[0] ?? null;
-  // Keep the overview total stable when an estimate passes without a payment.
-  // The schedule page retains the separate future and past populations.
-  const scheduledCents = schedule ? schedule.totalCents + schedule.pastTotalCents : 0n;
-  const scheduledCount = schedule ? schedule.rows.length + schedule.pastRows.length - schedule.pastExcludedAmounts : 0;
+  // Include current-year past estimates; earlier years remain separate history.
+  const scheduledCents = schedule ? schedule.totalCents + schedule.currentYearPast.totalCents : 0n;
+  const scheduledCount = schedule ? schedule.rows.length + schedule.currentYearPast.rows.length - schedule.currentYearPast.excludedAmounts : 0;
   const [dollars, cents] = formatUsdCents(scheduledCents).split(".");
 
   const primaryCounts: Record<string, string> = {
@@ -156,7 +155,7 @@ export default async function ZcgPage() {
               </p>
               <p className="zcg-overview-schedule-note">
                 <strong>{scheduledCount} {scheduledCount === 1 ? "entry" : "entries"} · Payment not recorded</strong>
-                Includes upcoming and past estimates. Open the schedule for dates, status and sources.
+                Includes upcoming estimates and current-year past estimates ({schedule.scheduleYear}). Earlier years are separate history.
               </p>
               {next ? (
                 <p className="zcg-overview-next">

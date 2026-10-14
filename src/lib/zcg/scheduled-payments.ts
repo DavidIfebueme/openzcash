@@ -64,6 +64,21 @@ export function scheduledPayments<T extends ScheduleRow>(
     .sort((a, b) =>
       b.estimatedPayoutDate!.localeCompare(a.estimatedPayoutDate!) ||
       a.id.localeCompare(b.id));
+  // The overview carries overdue estimates from this reporting year only.
+  // Older records remain available as history, with their own amount and count.
+  // `today` is already resolved in America/Sao_Paulo by schedule-repo.
+  const scheduleYear = today.slice(0, 4);
+  const yearStart = `${scheduleYear}-01-01`;
+  function summarizePast(rows: T[]) {
+    const valued = rows.filter((r) => r.amountUsdCents != null && r.amountUsdCents > 0n);
+    return {
+      rows,
+      totalCents: valued.reduce((sum, r) => sum + r.amountUsdCents!, 0n),
+      excludedAmounts: rows.length - valued.length,
+    };
+  }
+  const currentYearPast = summarizePast(pastRows.filter((r) => r.estimatedPayoutDate! >= yearStart));
+  const historicalPast = summarizePast(pastRows.filter((r) => r.estimatedPayoutDate! < yearStart));
   const pastValuedRows = pastRows.filter(
     (r) => r.amountUsdCents != null && r.amountUsdCents > 0n,
   );
@@ -102,6 +117,9 @@ export function scheduledPayments<T extends ScheduleRow>(
     totalCents: included.reduce((sum, r) => sum + r.amountUsdCents!, 0n),
     byCategory: groupBy((r) => r.category || "Uncategorized"),
     byMonth: groupBy((r) => r.estimatedPayoutDate!.slice(0, 7)),
+    scheduleYear,
+    currentYearPast,
+    historicalPast,
     overdue: pastRows.length,
     pastRows,
     pastTotalCents: pastValuedRows.reduce((sum, r) => sum + r.amountUsdCents!, 0n),

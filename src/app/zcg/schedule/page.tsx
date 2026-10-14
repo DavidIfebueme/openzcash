@@ -35,6 +35,8 @@ export default async function SchedulePage({
 }) {
   const params = await searchParams;
   const s = await getPaymentSchedule(params);
+  const past = s.currentYearPast;
+  const history = s.historicalPast;
   return (
     <>
       <PageHeader
@@ -63,17 +65,18 @@ export default async function SchedulePage({
           sub="all categories · no estimated date"
         />
         <Stat
-          label="Past estimates · USD"
-          value={<span className="ws-exact-amount">{formatUsdCents(s.pastTotalCents)}</span>}
-          sub={<a href="#past-estimates" className="underline underline-offset-4">{s.overdue} {s.overdue === 1 ? "entry" : "entries"} · View records ↓</a>}
+          label={`Past estimates · ${s.scheduleYear}`}
+          value={<span className="ws-exact-amount">{formatUsdCents(past.totalCents)}</span>}
+          sub={<a href="#past-estimates" className="underline underline-offset-4">{past.rows.length} {past.rows.length === 1 ? "entry" : "entries"} · View records ↓</a>}
         />
       </section>
       <nav className={styles.jumpLinks} aria-label="Payment schedule sections">
         <a href="#upcoming-payments">Upcoming <span>{s.rows.length}</span></a>
-        <a href="#past-estimates">Past estimates <span>{s.overdue}</span></a>
+        <a href="#past-estimates">Past estimates · {s.scheduleYear} <span>{past.rows.length}</span></a>
+        <a href="#historical-estimates">History <span>{history.rows.length}</span></a>
       </nav>
       <p className="mb-3 text-xs text-stone-600" id="schedule-filter-help">
-        Dates filter upcoming payments. Category applies to both lists.
+        Dates filter upcoming payments. Category applies to all lists.
       </p>
       <form
         aria-describedby="schedule-filter-help"
@@ -155,21 +158,31 @@ export default async function SchedulePage({
       </section>
       <section id="past-estimates" className={styles.section} aria-label="Past estimates">
         <SectionHeading
-          title="Past estimates"
-          count={s.overdue}
-          description="The estimated date has passed; payment is not recorded in the imported ledger."
-          action={<div className={styles.pastTotal}><span>Budgeted USD</span><strong>{formatUsdCents(s.pastTotalCents)}</strong></div>}
+          title={`Past estimates · ${s.scheduleYear}`}
+          count={past.rows.length}
+          description={`Estimates from ${s.scheduleYear} whose date has passed; payment is not recorded in the imported ledger.`}
+          action={<div className={styles.pastTotal}><span>Budgeted USD</span><strong>{formatUsdCents(past.totalCents)}</strong></div>}
         />
         <p className={styles.explanation}>These records stay visible for follow-up. An estimate is not a payment deadline or confirmation of nonpayment.</p>
-        <PaymentTable rows={s.pastRows} label="Past estimates" empty="No past estimates match this category." />
-        {s.pastExcludedAmounts > 0 && <p className="mt-3 text-xs text-stone-600">{s.pastExcludedAmounts} entries with missing or non-positive amounts are shown but excluded from this total.</p>}
+        <PaymentTable rows={past.rows} label="Past estimates" empty={`No past estimates from ${s.scheduleYear} match this category.`} />
+        {past.excludedAmounts > 0 && <p className="mt-3 text-xs text-stone-600">{past.excludedAmounts} entries with missing or non-positive amounts are shown but excluded from this total.</p>}
+      </section>
+      <section id="historical-estimates" className={styles.section} aria-label="Historical estimates">
+        <SectionHeading
+          title={`History · Before ${s.scheduleYear}`}
+          count={history.rows.length}
+          description="Earlier estimates with no payment recorded. Excluded from the overview total."
+          action={<div className={styles.pastTotal}><span>Historical budgeted USD</span><strong>{formatUsdCents(history.totalCents)}</strong></div>}
+        />
+        <PaymentTable rows={history.rows} label="Historical estimates" empty="No earlier estimates match this category." />
+        {history.excludedAmounts > 0 && <p className="mt-3 text-xs text-stone-600">{history.excludedAmounts} entries with missing or non-positive amounts are shown but excluded from this historical total.</p>}
       </section>
       <p className="mt-5 text-xs leading-relaxed text-stone-600">
         Dates are estimates, not payment confirmations. Cancelled, vetoed,
         returned, test and internal entries are excluded. {s.unknownAmount}{" "}
         dated entries have an unknown amount; {s.nonpositive} have a
         non-positive amount. Neither is counted as a future payment. Undated estimates remain available in each grant’s original milestone
-        table. Past-estimate values are separate from upcoming totals. Day boundary: Brasília time. Amount rules:{" "}
+        table. The overview combines upcoming estimates with current-year past estimates ({s.scheduleYear}); earlier years remain in history. Year and day boundaries: Brasília time. Amount rules:{" "}
         <Link
           href="/zcg/methodology"
           className="text-amber-700 hover:underline"
