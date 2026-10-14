@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, expect, it } from "vitest";
 import { PublishedDecisionCard } from "./published-decision-card";
-import { publishedDecisionForIssue } from "@/lib/zcg/committee-minutes";
+import { PUBLISHED_COMMITTEE_DECISIONS, publishedDecisionForIssue } from "@/lib/zcg/committee-minutes";
+import { ZCG_PROPOSAL_EXAMPLES } from "@/lib/participate/workspace/data/zcg-proposal-examples";
 import { ZcgProposalExamples } from "./zcg-proposal-examples";
 
 afterEach(cleanup);
@@ -24,6 +25,30 @@ it("keeps the recorded asynchronous date on the card", () => {
   const mexico = publishedDecisionForIssue("https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447", Date.parse("2026-10-14T14:00:00Z"))!;
   render(<PublishedDecisionCard decision={mexico} />);
   expect(screen.getByText("Unanimous · 5 of 5 · Oct 2, 2026 · Async")).toBeTruthy();
+});
+
+it.each([...PUBLISHED_COMMITTEE_DECISIONS, ...ZCG_PROPOSAL_EXAMPLES])("shows a consistent minutes section for $id before and after archive import", proposal => {
+  const props = { proposals: [proposal], communityId: "zcg", filterTarget: { recordId: proposal.id, fallback: proposal.outcome } };
+  const { rerender } = render(<ZcgProposalExamples {...props} archiveRecordIds={[]} />);
+  const card = screen.getByRole("region", { name: "Published committee verdict" });
+  expect(within(card).getByRole("link", { name: "Meeting minutes ↗" }).getAttribute("href")).toBe(proposal.minutesUrl);
+  expect(within(card).getAllByRole("button", { name: /Read feedback/ })).toHaveLength(proposal.votes.length);
+  expect(screen.queryByText("Meeting record ↗")).toBeNull();
+  rerender(<ZcgProposalExamples {...props} archiveRecordIds={[proposal.id]} renderActions={() => <button>Comments</button>} />);
+  expect(screen.getByRole("button", { name: "Comments" })).toBeTruthy();
+  expect(screen.getAllByRole("link", { name: "Meeting minutes ↗" })).toHaveLength(1);
+  expect(screen.getByRole("link", { name: "Meeting minutes ↗" }).getAttribute("href")).toBe(proposal.minutesUrl);
+});
+
+it("keeps mixed votes and abstentions explicit on older minutes", () => {
+  const ironwood = ZCG_PROPOSAL_EXAMPLES.find(proposal => proposal.id === "zcg-ironwood-2026-09-28")!;
+  render(<PublishedDecisionCard decision={ironwood} />);
+  expect(screen.getByText("4 approve · 0 reject · 1 abstain · Sep 28, 2026")).toBeTruthy();
+  expect(screen.queryByText(/Unanimous/)).toBeNull();
+  expect(screen.queryByText(/Collective votes/)).toBeNull();
+  fireEvent.click(screen.getByRole("button", { name: "Paul Brigner: Abstain. Read feedback" }));
+  expect(screen.getByRole("dialog").textContent).toContain("Abstention recorded");
+  expect(screen.getByRole("link", { name: "Read source ↗" }).getAttribute("href")).toBe(ironwood.minutesUrl);
 });
 
 it("takes a history deep link directly to a published decision when its archive has not been imported", () => {
