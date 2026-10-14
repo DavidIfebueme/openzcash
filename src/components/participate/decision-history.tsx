@@ -69,9 +69,10 @@ export async function DecisionHistory() {
       <DecisionHomes current="committee" />
 
       <SourceNote>
-        Verdicts and dates come from the official ZCG sheet. Minutes are linked
-        when a committee meeting falls on the decision day. A verdict links to
-        the grant it created when the titles match.
+        Verdicts and dates come from the official ZCG sheet and reviewed public
+        meeting minutes. The October 12 minutes are matched by exact issue and
+        forum topic; asynchronous votes keep their earlier dates. Other minutes
+        are linked by meeting date. Grant records use title matching.
       </SourceNote>
     </>
   );

@@ -31,13 +31,14 @@ export type ProposalTableRow = {
   platformLink: string | null;
   applicant: string;
   submitted: string;
+  decisionDate?: string | null;
   status: string;
   /** Original published source wording, for distinguishing screening from a verdict. */
   statusRaw?: string;
   statusSourceUrl?: string;
   statusLabel: string;
-  /** "github" = enriched with GitHub details or a decision; "sheet" = mirrored row. */
-  source?: "sheet" | "github";
+  /** Provenance of the displayed row, including reviewed public verdicts. */
+  source?: "sheet" | "github" | "minutes";
   /** Requested grant amount in whole USD (from the GitHub application), or null. */
   amountUsd?: number | null;
   /** Diligence signals — only computed for the live under-review set. */
@@ -205,6 +206,7 @@ const columns: Column<ProposalTableRow>[] = [
             GitHub live
           </span>
         ) : null}
+        {r.source === "minutes" && r.statusSourceUrl ? <a href={r.statusSourceUrl} target="_blank" rel="noreferrer" className="shrink-0 text-xs text-amber-700 hover:underline">Meeting minutes ↗</a> : null}
       </div>
     ),
   },

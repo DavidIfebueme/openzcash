@@ -9,6 +9,7 @@ import { officialProposalVerdict } from "@/lib/coinholder/official-status";
 import type { ProposalTableRow } from "@/app/zcg/proposals/proposals-table";
 import { reconcileProposalRows } from "./reconcile-proposals";
 import { spreadsheetSource } from "./source-links";
+import { applyPublishedMinutes } from "./committee-minutes-projection";
 
 function toTableRow(p: ProposalRow): ProposalTableRow {
   // A closed coinholder round shows FPF's official results, which the
@@ -23,6 +24,7 @@ function toTableRow(p: ProposalRow): ProposalTableRow {
     platformLink: p.platformLink ?? null,
     applicant: p.applicantsRaw ?? "",
     submitted: p.submittedDate ?? "",
+    decisionDate: p.decisionDate,
     status,
     statusRaw: p.statusRaw,
     ...(p.origin === "sheet" && !p.locked ? { statusSourceUrl: spreadsheetSource(p.sourceSheetGid, p.sourceRowIndex).sourceUrl ?? undefined } : {}),
@@ -39,5 +41,6 @@ export async function readPublishedProposals() {
     getMissingIssues(),
     getIssueDecisions(),
   ]);
-  return { all, ...reconcileProposalRows(all.map(toTableRow), applications, missingIssues, issueDecisions, getIssueAmounts()) };
+  const reconciled = reconcileProposalRows(all.map(toTableRow), applications, missingIssues, issueDecisions, getIssueAmounts());
+  return { all, ...reconciled, ...applyPublishedMinutes(reconciled.rows) };
 }

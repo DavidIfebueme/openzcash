@@ -25,6 +25,8 @@ import { officialIssueNumber, type OfficialProposalSnapshot, type ParticipatePro
 import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
 import { useApprovedProposalBudgets, budgetStatusText } from "./approved-proposal-budgets";
 import { ProposalScreeningNote } from "./proposal-screening-note";
+import { PUBLISHED_COMMITTEE_DECISIONS, publishedDecisionForIssue } from "@/lib/zcg/committee-minutes";
+import { PublishedDecisionCard } from "./published-decision-card";
 
 const requestedDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
@@ -69,6 +71,12 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
   const currentFilter = (proposal?: ProposalParticipation) => (proposal && officialOutcomes[proposal.recordId]) ?? proposalFilter(proposal);
   const ids = board.proposals.map(proposal => proposal.recordId);
   const examples = [...ZCG_REVIEW_PROPOSALS, ...ZCG_PROPOSAL_EXAMPLES].filter(proposal => ids.includes(proposal.id) && !board.proposals.find(row => row.recordId === proposal.id)?.sourceCapture);
+  // A published decision can be browsed before its archive exists, but gets no
+  // invented discussion or verification controls. Imported records stay unique.
+  for (const decision of PUBLISHED_COMMITTEE_DECISIONS) {
+    if (!ids.includes(decision.id) && officialByIssue.get(decision.issueNumber)?.outcome === decision.outcome) examples.push(decision);
+  }
+  examples.sort((a, b) => (b.outcome === "under_review" ? b.submittedAt : b.decisionDate).localeCompare(a.outcome === "under_review" ? a.submittedAt : a.decisionDate));
   const other = board.proposals.filter(proposal => !examples.some(example => example.id === proposal.recordId));
   const budgetState = useApprovedProposalBudgets(initialBudgets);
   const approvedBudgets = budgetState.snapshot?.budgets ?? {};
@@ -95,6 +103,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       const source = captured?.source ?? zcgSourceMetadata(proposal.recordId);
       const issue = source ? officialIssueNumber(source.url) : null;
       const listing = issue ? officialByIssue.get(issue) : undefined;
+      const decision = publishedDecisionForIssue(source?.url);
       const requestedUsd = proposal.application ? Number(proposal.application.requestedAmountUsd) : captured && outcome !== "approved" ? proposal.sourceRequestedUsd ?? captured.proposal.requestedUsd : null;
       const requestedBudget = requestedUsd == null ? null : requestedDollars.format(requestedUsd);
       const approvedBudget = outcome === "approved" ? zcgApprovedBudget(approvedBudgets, proposal.recordId, captured?.source) : null;
@@ -102,6 +111,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
         <div className="dao-proposal-card-heading dao-zcg-card-heading"><h2 className="dao-proposal-heading"><button type="button" className="dao-proposal-title proposal-title-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>{captured?.proposal.title ?? proposal.title}</button></h2>{approvedBudget ? <div className="dao-zcg-budget" data-approved role="group" aria-label={`Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}`}><div className="dao-zcg-budget-amount"><strong>{formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "")}</strong><span>USD</span></div><ProposalZecEstimate budget={approvedBudget} state={price} ledgerImportedAt={ledgerImportedAt} /></div> : outcome === "approved" ? <div className="dao-zcg-budget" role="status">{budgetStatusText(budgetState.status)}</div> : requestedBudget !== null ? <div className="dao-zcg-budget" data-approved={false} role="group" aria-label={`Requested budget: ${requestedBudget} USD`}><div className="dao-zcg-budget-amount"><strong>{requestedBudget}</strong><span>USD requested</span></div></div> : !captured ? <span className={`dao-status${proposal.abandonment ? " dao-status--abandoned" : ""}`}>{proposal.abandonment ? "Abandoned" : proposal.application?.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"}</span> : null}</div>
         {captured ? <><p className="dao-proposal-created">Submitted {new Date(captured.proposal.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })} · @{captured.proposal.applicant}</p><ZcgProposalLabels recordId={proposal.recordId} title={captured.proposal.title} tags={captured.proposal.tags} sourceOverride={captured.source} categoryOverride={proposal.sourceCategory} outcome={outcome} committeeLabels={proposal.labels} /><p className="dao-proposal-created">Source checked <time dateTime={captured.checkedAt}>{new Date(captured.checkedAt).toLocaleString("en-US", { timeZone: "UTC", timeZoneName: "short" })}</time></p></> : <>{proposal.application ? <p className="dao-proposal-created">{proposal.application.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"} · {proposal.application.applicant} · {new Date(proposal.application.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}</p> : null}<CommitteeLabels ids={proposal.labels} /></>}
         {outcome === "filtered" && listing ? <ProposalScreeningNote listing={listing} source={source ?? undefined} /> : null}
+        {decision && decision.outcome === outcome ? <PublishedDecisionCard decision={decision} /> : null}
         {proposal.abandonment ? <AbandonmentNotice value={proposal.abandonment} endpoint={`/api/communities/${encodeURIComponent(community.id)}/archives/${encodeURIComponent(proposal.recordId)}`} /> : null}
         <div className="dao-proposal-card-footer">{renderActions(proposal.recordId)}<button id={`proposal-read-${proposal.recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button></div>
         {mine && !proposal.abandonment ? <SubmissionLifecycleAction draft={mine} /> : null}

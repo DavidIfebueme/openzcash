@@ -39,7 +39,7 @@ export default async function PropostasPage({
     getIsAdmin(), readPublishedProposals(),
     cached("links", LEDGER_TTL_MS, () => getLinks()),
   ]);
-  const { all, removedCount, ghApproved, ghRejected } = published;
+  const { all, removedCount, ghApproved, ghRejected, minutesDecided } = published;
   const submitUrl = links.proposal_zcg ?? "#";
   const diligence = getDiligence();
   const allRows = published.rows.map(row => ({ ...row, diligence: row.source === "github" && row.status === "under_review"
@@ -274,6 +274,7 @@ export default async function PropostasPage({
         </p>
       ) : null}
 
+      {minutesDecided > 0 ? <p className="mt-1.5 text-xs text-stone-500">{minutesDecided} applications still marked under review in the spreadsheet have a published committee verdict. Their cards link to the reviewed meeting minutes.</p> : null}
       {ghRejected + ghApproved > 0 ? (
         <p className="mt-1.5 text-xs text-stone-500">
           {ghRejected + ghApproved} under-review{" "}

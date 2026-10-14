@@ -95,3 +95,37 @@ it("opens a screened resubmission in Filtered, keeps its source discrepancy visi
   expect(JSON.stringify(checked.capture)).toBe(original);
   expect(renderToStaticMarkup(<ProposalWorkspace {...props} />)).not.toContain("Comments for zcg-github-489");
 });
+
+it("adds the published vote card to the existing 0xramp archive without duplicating its discussion or rewriting its capture", async () => {
+  const url = "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/454";
+  const title = "0xramp: ZEC payments and wallet integrations (revision of #408)";
+  const checked = await buildSourceProposal({ number: 454, html_url: url, title,
+    body: "### Requested Grant Amount (USD)\n\n$45,000", user: { login: "vinibarbosabr" }, state: "open",
+    created_at: "2026-09-29T12:00:00Z", updated_at: "2026-10-12T12:00:00Z",
+    labels: [{ name: "📋 Grant Application", color: "bdb853", description: null }, { name: "👀 Ready For ZCG Review", color: "115858", description: null }],
+  }, 454, "2026-10-14T14:00:00.000Z");
+  const original = JSON.stringify(checked.capture);
+  const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+    board={{ ...board, proposals: [{ ...board.proposals[0], recordId: checked.manifest.recordId, title, sourceCapture: checked.capture }] }}
+    initialOfficialProposals={{ ...snapshot, proposals: [{ ...snapshot.proposals[0], issueNumber: 454, url, title, outcome: "approved" }] }}
+    initialRecordId="zcg-github-454" />);
+  expect(html).toContain('aria-label="Published committee verdict"');
+  expect(html).toContain("Hanh: Approve via unanimous record");
+  expect(html).toContain("Paul Brigner: Approve via unanimous record");
+  expect(html.match(/Comments for zcg-github-454/g)).toHaveLength(1);
+  expect(html).toContain("Preserved zcg-github-454");
+  expect(JSON.stringify(checked.capture)).toBe(original);
+});
+
+it("shows a documented decision before archive import without offering nonexistent comments or proof", () => {
+  const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+    board={{ ...board, proposals: [] }} initialRecordId="zcg-github-447"
+    initialOfficialProposals={{ ...snapshot, proposals: [{ ...snapshot.proposals[0], issueNumber: 447,
+      url: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447", title: "Mexico", outcome: "approved" }] }} />);
+  expect(html).toContain("Mexico Tech Week");
+  expect(html).toContain("Unanimous vote recorded");
+  expect(html).toContain("Oct 2, 2026");
+  expect(html).not.toContain("Comments for zcg-github-447");
+  expect(html).not.toContain("Preserved zcg-github-447");
+  expect(html).not.toContain("proposal-read-zcg-github-447");
+});

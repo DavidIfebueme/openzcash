@@ -261,3 +261,12 @@
 @media (max-width: 420px) {
   .oz-participate .dao-app .dao-auth-dialog { padding: 28px 22px; }
 }
+
+/* Reviewed committee minutes alongside the preserved proposal. */
+.oz-participate .proposal-published-decision { margin-top: 20px; padding: 16px 18px; border-radius: 12px; background: var(--dao-soft); }
+.oz-participate .proposal-published-decision-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+.oz-participate .proposal-published-decision-heading > div { display: flex; align-items: baseline; gap: 8px 14px; flex-wrap: wrap; }
+.oz-participate .proposal-published-decision-heading strong { font-size: 13px; font-weight: 600; }
+.oz-participate .proposal-published-decision-heading span { color: var(--dao-muted); font-size: 12px; }
+.oz-participate .dao-app .proposal-published-decision-caption { margin-top: 10px; font-size: 11px; color: var(--dao-muted); line-height: 1.6; }
+.oz-participate .dao-zcg-vote-basis { display: block; margin-top: 3px; color: var(--dao-muted); font-size: 9px; font-weight: 400; line-height: 1.4; }

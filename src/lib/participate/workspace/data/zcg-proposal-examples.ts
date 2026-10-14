@@ -9,7 +9,7 @@ export const ZCG_EXAMPLE_MEMBERS = {
 
 export type ZcgMemberId = keyof typeof ZCG_EXAMPLE_MEMBERS;
 export type ZcgVote = "approve" | "reject" | "abstain";
-export type ZcgMemberFeedback = { memberId: ZcgMemberId; vote: ZcgVote; summary: string };
+export type ZcgMemberFeedback = { memberId: ZcgMemberId; vote: ZcgVote; summary: string; basis?: "individual" | "unanimous" };
 export type ZcgProposalExample = {
   id: string;
   title: string;
@@ -20,6 +20,10 @@ export type ZcgProposalExample = {
   proposalUrl: string;
   minutesUrl: string;
   votes: readonly ZcgMemberFeedback[];
+  meetingDate?: string;
+  decisionMode?: "meeting" | "async";
+  unanimous?: boolean;
+  voteEvidenceUrl?: string;
 };
 
 const forum = "https://forum.zcashcommunity.com/t";
