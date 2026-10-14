@@ -123,7 +123,8 @@ it("shows a documented decision before archive import without offering nonexiste
     initialOfficialProposals={{ ...snapshot, proposals: [{ ...snapshot.proposals[0], issueNumber: 447,
       url: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447", title: "Mexico", outcome: "approved" }] }} />);
   expect(html).toContain("Mexico Tech Week");
-  expect(html).toContain("Unanimous vote recorded");
+  expect(html).toContain('aria-label="Published committee verdict"');
+  expect(html).toContain("Meeting minutes ↗");
   expect(html).toContain("Oct 2, 2026");
   expect(html).not.toContain("Comments for zcg-github-447");
   expect(html).not.toContain("Preserved zcg-github-447");
