@@ -32,7 +32,7 @@ it("takes a history deep link directly to a published decision when its archive 
   const { rerender } = render(<ZcgProposalExamples {...props} proposals={[]} />);
   rerender(<ZcgProposalExamples {...props} proposals={[ramp, mexico]} />);
   expect(document.activeElement).toBe(screen.getByRole("heading", { name: /Mexico Tech Week/ }).closest("li"));
-  expect(screen.getByRole("button", { name: "Approved", exact: true }).getAttribute("aria-pressed")).toBe("true");
-  fireEvent.click(screen.getByRole("button", { name: "Rejected", exact: true }));
+  expect(screen.getByRole("button", { name: "Approved" }).getAttribute("aria-pressed")).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "Rejected" }));
   expect(screen.queryByRole("heading", { name: /Mexico Tech Week/ })).toBeNull();
 });
