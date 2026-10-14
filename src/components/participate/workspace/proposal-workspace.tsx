@@ -27,6 +27,7 @@ import { useApprovedProposalBudgets, budgetStatusText } from "./approved-proposa
 import { ProposalScreeningNote } from "./proposal-screening-note";
 import { PUBLISHED_COMMITTEE_DECISIONS, publishedDecisionForIssue } from "@/lib/zcg/committee-minutes";
 import { PublishedDecisionCard } from "./published-decision-card";
+import { PendingCommitteeCard } from "./pending-committee-card";
 
 const requestedDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
@@ -112,6 +113,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
         {captured ? <><p className="dao-proposal-created">Submitted {new Date(captured.proposal.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })} · @{captured.proposal.applicant}</p><ZcgProposalLabels recordId={proposal.recordId} title={captured.proposal.title} tags={captured.proposal.tags} sourceOverride={captured.source} categoryOverride={proposal.sourceCategory} outcome={outcome} committeeLabels={proposal.labels} /><p className="dao-proposal-created">Source checked <time dateTime={captured.checkedAt}>{new Date(captured.checkedAt).toLocaleString("en-US", { timeZone: "UTC", timeZoneName: "short" })}</time></p></> : <>{proposal.application ? <p className="dao-proposal-created">{proposal.application.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"} · {proposal.application.applicant} · {new Date(proposal.application.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}</p> : null}<CommitteeLabels ids={proposal.labels} /></>}
         {outcome === "filtered" && listing ? <ProposalScreeningNote listing={listing} source={source ?? undefined} /> : null}
         {decision && decision.outcome === outcome ? <PublishedDecisionCard decision={decision} /> : null}
+        {issue && outcome === "under_review" ? <PendingCommitteeCard /> : null}
         {proposal.abandonment ? <AbandonmentNotice value={proposal.abandonment} endpoint={`/api/communities/${encodeURIComponent(community.id)}/archives/${encodeURIComponent(proposal.recordId)}`} /> : null}
         <div className="dao-proposal-card-footer">{renderActions(proposal.recordId)}<button id={`proposal-read-${proposal.recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button></div>
         {mine && !proposal.abandonment ? <SubmissionLifecycleAction draft={mine} /> : null}
