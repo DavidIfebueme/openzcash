@@ -8,6 +8,7 @@ import { PROPOSAL_STATUS_LABEL as STATUS_LABEL } from "./status-labels";
 import { officialProposalVerdict } from "@/lib/coinholder/official-status";
 import type { ProposalTableRow } from "@/app/zcg/proposals/proposals-table";
 import { reconcileProposalRows } from "./reconcile-proposals";
+import { spreadsheetSource } from "./source-links";
 
 function toTableRow(p: ProposalRow): ProposalTableRow {
   // A closed coinholder round shows FPF's official results, which the
@@ -23,6 +24,8 @@ function toTableRow(p: ProposalRow): ProposalTableRow {
     applicant: p.applicantsRaw ?? "",
     submitted: p.submittedDate ?? "",
     status,
+    statusRaw: p.statusRaw,
+    ...(p.origin === "sheet" && !p.locked ? { statusSourceUrl: spreadsheetSource(p.sourceSheetGid, p.sourceRowIndex).sourceUrl ?? undefined } : {}),
     statusLabel: STATUS_LABEL[status] ?? status,
     source: "sheet",
   };

@@ -4,20 +4,21 @@ import type { CSSProperties } from "react";
 import { CommitteeLabels } from "@/components/participate/workspace/committee-labels";
 import { committeeLabelStyle, selectedCommitteeLabels } from "@/lib/participate/workspace/domain/committee-labels";
 import { PROPOSAL_TAGS } from "@/lib/participate/workspace/domain/proposal-tags";
-import { classifyZcgSectors, sourceCategoryTag, zcgCurrentStatusLabel, type githubProposalOutcome, type ZcgSourceMetadata } from "@/lib/participate/workspace/domain/zcg-source-metadata";
+import { classifyZcgSectors, sourceCategoryTag, zcgCurrentStatusLabel, type ZcgSourceMetadata } from "@/lib/participate/workspace/domain/zcg-source-metadata";
+import type { ParticipateProposalOutcome } from "@/lib/participate/official-proposals-model";
 import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
 import { classifyOpenZcashSectors } from "@/lib/participate/workspace/domain/openzcash-sectors";
 
-const outcomeLabels = { under_review: "Under review", approved: "Approved", rejected: "Rejected", abandoned: "Withdrawn", closed: "Closed" };
+const outcomeLabels = { under_review: "Under review", approved: "Approved", rejected: "Rejected", filtered: "Filtered", abandoned: "Withdrawn", closed: "Closed" };
 
-export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [], outcome, sourceOverride, categoryOverride }: { recordId: string; title: string; tags: readonly string[]; committeeLabels?: readonly string[]; outcome?: ReturnType<typeof githubProposalOutcome>; sourceOverride?: ZcgSourceMetadata; categoryOverride?: string | null }) {
+export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [], outcome, sourceOverride, categoryOverride }: { recordId: string; title: string; tags: readonly string[]; committeeLabels?: readonly string[]; outcome?: ParticipateProposalOutcome; sourceOverride?: ZcgSourceMetadata; categoryOverride?: string | null }) {
   const source = sourceOverride ?? zcgSourceMetadata(recordId);
   const category = categoryOverride ?? source?.category;
   const sectors = classifyZcgSectors(title, category, classifyOpenZcashSectors(title, tags));
   const declared = sourceCategoryTag(category);
   const names = new Set(source?.labels.map(label => label.name.toLowerCase()) ?? []);
   const local = selectedCommitteeLabels(committeeLabels).filter(label => !names.has(label.name.toLowerCase())).map(label => label.id);
-  const statusLabel = outcome ? zcgCurrentStatusLabel(source, outcome) : null;
+  const statusLabel = outcome && outcome !== "filtered" ? zcgCurrentStatusLabel(source, outcome) : null;
   const visibleLabels = outcome ? statusLabel ? [statusLabel] : [] : source?.labels ?? [];
   const extraLabels = outcome ? source?.labels.filter(label => label !== statusLabel) ?? [] : [];
   return <div className={`zcg-proposal-labels${outcome ? " zcg-proposal-labels--compact" : ""}`}>

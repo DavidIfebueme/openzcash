@@ -21,9 +21,10 @@ import { formatProposalUsd } from "@/lib/participate/workspace/domain/proposal-f
 import { ProposalZecEstimate, useProposalZecPrice } from "@/components/participate/workspace/proposal-zec-estimate";
 import { useOfficialProposals } from "./official-proposals";
 import { OfficialReviewQueue } from "./official-review-queue";
-import { officialIssueNumber, type OfficialProposalSnapshot } from "@/lib/participate/official-proposals-model";
+import { officialIssueNumber, type OfficialProposalSnapshot, type ParticipateProposalOutcome } from "@/lib/participate/official-proposals-model";
 import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
 import { useApprovedProposalBudgets, budgetStatusText } from "./approved-proposal-budgets";
+import { ProposalScreeningNote } from "./proposal-screening-note";
 
 const requestedDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
 
@@ -49,7 +50,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
   const official = officialState.snapshot;
   const officialByIssue = new Map(official?.proposals.map(row => [row.issueNumber, row]));
   const officialRecords = new Map<number, ProposalParticipation>();
-  const officialOutcomes: Record<string, "under_review" | "approved" | "rejected" | "abandoned" | "closed"> = {};
+  const officialOutcomes: Record<string, ParticipateProposalOutcome> = {};
   for (const record of board.proposals) {
     const source = record.sourceCapture?.source ?? zcgSourceMetadata(record.recordId);
     const issue = source ? officialIssueNumber(source.url) : /^zcg-github-([1-9]\d*)$/.test(record.recordId) ? Number(record.recordId.slice(11)) : null;
@@ -91,12 +92,16 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       const mine = drafts.find(draft => draft.recordId === proposal.recordId);
       const captured = proposal.sourceCapture;
       const outcome = currentFilter(proposal);
+      const source = captured?.source ?? zcgSourceMetadata(proposal.recordId);
+      const issue = source ? officialIssueNumber(source.url) : null;
+      const listing = issue ? officialByIssue.get(issue) : undefined;
       const requestedUsd = proposal.application ? Number(proposal.application.requestedAmountUsd) : captured && outcome !== "approved" ? proposal.sourceRequestedUsd ?? captured.proposal.requestedUsd : null;
       const requestedBudget = requestedUsd == null ? null : requestedDollars.format(requestedUsd);
       const approvedBudget = outcome === "approved" ? zcgApprovedBudget(approvedBudgets, proposal.recordId, captured?.source) : null;
       return <li className={`dao-proposal-row${captured ? " dao-zcg-proposal" : ""}`} key={proposal.recordId}>
         <div className="dao-proposal-card-heading dao-zcg-card-heading"><h2 className="dao-proposal-heading"><button type="button" className="dao-proposal-title proposal-title-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>{captured?.proposal.title ?? proposal.title}</button></h2>{approvedBudget ? <div className="dao-zcg-budget" data-approved role="group" aria-label={`Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}`}><div className="dao-zcg-budget-amount"><strong>{formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "")}</strong><span>USD</span></div><ProposalZecEstimate budget={approvedBudget} state={price} ledgerImportedAt={ledgerImportedAt} /></div> : outcome === "approved" ? <div className="dao-zcg-budget" role="status">{budgetStatusText(budgetState.status)}</div> : requestedBudget !== null ? <div className="dao-zcg-budget" data-approved={false} role="group" aria-label={`Requested budget: ${requestedBudget} USD`}><div className="dao-zcg-budget-amount"><strong>{requestedBudget}</strong><span>USD requested</span></div></div> : !captured ? <span className={`dao-status${proposal.abandonment ? " dao-status--abandoned" : ""}`}>{proposal.abandonment ? "Abandoned" : proposal.application?.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"}</span> : null}</div>
         {captured ? <><p className="dao-proposal-created">Submitted {new Date(captured.proposal.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })} · @{captured.proposal.applicant}</p><ZcgProposalLabels recordId={proposal.recordId} title={captured.proposal.title} tags={captured.proposal.tags} sourceOverride={captured.source} categoryOverride={proposal.sourceCategory} outcome={outcome} committeeLabels={proposal.labels} /><p className="dao-proposal-created">Source checked <time dateTime={captured.checkedAt}>{new Date(captured.checkedAt).toLocaleString("en-US", { timeZone: "UTC", timeZoneName: "short" })}</time></p></> : <>{proposal.application ? <p className="dao-proposal-created">{proposal.application.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"} · {proposal.application.applicant} · {new Date(proposal.application.submittedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" })}</p> : null}<CommitteeLabels ids={proposal.labels} /></>}
+        {outcome === "filtered" && listing ? <ProposalScreeningNote listing={listing} source={source ?? undefined} /> : null}
         {proposal.abandonment ? <AbandonmentNotice value={proposal.abandonment} endpoint={`/api/communities/${encodeURIComponent(community.id)}/archives/${encodeURIComponent(proposal.recordId)}`} /> : null}
         <div className="dao-proposal-card-footer">{renderActions(proposal.recordId)}<button id={`proposal-read-${proposal.recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button></div>
         {mine && !proposal.abandonment ? <SubmissionLifecycleAction draft={mine} /> : null}

@@ -4,6 +4,7 @@ import { expect, it, vi } from "vitest";
 import { ProposalWorkspace } from "./proposal-workspace";
 import type { OfficialProposalSnapshot } from "@/lib/participate/official-proposals-model";
 import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-review-proposals";
+import { buildSourceProposal } from "@/lib/participate/workspace/archive/source-proposals";
 vi.mock("./community-workspace", () => ({ WorkspaceFrame: ({ children }: { children: ReactNode }) => <main>{children}</main> }));
 vi.mock("./proposal-economy", () => ({ ProposalEconomyProvider: ({ children }: { children: ReactNode }) => <>{children}</>, ProposalEconomyNotice: () => null, ProposalEngagement: ({ recordId }: {recordId: string}) => <button>Comments for {recordId}</button> }));
 vi.mock("./proposal-inline-details", () => ({ ProposalInlineDetails: ({recordId}: {recordId: string}) => <span>Preserved {recordId}</span> }));
@@ -63,4 +64,34 @@ it("retains the original captured board when the shared source is unavailable", 
 it("renders the official queue even when there are no archived proposals yet", () => {
   const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null} board={{...board, proposals: []}} initialOfficialProposals={snapshot} />);
   expect(html).toContain("Konclave"); expect(html).not.toContain("No public proposals yet");
+});
+
+it("opens a screened resubmission in Filtered, keeps its source discrepancy visible and preserves its archive", async () => {
+  const url = "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/489";
+  const title = "Grant Application - ZEC Order Pay";
+  const checked = await buildSourceProposal({ number: 489, html_url: url, title,
+    body: "### Requested Grant Amount (USD)\n\n$36,000", user: { login: "wolkodaww123-ctrl" },
+    state: "open", created_at: "2026-10-13T13:49:21Z", updated_at: "2026-10-13T13:57:24Z",
+    labels: [{ name: "📋 Grant Application", color: "bdb853", description: null }, { name: "👀 Ready For ZCG Review", color: "115858", description: null }],
+  }, 489, "2026-10-14T12:00:00.000Z");
+  const original = JSON.stringify(checked.capture);
+  const screened = { ...snapshot, proposals: [{ ...snapshot.proposals[0], issueNumber: 489, title, url,
+    outcome: "filtered" as const, requestedUsd: 36000,
+    statusDetail: "Filtered by FPF / Outside of Scope / Guidelines Not Met",
+    statusSourceUrl: "https://docs.google.com/spreadsheets/d/official-ledger/edit#gid=1164534734&range=A729",
+  }] };
+  const props = { community, communities: [community], viewer: null, initialOfficialProposals: screened,
+    board: { ...board, proposals: [{ ...board.proposals[0], recordId: checked.manifest.recordId, title, sourceCapture: checked.capture }] } };
+  const html = renderToStaticMarkup(<ProposalWorkspace {...props} initialRecordId="zcg-github-489" />);
+  expect(html).toContain('aria-pressed="true">Filtered</button>');
+  expect(html).toContain('dao-status--filtered">Filtered</span>');
+  expect(html).not.toContain('dao-status--rejected');
+  expect(html).toContain(screened.proposals[0].statusDetail);
+  expect(html).toContain("GitHub shows Under review at the last source check.");
+  expect(html).toContain("range=A729");
+  expect(html).toContain("$36,000");
+  expect(html).toContain("Comments for zcg-github-489");
+  expect(html).toContain("Preserved zcg-github-489");
+  expect(JSON.stringify(checked.capture)).toBe(original);
+  expect(renderToStaticMarkup(<ProposalWorkspace {...props} />)).not.toContain("Comments for zcg-github-489");
 });

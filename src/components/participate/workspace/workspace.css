@@ -2992,6 +2992,10 @@
 .oz-participate .proposal-abandonment p, .oz-participate .proposal-activity-reason { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.65; color: var(--dao-muted); }
 .oz-participate .proposal-abandonment .dao-text-button { font-size: 12px; }
 .oz-participate .dao-status--abandoned { color: var(--dao-muted); background: var(--dao-soft); }
+.oz-participate .dao-status--filtered { color: var(--dao-muted); background: var(--dao-soft); }
+.oz-participate .proposal-screening-note { display: grid; gap: 4px; margin-block: 12px; color: var(--dao-muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.oz-participate .proposal-screening-note p { margin: 0; }
+.oz-participate .proposal-screening-note a { color: var(--dao-accent); }
 
 /* ---- workspace-auth.css ---- */
 /* Account access shares the workspace identity and never blocks browsing. */

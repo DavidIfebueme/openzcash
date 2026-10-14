@@ -98,6 +98,7 @@ export function ZcgVoteBar({ proposal, selection: controlledSelection, onSelecti
 const filters = [
   { value: "under_review", label: "Under review" },
   { value: "approved", label: "Approved" }, { value: "rejected", label: "Rejected" }, { value: "abandoned", label: "Withdrawn" },
+  { value: "filtered", label: "Filtered" },
   { value: "closed", label: "Closed" }
 ] as const;
 type ProposalFilter = typeof filters[number]["value"];
@@ -117,13 +118,14 @@ export function ZcgProposalExamples({ officialOutcomes = {}, replaceReviewQueue 
   const targetFilter = target ? currentOutcome(target) : filterTarget?.fallback ?? "under_review";
   const [selection, setSelection] = useState<{ filter: ProposalFilter; key: number; manual: boolean }>({ filter: targetFilter, key: filterResetKey, manual: false });
   const hasClosed = proposals.some(proposal => currentOutcome(proposal) === "closed") || (additionalCount?.("closed") ?? 0) > 0;
+  const hasFiltered = proposals.some(proposal => currentOutcome(proposal) === "filtered") || (additionalCount?.("filtered") ?? 0) > 0;
   const selectedFilter = selection.key === filterResetKey && selection.manual ? selection.filter : targetFilter;
-  const filter = selectedFilter === "closed" && !hasClosed ? "under_review" : selectedFilter;
+  const filter = (selectedFilter === "closed" && !hasClosed) || (selectedFilter === "filtered" && !hasFiltered) ? "under_review" : selectedFilter;
   const setFilter = (value: ProposalFilter) => setSelection({ filter: value, key: filterResetKey, manual: true });
   const filtered = proposals.filter(proposal => currentOutcome(proposal) === filter && !(replaceReviewQueue && filter === "under_review"));
   return <div className="dao-zcg-examples">
     <div className="dao-proposal-tools" data-participate-tour="filters">
-      <div className="dao-filter-list" aria-label="Filter proposals">{filters.filter(item => item.value !== "closed" || hasClosed).map(({ value, label }) => <button key={value} type="button" className={`dao-filter${filter === value ? " dao-filter--active" : ""}`} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</button>)}</div>
+      <div className="dao-filter-list" aria-label="Filter proposals">{filters.filter(item => (item.value !== "closed" || hasClosed) && (item.value !== "filtered" || hasFiltered)).map(({ value, label }) => <button key={value} type="button" className={`dao-filter${filter === value ? " dao-filter--active" : ""}`} aria-pressed={filter === value} onClick={() => setFilter(value)}>{label}</button>)}</div>
       {toolbar}
     </div>
     {additionalRecords?.(filter)}

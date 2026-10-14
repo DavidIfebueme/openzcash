@@ -32,6 +32,9 @@ export type ProposalTableRow = {
   applicant: string;
   submitted: string;
   status: string;
+  /** Original published source wording, for distinguishing screening from a verdict. */
+  statusRaw?: string;
+  statusSourceUrl?: string;
   statusLabel: string;
   /** "github" = enriched with GitHub details or a decision; "sheet" = mirrored row. */
   source?: "sheet" | "github";
