@@ -68,7 +68,8 @@ export function readZcgSourceRequestedUsd(markdown: string | null | undefined): 
 
 const categories = new Map<string, ProposalTagId>([
   ...PROPOSAL_TAGS.map(tag => [tag.label.toLowerCase(), tag.id] as [string, ProposalTagId]),
-  ["non-wallet applications", "applications"], ["non wallet applications", "applications"], ["research and development", "research"]
+  ["non-wallet applications", "applications"], ["non wallet applications", "applications"], ["research and development", "research"],
+  ["event sponsorships", "events"],
 ]);
 export function sourceCategoryTag(category: string | null | undefined): ProposalTagId | undefined {
   return category ? categories.get(category.trim().toLowerCase()) : undefined;

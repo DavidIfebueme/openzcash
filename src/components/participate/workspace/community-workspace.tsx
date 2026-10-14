@@ -13,8 +13,9 @@ import { WorkspaceSignInButton } from "@/components/participate/workspace/worksp
 import { TreasuryActions } from "@/components/participate/workspace/treasury-actions";
 import { getWorkspaceVotePreview } from "@/lib/participate/workspace/domain/workspace-vote-preview";
 import { WorkspaceVotePreviewBar } from "@/components/participate/workspace/workspace-vote-preview";
-import { ProposalTags } from "@/components/participate/workspace/proposal-tags";
+import { ProposalCard } from "./proposal-card";
 import { PROPOSAL_TAGS } from "@/lib/participate/workspace/domain/proposal-tags";
+import { proposalSectors } from "@/lib/participate/workspace/domain/proposal-filters";
 import { useParticipateHost } from "@/components/participate/workspace/participate-bridge";
 import { DiscussionNotifications } from "@/components/participate/workspace/discussion-notifications";
 
@@ -164,7 +165,8 @@ export function CommunityWorkspace({ community, communities, viewer, treasury, p
       || (filter === "In progress" && IN_PROGRESS_STATUSES.has(proposal.displayStatus))
       || (filter === "Draft" && proposal.displayStatus === "DRAFT")
       || (filter === "Closed" && ["CLOSED", "FINALIZED", "ARCHIVED"].includes(proposal.displayStatus));
-    const searchable = [proposal.question, ...PROPOSAL_TAGS.filter(tag => proposal.tags?.includes(tag.id)).map(tag => tag.label)].join(" ");
+    const sectors = proposalSectors(proposal.question, proposal.tags ?? []);
+    const searchable = [proposal.question, ...(sectors.length ? PROPOSAL_TAGS.filter(tag => sectors.includes(tag.id)).map(tag => tag.label) : ["Uncategorized"])].join(" ");
     return matches && searchable.toLocaleLowerCase("en-US").includes(search.trim().toLocaleLowerCase("en-US"));
   }), [filter, displayedProposals, search]);
 
@@ -195,35 +197,25 @@ export function CommunityWorkspace({ community, communities, viewer, treasury, p
           </div>
           <ul className="dao-proposal-list">
             {filtered.map(proposal => (
-              <li className="dao-proposal-row" key={proposal.id}>
-                <div className="dao-proposal-card-heading">
-                  <div className="dao-proposal-primary">
-                    <h2 className="dao-proposal-heading"><Link className="dao-proposal-title" href={`${base}/proposals/${encodeURIComponent(proposal.id)}`}>{proposal.question}</Link></h2>
-                    <ProposalTags tags={proposal.tags} />
-                    <div className="dao-proposal-created">
-                      <time dateTime={proposal.createdAt}>{dateLabel(proposal.createdAt)}</time>
-                      {proposal.requestedAmountUsdCents ? (
-                        <><span aria-hidden="true">·</span><Link href={`${base}/proposals/${encodeURIComponent(proposal.id)}`} aria-label={`${formatProposalUsd(proposal.requestedAmountUsdCents)} requested. ${PROPOSAL_SETTLEMENT_LABEL}`} title={`${proposal.treasuryName ? `Requested from ${proposal.treasuryName}. ` : ""}${PROPOSAL_SETTLEMENT_LABEL}`}>{formatProposalUsd(proposal.requestedAmountUsdCents)}</Link><span aria-hidden="true">·</span><span>Payable in ZEC</span></>
-                      ) : proposal.requestedAmountZat ? (
-                        <><span aria-hidden="true">·</span><Link href={`${base}/proposals/${encodeURIComponent(proposal.id)}`} aria-label={`${formatTreasuryZec(proposal.requestedAmountZat)} ZEC requested`} title={proposal.treasuryName ? `Requested from ${proposal.treasuryName}` : "Requested funding"}>{formatTreasuryZec(proposal.requestedAmountZat)} ZEC</Link></>
-                      ) : null}
-                    </div>
-                  </div>
-                  <span className={`dao-status dao-status--${proposal.previewVote?.outcome ?? proposal.status.toLowerCase()}`}>
-                    {proposal.previewVote ? ({ approved: "Approved", rejected: "Rejected", ongoing: "In progress" } as const)[proposal.previewVote.outcome] : STATUS_LABELS[proposal.status] ?? proposal.status}
-                  </span>
-                </div>
+              <ProposalCard key={proposal.id} recordId={proposal.id}
+                title={<Link className="dao-proposal-title" href={`${base}/proposals/${encodeURIComponent(proposal.id)}`}>{proposal.question}</Link>}
+                submittedAt={proposal.createdAt}
+                closesAt={proposal.previewVote && proposal.previewVote.outcome !== "ongoing" ? undefined : proposal.closesAt}
+                budget={<div className="dao-zcg-budget">
+                  {proposal.requestedAmountUsdCents ? <><div className="dao-zcg-budget-amount"><Link href={`${base}/proposals/${encodeURIComponent(proposal.id)}`} aria-label={`${formatProposalUsd(proposal.requestedAmountUsdCents)} requested. ${PROPOSAL_SETTLEMENT_LABEL}`} title={proposal.treasuryName ? `Requested from ${proposal.treasuryName}` : "Requested funding"}><strong>{formatProposalUsd(proposal.requestedAmountUsdCents).replace(" USD", "").replace(/\.00$/, "")}</strong></Link><span>USD requested</span></div><span>Payable in ZEC</span></>
+                    : proposal.requestedAmountZat ? <div className="dao-zcg-budget-amount"><Link href={`${base}/proposals/${encodeURIComponent(proposal.id)}`} aria-label={`${formatTreasuryZec(proposal.requestedAmountZat)} ZEC requested`}><strong>{formatTreasuryZec(proposal.requestedAmountZat)}</strong></Link><span>ZEC requested</span></div>
+                      : <span>Amount not specified</span>}
+                </div>}
+                labels={{ title: proposal.question, tags: proposal.tags ?? [], sourceOverride: null,
+                  statusOverride: <span className={`dao-status dao-status--${proposal.previewVote?.outcome ?? proposal.status.toLowerCase()}`}>{proposal.previewVote ? ({ approved: "Approved", rejected: "Rejected", ongoing: "In progress" } as const)[proposal.previewVote.outcome] : STATUS_LABELS[proposal.status] ?? proposal.status}</span> }}
+                engagement={<div className="dao-proposal-meta"><Link href={`${base}/proposals/${encodeURIComponent(proposal.id)}#discussion`} aria-label={proposal.commentCount === null ? `Discussion on ${proposal.question}` : `${proposal.commentCount} comments on ${proposal.question}`}>
+                  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2v3l4-3h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" /></svg>
+                  {proposal.commentCount === null ? "Discussion" : <>{proposal.commentCount} {proposal.commentCount === 1 ? "comment" : "comments"}</>}
+                </Link></div>}
+                actions={<Link className="dao-text-button" href={`${base}/proposals/${encodeURIComponent(proposal.id)}`}>Read proposal →</Link>}
+              >
                 {proposal.previewVote ? <WorkspaceVotePreviewBar vote={proposal.previewVote} /> : null}
-                <div className="dao-proposal-card-footer">
-                  <div className="dao-proposal-meta">
-                    <Link href={`${base}/proposals/${encodeURIComponent(proposal.id)}#discussion`} aria-label={proposal.commentCount === null ? `Discussion on ${proposal.question}` : `${proposal.commentCount} comments on ${proposal.question}`}>
-                      <svg aria-hidden="true" width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M16 3H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h2v3l4-3h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2Z" /></svg>
-                      {proposal.commentCount === null ? "Discussion" : <>{proposal.commentCount} {proposal.commentCount === 1 ? "comment" : "comments"}</>}
-                    </Link>
-                  </div>
-                  <div className="dao-proposal-date">{proposal.previewVote && proposal.previewVote.outcome !== "ongoing" ? "Vote ended" : <><span className="dao-proposal-date-label">Closes </span><time dateTime={proposal.closesAt}>{dateLabel(proposal.closesAt)}</time></>}</div>
-                </div>
-              </li>
+              </ProposalCard>
             ))}
           </ul>
           {filtered.length === 0 ? (

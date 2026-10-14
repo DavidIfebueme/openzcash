@@ -12,8 +12,6 @@ import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-revie
 import type { ProposalParticipation, ProposalParticipationBoard } from "@/lib/participate/workspace/domain/proposal-participation";
 import { ParticipateTour } from "@/components/participate/workspace/participate-tour";
 import type { SubmissionDraft } from "@/lib/participate/workspace/domain/proposal-submission";
-import { CommitteeLabels } from "@/components/participate/workspace/committee-labels";
-import { ZcgProposalLabels } from "@/components/participate/workspace/zcg-proposal-labels";
 import { AbandonmentNotice, SubmissionLifecycleAction } from "@/components/participate/workspace/submission-lifecycle";
 
 import { zcgApprovedBudget, type ApprovedBudgetSnapshot } from "@/lib/participate/workspace/data/zcg-approved-budgets";
@@ -27,7 +25,7 @@ import { useApprovedProposalBudgets, budgetStatusText } from "./approved-proposa
 import { ProposalScreeningNote } from "./proposal-screening-note";
 import { PUBLISHED_COMMITTEE_DECISIONS, publishedDecisionForIssue } from "@/lib/zcg/committee-minutes";
 import { matchesProposalFilters, proposalSectors, type ProposalFilters } from "@/lib/participate/workspace/domain/proposal-filters";
-import { ProposalCardHeading } from "./proposal-card-heading";
+import { ProposalCard } from "./proposal-card";
 import { PublishedDecisionCard } from "./published-decision-card";
 import { PendingCommitteeCard } from "./pending-committee-card";
 
@@ -101,7 +99,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
     const title = captured?.proposal.title ?? proposal.title;
     return matchesProposalFilters({ title, recordId: proposal.recordId, issueNumber: officialIssueNumber(source?.url),
       applicant: captured?.proposal.applicant ?? proposal.application?.applicant,
-      sectors: captured ? proposalSectors(title, captured.proposal.tags, proposal.sourceCategory ?? source?.category) : [] }, search);
+      sectors: proposalSectors(title, captured?.proposal.tags ?? [], proposal.sourceCategory ?? source?.category) }, search);
   });
   const reviewCount = (search?: ProposalFilters) => officialListings.filter(proposal => proposal.outcome === "under_review" && reviewProposalMatches(proposal, officialRecords.get(proposal.issueNumber), search)).length;
   const additionalRecords = (filter: string, search: ProposalFilters) => {
@@ -117,24 +115,23 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       const requestedUsd = proposal.application ? Number(proposal.application.requestedAmountUsd) : captured && outcome !== "approved" ? proposal.sourceRequestedUsd ?? captured.proposal.requestedUsd : null;
       const requestedBudget = requestedUsd == null ? null : requestedDollars.format(requestedUsd);
       const approvedBudget = outcome === "approved" ? zcgApprovedBudget(approvedBudgets, proposal.recordId, captured?.source) : null;
-      return <li className={`dao-proposal-row${captured ? " dao-zcg-proposal" : ""}`} key={proposal.recordId}>
-        <ProposalCardHeading
+      return <ProposalCard key={proposal.recordId} recordId={proposal.recordId}
+        labels={{ title: captured?.proposal.title ?? proposal.title, tags: captured?.proposal.tags ?? [], sourceOverride: captured?.source ?? null, categoryOverride: proposal.sourceCategory, outcome, committeeLabels: proposal.labels }}
+        engagement={renderActions(proposal.recordId)}
+        actions={<button id={`proposal-read-${proposal.recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button>}
+        panel={<>{mine && !proposal.abandonment ? <SubmissionLifecycleAction draft={mine} /> : null}{renderPanel(proposal.recordId)}</>}
           title={<button type="button" className="dao-proposal-title proposal-title-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>{captured?.proposal.title ?? proposal.title}</button>}
           submittedAt={captured?.proposal.submittedAt ?? proposal.application?.submittedAt}
           applicant={captured ? `@${captured.proposal.applicant}` : proposal.application ? `${proposal.application.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"} · ${proposal.application.applicant}` : undefined}
           decision={decision?.outcome === outcome ? decision : undefined}
           checkedAt={captured?.checkedAt}
-          budget={approvedBudget ? <div className="dao-zcg-budget" data-approved role="group" aria-label={`Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}`}><div className="dao-zcg-budget-amount"><strong>{formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "")}</strong><span>USD</span></div><ProposalZecEstimate budget={approvedBudget} state={price} ledgerImportedAt={ledgerImportedAt} /></div> : outcome === "approved" ? <div className="dao-zcg-budget" role="status">{budgetStatusText(budgetState.status)}</div> : requestedBudget !== null ? <div className="dao-zcg-budget" data-approved={false} role="group" aria-label={`Requested budget: ${requestedBudget} USD`}><div className="dao-zcg-budget-amount"><strong>{requestedBudget}</strong><span>USD requested</span></div></div> : !captured ? <span className={`dao-status${proposal.abandonment ? " dao-status--abandoned" : ""}`}>{proposal.abandonment ? "Abandoned" : proposal.application?.publication === "COMMUNITY_PUBLICATION" ? "Community proposal" : "Legacy test proposal"}</span> : null}
-        />
-        {captured ? <ZcgProposalLabels recordId={proposal.recordId} title={captured.proposal.title} tags={captured.proposal.tags} sourceOverride={captured.source} categoryOverride={proposal.sourceCategory} outcome={outcome} committeeLabels={proposal.labels} /> : <CommitteeLabels ids={proposal.labels} />}
+          budget={approvedBudget ? <div className="dao-zcg-budget" data-approved role="group" aria-label={`Approved budget: ${formatProposalUsd(approvedBudget.usdCents)}`}><div className="dao-zcg-budget-amount"><strong>{formatProposalUsd(approvedBudget.usdCents).replace(" USD", "").replace(/\.00$/, "")}</strong><span>USD</span></div><ProposalZecEstimate budget={approvedBudget} state={price} ledgerImportedAt={ledgerImportedAt} /></div> : outcome === "approved" ? <div className="dao-zcg-budget" role="status">{budgetStatusText(budgetState.status)}</div> : requestedBudget !== null ? <div className="dao-zcg-budget" data-approved={false} role="group" aria-label={`Requested budget: ${requestedBudget} USD`}><div className="dao-zcg-budget-amount"><strong>{requestedBudget}</strong><span>USD requested</span></div></div> : <div className="dao-zcg-budget"><span>Amount not specified</span></div>}
+        >
         {outcome === "filtered" && listing ? <ProposalScreeningNote listing={listing} source={source ?? undefined} /> : null}
         {decision && decision.outcome === outcome ? <PublishedDecisionCard decision={decision} /> : null}
         {issue && outcome === "under_review" ? <PendingCommitteeCard /> : null}
         {proposal.abandonment ? <AbandonmentNotice value={proposal.abandonment} endpoint={`/api/communities/${encodeURIComponent(community.id)}/archives/${encodeURIComponent(proposal.recordId)}`} /> : null}
-        <div className="dao-proposal-card-footer">{renderActions(proposal.recordId)}<button id={`proposal-read-${proposal.recordId}`} type="button" className="dao-text-button proposal-read-toggle" aria-expanded={panels[proposal.recordId] === "record"} aria-controls={`proposal-panel-${proposal.recordId}`} onClick={() => toggle(proposal.recordId, "record")}>Read & verify <span className="proposal-disclosure-arrow" aria-hidden="true">⌄</span></button></div>
-        {mine && !proposal.abandonment ? <SubmissionLifecycleAction draft={mine} /> : null}
-        {renderPanel(proposal.recordId)}
-      </li>;
+      </ProposalCard>;
     })}</ul> : null}</>;
   };
   return <WorkspaceFrame community={community} communities={communities} viewer={viewer} workspaceModule="proposals" creditScope={board.participation?.creditScope} initialProfile={initialProfile} initialCreditSummary={initialCreditSummary} embedded={embedded}>

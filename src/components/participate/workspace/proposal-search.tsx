@@ -23,6 +23,7 @@ export function ProposalSearch({ value, onChange }: {
         <select id={id} value={value.category} onChange={event => onChange({ ...value, category: event.target.value as ProposalFilters["category"] })} aria-controls="proposal-results">
           <option value="all">All categories</option>
           {PROPOSAL_TAGS.map(tag => <option key={tag.id} value={tag.id}>{tag.label}</option>)}
+          <option value="uncategorized">Uncategorized</option>
         </select>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
       </div>

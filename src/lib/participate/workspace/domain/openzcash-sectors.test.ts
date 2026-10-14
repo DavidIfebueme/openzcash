@@ -7,6 +7,8 @@ describe("OpenZcash classification before source import", () => {
     ["CENTIREINGS Zcash Market Segmentation & Comparative Intelligence", ["research"]],
     ["ZEC Order Pay: shielded ZEC checkout, refunds and creator payouts for service marketplaces", ["applications", "integration"]],
     ["Skyhook and ESMASTe: Cross-chain Bridging, Messaging and Execution Layer", ["integration", "infrastructure"]],
+    ["Zcash Türkiye University Tour 2026", ["education", "events"]],
+    ["Mexico Tech Week October 2026 — Zcash México", ["events"]],
   ])("classifies %s without a GitHub category or labels", (title, expected) => {
     expect(classifyOpenZcashSectors(title)).toEqual(expected);
   });
