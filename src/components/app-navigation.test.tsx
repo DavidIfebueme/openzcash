@@ -4,7 +4,7 @@ import { APPS, placeOf } from "@/lib/design-routes";
 import { AppNavigation } from "./app-navigation";
 
 const render = (path: string, openApps: Record<string, boolean> = {}, counts: Record<string, string> = {}) => renderToStaticMarkup(
-  <AppNavigation apps={APPS.filter((app) => !app.hidden)} place={placeOf(path)} counts={counts} openApps={openApps} onOpen={() => {}} onToggle={() => {}} />,
+  <AppNavigation apps={APPS.filter((app) => !app.hidden)} place={placeOf(path)} counts={counts} openApps={openApps} compact={false} onOpen={() => {}} onToggle={() => {}} />,
 );
 
 const linkTag = (html: string, href: string) => html.match(new RegExp(`<a\\b[^>]*href="${href}"[^>]*>`))?.[0] ?? "";
@@ -18,16 +18,18 @@ describe("grouped ecosystem navigation", () => {
     expect(links.slice(index - 1, index + 2)).toEqual(["/zcg/participate", "/zcash-network", "/ecosystem"]);
     expect(linkTag(html, "/zcash-network")).toContain('aria-current="page"');
   });
-  it("starts ZCG collapsed and sends its title to Participate", () => {
+  it("starts ZCG collapsed and exposes its pages when expanded", () => {
     const html = render("/zcg/participate");
     expect(html).toContain('aria-label="Expand ZCG"');
     expect(html).not.toContain('id="nav-zcg"');
     expect(linkTag(html, "/zcg/participate")).toContain('aria-current="page"');
+    expect(linkTag(html, "/zcg/participate")).toContain('aria-expanded="false"');
     expect(html.match(/href="\/zcg\/participate"/g)).toHaveLength(1);
 
     const expanded = render("/zcg/participate", { zcg: true });
     expect(expanded).toContain('aria-label="Collapse ZCG"');
     expect(expanded).toContain('id="nav-zcg"');
+    expect(linkTag(expanded, "/zcg/participate")).toContain('aria-expanded="true"');
     expect(expanded).toContain('href="/zcg/grants"');
   });
   it("interleaves direct destinations in reading order and keeps the curated organization order", () => {

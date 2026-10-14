@@ -9,12 +9,13 @@ type Props = {
   place?: Place;
   counts: Record<string, string>;
   openApps: Record<string, boolean>;
+  compact: boolean;
   onToggle: (id: string, fallbackOpen: boolean) => void;
   onOpen: (id: string) => void;
 };
 
 /** The desktop sidebar and phone Apps drawer share one hierarchy. */
-export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen }: Props) {
+export function AppNavigation({ apps, place, counts, openApps, compact, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
     const isZcg = app.id === "zcg";
     const children = childAppsOf(app, apps);
@@ -51,7 +52,13 @@ export function AppNavigation({ apps, place, counts, openApps, onToggle, onOpen 
             className="rd-side-item"
             aria-current={headerActive ? "page" : undefined}
             title={app.sub}
-            onClick={isZcg ? undefined : () => onOpen(app.id)}
+            aria-expanded={isZcg ? open : undefined}
+            aria-controls={isZcg && open ? `nav-${app.id}` : undefined}
+            onClick={isZcg ? (event) => {
+              onOpen(app.id);
+              // Keep the phone drawer visible so its newly opened pages can be used.
+              if (compact && !open) event.preventDefault();
+            } : () => onOpen(app.id)}
             data-long={app.label.length > 18 || undefined}
           >
             <AppMark app={app} />

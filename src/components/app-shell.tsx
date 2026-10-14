@@ -195,7 +195,7 @@ export function AppShell({
   }
   /** Following an app's name also opens its list, even after the visitor collapsed it. */
   function openApp(id: string) {
-    if (openApps[id] === false) saveOpenApps({ ...openApps, [id]: true });
+    if (openApps[id] !== true) saveOpenApps({ ...openApps, [id]: true });
   }
 
   return (
@@ -226,7 +226,7 @@ export function AppShell({
         aria-modal={drawerOpen || undefined}
         onClick={(e) => {
           // Following any link closes the drawer, even one to the page already open.
-          if (e.target instanceof Element && e.target.closest("a")) setNavOpen(false);
+          if (!e.defaultPrevented && e.target instanceof Element && e.target.closest("a")) setNavOpen(false);
         }}
       >
         <div className="rd-side-banner">
@@ -252,6 +252,7 @@ export function AppShell({
             place={place}
             counts={counts}
             openApps={openApps}
+            compact={compact}
             onToggle={toggleApp}
             onOpen={openApp}
           />
