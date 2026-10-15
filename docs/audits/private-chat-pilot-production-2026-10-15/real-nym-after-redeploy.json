@@ -1,0 +1,67 @@
+{
+  "startedAt": "2026-10-15T22:03:13.927Z",
+  "finishedAt": "2026-10-15T22:04:49.453Z",
+  "sources": {
+    "src/lib/private-chat/controller.ts": "f9d47200d51bcf127e20c38adb75031c35247f6ce80db9002e83d07947a7c2ec",
+    "src/lib/private-chat/protocol.ts": "c1a2a9cfe555565e511430debec969d7c01c90e41702227a6940c1d17774bf49",
+    "src/lib/private-chat/ratchet.ts": "e0ab0617d43a6fbd11d9084fde36182c6b6dbf52cdbd6c3457846cd69d7b0b33",
+    "src/lib/private-chat/envelope.ts": "86d082256a576213dba73d3f300e81422e35a454bbce111ac2aed123e33e8dc6",
+    "package-lock.json": "e0c99a3b28e888182ce26c9f9312e0445833bf5d266f2b946022ac03e3486660",
+    "scripts/private-chat-directory-server.ts": "4f2701c94cc6767f6370fdf72e3fd98e8b4f8922aef648f9afa62144086262f8",
+    "src/lib/private-chat/native-wire.ts": "48bb3944f24a4733251e493d854ab2a74db5de7f48aa30b012c2a8527aa9bc87",
+    "src/lib/private-chat/directory-provider.ts": "a1a228a109564f03a4e610d6288e3be147bbb5bfa4711c904b3e76ba99c9af8b",
+    "scripts/private-chat-nym-worker.js": "39eff33f68803bd47f759048c6add393129af0a428601a61795e3bd670662dd5",
+    "public/private-chat-nym/nym_client_wasm_bg.wasm": "9d624b63a5510ceab95e624158e639776303a31cf64f272365d91bb78165503e"
+  },
+  "sdk": "@nymproject/nym-client-wasm@1.4.1",
+  "topology": "two independent WASM workers on one host and one network",
+  "directoryMode": "surb",
+  "checks": [
+    {
+      "name": "Two independent Nym routes with round-trip probes",
+      "durationMs": 15560
+    },
+    {
+      "name": "Encrypted private-room Discover over real Nym",
+      "durationMs": 32551
+    },
+    {
+      "name": "Invitation and explicit acceptance over real Nym",
+      "durationMs": 5723
+    },
+    {
+      "name": "Ten alternating messages with authenticated delivery receipts",
+      "durationMs": 18916
+    },
+    {
+      "name": "Network interruption fails closed",
+      "durationMs": 752
+    },
+    {
+      "name": "Reconnection preserves the conversation and exchanges new messages",
+      "durationMs": 18996
+    },
+    {
+      "name": "Explicit ending reaches the peer",
+      "durationMs": 1217
+    },
+    {
+      "name": "Invitation refusal reaches the requester",
+      "durationMs": 1718
+    },
+    {
+      "name": "Expired signed invitation is refused before transmission",
+      "durationMs": 7
+    }
+  ],
+  "transport": {
+    "submitted": 54,
+    "anonymous": 9,
+    "received": 54,
+    "connections": 3,
+    "topologyRequests": 15,
+    "unexpectedFetches": 0
+  },
+  "success": true,
+  "failure": ""
+}

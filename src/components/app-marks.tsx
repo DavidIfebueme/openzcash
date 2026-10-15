@@ -26,6 +26,7 @@ import {
   IconMail,
   IconNews,
   IconPencil,
+  IconPrivateChat,
   IconReceipt,
   IconShield,
   IconSigma,
@@ -40,6 +41,7 @@ type IconType = ComponentType<{ className?: string }>;
 
 /** Line icons by key (apps without a logo) and by route (inner pages). */
 const ICON_BY_KEY: Record<string, IconType> = {
+  "private-chat": IconPrivateChat,
   network: (props) => <NetworkIcon name="network" {...props} />,
   zarvis: ZarvisMark,
   book: IconBook,
@@ -60,6 +62,7 @@ const ICON_BY_KEY: Record<string, IconType> = {
   key: IconKey,
 };
 const PAGE_ICON: Record<string, IconType> = {
+  "/private-chat": IconPrivateChat,
   "/legal": IconNews,
   "/legal/pgp": IconBook,
   "/zcg/grants": IconGrant,

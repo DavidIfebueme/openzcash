@@ -1,0 +1,63 @@
+{
+  "startedAt": "2026-10-15T21:37:40.314Z",
+  "finishedAt": "2026-10-15T21:38:43.543Z",
+  "success": true,
+  "failure": "",
+  "topology": "two independent WASM workers on one host and one network",
+  "directoryMode": "surb",
+  "checks": [
+    {
+      "name": "Two independent Nym routes with round-trip probes",
+      "durationMs": 16700
+    },
+    {
+      "name": "Encrypted private-room Discover over real Nym",
+      "durationMs": 3622
+    },
+    {
+      "name": "Invitation and explicit acceptance over real Nym",
+      "durationMs": 4923
+    },
+    {
+      "name": "Ten alternating messages with authenticated delivery receipts",
+      "durationMs": 19108
+    },
+    {
+      "name": "Network interruption fails closed",
+      "durationMs": 751
+    },
+    {
+      "name": "Reconnection preserves the conversation and exchanges new messages",
+      "durationMs": 14277
+    },
+    {
+      "name": "Explicit ending reaches the peer",
+      "durationMs": 804
+    },
+    {
+      "name": "Invitation refusal reaches the requester",
+      "durationMs": 3027
+    },
+    {
+      "name": "Expired signed invitation is refused before transmission",
+      "durationMs": 1
+    }
+  ],
+  "transport": {
+    "submitted": 49,
+    "anonymous": 6,
+    "received": 49,
+    "connections": 3,
+    "topologyRequests": 15,
+    "unexpectedFetches": 0
+  },
+  "directoryMetrics": {
+    "ready": true,
+    "received": 6,
+    "queued": 6,
+    "discarded": 0,
+    "failures": 0
+  },
+  "compiledRuntimeManifestSha256": "970d98425ee1dc3eb5aab306ae1108dfdbd4aea8ba56114520c4b7320b302928",
+  "nativeClientSha256": "076391d969cf4dc8715ed2aa6650b43a34120b050c93fc760c511f5b48b2e4f5"
+}

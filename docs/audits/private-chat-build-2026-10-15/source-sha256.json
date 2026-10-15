@@ -1,0 +1,10 @@
+{
+  "package-lock.json": "e0c99a3b28e888182ce26c9f9312e0445833bf5d266f2b946022ac03e3486660",
+  "next.config.ts": "c610b418fdf305daf4440142c9ec451935eec76e11cecd5b8bd4747d9869fc5d",
+  "src/proxy.ts": "1b70718a14464dccb1ae6d671e16049ac5fed3aebc79bfb524239fbab81b7f0a",
+  "src/instrumentation.ts": "e82143854f0508407a29190806c07743e620b13d85a01b88016dd41a437f82d2",
+  "src/lib/private-chat/ratchet.ts": "e0ab0617d43a6fbd11d9084fde36182c6b6dbf52cdbd6c3457846cd69d7b0b33",
+  "src/lib/private-chat/controller.ts": "f9d47200d51bcf127e20c38adb75031c35247f6ce80db9002e83d07947a7c2ec",
+  "src/lib/private-chat/messages.ts": "277360c13ef1701af86ff5f6bd0cd2ae2ebe3ee19beefd0422c816c4618baf34",
+  "src/lib/private-chat/envelope.ts": "86d082256a576213dba73d3f300e81422e35a454bbce111ac2aed123e33e8dc6"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "openzcash-private-chat-directory",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": { "libsodium-wrappers": "0.8.4", "ws": "8.22.0" }
+}

@@ -1,0 +1,9 @@
+
+> account-zcash-viewingkeys@0.1.0 start
+> next start -H 127.0.0.1 -p 4435
+
+▲ Next.js 16.3.8
+- Local:         http://127.0.0.1:4435
+- Network:       http://127.0.0.1:4435
+✓ Ready in 85ms
+✓ Running next.config.ts took 20ms

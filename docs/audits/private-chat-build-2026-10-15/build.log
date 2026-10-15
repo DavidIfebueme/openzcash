@@ -1,0 +1,161 @@
+
+> account-zcash-viewingkeys@0.1.0 prebuild
+> node scripts/stage-private-chat-nym.mjs && node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs && npm run errors:check && npm run check:proposal-cards
+
+Published 3 copilots: 14 allowlisted files
+Zarvis public knowledge index updated.
+
+> account-zcash-viewingkeys@0.1.0 errors:check
+> tsx scripts/build-error-fallback.tsx --check
+
+Error fallback matches the application UI.
+
+> account-zcash-viewingkeys@0.1.0 check:proposal-cards
+> node scripts/check-proposal-cards.mjs
+
+Proposal card contract passed for all TSX surfaces.
+
+> account-zcash-viewingkeys@0.1.0 build
+> next build
+
+▲ Next.js 16.3.8 (Turbopack)
+✓ Running next.config.ts took 85ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 5.1s
+  Running TypeScript ...
+  Finished TypeScript in 6.1s ...
+  Collecting page data using 2 workers ...
+  Generating static pages using 2 workers (0/36) ...
+  Generating static pages using 2 workers (9/36) 
+  Generating static pages using 2 workers (18/36) 
+  Generating static pages using 2 workers (27/36) 
+✓ Generating static pages using 2 workers (36/36) in 439ms
+  Finalizing page optimization ...
+
+Route (app)                                         Revalidate  Expire
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /api
+├ ƒ /api/chain-tip
+├ ƒ /api/coinholders/activity
+├ ƒ /api/coinholders/verify
+├ ƒ /api/cron/legal
+├ ƒ /api/cron/refresh
+├ ƒ /api/ecosystem
+├ ƒ /api/feeds/meetings.ics
+├ ƒ /api/feeds/zcg.xml
+├ ƒ /api/feeds/zechub.xml
+├ ƒ /api/funding/history
+├ ƒ /api/legal/status
+├ ƒ /api/markets
+├ ƒ /api/nav-counts
+├ ƒ /api/network
+├ ƒ /api/news/summary
+├ ƒ /api/participate/approved-budgets
+├ ƒ /api/participate/github-comments/[issueNumber]
+├ ƒ /api/participate/history
+├ ƒ /api/participate/official-proposals
+├ ƒ /api/private-chat/presence
+├ ƒ /api/project-activity
+├ ƒ /api/project-history
+├ ƒ /api/project-history/[id]
+├ ƒ /api/zarvis
+├ ƒ /api/zarvis/canary
+├ ƒ /api/zarvis/feedback
+├ ƒ /api/zarvis/health
+├ ƒ /api/zarvis/metrics
+├ ƒ /api/zarvis/transcribe
+├ ƒ /api/zcg
+├ ○ /api/zcg/coinholder/round                               1h      1y
+├ ƒ /api/zcg/data/disbursements
+├ ƒ /api/zcg/data/grants
+├ ƒ /api/zcg/data/recipients
+├ ƒ /api/zcg/office
+├ ƒ /api/zec-price
+├ ƒ /api/zechub/treasury
+├ ƒ /arborist
+├ ƒ /ceremony
+├ ƒ /ceremony/people
+├ ƒ /ceremony/record
+├ ƒ /ceremony/road
+├ ƒ /ceremony/ten-years
+├ ƒ /ceremony/watch
+├ ƒ /cex-zec-dex
+├ ƒ /coinholders
+├ ƒ /coinholders/activity
+├ ƒ /coinholders/fund
+├ ƒ /coinholders/overview
+├ ƒ /coinholders/results
+├ ƒ /coinholders/verify
+├ ƒ /coinholders/verify/[round]/[proposal]
+├ ƒ /communities
+├ ƒ /defi
+├ ƒ /design-review
+├ ƒ /development
+├ ƒ /ecosystem
+├ ƒ /ecosystem/history
+├ ƒ /ecosystem/history/[id]
+├ ƒ /error-preview
+├ ƒ /funding-history
+├ ƒ /governance
+├ ○ /icon.svg
+├ ƒ /legal
+├ ƒ /legal/pgp
+├ ƒ /lockbox
+├ ○ /manifest.webmanifest
+├ ƒ /monthly
+├ ƒ /monthly-preview
+├ ƒ /monthly/[issue]
+├ ƒ /news
+├ ƒ /og
+├ ƒ /private-chat
+├ ƒ /shielded-labs
+├ ƒ /tachyon
+├ ƒ /wallets
+├ ƒ /z3
+├ ƒ /zakura
+├ ƒ /zarvis
+├ ƒ /zarvis/about
+├ ƒ /zarvis/iterations
+├ ƒ /zcash-network
+├ ƒ /zcg
+├ ƒ /zcg/analytics
+├ ƒ /zcg/budget
+├ ƒ /zcg/coinholder/copilot
+├ ƒ /zcg/coinholder/copilot/instructions
+├ ƒ /zcg/committee
+├ ƒ /zcg/copilot
+├ ƒ /zcg/copilot/instructions
+├ ƒ /zcg/decisions
+├ ƒ /zcg/disbursements
+├ ƒ /zcg/fpf
+├ ƒ /zcg/grant
+├ ƒ /zcg/grants
+├ ƒ /zcg/investments
+├ ƒ /zcg/maya
+├ ƒ /zcg/meetings
+├ ƒ /zcg/methodology
+├ ƒ /zcg/office
+├ ƒ /zcg/participate
+├ ƒ /zcg/proposals
+├ ƒ /zcg/recipient
+├ ƒ /zcg/recipients
+├ ƒ /zcg/reconciliation
+├ ƒ /zcg/schedule
+├ ƒ /zcg/stipends
+├ ƒ /zcg/totals
+├ ƒ /zcg/treasury-calculator
+├ ƒ /zec-observatory
+├ ƒ /zechub
+├ ƒ /zechub/copilot
+├ ƒ /zechub/copilot/instructions
+├ ƒ /zf
+└ ƒ /zodl
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

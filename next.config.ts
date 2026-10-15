@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { chatCsp } from "./src/lib/private-chat/csp";
 import monthlyReadingSets from "./src/lib/monthly/reading-sets.json";
 import { participationRewrites } from "./src/lib/participate/upstream";
 
@@ -12,6 +13,7 @@ import { participationRewrites } from "./src/lib/participate/upstream";
 // debugging features, and without 'unsafe-eval' the dev overlay reports a CSP
 // violation on every page. Only explicit development enables it; every other
 // environment keeps the strict default.
+// Private Chat has its own document/worker policies; the portal stays self-only.
 // 'blob:' is required by the 3D office (/zcg/office): three.js loads GLB-embedded
 // textures via URL.createObjectURL (blob: URLs) and, when createImageBitmap is
 // available, FETCHES that blob URL — so blob: must be allowed on both img-src
@@ -19,6 +21,7 @@ import { participationRewrites } from "./src/lib/participate/upstream";
 const scriptSrc = process.env.NODE_ENV === "development"
   ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
   : "script-src 'self' 'unsafe-inline'";
+const connectSrc = "connect-src 'self' blob:";
 const csp = [
   "default-src 'self'",
   scriptSrc,
@@ -31,7 +34,7 @@ const csp = [
   // YouTube's privacy-enhanced player, loaded only when a visitor clicks a film.
   "frame-src https://www.youtube-nocookie.com",
   "font-src 'self'",
-  "connect-src 'self' blob:",
+  connectSrc,
   "worker-src 'self'",
   "frame-ancestors 'none'",
   "base-uri 'self'",
@@ -57,6 +60,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
+  ...(process.env.PRIVATE_CHAT_DEPLOYMENT === "pilot" ? { output: "standalone" as const } : {}),
   // Don't advertise the framework/version in responses.
   poweredByHeader: false,
   async rewrites() {
@@ -66,26 +71,82 @@ const nextConfig: NextConfig = {
   // rendering (the page-level redirect would stream behind loading.tsx).
   async redirects() {
     return [
-      { source: "/", destination: "/zcg", permanent: false },
-      { source: "/cex-zec-dex", destination: "/zec-observatory", permanent: true },
-      { source: "/decisions", destination: "/zcg/participate?view=history", permanent: true },
-      { source: "/zcg/decisions", destination: "/zcg/participate?view=history", permanent: true },
+      { source: "/", destination: process.env.PRIVATE_CHAT_DEPLOYMENT === "pilot" ? "/private-chat" : "/zcg", permanent: false },
+      {
+        source: "/cex-zec-dex",
+        destination: "/zec-observatory",
+        permanent: true,
+      },
+      {
+        source: "/decisions",
+        destination: "/zcg/participate?view=history",
+        permanent: true,
+      },
+      {
+        source: "/zcg/decisions",
+        destination: "/zcg/participate?view=history",
+        permanent: true,
+      },
       // The pilot's former embedded workspace paths land on the native screens.
-      { source: "/participate", destination: "/zcg/participate", permanent: true },
-      { source: "/participate/committee", destination: "/zcg/participate", permanent: true },
-      { source: "/treasury-calculator", destination: "/zcg/treasury-calculator", permanent: true },
-      { source: "/zcash10years", destination: "/ceremony/ten-years", permanent: true },
+      {
+        source: "/participate",
+        destination: "/zcg/participate",
+        permanent: true,
+      },
+      {
+        source: "/participate/committee",
+        destination: "/zcg/participate",
+        permanent: true,
+      },
+      {
+        source: "/treasury-calculator",
+        destination: "/zcg/treasury-calculator",
+        permanent: true,
+      },
+      {
+        source: "/zcash10years",
+        destination: "/ceremony/ten-years",
+        permanent: true,
+      },
       // The coinholder program has its own home above ZCG; old links keep working.
-      { source: "/zcg/coinholder", destination: "/coinholders", permanent: true },
-      { source: "/zcg/coinholder/votes", destination: "/coinholders/results?round=all", permanent: true },
-      { source: "/coinholders/votes", destination: "/coinholders/results?round=all", permanent: true },
-      { source: "/coinholders/:round(q[1-4]-\\d{4}|ratification-\\d{4})", destination: "/coinholders/results?round=:round", permanent: true },
-      { source: "/zcg/coinholder/pool", destination: "/coinholders/fund", permanent: true },
+      {
+        source: "/zcg/coinholder",
+        destination: "/coinholders",
+        permanent: true,
+      },
+      {
+        source: "/zcg/coinholder/votes",
+        destination: "/coinholders/results?round=all",
+        permanent: true,
+      },
+      {
+        source: "/coinholders/votes",
+        destination: "/coinholders/results?round=all",
+        permanent: true,
+      },
+      {
+        source: "/coinholders/:round(q[1-4]-\\d{4}|ratification-\\d{4})",
+        destination: "/coinholders/results?round=:round",
+        permanent: true,
+      },
+      {
+        source: "/zcg/coinholder/pool",
+        destination: "/coinholders/fund",
+        permanent: true,
+      },
       { source: "/coinholder", destination: "/coinholders", permanent: true },
       // Retired standalone pages keep existing bookmarks pointing to their records.
       { source: "/z3", destination: "/ecosystem/history/z3", permanent: true },
-      { source: "/defi", destination: "/zec-observatory#liquidity", permanent: true },
-      { source: "/zcg/maya", destination: "/zec-observatory#liquidity", permanent: true },
+      {
+        source: "/defi",
+        destination: "/zec-observatory#liquidity",
+        permanent: true,
+      },
+      {
+        source: "/zcg/maya",
+        destination: "/zec-observatory#liquidity",
+        permanent: true,
+      },
       // The former mixed August-close link resolves to the corrected August
       // set until a September reading set takes the id. Temporary, so no
       // browser keeps it once that edition exists.
@@ -103,6 +164,15 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
+      {
+        source: "/private-chat-nym/:path*",
+        headers: [
+          { key: "Content-Security-Policy", value: chatCsp(process.env) },
+          { key: "Cache-Control", value: "no-store" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+          { key: "Cross-Origin-Resource-Policy", value: "same-origin" },
+        ],
+      },
       ...["agent-skills", "skills"].map((directory) => ({
         source: `/.well-known/${directory}/:path*`,
         headers: [{ key: "Cache-Control", value: "public, max-age=300" }],
@@ -118,11 +188,21 @@ const nextConfig: NextConfig = {
       // Monthly files are content-addressed. Corrections get a new directory.
       {
         source: "/monthly/editions/:path*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
       },
       {
         source: "/monthly/pdfjs/:path*",
-        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
       },
       // Heavy 3D assets (GLB models, graffiti textures) never change in place —
       // a new model gets a new filename. Without this, Next serves public/
@@ -144,21 +224,15 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/community-logos/:path*",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=86400" },
-        ],
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
       },
       {
         source: "/logos/:path*",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=86400" },
-        ],
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
       },
       {
         source: "/wallet-logos/:path*",
-        headers: [
-          { key: "Cache-Control", value: "public, max-age=86400" },
-        ],
+        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
       },
       {
         source: "/zcash-emblem.png",

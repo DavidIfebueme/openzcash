@@ -1,0 +1,7 @@
+5c9407a8366bc32a0dbc317c522dd3a19d2d7c17fc98f5908070cdb688eb4bbd  scripts/private-chat-directory-init.ts
+4f2701c94cc6767f6370fdf72e3fd98e8b4f8922aef648f9afa62144086262f8  scripts/private-chat-directory-server.ts
+72d975313eedd589c5c5d788f07c9b49198ec044859c1e93a059251a71f94faf  src/lib/private-chat/directory-storage.ts
+5400a49355d57c838fd875897c31039790e89895b96695545912c10c8ec7cbd3  src/lib/private-chat/native-runtime.test.ts
+e1cfa31a5056d93dd6302ed0878f3b4e2de83dd4ceb3c88407bd7ea25086f8af  src/lib/private-chat/pilot-operations.test.ts
+cdcd10237dc38c6f6ce73e713f7d06ab7b5444d8df070c6290f938a170b4f715  dist-private-chat/scripts/private-chat-directory-init.js
+239cd69eb06a82ae29718e22383769bcc9762175ed2b28583901f3f192d3dc20  dist-private-chat/scripts/private-chat-directory-server.js

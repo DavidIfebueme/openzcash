@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import "./redesign.css";
@@ -8,7 +9,6 @@ import "./theme.css";
 import "./zarvis/zarvis.css";
 import "./mobile-shell.css";
 import { ShellGate } from "@/components/shell-gate";
-import { TapFeedback } from "@/components/tap-feedback";
 import { TreasuryBar } from "@/components/treasury-bar";
 import { rootShareMetadata, SITE_DESCRIPTION } from "@/lib/seo/page-metadata";
 
@@ -61,6 +61,13 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+async function SiteTreasuryBar() {
+  // The chat is rendered on its own small client shell. Avoid fetching site
+  // treasury data on a direct chat request, including on the isolated pilot.
+  if ((await headers()).get("x-pathname") === "/private-chat") return null;
+  return <TreasuryBar />;
+}
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -75,7 +82,6 @@ export default async function RootLayout({
       className={`${inter.variable} ${geist.variable} ${geistMono.variable} h-full`}
     >
       <body className="min-h-full">
-        <TapFeedback />
         <ShellGate
           isAdmin={isAdmin}
           isPreview={process.env.OPENZCASH_ENV === "redesign"}
@@ -87,7 +93,7 @@ export default async function RootLayout({
                 </div>
               }
             >
-              <TreasuryBar />
+              <SiteTreasuryBar />
             </Suspense>
           }
         >

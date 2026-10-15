@@ -1,0 +1,25 @@
+FROM node:26.12.0-trixie-slim@sha256:0d1e33586362bb9e608c4e751e7a9e7edb55c9ac11461ed5666af696cc461dd4 AS builder
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts
+COPY . .
+ARG PRIVATE_CHAT_DEPLOYMENT
+ARG NEXT_PUBLIC_PRIVATE_CHAT_PILOT
+ARG PRIVATE_CHAT_ISOLATED
+ARG PRIVATE_CHAT_ORIGIN
+ARG NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ORIGIN
+ARG NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ID
+ARG PRIVATE_CHAT_DIRECTORY_ADDRESS
+ARG PRIVATE_CHAT_DIRECTORY_PUBLIC_KEY
+RUN npm run build
+
+FROM node:26.12.0-trixie-slim@sha256:0d1e33586362bb9e608c4e751e7a9e7edb55c9ac11461ed5666af696cc461dd4
+WORKDIR /app
+ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=8080 HOSTNAME=0.0.0.0
+COPY --from=builder --chown=node:node /app/.next/standalone ./
+COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
+USER node
+EXPOSE 8080
+CMD ["node", "server.js"]

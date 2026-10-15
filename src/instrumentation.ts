@@ -11,6 +11,9 @@
 export async function register() {
   if (process.env.NEXT_RUNTIME !== "nodejs") return;
   if (process.env.NODE_ENV !== "production") return;
+  // The isolated chat process has no portal collectors, database writes or canaries.
+  if (process.env.PRIVATE_CHAT_DEPLOYMENT === "pilot" ||
+      process.env.PRIVATE_CHAT_ISOLATED === "true") return;
   if (process.env.DISABLE_AUTO_REFRESH !== "true") {
     const { startNewsSchedule } = await import("@/lib/news/feed");
     startNewsSchedule();

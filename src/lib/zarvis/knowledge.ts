@@ -102,7 +102,8 @@ function externalChunks(corpus: ExternalCorpus): KnowledgeDocument[] {
   return corpus.sources.flatMap((source) => referenceChunks({ id: source.id, title: `${SITE_LABELS[source.site] ?? source.site} · ${source.title}`, url: source.url, text: source.text, retrievedAt: source.retrievedAt, sourceUpdatedOn: source.publishedOn, note: externalNote(source) }, source.kind, { publishedOn: source.publishedOn, site: source.site }));
 }
 const referenceDocs = references.sources.filter((source) => !source.id.startsWith("zip-")).flatMap((source) => referenceChunks(source));
-const navigation: KnowledgeDocument[] = APPS.filter((app)=>!app.admin).flatMap((app)=>[
+// The local chat prototype is not a public destination, even while previewing it.
+const navigation: KnowledgeDocument[] = APPS.filter((app)=>!app.admin && app.id !== "private-chat").flatMap((app)=>[
   {id:`nav:${app.id}`,title:app.label,url:`https://openzcash.org${app.href}`,text:app.sub,kind:"navigation" as const},
   ...app.pages.map((p)=>({id:`nav:${p.href}`,title:`${app.label} · ${p.label}`,url:`https://openzcash.org${p.href}`,text:`${p.label} in ${app.label}.`,kind:"navigation" as const})),
 ]);

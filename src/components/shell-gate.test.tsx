@@ -16,6 +16,17 @@ describe("ShellGate", () => {
     const network = render("/zcash-network");
     expect(network).toContain("data-probe"); expect(network).not.toContain("data-shell");
   });
+  it("renders Private Chat without the site shell or Zarvis provider", () => {
+    state.pathname = "/private-chat";
+    const html = renderToStaticMarkup(
+      <ShellGate isAdmin={false}><span data-private-content="">Chat</span></ShellGate>,
+    );
+    expect(html).toContain("data-chat-shell");
+    expect(html).toContain("data-private-content");
+    expect(html).toContain('href="/zcg"');
+    expect(html).not.toContain("data-shell");
+    expect(html).not.toContain("data-probe");
+  });
   it("renders the shell around workspace pages", () => {
     const html = render("/zcg");
     expect(html).toContain("data-shell"); expect(html).toContain("data-probe");

@@ -1,13 +1,51 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-import { APPS, placeOf } from "@/lib/design-routes";
+import { describe, expect, it, vi } from "vitest";
+import { APPS, placeOf, type AppDef } from "@/lib/design-routes";
 import { AppNavigation } from "./app-navigation";
+
+vi.mock("next/link", () => ({
+  default: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+    [key: string]: unknown;
+  }) => <a href={href} data-next-link="" {...rest}>{children}</a>,
+}));
 
 const render = (path: string, openApps: Record<string, boolean> = {}, counts: Record<string, string> = {}) => renderToStaticMarkup(
   <AppNavigation apps={APPS.filter((app) => !app.hidden)} place={placeOf(path)} counts={counts} openApps={openApps} compact={false} onOpen={() => {}} onToggle={() => {}} />,
 );
 
 const linkTag = (html: string, href: string) => html.match(new RegExp(`<a\\b[^>]*href="${href}"[^>]*>`))?.[0] ?? "";
+
+const renderApps = (apps: AppDef[], compact: boolean) => renderToStaticMarkup(
+  <AppNavigation apps={apps} place={placeOf("/private-chat")} counts={{}} openApps={{}} compact={compact} onOpen={() => {}} onToggle={() => {}} />,
+);
+
+describe("private chat navigation", () => {
+  it.each([false, true])("hides the disabled preview even when an unfiltered model is passed (compact: %s)", (compact) => {
+    const html = renderApps(APPS.map((app) => app.id === "private-chat" ? { ...app, hidden: true } : app), compact);
+    expect(html).not.toContain('href="/private-chat"');
+    expect(html).not.toContain("Private Chat");
+    expect(html).not.toContain("data-separated");
+    expect(html).toContain('href="/monthly"');
+  });
+
+  it.each([false, true])("places the enabled preview below Monthly with its own separator and icon (compact: %s)", (compact) => {
+    const html = renderApps(APPS.map((app) => app.id === "private-chat" ? { ...app, hidden: false } : app), compact);
+    const links = [...html.matchAll(/<a\b[^>]*href="([^"]+)"/g)].map((match) => match[1]);
+    expect(links.slice(links.indexOf("/monthly"), links.indexOf("/monthly") + 2)).toEqual(["/monthly", "/private-chat"]);
+    expect(linkTag(html, "/private-chat")).toContain('aria-current="page"');
+    expect(linkTag(html, "/private-chat")).not.toContain("data-next-link");
+    expect(linkTag(html, "/monthly")).toContain("data-next-link");
+    expect(html.match(/data-separated="true"/g)).toHaveLength(1);
+    expect(html.match(/href="\/private-chat"/g)).toHaveLength(1);
+    expect(html).toContain('x="9" y="10" width="6" height="5.5"');
+  });
+});
 
 describe("grouped ecosystem navigation", () => {
   it("places the Network destination immediately after ZCG and before Ecosystem", () => {

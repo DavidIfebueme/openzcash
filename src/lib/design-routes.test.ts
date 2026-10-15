@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   APPS,
   backOf,
@@ -14,6 +14,32 @@ const appOf = (id: string) => {
   if (!app) throw new Error(`no app ${id}`);
   return app;
 };
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  vi.resetModules();
+});
+
+describe("private chat preview navigation", () => {
+  it.each([
+    { environment: "production", flag: "true", hidden: true },
+    { environment: "development", flag: undefined, hidden: true },
+    { environment: "development", flag: "true", hidden: false },
+  ])("keeps preview destinations gated in $environment with flag $flag", async ({ environment, flag, hidden }) => {
+    vi.stubEnv("NODE_ENV", environment);
+    vi.stubEnv("NEXT_PUBLIC_PRIVATE_CHAT_PREVIEW", flag);
+    vi.resetModules();
+    const { APPS: apps, DESIGN_GROUPS, paletteEntries } = await import("./design-routes");
+    const chat = apps.find((app) => app.id === "private-chat")!;
+
+    expect(chat.hidden).toBe(hidden);
+    expect(apps[apps.indexOf(chat) - 1]?.id).toBe("monthly");
+    expect(paletteEntries(chat).some((entry) => entry.href === "/private-chat")).toBe(!hidden);
+    expect(DESIGN_GROUPS.some((group) => group.routes.some(([href]) => href === "/private-chat"))).toBe(!hidden);
+    // Existing hidden apps remain available to the design directory.
+    expect(DESIGN_GROUPS.some((group) => group.name === "Lockbox")).toBe(true);
+  });
+});
 
 describe("the navigation hierarchy", () => {
   it("replaces the standalone Decisions menu with Participate", () => {

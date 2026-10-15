@@ -121,7 +121,7 @@ export const KNOWLEDGE: KnowledgeNote[] = [
 ];
 
 export function publicSiteGuide(): string {
-  return APPS.filter((app) => !app.admin).map((app) =>
+  return APPS.filter((app) => !app.admin && app.id !== "private-chat").map((app) =>
     `${app.label}: https://openzcash.org${app.href} — ${app.sub}\n` +
     app.pages.filter((p) => !p.hidden).map((p) => `  ${p.label}: https://openzcash.org${p.href}`).join("\n"),
   ).join("\n");

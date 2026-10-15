@@ -6,6 +6,7 @@
  * is defined once.
  */
 import { CEREMONY_HREF, PARTS } from "@/lib/ceremony/parts";
+import { PRIVATE_CHAT_ENABLED } from "@/lib/private-chat/config";
 
 export type AppPage = {
   href: string;
@@ -153,6 +154,7 @@ export const APPS: AppDef[] = [
   { id: "zec-observatory", label: "ZEC Observatory", href: "/zec-observatory", sub: "Markets, DeFi liquidity & holdings", icon: "chart", pages: [] },
   { id: "legal", label: "Privacy & Policy", href: "/legal", sub: "Rights, regulation & public debate", icon: "balance", pages: [{ href: "/legal", label: "Updates" }] },
   { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
+  { id: "private-chat", label: "Private Chat", href: "/private-chat", sub: "Private conversations · beta", icon: "private-chat", pages: [], hidden: !PRIVATE_CHAT_ENABLED },
   { id: "lockbox", label: "Lockbox", href: "/lockbox", sub: "Live funding", logo: "/logos/marks/lockbox.png", icon: "shield", pages: [], hidden: true },
   { id: "arborist", parentId: "ecosystem", parentGroup: "pages", label: "Arborist Calls", href: "/arborist", sub: "Protocol call archive", logo: "/logos/arborist.png", icon: "sigma", pages: [] },
   { id: "communities", parentId: "ecosystem", parentGroup: "pages", label: "Communities", href: "/communities", sub: "Global groups · live", logo: "/logos/communities.png", icon: "users", pages: [] },
@@ -291,6 +293,7 @@ export function overviewEntry(app: AppDef): AppPage | null {
 }
 
 export function paletteEntries(app: AppDef): { href: string; label: string }[] {
+  if (app.id === "private-chat" && app.hidden) return [];
   const landingIsPage = app.pages.some((p) => p.href === app.href);
   return [
     ...(landingIsPage ? [] : [{ href: app.href, label: app.pages.length ? "Overview" : app.label }]),
@@ -299,7 +302,7 @@ export function paletteEntries(app: AppDef): { href: string; label: string }[] {
 }
 
 /** Grouped view of the same model, for directories and the design-review page. */
-export const DESIGN_GROUPS = APPS.map((app) => ({
+export const DESIGN_GROUPS = APPS.filter((app) => app.id !== "private-chat" || !app.hidden).map((app) => ({
   name: app.label,
   description: app.sub,
   admin: app.admin ?? false,

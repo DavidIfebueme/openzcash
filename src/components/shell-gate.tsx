@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { usePathname } from "next/navigation";
 import { AppShell } from "./app-shell";
+import { PrivateChatShell } from "./private-chat-shell";
+import { TapFeedback } from "./tap-feedback";
 import { ZarvisProvider } from "./zarvis/zarvis-provider";
 
 /** Monthly and Network own compact headers and use the full viewport. */
@@ -36,8 +38,12 @@ export function ShellGate({
   const pathname = usePathname();
   // The conversation lives in the provider, above the chrome decision, so
   // opening a bare page (Monthly) and coming back keeps the chat intact.
+  if (pathname === "/private-chat")
+    return <PrivateChatShell>{children}</PrivateChatShell>;
+
   return (
     <ZarvisProvider>
+      <TapFeedback />
       {isBare(pathname) ? (
         children
       ) : (

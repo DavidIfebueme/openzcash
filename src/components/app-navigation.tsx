@@ -18,7 +18,9 @@ type Props = {
 export function AppNavigation({ apps, place, counts, openApps, compact, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
     const isZcg = app.id === "zcg";
-    const children = childAppsOf(app, apps);
+    // A full document navigation starts the chat without retaining this shell.
+    const HeaderLink = app.id === "private-chat" ? "a" : Link;
+    const children = childAppsOf(app, apps).filter((child) => !child.hidden);
     const showCounts = app.id !== "zcg" && app.id !== "ecosystem" && app.parentId !== "ecosystem";
     const directChildren = children.filter((child) => child.parentGroup === "pages");
     const destinations = [
@@ -45,9 +47,9 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
     const groupId = `${app.id}:organizations`;
     const groupOpen = openApps[groupId] ?? containsCurrentOrganization;
     return (
-      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined}>
+      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined} data-separated={app.id === "private-chat" || undefined}>
         <div className="rd-side-app-row">
-          <Link
+          <HeaderLink
             href={isZcg ? "/zcg/participate" : app.href}
             className="rd-side-item"
             aria-current={headerActive ? "page" : undefined}
@@ -70,7 +72,7 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
               </small>
             ) : null}
             {showCounts && counts[app.href] ? <small className="tnum">{counts[app.href]}</small> : null}
-          </Link>
+          </HeaderLink>
           {expandable ? (
             <button
               type="button"
@@ -131,5 +133,5 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
       </div>
     );
   }
-  return <>{apps.filter((app) => !app.parentId).map((app) => renderApp(app))}</>;
+  return <>{apps.filter((app) => !app.parentId && !app.hidden).map((app) => renderApp(app))}</>;
 }

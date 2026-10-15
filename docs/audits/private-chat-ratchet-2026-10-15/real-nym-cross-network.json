@@ -1,0 +1,97 @@
+{
+  "startedAt": "2026-10-15T21:10:52.817Z",
+  "success": true,
+  "topology": "Mac local network and Railway redesign non-production Linux network; two independent Nym WASM clients; isolated Node 26.5.0 on Linux",
+  "sdk": "@nymproject/nym-client-wasm@1.4.1, @matrix-org/matrix-sdk-crypto-wasm@18.9.0",
+  "sources": {
+    "scripts/private-chat-cross-network-role.mts": "a1a113fc7a622bb4d53b5358963cea19c22e597bc1715bf849591cc0887e1423",
+    "scripts/private-chat-real-nym-worker.mjs": "ab215d6b2c959c4e54b539619ebbcb190549bd54520d686166f915521cdbe815",
+    "src/lib/private-chat/controller.ts": "f9d47200d51bcf127e20c38adb75031c35247f6ce80db9002e83d07947a7c2ec",
+    "src/lib/private-chat/protocol.ts": "c1a2a9cfe555565e511430debec969d7c01c90e41702227a6940c1d17774bf49",
+    "src/lib/private-chat/ratchet.ts": "e0ab0617d43a6fbd11d9084fde36182c6b6dbf52cdbd6c3457846cd69d7b0b33",
+    "src/lib/private-chat/envelope.ts": "86d082256a576213dba73d3f300e81422e35a454bbce111ac2aed123e33e8dc6",
+    "src/lib/private-chat/transport.ts": "e06dc953e6479bdfe0d982911e9eb18932f8cf713bc38fb115fd64c412323f0b",
+    "public/private-chat-nym/worker.js": "39eff33f68803bd47f759048c6add393129af0a428601a61795e3bd670662dd5",
+    "public/private-chat-nym/nym_client_wasm_bg.wasm": "9d624b63a5510ceab95e624158e639776303a31cf64f272365d91bb78165503e",
+    "package-lock.json": "e0c99a3b28e888182ce26c9f9312e0445833bf5d266f2b946022ac03e3486660"
+  },
+  "checks": [
+    {
+      "name": "Independent test processes on Mac and Railway Linux",
+      "durationMs": 4426
+    },
+    {
+      "name": "Both clients connect to the actual Nym mixnet",
+      "durationMs": 13764
+    },
+    {
+      "name": "Signed invitation requires explicit acceptance across networks",
+      "durationMs": 3649
+    },
+    {
+      "name": "Ten alternating encrypted messages and authenticated receipts",
+      "durationMs": 16428
+    },
+    {
+      "name": "Linux network interruption blocks sending",
+      "durationMs": 983
+    },
+    {
+      "name": "Linux reconnects through Nym and exchanges new messages",
+      "durationMs": 10327
+    },
+    {
+      "name": "Ending the conversation propagates across networks",
+      "durationMs": 632
+    }
+  ],
+  "clients": {
+    "mac": {
+      "state": {
+        "link": "connected",
+        "contact": null,
+        "ready": false,
+        "incoming": 0,
+        "delivered": 0,
+        "retry": 0,
+        "note": ""
+      },
+      "counters": {
+        "sends": 20,
+        "anonymous": 0,
+        "receives": 19,
+        "connections": 1,
+        "topologyFetches": 6,
+        "unexpectedFetches": 0,
+        "workerFailures": {
+          "network": 1
+        },
+        "workerErrors": 0,
+        "workerErrorCategories": {}
+      }
+    },
+    "linux": {
+      "state": {
+        "link": "connected",
+        "contact": "ended",
+        "ready": false,
+        "incoming": 6,
+        "delivered": 6,
+        "retry": 0,
+        "note": "The other person ended this conversation."
+      },
+      "counters": {
+        "sends": 19,
+        "anonymous": 0,
+        "receives": 20,
+        "connections": 2,
+        "topologyFetches": 10,
+        "unexpectedFetches": 0,
+        "workerFailures": {},
+        "workerErrors": 0,
+        "workerErrorCategories": {}
+      }
+    }
+  },
+  "finishedAt": "2026-10-15T21:11:43.523Z"
+}

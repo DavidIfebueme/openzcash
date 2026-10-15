@@ -86,6 +86,17 @@ describe("server data collection scheduling", () => {
     expect(jobs.warmDiligence).toHaveBeenCalledTimes(1);
   });
 
+  it.each([
+    ["PRIVATE_CHAT_DEPLOYMENT", "pilot"],
+    ["PRIVATE_CHAT_ISOLATED", "true"],
+  ])("starts no portal jobs on isolated chat (%s)", async (name, value) => {
+    vi.stubEnv(name, value);
+    await register();
+    expect(vi.getTimerCount()).toBe(0);
+    await vi.advanceTimersByTimeAsync(7 * 60 * 60 * 1000);
+    for (const job of Object.values(jobs)) expect(job).not.toHaveBeenCalled();
+  });
+
   it("does nothing outside the production Node runtime", async () => {
     vi.stubEnv("NODE_ENV", "test");
     await register();

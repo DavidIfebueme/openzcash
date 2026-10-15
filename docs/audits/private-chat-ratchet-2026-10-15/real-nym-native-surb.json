@@ -1,0 +1,114 @@
+{
+  "startedAt": "2026-10-15T20:48:22.602Z",
+  "finishedAt": "2026-10-15T20:49:17.904Z",
+  "sources": {
+    "src/lib/private-chat/controller.ts": "f9d47200d51bcf127e20c38adb75031c35247f6ce80db9002e83d07947a7c2ec",
+    "src/lib/private-chat/protocol.ts": "c1a2a9cfe555565e511430debec969d7c01c90e41702227a6940c1d17774bf49",
+    "src/lib/private-chat/ratchet.ts": "e0ab0617d43a6fbd11d9084fde36182c6b6dbf52cdbd6c3457846cd69d7b0b33",
+    "scripts/private-chat-nym-worker.js": "39eff33f68803bd47f759048c6add393129af0a428601a61795e3bd670662dd5",
+    "public/private-chat-nym/nym_client_wasm_bg.wasm": "9d624b63a5510ceab95e624158e639776303a31cf64f272365d91bb78165503e",
+    "src/lib/private-chat/envelope.ts": "86d082256a576213dba73d3f300e81422e35a454bbce111ac2aed123e33e8dc6",
+    "package-lock.json": "e0c99a3b28e888182ce26c9f9312e0445833bf5d266f2b946022ac03e3486660",
+    "scripts/private-chat-directory-server.ts": "a46cc0e53891f6d49dd4944b929c236495ea298fb016c76aeda1a3f7f811d33c",
+    "src/lib/private-chat/native-wire.ts": "48bb3944f24a4733251e493d854ab2a74db5de7f48aa30b012c2a8527aa9bc87",
+    "src/lib/private-chat/directory-provider.ts": "a1a228a109564f03a4e610d6288e3be147bbb5bfa4711c904b3e76ba99c9af8b"
+  },
+  "sdk": "@nymproject/nym-client-wasm@1.4.1",
+  "topology": "two independent WASM workers on one host and one network",
+  "directoryMode": "surb",
+  "checks": [
+    {
+      "name": "Two independent Nym routes with round-trip probes",
+      "durationMs": 17565
+    },
+    {
+      "name": "Encrypted private-room Discover over real Nym",
+      "durationMs": 2621
+    },
+    {
+      "name": "Invitation and explicit acceptance over real Nym",
+      "durationMs": 3492
+    },
+    {
+      "name": "Ten alternating messages with authenticated delivery receipts",
+      "durationMs": 15318
+    },
+    {
+      "name": "Network interruption fails closed",
+      "durationMs": 753
+    },
+    {
+      "name": "Reconnection preserves the conversation and exchanges new messages",
+      "durationMs": 13509
+    },
+    {
+      "name": "Explicit ending reaches the peer",
+      "durationMs": 809
+    },
+    {
+      "name": "Invitation refusal reaches the requester",
+      "durationMs": 1224
+    },
+    {
+      "name": "Expired signed invitation is refused before transmission",
+      "durationMs": 1
+    }
+  ],
+  "transport": {
+    "submitted": 47,
+    "anonymous": 6,
+    "received": 47,
+    "connections": 3,
+    "topologyRequests": 15,
+    "unexpectedFetches": 0
+  },
+  "success": true,
+  "failure": "",
+  "native": {
+    "nativeRelease": "nym-binaries-v2026.20-glasgow",
+    "binarySha256": "076391d969cf4dc8715ed2aa6650b43a34120b050c93fc760c511f5b48b2e4f5",
+    "environment": "Railway redesign non-production",
+    "architecture": "Linux x86_64",
+    "runtimeNode": "22.19.0",
+    "directory": "Exact compiled runtime, encrypted persistence, SURB reply mode",
+    "lock": "Linux flock, inherited descriptor 3; production validation unchanged",
+    "network": "WebSocket 127.0.0.1:1977; health 127.0.0.1:1978; no public endpoints added",
+    "dependencies": {
+      "ws": "8.22.0",
+      "libsodium-wrappers": "0.8.4"
+    },
+    "filesSha256": {
+      "dist-private-chat/scripts/private-chat-directory-server.js": "b7e7715e02ebaefcb6c0e859b3fbc3ed58790fb6f0f32612e57059b827ccbced",
+      "dist-private-chat/src/lib/private-chat/live-invite.js": "7b6cb322599cba47aeefa1967221d562d36525d370a2ce9835503ab69b8212c4",
+      "dist-private-chat/src/lib/private-chat/protocol.js": "9c7b1b00b3103b715bd1343aba50c05b913a2a55002bcd24be97ccc1adf40068",
+      "dist-private-chat/src/lib/private-chat/discovery-room.js": "2cf70f00bc04143f6a882f886e1c8881dd1946b9b1c7b44fe87d7ccb46540f83",
+      "dist-private-chat/src/lib/private-chat/presence.js": "194dbea6cd99fff9d9a24658f9ce74e7a4ef0f08df786dddf8fb0f2875fe9f4b",
+      "dist-private-chat/src/lib/private-chat/keys.js": "cea68e1eaefc11ca0e684f75889fda533a3d4b76337a7d4cf5a25640ba291420",
+      "dist-private-chat/src/lib/private-chat/session.js": "616a8f869d4a15fb86745889003bae7308f4437579feca9b9577070d186345eb",
+      "dist-private-chat/src/lib/private-chat/nym-address.js": "d2439dfde65599c4dbf3a6ce5d8482f9a2529afa7791b088352ce8c02c5854f7",
+      "dist-private-chat/src/lib/private-chat/directory-provider.js": "eb90b81c3710ea66e2d87fbaac96e8f8461eb0d83999445bf15e95890762efc6",
+      "dist-private-chat/src/lib/private-chat/ratchet.js": "1ebfa0b3632068ce53f6197f96f438c15a1ab123fde218450c7ea12aaec6efa4",
+      "dist-private-chat/src/lib/private-chat/presence-store.js": "535aaf410493a85f2b18fb80d1acb602c51d00fd1510b538996d0dee2eb809f2",
+      "dist-private-chat/src/lib/private-chat/directory-wire.js": "17a4afc41b1d182f91cd1fd404c64eaa67fd250b2ff75eaf66a4343d77cdb2b4",
+      "dist-private-chat/src/lib/private-chat/identity.js": "7619987112548b16ecd98956635e09a3b940a5bd649a1d21235c1e8ae2034ddb",
+      "dist-private-chat/src/lib/private-chat/directory-storage.js": "6e5f04c35688cc91e9eb8f27de0fea2af5437235de2133f3cfa3a8d1305fcd8f",
+      "dist-private-chat/src/lib/private-chat/native-wire.js": "a3438bbe48fdf665de4e42c80f1c93cd6d06b738ef812c199d2f44bec57e6a9e",
+      "dist-private-chat/src/lib/private-chat/messages.js": "9cc9895f19d1ebe8040db2be90c4c5bd2b9439c201988446d6c0919a75b6dcc4"
+    },
+    "metrics": {
+      "ready": true,
+      "uptimeSeconds": 129,
+      "received": 6,
+      "queued": 6,
+      "discarded": 0,
+      "failures": 0
+    },
+    "cleanup": {
+      "matchingLiveTestProcesses": 0,
+      "testLoopbackListeners": 0,
+      "temporaryDirectoryRemoved": true,
+      "note": "The supervisor /proc entry remained briefly after exit; verification found no live test process or listener."
+    }
+  },
+  "sourceVerification": "All initial hashes matched after completion; additional sources were unchanged since before test start."
+}

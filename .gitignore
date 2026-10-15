@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-chat-*/
 /out/
 
 # production
@@ -47,5 +48,8 @@ next-env.d.ts
 /src/data/ecosystem/*.tmp
 /public/.well-known/agent-skills/
 /public/.well-known/skills/
+/public/private-chat-nym/
 /skills/zcg-copilot/**/__pycache__/
 /tmp/
+
+/dist-private-chat/

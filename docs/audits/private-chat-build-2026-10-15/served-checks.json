@@ -1,0 +1,280 @@
+{
+  "kind": "served production HTTP checks, synthetic pilot descriptor, no browser execution",
+  "port": 4435,
+  "checks": [
+    {
+      "check": "chat HTTP 200",
+      "passed": true
+    },
+    {
+      "check": "fresh nonce policy",
+      "passed": true
+    },
+    {
+      "check": "strict dynamic policy",
+      "passed": true
+    },
+    {
+      "check": "no JS unsafe eval",
+      "passed": true
+    },
+    {
+      "check": "no inline script exception",
+      "passed": true
+    },
+    {
+      "check": "pinned gateway",
+      "passed": true
+    },
+    {
+      "check": "no broad WSS",
+      "passed": true
+    },
+    {
+      "check": "document no-store",
+      "passed": true
+    },
+    {
+      "check": "document no-referrer",
+      "passed": true
+    },
+    {
+      "check": "noindex",
+      "passed": true
+    },
+    {
+      "check": "camera and microphone off",
+      "passed": true
+    },
+    {
+      "check": "rendered scripts present",
+      "passed": true
+    },
+    {
+      "check": "all script tags use response nonce",
+      "passed": true
+    },
+    {
+      "check": "isolated chat shell rendered",
+      "passed": true
+    },
+    {
+      "check": "different nonce per request",
+      "passed": true
+    },
+    {
+      "check": "blocked /zcg",
+      "passed": true
+    },
+    {
+      "check": "blocked /api/zarvis/chat",
+      "passed": true
+    },
+    {
+      "check": "blocked /api/private-chat/presence",
+      "passed": true
+    },
+    {
+      "check": "blocked /private-chat/extra",
+      "passed": true
+    },
+    {
+      "check": "blocked origin https://unintended.example",
+      "passed": true
+    },
+    {
+      "check": "blocked origin http://chat.example",
+      "passed": true
+    },
+    {
+      "check": "asset available /private-chat-nym/worker.js",
+      "passed": true
+    },
+    {
+      "check": "asset no-store /private-chat-nym/worker.js",
+      "passed": true
+    },
+    {
+      "check": "worker exact gateway and no eval",
+      "passed": true
+    },
+    {
+      "check": "worker same-origin",
+      "passed": true
+    },
+    {
+      "check": "asset available /private-chat-nym/nym_client_wasm.js",
+      "passed": true
+    },
+    {
+      "check": "asset no-store /private-chat-nym/nym_client_wasm.js",
+      "passed": true
+    },
+    {
+      "check": "asset available /private-chat-nym/nym_client_wasm_bg.wasm",
+      "passed": true
+    },
+    {
+      "check": "asset no-store /private-chat-nym/nym_client_wasm_bg.wasm",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/26g4tn5b226u5.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/26g4tn5b226u5.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/313nkciqjr80k.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/313nkciqjr80k.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/0-4srap-ffvu1.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/0-4srap-ffvu1.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/0h1470w3gemlb.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/0h1470w3gemlb.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/turbopack-009n7et0yb32j.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/turbopack-009n7et0yb32j.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/33t46atd3n2zd.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/33t46atd3n2zd.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/0f1t_op4z5419.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/0f1t_op4z5419.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/1ri_sh8evylo6.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/1ri_sh8evylo6.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/3m0g799rg5szc.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/3m0g799rg5szc.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/2_gyipwzth8s-.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/2_gyipwzth8s-.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/2ctv33p9byctx.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/2ctv33p9byctx.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/18s2vga-2lmi0.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/18s2vga-2lmi0.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/2qg34gb70pse9.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/2qg34gb70pse9.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/2rg496kutqdmr.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/2rg496kutqdmr.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/3tamwbf-kb-dy.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/3tamwbf-kb-dy.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/12r7c90xt75kw.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/12r7c90xt75kw.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/0cz1d0mv5g_q7.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/0cz1d0mv5g_q7.js",
+      "passed": true
+    },
+    {
+      "check": "script local /_next/static/chunks/2m5a65cn7-g0k.js",
+      "passed": true
+    },
+    {
+      "check": "script serves /_next/static/chunks/2m5a65cn7-g0k.js",
+      "passed": true
+    },
+    {
+      "check": "one emitted ratchet wasm asset",
+      "passed": true
+    },
+    {
+      "check": "ratchet wasm serves with wasm MIME",
+      "passed": true
+    },
+    {
+      "check": "ratchet wasm exact pinned package bytes",
+      "passed": true
+    }
+  ],
+  "passed": 68,
+  "total": 68
+}

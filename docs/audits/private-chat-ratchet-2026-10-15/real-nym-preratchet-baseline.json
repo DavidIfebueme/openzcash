@@ -1,0 +1,50 @@
+{
+  "startedAt": "2026-10-15T20:39:58.333Z",
+  "sdk": "@nymproject/nym-client-wasm@1.4.1",
+  "topology": "two independent WASM workers on one host and one network",
+  "directoryMode": "address",
+  "checks": [
+    {
+      "name": "Two independent Nym routes with round-trip probes",
+      "durationMs": 17111
+    },
+    {
+      "name": "Encrypted private-room Discover over real Nym",
+      "durationMs": 5594
+    },
+    {
+      "name": "Invitation and explicit acceptance over real Nym",
+      "durationMs": 3619
+    },
+    {
+      "name": "Ten alternating messages with authenticated delivery receipts",
+      "durationMs": 14285
+    },
+    {
+      "name": "Network interruption fails closed",
+      "durationMs": 752
+    },
+    {
+      "name": "Reconnection preserves the conversation and exchanges new messages",
+      "durationMs": 12882
+    },
+    {
+      "name": "Explicit ending reaches the peer",
+      "durationMs": 606
+    },
+    {
+      "name": "Invitation refusal reaches the requester",
+      "durationMs": 1418
+    }
+  ],
+  "transport": {
+    "submitted": 48,
+    "anonymous": 0,
+    "received": 48,
+    "connections": 3,
+    "topologyRequests": 15,
+    "unexpectedFetches": 0
+  },
+  "success": true,
+  "failure": ""
+}

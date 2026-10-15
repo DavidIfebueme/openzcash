@@ -1,0 +1,10 @@
+{
+  "directory": {
+    "files": 27,
+    "manifestSha256": "5e4f8282447545fe8297eca1e771a7b5a9926dfcb3d4c2b0444d2c302c4f7c77"
+  },
+  "web": {
+    "files": 1808,
+    "manifestSha256": "9b07f6e7db3d829131240a45437230717c0bf1bd325b8de3b98f29ff1b388b32"
+  }
+}
