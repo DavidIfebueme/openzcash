@@ -39,7 +39,7 @@
 .identity > span:first-child:not([data-community-mark]) img { width: 42px; height: 42px; max-height: 42px; object-fit: contain; }
 .identity > div { min-width: 0; }
 .identity h3 { font-size: 16px; font-weight: 650; line-height: 1.35; letter-spacing: -.015em; margin: 0; }
-.identity p { color: var(--text-muted); font-size: 12px; line-height: 1.55; margin: 5px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.identity p { color: var(--text-muted); font-size: 13px; line-height: 1.55; margin: 5px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .category { display: block; margin-top: 3px; font-size: 10px; color: var(--text-muted); }
 .entryFunding { display: grid; gap: 8px; font-variant-numeric: tabular-nums; }
 .entryFunding > div { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
@@ -50,7 +50,7 @@
 .entryLatest > div { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .entryLatest small { font-size: 11px; font-weight: 600; }
 .entryLatest time { font-size: 10px; color: var(--text-muted); }
-.activityTitle { font-size: 12px; line-height: 1.5; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.activityTitle { font-size: 13px; line-height: 1.5; color: var(--text-muted); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
 .entryAcceptance { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .entryAcceptance strong { font-size: 12px; line-height: 1.4; font-weight: 500; }
 .entryAcceptance > span:not(.mobileCaption), .noEvidence { font-size: 11px; line-height: 1.5; color: var(--text-muted); }

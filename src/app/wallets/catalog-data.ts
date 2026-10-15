@@ -31,7 +31,8 @@ export const SOFTWARE: Wallet[] = [
     name: "Zodl",
     maker: "Zcash Open Development Lab",
     url: "https://zodl.com",
-    logo: "/wallet-logos/zodl.png",
+    // Official iOS AppIcon (zodl-inc/zodl-ios); content version refreshes cached artwork.
+    logo: "/wallet-logos/zodl.png?v=1ae79a66",
     platforms: ["iOS", "Android"],
     shielded: "full",
     flagship: true,

@@ -226,6 +226,7 @@ export default async function DesembolsosPage({
           return (
             <Link
               key={s.id ?? "all"}
+              aria-current={active ? "page" : undefined}
               href={
                 s.id ? `/zcg/disbursements?sheet=${s.id}` : "/zcg/disbursements"
               }

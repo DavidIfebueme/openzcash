@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 /* eslint-disable @next/next/no-img-element */
-import { Badge, PageHeader } from "@/components/ui";
+import { PageHeader } from "@/components/ui";
 import { COMMUNITIES } from "@/lib/communities/data";
 import {
   getNews,
@@ -87,13 +87,10 @@ export default async function NewsPage({
       <SourceRefresh />
       <PageHeader
         title="News"
-        subtitle="The last seven days across Zcash: proposals, community discussions, releases and grant payments."
-        actions={
-          newCount > 0 ? <Badge tone="rose">{newCount} new</Badge> : undefined
-        }
+        subtitle="Proposals, discussions, releases and grant payments from the last seven days."
       />
 
-      <nav className="ws-pipeline" aria-label="News sources">
+      <nav className="ws-news-sources" aria-label="News sources">
         <Link
           href={query ? `/news?q=${encodeURIComponent(query)}` : "/news"}
           aria-current={!source ? "page" : undefined}
@@ -118,13 +115,16 @@ export default async function NewsPage({
         className="ws-news-search"
         role="search"
       >
-        <input
-          name="q"
-          type="search"
-          aria-label="Search news"
-          placeholder="Search this week's updates…"
-          defaultValue={query}
-        />
+        <label className="ws-news-search-field">
+          <span>Search</span>
+          <input
+            name="q"
+            type="search"
+            aria-label="Search news"
+            placeholder="Search this week's updates…"
+            defaultValue={query}
+          />
+        </label>
         {source ? (
           <input type="hidden" name="source" value={source} />
         ) : null}
@@ -136,16 +136,12 @@ export default async function NewsPage({
         ) : null}
       </form>
 
-      <p className="ws-news-cadence">Forum &amp; proposals · every 5 min <span>Releases · hourly</span><span>Spreadsheet · every 6h</span></p>
-
       <p className="ws-news-meta">
         {shown.length === totalCount
           ? `${totalCount} updates`
           : `${shown.length} of ${totalCount} updates`}
         {" · "}
-        {newCount} new in 48 hours · last 7 days
-        {fetchedAgo ? ` · feed checked ${fetchedAgo}` : ""}. Older entries stay on
-        their own pages.
+        {newCount} new in 48 hours
       </p>
 
       {unavailable.length > 0 ? (
@@ -218,6 +214,14 @@ export default async function NewsPage({
           );
         })}
       </div>
+
+      <details className="ws-news-coverage">
+        <summary>Sources &amp; updates</summary>
+        <div>
+          <p>Forum and proposals refresh every 5 minutes, releases hourly, and spreadsheet records every 6 hours.</p>
+          <p>{fetchedAgo ? `Feed checked ${fetchedAgo}. ` : ""}This feed covers the last seven days. Older entries remain on their source pages.</p>
+        </div>
+      </details>
     </>
   );
 }

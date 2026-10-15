@@ -2,7 +2,7 @@
 import { useState } from "react";
 /* eslint-disable @next/next/no-img-element */
 import type { CSSProperties } from "react";
-import { Card, PageHeader, Stat } from "@/components/ui";
+import { PageHeader, Stat } from "@/components/ui";
 import { IconShield } from "@/components/icons";
 import { cn } from "@/lib/utils";
 import { HARDWARE, SOFTWARE, type Shielded, type Wallet } from "./catalog-data";
@@ -49,9 +49,9 @@ const SHIELDED: Record<
 > = {
   full: {
     ringColor: "ring-emerald-400/70",
-    monoBg: "bg-emerald-50 text-emerald-700",
+    monoBg: "bg-[var(--pos-soft)] text-[var(--pos)]",
     label: "Full shielded",
-    text: "text-emerald-700",
+    text: "text-[var(--pos)]",
   },
   partial: {
     ringColor: "ring-amber-400/70",
@@ -86,14 +86,17 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
         className="absolute inset-0 z-10 rounded-2xl"
       />
       <div className="flex h-full flex-col rounded-2xl bg-white p-4 shadow-[0_0_0_1px_var(--led),0_5px_18px_-9px_var(--led)] transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_0_0_1.5px_var(--led),0_12px_28px_-7px_var(--led)]">
-        <div className="flex items-center gap-3">
+        <div className="flex items-start gap-3">
           {w.logo ? (
             <img
               src={w.logo}
               alt=""
               width={40}
               height={40}
-              className="h-10 w-10 shrink-0 rounded-full bg-white object-contain p-1.5 ring-1 ring-inset ring-stone-200"
+              className={cn(
+                "h-10 w-10 shrink-0 rounded-full bg-white object-contain ring-1 ring-inset ring-stone-200",
+                w.name === "Zodl" ? "p-0" : "p-1.5",
+              )}
             />
           ) : (
             <span
@@ -107,20 +110,20 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className="truncate text-[15px] font-semibold tracking-wide text-stone-900">
+            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+              <span className="min-w-0 max-w-full break-words text-base font-semibold leading-snug tracking-wide text-stone-900">
                 {w.name.toUpperCase()}
               </span>
               {star ? (
                 <span className="shrink-0 text-xs text-amber-500">★</span>
               ) : null}
               {w.tag ? (
-                <span className="shrink-0 rounded-full bg-stone-200/80 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-stone-600">
+                <span className="shrink-0 rounded-full bg-stone-200/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-stone-600">
                   {w.tag}
                 </span>
               ) : null}
             </div>
-            <p className="truncate text-xs font-medium text-stone-600">
+            <p className="mt-1 break-words text-[13px] font-medium leading-relaxed text-stone-600">
               {w.maker}
             </p>
           </div>
@@ -140,7 +143,7 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
           </svg>
         </div>
 
-        <p className="mt-3 text-[13px] leading-relaxed text-stone-600">
+        <p className="mt-3 text-sm leading-relaxed text-stone-600">
           {w.note}
         </p>
 
@@ -149,7 +152,7 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
             {w.platforms.map((p) => (
               <span
                 key={p}
-                className="rounded-md bg-stone-100 px-2 py-0.5 text-[11px] font-medium text-stone-600"
+                className="rounded-md bg-stone-100 px-2 py-0.5 text-xs font-medium text-stone-600"
               >
                 {p}
               </span>
@@ -161,7 +164,7 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
                 target="_blank"
                 rel="noreferrer"
                 title={`Fully open source. Code at ${w.source.replace("https://", "")}`}
-                className="relative z-20 rounded-md bg-sky-500/10 px-2 py-0.5 text-[11px] font-medium text-sky-800 ring-1 ring-inset ring-sky-500/20 transition hover:bg-sky-500/20"
+                className="relative z-20 rounded-md bg-sky-500/10 px-2 py-0.5 text-xs font-medium text-sky-800 ring-1 ring-inset ring-sky-500/20 transition hover:bg-sky-500/20"
               >
                 Open source
               </a>
@@ -172,7 +175,7 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
                 target="_blank"
                 rel="noreferrer"
                 title="Opens the public third-party security audit report"
-                className="relative z-20 rounded-md bg-violet-500/10 px-2 py-0.5 text-[11px] font-medium text-violet-800 ring-1 ring-inset ring-violet-500/20 transition hover:bg-violet-500/20"
+                className="relative z-20 rounded-md bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-800 ring-1 ring-inset ring-violet-500/20 transition hover:bg-violet-500/20"
               >
                 Audited
               </a>
@@ -180,7 +183,7 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
           </div>
           <span
             className={cn(
-              "flex shrink-0 items-center gap-1.5 text-[11px] font-semibold",
+              "flex shrink-0 items-center gap-1.5 text-xs font-semibold",
               s.text,
             )}
           >
@@ -291,23 +294,23 @@ export default function WalletCatalog() {
           Reset
         </button>
       </div>
-      <p className="mb-5 text-xs text-stone-500" aria-live="polite">
+      <p className="mb-5 text-[13px] text-stone-500" aria-live="polite">
         {software.length + hardware.length} wallets match this view
       </p>
-      <Card className="mb-7 flex items-start gap-3 border-emerald-500/20 bg-emerald-500/[0.05]">
-        <IconShield className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700/70" />
-        <p className="text-sm leading-relaxed text-emerald-900/85">
-          <span className="font-semibold text-emerald-900">
+      <aside className="mb-7 flex items-start gap-3 rounded-2xl border border-[var(--pos-soft)] bg-[var(--pos-soft)] p-5">
+        <IconShield className="mt-0.5 h-5 w-5 shrink-0 text-[var(--pos)]" />
+        <p className="text-sm leading-relaxed text-[var(--ink)]">
+          <span className="font-semibold">
             Shielded = private.
           </span>{" "}
           Only shielded (Orchard/Sapling) transactions hide the amount, sender
           and receiver. Transparent (t-address) ZEC is public like Bitcoin.
         </p>
-      </Card>
+      </aside>
 
       {software.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-3.5 text-sm font-semibold text-stone-700">
+          <h2 className="mb-3.5 text-[15px] font-semibold text-stone-700">
             Software wallets
           </h2>
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -320,7 +323,7 @@ export default function WalletCatalog() {
 
       {hardware.length > 0 && (
         <section>
-          <h2 className="mb-3.5 text-sm font-semibold text-stone-700">
+          <h2 className="mb-3.5 text-[15px] font-semibold text-stone-700">
             Hardware wallets
           </h2>
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -340,17 +343,17 @@ export default function WalletCatalog() {
         </p>
       )}
 
-      <p className="mt-7 text-xs text-stone-600">
+      <p className="mt-7 text-[13px] leading-relaxed text-stone-600">
         {SOFTWARE.length + HARDWARE.length} wallets · curated from official
         sources, 2026 · shielded support verified per wallet. The{" "}
-        <span className="rounded-md bg-sky-500/10 px-1.5 py-px text-[10px] font-medium text-sky-800 ring-1 ring-inset ring-sky-500/20">
+        <span className="rounded-md bg-sky-500/10 px-1.5 py-px text-xs font-medium text-sky-800 ring-1 ring-inset ring-sky-500/20">
           Open source
         </span>{" "}
         badge links to the public repository and appears only when the wallet
         itself (app or firmware) is fully open source, verified per repo and
         license; Ledger is excluded because its device OS is proprietary, even
         though its Zcash app is open. The{" "}
-        <span className="rounded-md bg-violet-500/10 px-1.5 py-px text-[10px] font-medium text-violet-800 ring-1 ring-inset ring-violet-500/20">
+        <span className="rounded-md bg-violet-500/10 px-1.5 py-px text-xs font-medium text-violet-800 ring-1 ring-inset ring-violet-500/20">
           Audited
         </span>{" "}
         badge links to a public third-party security audit of the wallet itself
