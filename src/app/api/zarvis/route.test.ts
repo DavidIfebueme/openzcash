@@ -49,7 +49,7 @@ describe("Zarvis API", () => {
   it("only exposes public readiness, never configuration or keys", async () => {
     mocks.config.mockReturnValue({ enabled: false, apiKey: "secret-sentinel", providerLabel: "OpenAI", webSearch: true });
     const response = GET();
-    expect(await response.json()).toEqual({ available: false, provider: "OpenAI", webSearch: true });
+    expect(await response.json()).toEqual({ available: false, provider: "OpenAI", webSearch: true, voice: false });
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
   it("rejects disabled, cross-origin and invalid requests before any paid call", async () => {

@@ -6,7 +6,7 @@ import type { FeedbackReason } from "./feedback";
 
 /** Durable daily counters and canary records in Postgres. Every write is fire-and-forget and short; nothing here delays or fails an answer. */
 export const LATENCY_BOUNDS_MS = [250, 1000, 3000, 5000, 10000, 20000, 40000, 60000, Infinity];
-export type DailyRoute = "local" | "model" | "rejected";
+export type DailyRoute = "local" | "model" | "rejected" | "voice";
 export const DAILY_COUNTERS = ["completed", "failed", "aborted", "quota", "busy", "spendCap", "modelCalls", "webSearchCalls", "inputTokens", "cachedInputTokens", "outputTokens", "groundingFallbacks", "unpricedRequests", "helpful", "unhelpful"] as const;
 export type DailyCounter = typeof DAILY_COUNTERS[number];
 export type DailyDelta = Partial<Record<DailyCounter, number>> & { estimatedUsd?: number; latencyMs?: number };

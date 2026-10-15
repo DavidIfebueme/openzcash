@@ -50,6 +50,7 @@
 .zarvis-welcome-note a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; white-space: nowrap; }
 .zarvis-starters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 14px; }
 .zarvis-starters button { color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px; text-align: center; font: inherit; font-size: 12px; line-height: 1.3; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.zarvis-starters button:disabled { opacity: .45; cursor: default; pointer-events: none; }
 .zarvis-starters button:hover { color: var(--ink); border-color: var(--line-strong); background: var(--surface2); }
 .zarvis-starters button:focus-visible, .zarvis-welcome-note a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* Empty chat: toolbar on top, privacy at the bottom, and mascot, title, composer and starters centred between them. */
@@ -75,6 +76,34 @@
 .zarvis-stop:hover { border-color: var(--muted); background: var(--surface); color: var(--ink); }
 .zarvis-stop:active { background: var(--line); }
 @media (prefers-reduced-motion: reduce) { .zarvis-stop { transition: none; } }
+/* Dictation: an outlined microphone beside send, a live meter in the textarea's place while recording. */
+.zarvis-chat { --zarvis-rec: #c2410c; --zarvis-rec-soft: rgb(194 65 12 / 12%); }
+.rd-shell[data-theme="dark"] .zarvis-chat { --zarvis-rec: #f97316; --zarvis-rec-soft: rgb(249 115 22 / 16%); }
+.zarvis-composer-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.zarvis-mic, .zarvis-voice-stop { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 34px; height: 34px; padding: 0; border-radius: 50%; cursor: pointer; transition: background .15s ease, border-color .15s ease, color .15s ease, opacity .15s ease; }
+.zarvis-mic::before, .zarvis-voice-stop::before { content: ""; position: absolute; inset: -5px; }
+.zarvis-mic { border: 1px solid var(--line-strong); background: transparent; color: var(--muted); }
+.zarvis-mic:hover:not(:disabled) { border-color: var(--muted); background: var(--surface2); color: var(--ink); }
+.zarvis-mic:disabled { opacity: .35; cursor: default; }
+.zarvis-mic[aria-busy] { opacity: 1; color: var(--zarvis-rec); border-color: var(--zarvis-rec); }
+.zarvis-voice-stop { border: 0; background: var(--zarvis-rec); color: #fff; }
+.zarvis-voice-stop:hover { filter: brightness(1.08); }
+.zarvis-mic:focus-visible, .zarvis-voice-stop:focus-visible, .zarvis-send:focus-visible, .zarvis-stop:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rd-shell .zarvis-composer[data-dictating] { border-color: var(--accent-muted); }
+.zarvis-voice-strip { display: flex; align-items: center; gap: 12px; min-height: 48px; }
+.zarvis-voice-dot { width: 8px; height: 8px; flex-shrink: 0; border-radius: 50%; background: var(--zarvis-rec); box-shadow: 0 0 0 4px var(--zarvis-rec-soft); animation: zarvis-voice-pulse 1.2s ease-in-out infinite; }
+.zarvis-voice-time { flex-shrink: 0; font: 500 13px var(--font-geist-mono), monospace; font-variant-numeric: tabular-nums; color: var(--ink); }
+.zarvis-voice-time small { font-size: inherit; font-weight: 400; color: var(--dim); }
+.zarvis-voice-bars { flex: 1; min-width: 0; height: 28px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; overflow: hidden; }
+.zarvis-voice-bars i { flex: 0 0 3px; height: 100%; border-radius: 2px; background: var(--accent); transform-origin: center; transition: transform 80ms linear; }
+.zarvis-voice-strip[data-busy] .zarvis-voice-bars i { background: var(--line-strong); }
+.zarvis-voice-label { flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+.zarvis-voice-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--line-strong); border-top-color: var(--accent); animation: zarvis-voice-spin .8s linear infinite; }
+.zarvis-voice-note { margin: 8px 8px 0; font-size: 11px; line-height: 1.5; color: var(--dim); text-align: center; }
+@keyframes zarvis-voice-pulse { 50% { opacity: .35; } }
+@keyframes zarvis-voice-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .zarvis-mic, .zarvis-voice-stop, .zarvis-voice-bars i { transition: none; } .zarvis-voice-dot, .zarvis-voice-spinner { animation: none; } }
+@media (max-width: 600px) { .zarvis-voice-strip { min-height: 51px; } .zarvis-voice-bars i { flex-basis: 2px; } }
 .zarvis-privacy { display: flex; justify-content: center; align-items: start; gap: 14px; margin-top: 10px; font-size: 10px; color: var(--dim); }
 .zarvis-privacy details { max-width: 350px; text-align: right; }
 .zarvis-privacy summary { cursor: pointer; }

@@ -1,11 +1,14 @@
 import { createHmac } from "node:crypto";
 export type UsageBucket = { key: string; limit: number; expiresAt: Date };
-export function usageBuckets(network: string, secret: string, now: number, limits: { dailyLimit: number; hourlyLimit: number; networkDailyLimit: number; networkWindowLimit: number }): UsageBucket[] {
+export type UsageLimits = { dailyLimit: number; hourlyLimit: number; networkDailyLimit: number; networkWindowLimit: number };
+/** Chat buckets keep their original keys; dictation counts under its own prefix so it never spends the chat quota. */
+export function usageBuckets(network: string, secret: string, now: number, limits: UsageLimits, scope: "chat" | "voice" = "chat"): UsageBucket[] {
   const day = Math.floor(now / 86_400_000);
   // A daily keyed digest, never a raw IP. This is a pseudonymous abuse counter.
   const digest = createHmac("sha256", secret).update(`zarvis:${day}:${network}`).digest("hex").slice(0, 32);
+  const prefix = scope === "chat" ? "" : `${scope}:`;
   const bucket = (label: string, period: number, limit: number): UsageBucket => ({
-    key: `${label}:${Math.floor(now / period)}`, limit,
+    key: `${prefix}${label}:${Math.floor(now / period)}`, limit,
     expiresAt: new Date((Math.floor(now / period) + 1) * period),
   });
   return [

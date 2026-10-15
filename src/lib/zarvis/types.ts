@@ -14,6 +14,6 @@ export type ZarvisEvent =
   | { type: "error"; message: string };
 /** Public provider names: the readiness endpoint, the badge fallback and the retention lookup all use them. */
 export type ProviderLabel = "OpenAI" | "xAI (Grok)" | "Anthropic (Claude)";
-export type ZarvisStatus = { available: boolean; provider: ProviderLabel; webSearch: boolean };
+export type ZarvisStatus = { available: boolean; provider: ProviderLabel; webSearch: boolean; voice?: boolean };
 
 export type ZarvisExpression = "idle" | "listening" | "thinking" | "explaining" | "error" | "greeting" | "pleased" | "reading" | "exploring" | "protecting" | "comparing" | "uncertain" | "clarifying";

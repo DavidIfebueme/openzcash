@@ -48,9 +48,10 @@ const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  // The microphone is allowed for this origin only: Zarvis dictation records after a tap, and no embedded frame can ask for it.
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+    value: "camera=(), microphone=(self), geolocation=(), browsing-topics=()",
   },
   { key: "X-DNS-Prefetch-Control", value: "off" },
 ];

@@ -2,19 +2,26 @@ import "server-only";
 import { inArray, lt, sql } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
 import { zarvisUsage } from "@/lib/db/schema";
-import { blockedBucket, usageBuckets } from "./limits";
+import { blockedBucket, usageBuckets, type UsageLimits } from "./limits";
 import { zarvisConfig } from "./config";
 
 export type Allowance = { allowed: true; retryAfter: 0; refund?: () => Promise<boolean> } | { allowed: false; retryAfter: number };
 /** Durable, atomic limits shared across replicas; failures close the paid API. The reservation is charged up front; `refund` gives it back when the answer never called the model. */
 export async function reserveZarvisRequest(headers: Headers): Promise<Allowance> {
+  return reserve(headers, zarvisConfig(), "chat");
+}
+/** Dictation has its own counters: a spoken question costs one transcription unit here and, once sent, one chat unit as usual. */
+export async function reserveVoiceRequest(headers: Headers, limits: UsageLimits): Promise<Allowance> {
+  return reserve(headers, limits, "voice");
+}
+async function reserve(headers: Headers, limits: UsageLimits, scope: "chat" | "voice"): Promise<Allowance> {
   const config = zarvisConfig();
   // Explicit loopback testing or a time-bounded server launch window; existing counters stay intact.
   if (config.unlimitedLocalTesting || config.quotaPause.active) return { allowed: true, retryAfter: 0 };
   // Advisory network limit only: global caps still apply if a proxy header is spoofed.
   const network = (headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown").trim().slice(0, 80);
   const now = Date.now();
-  const buckets = usageBuckets(network, config.hmacSecret, now, config);
+  const buckets = usageBuckets(network, config.hmacSecret, now, limits, scope);
   const refund = () => refundZarvisRequest(buckets.map((b) => b.key));
   return getDb().transaction(async (tx): Promise<Allowance> => {
     await tx.execute(sql`set local statement_timeout = '4000ms'`);

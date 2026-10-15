@@ -571,7 +571,7 @@ export const zarvisUsage = pgTable("zarvis_usage", {
 /** Zarvis durable daily counters per UTC day and route: counts, tokens, latency buckets and estimated USD only. */
 export const zarvisMetricsDaily = pgTable("zarvis_metrics_daily", {
   day: date("day").notNull(),
-  route: text("route").notNull(), // "local" | "model" | "rejected"
+  route: text("route").notNull(), // "local" | "model" | "rejected" | "voice" (dictation)
   completed: integer("completed").notNull().default(0),
   failed: integer("failed").notNull().default(0),
   aborted: integer("aborted").notNull().default(0),
