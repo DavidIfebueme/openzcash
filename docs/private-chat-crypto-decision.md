@@ -1,6 +1,6 @@
 # ADR — evolução criptográfica do Private Chat
 
-**Data:** 15 de outubro de 2026  
+**Data:** 15 de outubro de 2026
 **Estado:** Olm Double Ratchet integrado localmente; validação operacional e revisão independente ainda são gates de lançamento.
 
 ## Implementação escolhida

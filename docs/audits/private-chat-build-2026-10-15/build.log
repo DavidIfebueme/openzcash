@@ -27,9 +27,9 @@ Proposal card contract passed for all TSX surfaces.
   Finished TypeScript in 6.1s ...
   Collecting page data using 2 workers ...
   Generating static pages using 2 workers (0/36) ...
-  Generating static pages using 2 workers (9/36) 
-  Generating static pages using 2 workers (18/36) 
-  Generating static pages using 2 workers (27/36) 
+  Generating static pages using 2 workers (9/36)
+  Generating static pages using 2 workers (18/36)
+  Generating static pages using 2 workers (27/36)
 ✓ Generating static pages using 2 workers (36/36) in 439ms
   Finalizing page optimization ...
 
@@ -158,4 +158,3 @@ Route (app)                                         Revalidate  Expire
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand
-
