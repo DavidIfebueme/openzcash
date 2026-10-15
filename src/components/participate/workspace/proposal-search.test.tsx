@@ -29,12 +29,13 @@ it("combines text and category filters for a new official proposal before import
   fireEvent.change(screen.getByRole("searchbox", { name: "Search proposals" }), { target: { value: "@DANIEL" } });
   fireEvent.change(screen.getByRole("combobox", { name: "Category" }), { target: { value: "wallets" } });
   expect(screen.getByRole("heading", { name: /Konclave/ })).toBeTruthy();
-  expect(screen.getByText("1 of 1 proposal")).toBeTruthy();
+  expect(screen.getByRole("status", { name: "Proposal count" }).textContent).toBe("1 of 1 proposal");
   expect(screen.getByRole("region", { name: "Committee review awaiting meeting minutes" })).toBeTruthy();
   expect(screen.queryByRole("button", { name: /Read feedback/ })).toBeNull();
   expect(screen.queryByText("Comments for zcg-github-486")).toBeNull();
   fireEvent.change(screen.getByRole("combobox", { name: "Category" }), { target: { value: "events" } });
   expect(screen.getByText("No proposals match these filters.")).toBeTruthy();
+  expect(screen.getByRole("status", { name: "Proposal count" }).textContent).toBe("0 of 1 proposal");
   fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
   expect(screen.getByRole("heading", { name: /Konclave/ })).toBeTruthy();
   expect((screen.getByRole("searchbox") as HTMLInputElement).value).toBe("");
@@ -52,12 +53,12 @@ it("searches imported, published-only and historical cards in one status list wi
       { ...base, recordId: historical.id, title: historical.title },
     ] }} />);
   const search = screen.getByRole("searchbox");
-  expect(screen.getByText("3 proposals")).toBeTruthy();
+  expect(screen.getByRole("status", { name: "Proposal count" }).textContent).toBe("3 proposals");
   fireEvent.change(search, { target: { value: "#454 @vinibar" } });
   fireEvent.change(screen.getByRole("combobox", { name: "Category" }), { target: { value: "wallets" } });
   expect(screen.getByText("Comments for zcg-github-454")).toBeTruthy();
   expect(screen.queryByRole("heading", { name: /Mexico/ })).toBeNull();
-  expect(screen.getByText("1 of 3 proposals")).toBeTruthy();
+  expect(screen.getByRole("status", { name: "Proposal count" }).textContent).toBe("1 of 3 proposals");
   fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
   fireEvent.change(search, { target: { value: "MEXICO" } });
   expect(screen.getByRole("heading", { name: /Mexico/ })).toBeTruthy();
@@ -65,7 +66,7 @@ it("searches imported, published-only and historical cards in one status list wi
   fireEvent.change(search, { target: { value: "graphsense" } });
   fireEvent.change(screen.getByRole("combobox", { name: "Category" }), { target: { value: "research" } });
   expect(screen.getByText(`Comments for ${historical.id}`)).toBeTruthy();
-  expect(screen.getByText("1 of 3 proposals")).toBeTruthy();
+  expect(screen.getByRole("status", { name: "Proposal count" }).textContent).toBe("1 of 3 proposals");
 });
 
 it("clears restrictive searches when a notification requests another proposal", () => {

@@ -7,6 +7,7 @@ import type { ProposalParticipation } from "@/lib/participate/workspace/domain/p
 import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-review-proposals";
 import { ProposalCard } from "./proposal-card";
 import { GitHubComments } from "./github-comments";
+import { SignedReviewCard } from "./signed-review-card";
 import { PendingCommitteeCard } from "./pending-committee-card";
 
 const dollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -19,8 +20,9 @@ export function reviewProposalMatches(proposal: OfficialProposalListing, record:
     sectors: proposalSectors(proposal.title, tags, record?.sourceCategory ?? source?.category) }, search);
 }
 
-export function OfficialReviewQueue({ proposals, records, search, renderActions, renderPanel, isOpen, toggle }: {
+export function OfficialReviewQueue({ proposals, records, communityId, search, renderActions, renderPanel, isOpen, toggle }: {
   proposals: readonly OfficialProposalListing[];
+  communityId: string;
   search?: ProposalFilters;
   records: ReadonlyMap<number, ProposalParticipation>;
   renderActions: (recordId: string) => ReactNode;
@@ -51,6 +53,7 @@ export function OfficialReviewQueue({ proposals, records, search, renderActions,
           </div>}
         >
         <PendingCommitteeCard />
+        <SignedReviewCard review={record?.review} communityId={communityId} recordId={recordId} />
       </ProposalCard>;
     })}
   </ul>;

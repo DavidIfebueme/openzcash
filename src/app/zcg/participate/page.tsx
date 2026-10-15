@@ -201,8 +201,9 @@ export default async function ParticipatePage({
       <WorkspaceFrame {...frame} embedded embeddedSection="committee">
         {committee ? (
           <CommitteeWorkspacePanel
-            key={session?.userId ?? "guest"}
+            key={`${session?.userId ?? "guest"}:${search.record ?? "queue"}`}
             initial={committee}
+            initialRecordId={search.record}
           />
         ) : (
           <div className="dao-empty-state" role="alert">

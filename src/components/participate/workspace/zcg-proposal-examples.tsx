@@ -41,7 +41,7 @@ function listedFilter(proposal: ListedProposal): ProposalFilter {
   return listedOutcome(proposal);
 }
 
-export function ZcgProposalExamples({ officialOutcomes = {}, officialProposals = [], replaceReviewQueue = false, proposals, communityId, archiveRecordIds, renderActions, inline, toolbar, additionalRecords, additionalCount, committeeLabels = {}, filterResetKey = 0, filterTarget, ledgerImportedAt, approvedBudgets = {}, budgetStatus = "loading", price = { status: "loading", price: null } }: { officialOutcomes?: Record<string, ProposalFilter>; officialProposals?: readonly OfficialProposalListing[]; replaceReviewQueue?: boolean; ledgerImportedAt?: string; approvedBudgets?: ApprovedBudgetMap; budgetStatus?: ApprovedBudgetStatus; price?: PriceState; proposals: readonly ListedProposal[]; filterResetKey?: number; filterTarget?: { recordId: string; fallback: ProposalFilter }; committeeLabels?: Record<string, string[]>; communityId?: string; archiveRecordIds?: string[]; renderActions?: (recordId: string) => ReactNode; toolbar?: ReactNode; additionalRecords?: (filter: ProposalFilter, search: ProposalFilters) => ReactNode; additionalCount?: (filter: ProposalFilter, search?: ProposalFilters) => number; inline?: { isRecordOpen: (recordId: string) => boolean; toggleRecord: (recordId: string) => void; renderPanel: (recordId: string) => ReactNode } }) {
+export function ZcgProposalExamples({ officialOutcomes = {}, officialProposals = [], replaceReviewQueue = false, proposals, communityId, archiveRecordIds, renderActions, renderReview, inline, toolbar, additionalRecords, additionalCount, committeeLabels = {}, filterResetKey = 0, filterTarget, ledgerImportedAt, approvedBudgets = {}, budgetStatus = "loading", price = { status: "loading", price: null } }: { officialOutcomes?: Record<string, ProposalFilter>; officialProposals?: readonly OfficialProposalListing[]; replaceReviewQueue?: boolean; ledgerImportedAt?: string; approvedBudgets?: ApprovedBudgetMap; budgetStatus?: ApprovedBudgetStatus; price?: PriceState; proposals: readonly ListedProposal[]; filterResetKey?: number; filterTarget?: { recordId: string; fallback: ProposalFilter }; committeeLabels?: Record<string, string[]>; communityId?: string; archiveRecordIds?: string[]; renderActions?: (recordId: string) => ReactNode; renderReview?: (recordId: string) => ReactNode; toolbar?: ReactNode; additionalRecords?: (filter: ProposalFilter, search: ProposalFilters) => ReactNode; additionalCount?: (filter: ProposalFilter, search?: ProposalFilters) => number; inline?: { isRecordOpen: (recordId: string) => boolean; toggleRecord: (recordId: string) => void; renderPanel: (recordId: string) => ReactNode } }) {
   const [feedback, setFeedback] = useState<(FeedbackSelection & { proposalId: string }) | null>(null);
   const officialByIssue = new Map(officialProposals.map(proposal => [proposal.issueNumber, proposal]));
   const currentOutcome = (proposal: ListedProposal) => officialOutcomes[proposal.id] ?? listedFilter(proposal);
@@ -78,7 +78,7 @@ export function ZcgProposalExamples({ officialOutcomes = {}, officialProposals =
       <ProposalSearch value={search} onChange={value => setSearchSelection({ key: searchKey, value })} />
       {toolbar}
     </div>
-    <p className="proposal-search-count" role="status" aria-live="polite">{search.query.trim() || search.category !== "all" ? `${resultCount} of ${totalCount}` : resultCount} {totalCount === 1 ? "proposal" : "proposals"}</p>
+    <p className="proposal-search-count" role="status" aria-label="Proposal count" aria-live="polite"><strong>{resultCount.toLocaleString("en-US")}</strong>{" "}<span>{`${search.query.trim() || search.category !== "all" ? `of ${totalCount.toLocaleString("en-US")} ` : ""}${totalCount === 1 ? "proposal" : "proposals"}`}</span></p>
     <div id="proposal-results">
     {additionalRecords?.(filter, search)}
     <ul className="dao-proposal-list dao-zcg-list">{filtered.map(proposal => {
@@ -108,6 +108,7 @@ export function ZcgProposalExamples({ officialOutcomes = {}, officialProposals =
         </div>}
       >
       {inReview ? outcome === "under_review" ? <PendingCommitteeCard /> : <div className="dao-zcg-review-state"><span>{outcome === "abandoned" ? "Withdrawn by the applicant on GitHub" : "Closed or decided on GitHub · See source"}</span></div> : <PublishedDecisionCard decision={proposal} selection={feedback?.proposalId === proposal.id ? feedback : null} onSelectionChange={selection => setFeedback(selection ? { ...selection, proposalId: proposal.id } : null)} />}
+      {renderReview?.(proposal.id)}
     </ProposalCard>; })}</ul>
     {resultCount === 0 ? <div className="dao-empty-state"><p>{search.query.trim() || search.category !== "all" ? "No proposals match these filters." : filter === "abandoned" ? "No withdrawn proposals." : "No matching proposals."}</p></div> : null}
     </div>

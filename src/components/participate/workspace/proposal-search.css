@@ -10,7 +10,8 @@
 .oz-participate .dao-app .proposal-category-select select { appearance: none; width: 100%; min-height: 44px; padding: 10px 38px 10px 13px; border: 1px solid var(--dao-line); border-radius: 8px; background: var(--dao-paper); color: var(--dao-ink); font-size: 13px; }
 .oz-participate .proposal-category-select > svg { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--dao-muted); }
 .oz-participate .dao-app .proposal-clear-filters { min-height: 44px; flex: none; width: 28px; padding: 0; font-size: 20px; }
-.oz-participate .dao-app .proposal-search-count { margin: 0 0 14px; color: var(--dao-muted); font-size: 11px; }
+.oz-participate .dao-app .proposal-search-count { display: flex; align-items: center; gap: 8px; margin: 4px 0 16px; color: var(--dao-muted); font-size: 13px; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.oz-participate .proposal-search-count > strong { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; padding: 3px 8px; border-radius: 6px; background: var(--dao-soft); color: var(--dao-ink); font-size: 13px; font-weight: 650; }
 @media (max-width: 1200px) {
   .oz-participate .dao-zcg-examples > .dao-proposal-tools { flex-wrap: wrap; }
   .oz-participate .dao-zcg-examples > .dao-proposal-tools > .dao-filter-list { flex-basis: 100%; }

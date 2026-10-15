@@ -2,7 +2,13 @@ import type { DiscussionParticipation } from "@/components/participate/workspace
 import type { ProposalAbandonment } from "./proposal-submission";
 import type { SourceCapture } from "@/lib/participate/workspace/archive/source-proposals";
 
+export type SignedReviewSummary = {
+  roundId: string; revision: number; signed: number; eligible: number; state: "COLLECTING" | "PUBLISHED";
+  outcome?: string; publishedAt?: string; approve?: number; reject?: number; abstain?: number;
+  positions?: { name: string; choice: "APPROVE" | "REJECT" | "ABSTAIN"; rationale: string }[];
+};
 export type ProposalParticipation = {
+  review?: SignedReviewSummary | null;
   recordId: string;
   title: string;
   application?: { applicant: string; requestedAmountUsd: string; submittedAt: string; publication: "PILOT_DEMO" | "COMMUNITY_PUBLICATION" };

@@ -8,6 +8,7 @@ import { ArchiveRecoveryGuide } from "@/components/participate/workspace/archive
 import { WorkspaceSignInButton } from "@/components/participate/workspace/workspace-auth";
 import type { ProposalRecord } from "@/lib/participate/workspace/domain/proposal-record";
 import { ArchiveActivity } from "@/components/participate/workspace/archive-activity";
+import { SignedDecision } from "./signed-decision";
 import { GitHubComments } from "./github-comments";
 import { zcgSourceMetadata } from "@/lib/participate/workspace/data/zcg-source-metadata";
 import { officialIssueNumber } from "@/lib/participate/official-proposals-model";
@@ -15,7 +16,7 @@ import { AbandonmentNotice } from "@/components/participate/workspace/submission
 import { CommitteeLabels } from "@/components/participate/workspace/committee-labels";
 import type { SourceCapture } from "@/lib/participate/workspace/archive/source-proposals";
 
-export type ProposalPanel = "discussion" | "record";
+export type ProposalPanel = "discussion" | "record" | "source";
 type Discussion = { comments: DiscussionComment[]; capabilities: DiscussionCapabilities; policy: DiscussionPolicy };
 type DiscussionPreview = { commentCount: number; canParticipate: boolean; participation: DiscussionPolicy["participation"] | null };
 const date = (value: string) => new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
@@ -44,7 +45,7 @@ function LoadState({ failed, retry, label }: { failed?: boolean; retry: () => vo
     : <p className="proposal-inline-state" role="status">Loading {label.toLowerCase()}…</p>;
 }
 
-export function ProposalInlineDetails({ communityId, recordId, active, sessionKey, onClose, focusComment, preview }: { communityId: string; recordId: string; active: ProposalPanel | null; sessionKey?: string; onClose: () => void; focusComment?: { id: string; request: number }; preview?: DiscussionPreview }) {
+export function ProposalInlineDetails({ communityId, recordId, active, sessionKey, onClose, focusComment, preview, committeeReview = false }: { committeeReview?: boolean; communityId: string; recordId: string; active: ProposalPanel | null; sessionKey?: string; onClose: () => void; focusComment?: { id: string; request: number }; preview?: DiscussionPreview }) {
   const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!active) return;
@@ -54,7 +55,7 @@ export function ProposalInlineDetails({ communityId, recordId, active, sessionKe
   const [revision, setRevision] = useState<number | null>(null);
   const endpoint = `/api/communities/${encodeURIComponent(communityId)}/archives/${encodeURIComponent(recordId)}`;
   const discussion = useDisclosureData<Discussion>(`${endpoint}/comments`, active === "discussion", sessionKey, focusComment?.request);
-  const record = useDisclosureData<{ record: ProposalRecord }>(`${endpoint}${revision ? `?revision=${revision}` : ""}`, active === "record");
+  const record = useDisclosureData<{ record: ProposalRecord }>(`${endpoint}${revision ? `?revision=${revision}` : ""}`, active === "record" || active === "source");
   const discussionReady = Boolean(discussion.value || preview);
   const pendingPreview: Discussion | null = active === "discussion" && preview ? { comments: [],
     capabilities: { canPost: preview.canParticipate && preview.commentCount < 500, canReact: preview.canParticipate, canModerate: false },
@@ -87,8 +88,8 @@ export function ProposalInlineDetails({ communityId, recordId, active, sessionKe
         <ProposalDiscussion pollId={recordId} sectionId={`discussion-${recordId}`} embedded showBalance={false} commentsEndpoint={`${endpoint}/comments`} communityId={communityId} initialComments={shownDiscussion.comments} capabilities={shownDiscussion.capabilities} policy={shownDiscussion.policy} loading={!discussion.value} expectedCommentCount={preview?.commentCount} focusComment={active === "discussion" ? focusComment : undefined} />
       </> : active === "discussion" ? <LoadState failed={discussion.failed} retry={discussion.retry} label="Comments" /> : null}
     </div>
-    <div hidden={active !== "record"}>
-      {record.value ? <>{record.failed ? <LoadState failed retry={record.retry} label="Record" /> : null}<InlineRecord record={record.value.record} endpoint={endpoint} onRevision={setRevision} sessionKey={sessionKey} visible={active === "record"} /></> : active === "record" ? <LoadState failed={record.failed} retry={record.retry} label="Record" /> : null}
+    <div hidden={active !== "record" && active !== "source"}>
+      {record.value ? <>{record.failed ? <LoadState failed retry={record.retry} label="Record" /> : null}<InlineRecord committeeReview={committeeReview} key={active === "source" ? "source" : "record"} initialSection={active === "source" ? "source" : "proposal"} record={record.value.record} endpoint={endpoint} onRevision={setRevision} sessionKey={sessionKey} visible={active === "record" || active === "source"} /></> : active === "record" || active === "source" ? <LoadState failed={record.failed} retry={record.retry} label="Record" /> : null}
     </div>
   </div>;
 }
@@ -106,23 +107,24 @@ function RecordIcon({ section }: { section: RecordSection }) {
   return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[section]} /></svg>;
 }
 
-function InlineRecord({ record, endpoint, onRevision, visible }: { record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void; sessionKey?: string; visible: boolean }) {
+function InlineRecord({ record, endpoint, onRevision, visible, committeeReview = false, initialSection = "proposal" }: { committeeReview?: boolean; initialSection?: RecordSection; record: ProposalRecord; endpoint: string; onRevision: (revision: number) => void; sessionKey?: string; visible: boolean }) {
   const id = useId();
   const heading = useRef<HTMLElement>(null);
   const returnToHeading = useRef(false);
-  const [selected, setSelected] = useState<RecordSection>("proposal");
-  const [visited, setVisited] = useState<RecordSection[]>(["proposal"]);
+  const [selected, setSelected] = useState<RecordSection>(initialSection);
+  const [visited, setVisited] = useState<RecordSection[]>([initialSection]);
   const download = `${endpoint}/revisions/${record.revision}`;
   const { proof } = record;
   const source = record.sourceCapture?.schema === "PARTICIPATE_SOURCE_CAPTURE_V2" ? record.sourceCapture : null;
   const sourceReference = record.sourceCapture?.source ?? zcgSourceMetadata(record.recordId);
   const sourceIssue = sourceReference ? officialIssueNumber(sourceReference.url) : null;
-  const activeSection = selected === "source" && !sourceIssue ? "proposal" : selected;
+  const activeSection = selected;
   const sections: { key: RecordSection; title: string; detail: string }[] = [
     { key: "proposal", title: "Proposal", detail: "Preserved contents" },
-    ...(sourceIssue ? [{ key: "source" as const, title: "Source & comments", detail: source ? sourceOutcomes[source.proposal.outcome] : "GitHub discussion" }] : []),
+    ...(sourceIssue && !committeeReview ? [{ key: "source" as const, title: "Source & comments", detail: source ? sourceOutcomes[source.proposal.outcome] : "GitHub discussion" }] : []),
+    ...(!committeeReview ? [{ key: "review" as const, title: "Signed review", detail: "Vote, reason & receipt" }] : []),
     { key: "files", title: "Files & proof", detail: proof.label },
-    { key: "activity", title: "Activity", detail: "Comments & likes" },
+    { key: "activity", title: "Activity", detail: "Tags, discussion & reviews" },
   ];
   useEffect(() => {
     if (!returnToHeading.current) return;
@@ -143,17 +145,18 @@ function InlineRecord({ record, endpoint, onRevision, visible }: { record: Propo
     <header ref={heading} className="proposal-inline-record-heading"><div><h3>Preserved record</h3><p>{record.kind === "NATIVE_PROPOSAL" ? `Published on OpenZcash · ${date(record.capturedAt)}` : record.kind === "SOURCE_PROPOSAL" ? `${source ? "Source observation captured" : "Full application captured"} · ${date(record.capturedAt)}` : record.originalDecisionDate ? `Summary snapshot · ${record.originalDecisionDate}` : `Review snapshot · ${date(record.capturedAt)}`}</p>{record.application ? <p>{record.application.applicant} · {record.application.requestedAmountUsd} USD requested</p> : null}</div>
       {record.revisions.length > 1 ? <label className="dao-comment-sort"><span className="dao-sr-only">Record revision</span><select value={record.revision} onChange={event => onRevision(Number(event.target.value))}>{record.revisions.map(item => <option key={item.revision} value={item.revision}>Revision {item.revision}{item.revision === record.revisions[0].revision ? " · Latest" : ""}</option>)}</select></label> : <span className="dao-eyebrow">Revision {record.revision}</span>}
     </header>
-    <nav className="proposal-record-nav" aria-label="Record sections">
+    {!committeeReview || initialSection !== "source" ? <nav className="proposal-record-nav" aria-label="Record sections">
       {sections.map(section => <button type="button" key={section.key} aria-pressed={activeSection === section.key} aria-controls={`${id}-${section.key}`} onClick={() => selectSection(section.key)}>
         <RecordIcon section={section.key} /><span><strong>{section.title}</strong><small>{section.detail}</small></span>
       </button>)}
-    </nav>
+    </nav> : null}
     <div className="proposal-record-panel" id={`${id}-proposal`} role="region" aria-label="Proposal contents" hidden={activeSection !== "proposal"}>
       <ProposalMarkdown>{record.markdown.replace(/^# [^\n]+\n\n/, "")}</ProposalMarkdown>
     </div>
     {sourceIssue ? <div className="proposal-record-panel" id={`${id}-source`} role="region" aria-label="Source status and decisions" hidden={activeSection !== "source"}>
       <SourceRevisionEvidence key={record.manifestHash} capture={source} download={download} issueNumber={sourceIssue} visible={visible && activeSection === "source"} />
-    </div> : null}
+    </div> : activeSection === "source" ? <p className="proposal-inline-state">This proposal was published on OpenZcash and has no external source discussion. Use Public discussion to read or add comments.</p> : null}
+    <div className="proposal-record-panel" id={`${id}-review`} role="region" aria-label="Signed pilot review" hidden={activeSection !== "review"}>{visited.includes("review") ? <SignedDecision endpoint={endpoint} revision={record.revision} initiallyOpen visible={visible && activeSection === "review"} /> : null}</div>
     <div className="proposal-record-panel" id={`${id}-files`} role="region" aria-label="Files and verification" hidden={activeSection !== "files"}>
       <div className="proposal-record-grid">
         <section className="proposal-record-box"><header><h4>Preserved files</h4><span>{record.fileCount} files</span></header>

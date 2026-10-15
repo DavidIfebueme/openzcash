@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { sha256, utf8 } from "@/lib/participate/workspace/archive/format";
+import { verifyActivityBundle } from "@/lib/participate/workspace/archive/activity";
 import type { ActivityProofState } from "@/lib/participate/workspace/archive/activity-proof";
 
 type ActivityItem = { id: string; sequence: number; label: string; origin: "LIVE" | "IMPORTED"; recordedAt: string; occurredAt: string;
@@ -40,7 +40,7 @@ export function ArchiveActivity({ endpoint, initiallyOpen = false, visible = tru
   }}>
     <summary>Activity & verification</summary>
     {open ? <div className="proposal-activity-content">
-      <p className="proposal-activity-hint">Proposal history, comments and likes. Each event shows its own verification status.</p>
+      <p className="proposal-activity-hint">Tags, discussion and completed reviews. Each event shows its own verification status.</p>
       <div className="proposal-activity-tools"><a href="/verify/activity-verify.mjs" download>Download verifier ↓</a><button type="button" className="dao-text-button" onClick={() => void load()} disabled={busy}>Refresh</button></div>
       {failed ? <p role="alert">Activity could not be loaded. <button type="button" className="dao-text-button" onClick={() => void load()}>Try again</button></p> : null}
       {busy ? <p role="status">Loading activity…</p> : null}
@@ -58,14 +58,10 @@ function ActivityRow({ item, endpoint }: { item: ActivityItem; endpoint: string 
     if (!file) return;
     setResult(null); setChecking(true);
     try {
-      if (file.size > 64000) throw new Error("Too large");
-      const receipt = JSON.parse(await file.text());
-      if (receipt.schema !== "PARTICIPATE_EVENT_RECEIPT_V1" || typeof receipt.event !== "string"
-        || receipt.eventHash !== item.eventHash || await sha256(utf8(receipt.event)) !== item.eventHash) throw new Error("Mismatch");
-      const event = JSON.parse(receipt.event);
+      if (file.size > 8_100_000) throw new Error("Too large");
+      const { event } = await verifyActivityBundle(JSON.parse(await file.text()), item.eventHash);
       if (event.id !== item.id) throw new Error("Mismatch");
-      if (receipt.body !== null && (event.kind !== "COMMENT_POSTED" || typeof receipt.body !== "string" || await sha256(utf8(receipt.body)) !== event.bodyHash)) throw new Error("Mismatch");
-      setResult("Event fingerprint matches. Use the downloaded verifier to check batch inclusion and the blockchain.");
+      setResult("Event and receipt contents match. Use the downloaded verifier for signatures and a fresh blockchain check.");
     } catch { setResult("This file does not match the recorded event."); }
     finally { setChecking(false); }
   }

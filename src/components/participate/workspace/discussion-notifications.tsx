@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AccountAvatar } from "@/components/participate/workspace/workspace-account";
-import { OPEN_COMMENT_EVENT, type CommentDestination, type DiscussionInbox, type DiscussionNotificationItem } from "@/lib/participate/workspace/domain/discussion-notifications";
+import { OPEN_COMMENT_EVENT, OPEN_REVIEW_EVENT, type CommitteeReviewDestination, type CommentDestination, type DiscussionInbox, type DiscussionNotificationItem } from "@/lib/participate/workspace/domain/discussion-notifications";
 
 const dateFormat = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 export function DiscussionNotifications({ communityId }: { communityId: string }) {
@@ -20,7 +20,7 @@ export function DiscussionNotifications({ communityId }: { communityId: string }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
-  const endpoint = `/api/account/notifications?communityId=${encodeURIComponent(communityId)}`;
+  const endpoint = `/api/account/notifications?communityId=${encodeURIComponent(communityId)}&include=proposals`;
   const cancelLoad = useCallback(() => {
     generation.current++;
     controller.current?.abort();
@@ -90,6 +90,13 @@ export function DiscussionNotifications({ communityId }: { communityId: string }
   async function visit(item: DiscussionNotificationItem) {
     if (writing.current || (!item.read && !await markRead(item))) return;
     setOpen(false);
+    if (item.kind === "PROPOSAL_ARRIVED") {
+      const destination: CommitteeReviewDestination = { communityId, recordId: item.recordId };
+      const event = new CustomEvent(OPEN_REVIEW_EVENT, { detail: destination });
+      window.dispatchEvent(event);
+      router.push(`/zcg/participate?view=committee&record=${encodeURIComponent(item.recordId)}`);
+      return;
+    }
     const destination: CommentDestination = { communityId, recordId: item.recordId, commentId: item.commentId };
     const event = new CustomEvent(OPEN_COMMENT_EVENT, { detail: destination, cancelable: true });
     // The proposal list claims this event to open the exact conversation in place.
@@ -108,11 +115,12 @@ export function DiscussionNotifications({ communityId }: { communityId: string }
       <header><h2>Notifications</h2><button ref={closeButton} type="button" className="discussion-notifications-close" aria-label="Close notifications" onClick={() => { setOpen(false); trigger.current?.focus(); }}>×</button></header>
       {unread > 0 ? <div className="discussion-notifications-toolbar"><span>{unread} unread</span><button type="button" disabled={saving || loading} onClick={() => void markRead()}>Mark all as read</button></div> : null}
       {error ? <div className="discussion-notifications-error" role="alert"><p>{error}</p><button type="button" disabled={loading || saving} onClick={() => void load()}>Refresh</button></div> : null}
-      {loading && !inbox ? <p className="discussion-notifications-empty" role="status">Loading notifications…</p> : inbox && !inbox.items.length ? <div className="discussion-notifications-empty"><strong>You’re all caught up</strong><p>Likes and replies to your comments appear here.</p></div> : null}
+      {loading && !inbox ? <p className="discussion-notifications-empty" role="status">Loading notifications…</p> : inbox && !inbox.items.length ? <div className="discussion-notifications-empty"><strong>You’re all caught up</strong><p>New proposals, replies and likes appear here.</p></div> : null}
       {inbox?.items.length ? <ul className="discussion-notifications-list">{inbox.items.map(item => <li key={item.id}>
         <button type="button" className={`discussion-notification${item.read ? "" : " discussion-notification--unread"}`} disabled={saving} onClick={() => void visit(item)}>
-          <AccountAvatar name={item.actorLabel} src={item.actorAvatarUrl} className="dao-comment-avatar" />
-          <span className="discussion-notification-copy"><span><strong>{item.actorLabel}</strong> {item.kind === "COMMENT_LIKED" ? "liked your comment" : "replied to your comment"}</span><span className="discussion-notification-proposal">{item.proposalTitle}</span><span className="discussion-notification-excerpt">{item.excerpt}</span><time dateTime={item.createdAt}>{dateFormat.format(new Date(item.createdAt))}</time></span>
+          {item.kind === "PROPOSAL_ARRIVED" ? <span className="discussion-notification-proposal-icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5" /></svg></span>
+            : <AccountAvatar name={item.actorLabel} src={item.actorAvatarUrl} className="dao-comment-avatar" />}
+          <span className="discussion-notification-copy"><span>{item.kind === "PROPOSAL_ARRIVED" ? <strong>New proposal to review</strong> : <><strong>{item.actorLabel}</strong> {item.kind === "COMMENT_LIKED" ? "liked your comment" : "replied to your comment"}</>}</span><span className="discussion-notification-proposal">{item.proposalTitle}</span><span className="discussion-notification-excerpt">{item.excerpt}</span><time dateTime={item.createdAt}>{dateFormat.format(new Date(item.createdAt))}</time></span>
           {!item.read ? <span className="discussion-notification-dot"><span className="dao-sr-only">Unread</span></span> : null}
         </button>
       </li>)}</ul> : null}

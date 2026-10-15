@@ -20,7 +20,7 @@ export function CommitteeLabelEditor({ recordId, labels, version, canReview, can
 }) {
   const [selection, setSelection] = useState(labels);
   const [search, setSearch] = useState("");
-  const [group, setGroup] = useState("All");
+  const [group, setGroup] = useState("Review");
   const [busy, setBusy] = useState(false), [error, setError] = useState(""), [stale, setStale] = useState(false);
   const guard = useRef(false);
   const changed = JSON.stringify([...selection].sort()) !== JSON.stringify([...labels].sort());
@@ -38,7 +38,7 @@ export function CommitteeLabelEditor({ recordId, labels, version, canReview, can
     } finally { guard.current = false; setBusy(false); }
   }
   return <section className="committee-label-editor" aria-label="Edit committee labels">
-    <div className="committee-label-heading"><div><h3>Labels <span>{COMMITTEE_LABELS.length}</span></h3><p>Committee annotations. Decisions and payments follow their own workflow.</p></div><a href={COMMITTEE_LABEL_CATALOG.url} target="_blank" rel="noopener noreferrer">ZCG catalog ↗</a></div>
+    <div className="committee-label-heading"><div><h3>Public proposal tags <span>{COMMITTEE_LABELS.length}</span></h3><p>Local annotations shown on the public proposal. Source labels, verdicts and payments stay separate.</p></div><a href={COMMITTEE_LABEL_CATALOG.url} target="_blank" rel="noopener noreferrer">ZCG catalog ↗</a></div>
     {canReview ? <>
       <div className="committee-label-search"><label><span className="dao-sr-only">Search labels</span><input type="search" placeholder="Search labels…" value={search} onChange={event => setSearch(event.target.value)} /></label><label><span className="dao-sr-only">Label category</span><select value={group} onChange={event => setGroup(event.target.value)}><option>All</option>{COMMITTEE_LABEL_GROUPS.map(item => <option key={item}>{item}</option>)}</select></label></div>
       {selection.length ? <div className="committee-label-selection"><span>{selection.length} selected</span><div>{selectedCommitteeLabels(selection).map(label => <button type="button" key={label.id} aria-label={`Remove ${label.name}`} disabled={busy || stale} onClick={() => setSelection(current => current.filter(id => id !== label.id))}><LabelBadge label={label} /><span aria-hidden="true">×</span></button>)}</div></div> : null}
@@ -47,7 +47,7 @@ export function CommitteeLabelEditor({ recordId, labels, version, canReview, can
         {!matches.length ? <p>No labels match your search.</p> : null}
       </fieldset>
       {error ? <p className="dao-form-error" role="alert">{error}</p> : null}
-      <div className="committee-label-footer"><span>{demo ? "Demo preview · A verified account is required to save." : !canSave ? "Verify your email to save labels." : "Changes are recorded in the proposal’s public history."}</span><div>{stale ? <button type="button" className="dao-button" disabled={busy} onClick={() => void onReload()}>Reload labels</button> : <button type="button" className="dao-text-button" disabled={busy || !changed} onClick={() => { setSelection(labels); setError(""); }}>Reset</button>}<button type="button" className="dao-button dao-button--primary" disabled={busy || !canSave || !changed || stale} onClick={() => void save()}>{busy ? "Saving…" : "Save labels"}</button></div></div>
+      <div className="committee-label-footer"><span>{demo ? "Read-only preview · Saving requires an authorized committee role and enabled operations." : !canSave ? "Verify your email to save labels." : "Changes are recorded in the proposal’s public history."}</span><div>{stale ? <button type="button" className="dao-button" disabled={busy} onClick={() => void onReload()}>Reload labels</button> : <button type="button" className="dao-text-button" disabled={busy || !changed} onClick={() => { setSelection(labels); setError(""); }}>Reset</button>}<button type="button" className="dao-button dao-button--primary" disabled={busy || !canSave || !changed || stale} onClick={() => void save()}>{busy ? "Saving…" : "Save labels"}</button></div></div>
     </> : <><CommitteeLabels ids={labels} /><p>Only committee reviewers can change labels.</p></>}
   </section>;
 }

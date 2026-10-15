@@ -8,7 +8,8 @@ import { WorkspaceSignInButton } from "@/components/participate/workspace/worksp
 import { AccountAvatar } from "@/components/participate/workspace/workspace-account";
 import { CommitteeDecisionRule, CommitteeCountingHelp } from "@/components/participate/workspace/committee-decision-rule";
 
-type State = {
+export type DecisionState = {
+  publication?: "COLLECTING" | "PUBLISHED"; progress?: { signed: number; eligible: number };
   scopeKind?: "COMMITTEE" | "DAO";
   abandonment?: { reason: string; occurredAt: string } | null;
   sourceWithdrawal?: { url: string; checkedAt: string } | null;
@@ -44,8 +45,8 @@ const messages: Record<string, string> = {
 const formatTime = (value: string) => new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
 const explain = (error: unknown) => error instanceof Error && messages[error.message] ? messages[error.message] : passkeyErrorMessage(error);
 
-export function SignedDecision({ endpoint, revision, initiallyOpen = false, visible = true, onChanged }: { endpoint: string; revision: number; sessionKey?: string; initiallyOpen?: boolean; visible?: boolean; onChanged?: () => void | Promise<void> }) {
-  const [open, setOpen] = useState(initiallyOpen), [data, setData] = useState<State | null>(null);
+export function SignedDecision({ endpoint, revision, initiallyOpen = false, visible = true, compact = false, readOnlyReason, onChanged }: { endpoint: string; revision: number; sessionKey?: string; initiallyOpen?: boolean; visible?: boolean; compact?: boolean; readOnlyReason?: string; onChanged?: () => void | Promise<void> }) {
+  const [open, setOpen] = useState(initiallyOpen), [data, setData] = useState<DecisionState | null>(null);
   const [loading, setLoading] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState("");
   const [choice, setChoice] = useState<DecisionChoice | "">(""), [notice, setNotice] = useState("");
   const [embedded, setEmbedded] = useState(false);
@@ -55,7 +56,7 @@ export function SignedDecision({ endpoint, revision, initiallyOpen = false, visi
   const url = `${endpoint}/decisions`;
   const refresh = useCallback(async () => {
     const current = ++generation.current;
-    try { const next = await passkeyFetch<State>(`${url}?revision=${revision}`, undefined, "GET"); if (current === generation.current) { setData(next); setError(""); } }
+    try { const next = await passkeyFetch<DecisionState>(`${url}?revision=${revision}`, undefined, "GET"); if (current === generation.current) { setData(next); setError(""); } }
     catch (cause) { if (current === generation.current) { setData(null); setError(explain(cause)); } }
     finally { if (current === generation.current) setLoading(false); }
   }, [url, revision]);
@@ -90,7 +91,7 @@ export function SignedDecision({ endpoint, revision, initiallyOpen = false, visi
       if (ceremony.envelope.choice !== choice || ("rationale" in ceremony.envelope ? ceremony.envelope.rationale : undefined) !== reason || ceremony.roundHash !== data.roundHash || ceremony.envelope.roundHash !== await decisionHash(data.round) || ceremony.options.challenge !== await decisionChallenge(ceremony.envelope)) throw new Error("DECISION_REFRESH_REQUIRED");
       const credential = await startAuthentication({ optionsJSON: ceremony.options });
       await passkeyFetch(roundUrl, { action: "sign", ceremonyId: ceremony.ceremonyId, credential });
-      setChoice(""); setRationale(""); setReceiptHash(""); setNotice("Decision signed. Your public receipt is ready."); await refresh(); await onChanged?.();
+      setChoice(""); setRationale(""); setReceiptHash(""); setNotice("Your vote and reason were recorded. The complete review becomes public after all five responses."); await refresh(); await onChanged?.();
     } catch (cause) { setError(explain(cause)); }
     finally { inFlight.current = false; setBusy(false); }
   }
@@ -110,9 +111,11 @@ export function SignedDecision({ endpoint, revision, initiallyOpen = false, visi
   const committee = data?.scopeKind === "COMMITTEE";
   const untimed = round?.schema === "PARTICIPATE_DECISION_ROUND_V4";
   const fixedMajority = round?.schema === "PARTICIPATE_DECISION_ROUND_V3" || untimed;
+  const signed = data?.progress?.signed ?? tally?.signed ?? 0;
+  const collecting = untimed && signed < 5;
   const reasonRequired = round?.schema === "PARTICIPATE_DECISION_ROUND_V2" || fixedMajority;
-  return <details className="signed-decision" open={open} onToggle={event => { if (event.target === event.currentTarget) setOpen(event.currentTarget.open); }}>
-    <summary>Signed review <span>Pilot</span></summary>
+  return <details className={`signed-decision${compact ? " signed-decision--compact" : ""}`} open={open} onToggle={event => { if (event.target === event.currentTarget) setOpen(event.currentTarget.open); }}>
+    <summary>{compact ? "Your vote" : "Signed review"} <span>Pilot</span></summary>
     {open ? <div className="signed-decision-body">
       {loading ? <p role="status">Loading signed review…</p> : null}
       {error ? <p className="dao-form-error" role="alert">{error} <button type="button" className="dao-text-button" disabled={busy} onClick={() => void refresh()}>Refresh</button></p> : null}
@@ -132,23 +135,23 @@ export function SignedDecision({ endpoint, revision, initiallyOpen = false, visi
           {committee ? <CommitteeCountingHelp /> : <details className="signed-decision-rules"><summary>Counting rules</summary><p>Abstentions count for quorum. Approval uses approve + reject only. One final choice per reviewer; rules lock when opened. Pilot reviews do not change published ZCG outcomes.</p></details>}
           {!data.canCreate ? <p className="signed-decision-note">{committee ? "All five seats need a verified account and passkey before opening. Configure them in Members." : "Verified accounts and passkeys are required to open a review."}</p> : null}
           <button type="submit" className="dao-button" disabled={busy || !data.canCreate}>{busy ? "Opening…" : "Open signed review"}</button>
-        </form> : <p className="signed-decision-note">No signed review for this revision yet. Workspace managers can open one.</p>}
-      </> : round && tally ? <>
-        <header className="signed-decision-heading"><div><strong>{round.proposal.title}</strong><p>Revision {round.proposal.revision} · Independent pilot</p></div><span className="signed-decision-status">{data?.abandonment || data?.sourceWithdrawal ? "Review stopped" : outcomes[tally.outcome]}</span></header>
-        {fixedMajority ? <div className="signed-majority-progress"><div><strong>{tally.approve} <span>/ 3 approvals</span></strong><span>{tally.thresholdMet ? "Approval threshold reached" : `${3 - tally.approve} more needed`}</span></div><div className="signed-member-meter" role="img" aria-label={`${tally.approve} approve, ${tally.reject} reject, ${tally.abstain} abstain, ${tally.eligible - tally.signed} pending`}>{round.members.map(member => <span key={member.id} data-choice={data?.ballots?.find(ballot => ballot.voterId === member.id)?.choice ?? "PENDING"} />)}</div><p>{tally.signed} of 5 responded · {tally.reject} reject · {tally.abstain} abstain</p></div> : <div className="signed-decision-counts"><span><strong>{tally.approve}</strong> Approve</span><span><strong>{tally.reject}</strong> Reject</span><span><strong>{tally.abstain}</strong> Abstain</span><span><strong>{tally.signed}/{tally.eligible}</strong> Signed</span></div>}
-        <p>{fixedMajority ? "3 of 5 approvals required" : `Quorum ${round.rules.quorum} · Approval ≥${round.rules.approvalPercent}% of approve + reject`} · {round.closesAt === null ? "No deadline" : <>{data?.abandonment ? "Original deadline" : tally.outcome === "OPEN" ? "Closes" : "Closed"} {formatTime(round.closesAt)}</>}</p>
-        {untimed && !data?.abandonment && !data?.sourceWithdrawal && tally.signed < tally.eligible ? <p className="signed-decision-note">Waiting for {tally.eligible - tally.signed} {tally.eligible - tally.signed === 1 ? "member" : "members"}. The result is published after all 5 votes.</p> : null}
-        <ul className="signed-member-list" aria-label="Member decisions">{round.members.map(member => { const ballot = data?.ballots?.find(b => b.voterId === member.id); return <li key={member.id}><AccountAvatar name={member.label} src={ballot?.avatar} /><div className="signed-member-content"><div><strong>{member.label}</strong><b className="signed-member-status" data-choice={ballot?.choice}>{ballot ? labels[ballot.choice] : "Pending"}</b></div>{ballot ? <details><summary>Read reason</summary><p>{ballot.rationale ?? "Legacy signature without a linked reason."}</p><small>{formatTime(ballot.recordedAt)} · Signed</small></details> : null}</div></li>; })}</ul>
+        </form> : <p className="signed-decision-note">{readOnlyReason ?? "No signed review is open yet. A coordinator opens it after all five reviewers are ready."}</p>}
+      </> : round && (tally || data?.progress) ? <>
+        <header className="signed-decision-heading"><div><strong>{compact ? "Your vote & reason" : round.proposal.title}</strong>{!compact ? <p>Revision {round.proposal.revision} · Independent pilot</p> : null}</div><span className="signed-decision-status">{data?.abandonment || data?.sourceWithdrawal ? "Review stopped" : collecting ? "Collecting votes" : outcomes[tally?.outcome ?? "OPEN"]}</span></header>
+        {collecting ? <div className="signed-review-progress" role="status"><strong>{signed} of 5 responses recorded</strong><p>Published together after the fifth response.</p></div> : tally && (fixedMajority ? <div className="signed-majority-progress"><div><strong>{tally.approve} <span>/ 3 approvals</span></strong><span>{tally.thresholdMet ? "Approval threshold reached" : `${3 - tally.approve} more needed`}</span></div><div className="signed-member-meter" role="img" aria-label={`${tally.approve} approve, ${tally.reject} reject, ${tally.abstain} abstain, ${5 - signed} pending`}>{round.members.map(member => <span key={member.id} data-choice={data?.ballots?.find(ballot => ballot.voterId === member.id)?.choice ?? "PENDING"} />)}</div><p>{tally.signed} of 5 responded · {tally.reject} reject · {tally.abstain} abstain</p></div> : <div className="signed-decision-counts"><span><strong>{tally.approve}</strong> Approve</span><span><strong>{tally.reject}</strong> Reject</span><span><strong>{tally.abstain}</strong> Abstain</span><span><strong>{tally.signed}/{tally.eligible}</strong> Signed</span></div>)}
+        <p>{fixedMajority ? "3 of 5 approvals required" : `Quorum ${round.rules.quorum} · Approval ≥${round.rules.approvalPercent}% of approve + reject`} · {round.closesAt === null ? "No deadline" : <>{data?.abandonment ? "Original deadline" : (tally?.outcome ?? "OPEN") === "OPEN" ? "Closes" : "Closed"} {formatTime(round.closesAt)}</>}</p>
+        {!collecting ? <ul className="signed-member-list" aria-label="Member decisions">{round.members.map(member => { const ballot = data?.ballots?.find(b => b.voterId === member.id); return <li key={member.id}><AccountAvatar name={member.label} src={ballot?.avatar} /><div className="signed-member-content"><div><strong>{member.label}</strong><b className="signed-member-status" data-choice={ballot?.choice}>{ballot ? labels[ballot.choice] : "Pending"}</b></div>{ballot ? <details><summary>Read reason</summary><p>{ballot.rationale ?? "Legacy signature without a linked reason."}</p><small>{formatTime(ballot.recordedAt)} · Signed</small></details> : null}</div></li>; })}</ul> : null}
         {data?.canSign ? embedded ? <p className="signed-decision-note">Signing is not available in this embedded pilot.</p> : <div className="signed-decision-confirm">
-          <fieldset disabled={busy}><legend>1. Your decision</legend>{(Object.keys(labels) as DecisionChoice[]).map(value => <label key={value}><input type="radio" name={`decision-${round.id}`} value={value} checked={choice === value} onChange={() => setChoice(value)} />{labels[value]}</label>)}</fieldset>
+          <fieldset disabled={busy}><legend>Your decision</legend>{(Object.keys(labels) as DecisionChoice[]).map(value => <label key={value}><input type="radio" name={`decision-${round.id}`} value={value} checked={choice === value} onChange={() => setChoice(value)} />{labels[value]}</label>)}</fieldset>
           {reasonRequired ? <label className="signed-decision-rationale">Public reason<textarea value={rationale} onChange={event => setRationale(event.target.value)} minLength={10} maxLength={4000} rows={4} disabled={busy} placeholder="Explain your decision, including any concerns or conflict of interest." /><small>{rationale.trim().length.toLocaleString("en")} / 4,000 characters · minimum 10</small></label> : null}
-          <p>Your choice{reasonRequired ? ", reason" : ""} and verification key become public. Your email stays private. This cannot be changed.</p>
+          {choice && rationale.trim() ? <details className="signed-review-draft" aria-label="Preview of your position"><summary>Preview public position · {labels[choice]}</summary><p>{rationale.trim()}</p><small>Not submitted.</small></details> : null}
+          <p>Your vote{reasonRequired ? ", reason" : ""} and verification key become public after all five responses. Your email stays private. Signing is final.</p>
           <button type="button" className="dao-button dao-button--primary" disabled={!choice || busy || (reasonRequired && rationale.trim().length < 10)} onClick={() => void sign()}>{busy ? "Confirm on your device…" : "Sign with passkey"}</button>
-        </div> : data?.myChoice ? <p className="signed-decision-note">You signed: <strong>{labels[data.myChoice]}</strong>.</p> : data?.signingError === "DECISION_SIGN_IN_REQUIRED" && tally.outcome === "OPEN" ? <WorkspaceSignInButton label="Sign in to review" className="dao-button" /> : data?.signingError && tally.outcome === "OPEN" ? <p className="signed-decision-note">{messages[data.signingError] ?? "Signing is unavailable in this session."}</p> : null}
-        <div className="signed-decision-tools"><button type="button" className="dao-text-button" disabled={busy} onClick={() => void download()}>Download receipt ↓</button><button type="button" className="dao-text-button" disabled={busy || loading} onClick={() => void refresh()}>Refresh</button></div>
+        </div> : data?.myChoice ? <p className="signed-decision-note">You signed: <strong>{labels[data.myChoice]}</strong>.</p> : data?.signingError === "DECISION_SIGN_IN_REQUIRED" && (tally?.outcome ?? "OPEN") === "OPEN" ? <WorkspaceSignInButton label="Sign in to review" className="dao-button" /> : data?.signingError && (tally?.outcome ?? "OPEN") === "OPEN" ? <p className="signed-decision-note">{messages[data.signingError] ?? "Signing is unavailable in this session."}</p> : null}
+        <div className="signed-decision-tools">{!collecting ? <button type="button" className="dao-text-button" disabled={busy || collecting} onClick={() => void download()}>Download receipt ↓</button> : null}<button type="button" className="dao-text-button" disabled={busy || loading} onClick={() => void refresh()}>Refresh</button></div>
         {fixedMajority ? <CommitteeCountingHelp timed={!untimed} /> : null}
         <details className="signed-decision-proof"><summary>Signatures & verification</summary>
-          <p>Checks proposal files, signatures and the declared quorum. The roster, receipt time and complete vote inventory still depend on the operator. This receipt has no Zcash anchor yet.</p>
+          <p>Checks proposal files, signatures and the declared quorum. The roster, receipt time and complete vote inventory still depend on the operator. The signature receipt and its blockchain commitment are separate evidence. Open Finish to check this decision’s anchor, or Proposal → Activity for the full history. A signature alone is not a Zcash anchor.</p>
           <p>Round fingerprint</p><code>{data?.roundHash}</code>
           <a className="dao-text-button" href="/verify/decision-verify.mjs" download>Download verifier ↓</a>
           <p>Run locally with Node.js 22+:</p><pre>{`node decision-verify.mjs decision-${round.id}.json --round-hash ${data?.roundHash}${receiptHash ? ` --hash ${receiptHash}` : ""}`}</pre>

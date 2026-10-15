@@ -40,7 +40,7 @@ export function ZcgProposalLabels({ recordId, title, tags, committeeLabels = [],
     }} onKeyDown={event => {
       if (event.key === "Escape") { event.currentTarget.open = false; event.currentTarget.querySelector("summary")?.focus(); }
     }}>
-      <summary>+{extraLabels.length} {extraLabels.length === 1 ? "label" : "labels"}</summary>
+      <summary><span>{`+${extraLabels.length.toLocaleString("en-US")} ${extraLabels.length === 1 ? "label" : "labels"}`}</span></summary>
       <div className="zcg-extra-labels-panel"><span>Review & milestones</span><ul className="committee-label-badges" aria-label="Additional GitHub labels">{extraLabels.map(label => <li key={label.name}>
         <span className="committee-label-badge" title={`Official GitHub label${label.description ? ` · ${label.description}` : ""}`} style={committeeLabelStyle(label.color) as CSSProperties}>{label.name}</span>
       </li>)}</ul></div>

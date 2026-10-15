@@ -27,6 +27,7 @@ import { PUBLISHED_COMMITTEE_DECISIONS, publishedDecisionForIssue } from "@/lib/
 import { matchesProposalFilters, proposalSectors, type ProposalFilters } from "@/lib/participate/workspace/domain/proposal-filters";
 import { ProposalCard } from "./proposal-card";
 import { PublishedDecisionCard } from "./published-decision-card";
+import { SignedReviewCard } from "./signed-review-card";
 import { PendingCommitteeCard } from "./pending-committee-card";
 
 const requestedDollars = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0, maximumFractionDigits: 2 });
@@ -104,7 +105,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
   const reviewCount = (search?: ProposalFilters) => officialListings.filter(proposal => proposal.outcome === "under_review" && reviewProposalMatches(proposal, officialRecords.get(proposal.issueNumber), search)).length;
   const additionalRecords = (filter: string, search: ProposalFilters) => {
     const rows = nativeRecords(filter, search);
-    return <>{official && filter === "under_review" ? <OfficialReviewQueue search={search} proposals={officialListings} records={officialRecords} renderActions={renderActions} renderPanel={renderPanel} isOpen={recordId => panels[recordId] === "record"} toggle={recordId => toggle(recordId, "record")} /> : null}{rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
+    return <>{official && filter === "under_review" ? <OfficialReviewQueue communityId={community.id} search={search} proposals={officialListings} records={officialRecords} renderActions={renderActions} renderPanel={renderPanel} isOpen={recordId => panels[recordId] === "record"} toggle={recordId => toggle(recordId, "record")} /> : null}{rows.length ? <ul className="dao-proposal-list participate-native-list">{rows.map(proposal => {
       const mine = drafts.find(draft => draft.recordId === proposal.recordId);
       const captured = proposal.sourceCapture;
       const outcome = currentFilter(proposal);
@@ -129,6 +130,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
         >
         {outcome === "filtered" && listing ? <ProposalScreeningNote listing={listing} source={source ?? undefined} /> : null}
         {decision && decision.outcome === outcome ? <PublishedDecisionCard decision={decision} /> : null}
+        <SignedReviewCard review={proposal.review} communityId={community.id} recordId={proposal.recordId} />
         {issue && outcome === "under_review" ? <PendingCommitteeCard /> : null}
         {proposal.abandonment ? <AbandonmentNotice value={proposal.abandonment} endpoint={`/api/communities/${encodeURIComponent(community.id)}/archives/${encodeURIComponent(proposal.recordId)}`} /> : null}
       </ProposalCard>;
@@ -141,7 +143,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       <ProposalEconomyNotice />
       {officialState.unavailable ? <p className="proposal-economy-warning" role="status">Proposal updates are temporarily unavailable. Showing the last available list.</p> : null}
       {draftsUnavailable ? <p className="proposal-economy-warning" role="status">Your proposals and drafts could not be loaded. <a className="dao-text-button" href="/zcg/participate">Try again</a></p> : null}
-      {ids.length || official ? <ZcgProposalExamples officialProposals={officialListings} officialOutcomes={officialOutcomes} replaceReviewQueue={Boolean(official)} ledgerImportedAt={ledgerImportedAt} approvedBudgets={approvedBudgets} budgetStatus={budgetState.status} price={price} filterResetKey={commentTarget.request} filterTarget={commentTarget.recordId ? { recordId: commentTarget.recordId, fallback: currentFilter(board.proposals.find(row => row.recordId === commentTarget.recordId)) } : undefined} committeeLabels={Object.fromEntries(board.proposals.map(row => [row.recordId, row.labels ?? []]))} proposals={examples} communityId={community.id} archiveRecordIds={ids} renderActions={renderActions} toolbar={toolbar} additionalRecords={additionalRecords} additionalCount={(filter, search) => nativeRecords(filter, search).length + (filter === "under_review" ? reviewCount(search) : 0)} inline={{ isRecordOpen: recordId => panels[recordId] === "record", toggleRecord: recordId => toggle(recordId, "record"), renderPanel }} /> : toolbar}
+      {ids.length || official ? <ZcgProposalExamples officialProposals={officialListings} officialOutcomes={officialOutcomes} replaceReviewQueue={Boolean(official)} ledgerImportedAt={ledgerImportedAt} approvedBudgets={approvedBudgets} budgetStatus={budgetState.status} price={price} filterResetKey={commentTarget.request} filterTarget={commentTarget.recordId ? { recordId: commentTarget.recordId, fallback: currentFilter(board.proposals.find(row => row.recordId === commentTarget.recordId)) } : undefined} committeeLabels={Object.fromEntries(board.proposals.map(row => [row.recordId, row.labels ?? []]))} proposals={examples} communityId={community.id} archiveRecordIds={ids} renderActions={renderActions} renderReview={recordId => <SignedReviewCard review={board.proposals.find(row => row.recordId === recordId)?.review} communityId={community.id} recordId={recordId} />} toolbar={toolbar} additionalRecords={additionalRecords} additionalCount={(filter, search) => nativeRecords(filter, search).length + (filter === "under_review" ? reviewCount(search) : 0)} inline={{ isRecordOpen: recordId => panels[recordId] === "record", toggleRecord: recordId => toggle(recordId, "record"), renderPanel }} /> : toolbar}
       {!ids.length && !official ? <div className="dao-empty-state"><p>No public proposals yet.</p><Link href="/zcg/participate?view=history" className="dao-text-button">View decision history →</Link></div> : null}
     </ProposalEconomyProvider>
   </WorkspaceFrame>;

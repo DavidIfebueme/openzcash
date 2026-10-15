@@ -29,6 +29,8 @@ it("shows new applications before import without fake interactions or archive pr
   expect(html.match(/class="proposal-pending-member"/g)).toHaveLength(10);
   expect(html).not.toContain('data-vote=');
   expect(html).not.toContain("Read feedback");
+  expect(html.match(/aria-label="Turnout unavailable/g)).toHaveLength(2);
+  expect(html).not.toContain("0% turnout");
 });
 it.each([
   [486, "Konclave: taking the viewing key off the coordinator", ["Wallets", "Security"]],
@@ -144,7 +146,7 @@ it("shows a documented decision before archive import without offering nonexiste
   expect(html).toContain('dateTime="2026-10-02">Decision Oct 2, 2026 (async)');
   expect(html).toContain('dateTime="2026-10-12">Minutes Oct 12, 2026');
   expect(html).not.toContain("Source checked");
-  expect(html).not.toContain("100% turnout");
+  expect(html).toContain("100% turnout: 5 of 5 member responses recorded");
   expect(html).not.toContain("Committee support:");
   expect(html).not.toContain("Comments for zcg-github-447");
   expect(html).not.toContain("Preserved zcg-github-447");
