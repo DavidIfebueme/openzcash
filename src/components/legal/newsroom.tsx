@@ -32,9 +32,27 @@ export function LegalNewsroom({ feed }: { feed: LegalFeed }) {
         {LEGAL_REGIONS.map(item => <button key={item.id} type="button" aria-pressed={region === item.id} onClick={() => update({ region: item.id })}>{item.label}</button>)}
       </nav>
       <div className={styles.filters}>
-        <label className={styles.topic}><span className={styles.srOnly}>Source</span><select value={sourceId} onChange={event => update({ source: event.target.value })}><option value="">All sources</option>{feed.sources.map(source => <option key={source.id} value={source.id}>{source.name}</option>)}</select></label>
-        <label className={`ws-field ${styles.search}`}><span className={styles.srOnly}>Search policy updates</span><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><input type="search" value={q} placeholder="Search a country, topic or update…" onChange={event => update({ q: event.target.value })}/></label>
-        <label className={styles.topic}><span className={styles.srOnly}>Topic</span><select value={topic} onChange={event => update({ topic: event.target.value })}><option value="">All topics</option>{LEGAL_TOPICS.map(item => <option key={item} value={item}>{item}</option>)}</select></label>
+        <label className={`${styles.filterField} ${styles.searchField}`}>
+          <span className={styles.filterLabel}>Search</span>
+          <span className={styles.searchControl}>
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>
+            <input type="search" aria-label="Search policy updates" value={q} placeholder="Country, topic or update…" onChange={event => update({ q: event.target.value })}/>
+          </span>
+        </label>
+        <label className={styles.filterField}>
+          <span className={styles.filterLabel}>Source</span>
+          <span className={styles.selectControl}>
+            <select value={sourceId} onChange={event => update({ source: event.target.value })}><option value="">All sources</option>{feed.sources.map(source => <option key={source.id} value={source.id}>{source.name}</option>)}</select>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </span>
+        </label>
+        <label className={styles.filterField}>
+          <span className={styles.filterLabel}>Topic</span>
+          <span className={styles.selectControl}>
+            <select value={topic} onChange={event => update({ topic: event.target.value })}><option value="">All topics</option>{LEGAL_TOPICS.map(item => <option key={item} value={item}>{item}</option>)}</select>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+          </span>
+        </label>
       </div>
       <div className={styles.results}><p role="status">{shown.length} {shown.length === 1 ? "update" : "updates"}<span> · newest first</span></p>{filtered && <button type="button" onClick={() => update({ q: "", region: "", topic: "", source: "" })}>Clear filters ×</button>}</div>
       <div className={styles.articles}>
