@@ -12,15 +12,15 @@ import {
   PLATFORM_LABELS, walletRequirementsQuery,
 } from "@/lib/wallet-finder/matching";
 import type { CapabilityEvidence, MatchReason, WalletMatch, WalletRequirements } from "@/lib/wallet-finder/types";
-import { HARDWARE, SOFTWARE } from "../catalog-data";
+import { EDITORIAL_HIGHLIGHTS, HARDWARE, SOFTWARE } from "../catalog-data";
 import styles from "./finder.module.css";
 
 const CATALOG = new Map([...SOFTWARE, ...HARDWARE].map(wallet => [wallet.name, wallet]));
-const STEPS = ["platform", "privacy", "hardware", "multichain"] as const;
+const STEPS = ["platform", "privacy", "hardware", "multichain", "audit"] as const;
 type Question = typeof STEPS[number];
 type View = Question | "results" | "evidence";
 const STEP_NAMES: Record<Question, string> = {
-  platform: "Platform", privacy: "Privacy", hardware: "Hardware", multichain: "Other coins",
+  platform: "Platform", privacy: "Privacy", hardware: "Hardware", multichain: "Other coins", audit: "Audit",
 };
 const PRIVACY_LABELS: Record<WalletRequirements["shielded"], string> = {
   any: "No privacy requirement", send: "Send privately", receive: "Receive privately", both: "Send and receive privately",
@@ -65,6 +65,14 @@ const QUESTIONS: Record<Question, { title: string; description: string; options:
       { value: "required", label: "I also need other blockchains", detail: "Require verified native asset management on more than one blockchain." },
     ],
   },
+  audit: {
+    title: "Need a public audit report?",
+    description: "Find wallets with a published independent report. Check its version and scope; a past audit cannot guarantee current safety.",
+    options: [
+      { value: "any", label: "No audit requirement", detail: "Include wallets with or without a verified public report." },
+      { value: "required", label: "Public report required", detail: "A past audit does not guarantee current safety." },
+    ],
+  },
 };
 
 function readParams(params: Pick<URLSearchParams, "forEach" | "getAll">): Record<string, string | string[]> {
@@ -85,7 +93,8 @@ function answer(requirements: WalletRequirements, question: Question): string {
   if (question === "platform") return requirements.platform === "any" ? "Any platform" : PLATFORM_LABELS[requirements.platform];
   if (question === "privacy") return PRIVACY_LABELS[requirements.shielded];
   if (question === "hardware") return requirements.hardware === "required" ? "Hardware signer required" : "No hardware requirement";
-  return requirements.multichain === "required" ? "Other blockchains required" : "Zcash is enough";
+  if (question === "multichain") return requirements.multichain === "required" ? "Other blockchains required" : "Zcash is enough";
+  return requirements.audit === "required" ? "Public report required" : "No audit requirement";
 }
 
 function checkedDate(date: CapabilityEvidence["checkedAt"]): string {
@@ -115,6 +124,13 @@ function Evidence({ reason }: { reason: MatchReason }) {
 
 function WalletResult({ result }: { result: WalletMatch }) {
   const wallet = CATALOG.get(result.walletName);
+  const profile = WALLET_EVIDENCE.find(item => item.walletName === result.walletName);
+  const auditedPlatform = result.status === "match" ? result.platforms.find(platform => {
+    const record = profile?.platforms[platform]?.securityAudit;
+    return record && capabilityReason("Public security audit", record, platform).state === "supported";
+  }) : undefined;
+  const auditEvidence = auditedPlatform ? profile?.platforms[auditedPlatform]?.securityAudit : undefined;
+  const auditReport = auditEvidence?.sources[0];
   const shownReasons = result.status === "match"
     ? result.platformReasons.flatMap((group, index) => index === 0 ? group.reasons : group.reasons.filter(reason => reason.platform))
     : result.reasons;
@@ -129,9 +145,16 @@ function WalletResult({ result }: { result: WalletMatch }) {
   return <article className={styles.wallet} aria-labelledby={id}>
     <div className={styles.walletHeading}>
       {wallet?.logo ? <img src={wallet.logo} alt="" width={44} height={44} /> : null}
-      <div><h3 id={id}>{result.walletName}</h3>{wallet ? <p>{wallet.maker}</p> : null}</div>
+      <div>
+        <div className={styles.walletName}><h3 id={id}>{result.walletName}</h3>{EDITORIAL_HIGHLIGHTS.has(result.walletName) && <span className={styles.editorialStar} role="img" aria-label="Editorial highlight" title="Editorial highlight, not a safety rating">⭐</span>}</div>
+        {wallet ? <p>{wallet.maker}</p> : null}
+      </div>
       {wallet ? <a className={styles.officialLink} href={wallet.url} target="_blank" rel="noopener noreferrer">Official website<span aria-hidden="true"> ↗</span></a> : null}
     </div>
+    {auditReport && auditedPlatform && auditEvidence && <div className={styles.auditBlock}>
+      <a className={styles.auditBadge} href={auditReport.url} target="_blank" rel="noopener noreferrer" aria-label={`Audit report for ${result.walletName} on ${PLATFORM_LABELS[auditedPlatform]}`}><span aria-hidden="true">🛡️</span> Audit report<span aria-hidden="true"> ↗</span></a>
+      <span className={styles.auditContext}>Scope: {auditEvidence.scope} · Source checked {checkedDate(auditEvidence.checkedAt)}. Past reports do not guarantee current safety.</span>
+    </div>}
     {result.status === "match" && <p className={styles.matchPlatform}>Matches on {result.platforms.map(platform => PLATFORM_LABELS[platform]).join(", ")}.</p>}
     {reviewedScopes.length > 0 && <dl className={styles.reviewedScope}>{reviewedScopes.map(({ platform, scope }) => <div key={platform}><dt>{PLATFORM_LABELS[platform]} reviewed scope</dt><dd>{scope}</dd></div>)}</dl>}
     {result.status !== "match" && <p className={styles.representative}>Reasons below assess {representativePlatform ? PLATFORM_LABELS[representativePlatform] : "one available record"}. Other platforms may differ. <Link href={`/wallets/find?view=evidence&wallet=${encodeURIComponent(result.walletName)}`}>See all capability records</Link>.</p>}
@@ -155,6 +178,7 @@ const CAPABILITY_LABELS = {
   shieldedReceive: "Receive shielded ZEC",
   hardwareSigning: "Sign with a hardware device",
   multichain: "Manage native assets on multiple blockchains",
+  securityAudit: "Public independent security audit",
 } as const;
 
 function CapabilityRecords({ selectedName, onSelect, onFind }: { selectedName: string | null; onSelect: (name: string) => void; onFind: () => void }) {
@@ -231,8 +255,7 @@ export function WalletFinder() {
   }
 
   return <div className={styles.finder}>
-    <PageHeader title={view === "evidence" ? "Wallet capability evidence" : "Wallet Finder"} subtitle={view === "evidence" ? "Sources, review dates and limits for every capability in the finder." : "Four questions to find Zcash wallets with evidence for your needs."} actions={<Link href="/wallets" className={styles.catalogLink}>Browse all wallets <span aria-hidden="true">↗</span></Link>} />
-    {view !== "evidence" && <p className={styles.intro}>No account or wallet connection needed. Your choices are saved in this page’s address so you can revisit or share them.</p>}
+    <PageHeader title={view === "evidence" ? "Wallet capability evidence" : "Wallet Finder"} subtitle={view === "evidence" ? "Sources, dates and limits, by wallet and platform." : "Five quick questions. Every match has a source."} actions={<Link href="/wallets" className={styles.catalogLink}>Browse all wallets <span aria-hidden="true">↗</span></Link>} />
     {view !== "evidence" && <nav aria-label="Wallet Finder steps" className={styles.steps}>
       <ol>{STEPS.map((question, index) => <li key={question}>
         <button type="button" onClick={() => navigate(question)} aria-current={view === question ? "step" : undefined}>
@@ -246,9 +269,9 @@ export function WalletFinder() {
       navigate(step === STEPS.length - 1 ? "results" : STEPS[step + 1]);
     }}>
       <fieldset aria-describedby={`question-${view}-description`}>
-        <legend ref={legendRef} tabIndex={-1}><span className={styles.stepHint}>Step {step + 1} of 4</span><span className={styles.questionTitle}>{QUESTIONS[view].title}</span></legend>
+        <legend ref={legendRef} tabIndex={-1}><span className={styles.stepHint}>Step {step + 1} of {STEPS.length}</span><span className={styles.questionTitle}>{QUESTIONS[view].title}</span></legend>
         <p id={`question-${view}-description`} className={styles.questionDescription}>{QUESTIONS[view].description}</p>
-        <div className={styles.options}>{QUESTIONS[view].options.map(option => <label key={option.value} className={styles.option}>
+        <div className={styles.options} data-count={QUESTIONS[view].options.length}>{QUESTIONS[view].options.map(option => <label key={option.value} className={styles.option}>
           <input type="radio" name={view} value={option.value} checked={(view === "privacy" ? requirements.shielded : requirements[view]) === option.value} onChange={() => select(view, option.value)} />
           <span><strong>{option.label}</strong><small>{option.detail}</small></span>
         </label>)}</div>
@@ -279,7 +302,7 @@ export function WalletFinder() {
         <details><summary>{excluded.length} {excluded.length === 1 ? "wallet does" : "wallets do"} not meet these choices<span aria-hidden="true"> +</span></summary><p>The reviewed evidence shows at least one requirement is not supported. Expand a wallet’s sources to see the reason and scope.</p><div className={styles.walletList}>{excluded.map(result => <WalletResult key={result.walletName} result={result} />)}{!excluded.length && <p>No wallets in this group.</p>}</div></details>
       </div>
     </>}
-    <aside className={styles.method}><h2>How matching works</h2><p>We check availability, platform and your selected capabilities against the linked sources. Unknown or incomplete evidence stays unknown. Swaps do not establish multichain support, and capabilities from different platforms are never combined into one match.</p><p>Read the source dates, platform or release scope and limits before choosing a wallet. <Link href="/wallets/find?view=evidence">Browse all capability records</Link> or <Link href="/wallets">open the full wallet catalog</Link>.</p></aside>
+    <aside className={styles.method}><details><summary>How matching works</summary><p>We check availability, platform and your selected capabilities against the linked sources. Unknown or incomplete evidence stays unknown. Swaps do not establish multichain support, and capabilities from different platforms are never combined into one match.</p><p>A public audit report covers its stated product and release; it is not a safety guarantee. The ⭐ is an editorial highlight. Read source dates and limits before choosing. <Link href="/wallets/find?view=evidence">Browse all capability records</Link> or <Link href="/wallets">open the full wallet catalog</Link>.</p><p>No account or wallet connection is needed. Your choices stay in this page’s address so you can revisit or share them.</p></details></aside>
     <CommunityCredit screen="wallet-finder" />
   </div>;
 }

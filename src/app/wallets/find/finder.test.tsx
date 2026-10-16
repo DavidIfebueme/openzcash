@@ -14,6 +14,7 @@ const fixtures = vi.hoisted(() => {
     availability: fact("supported"), shieldedSend: fact(privacy), shieldedReceive: fact(privacy),
     hardwareSigning: fact("unsupported", "A hardware signing integration is not supported."),
     multichain: fact("unknown", "Native asset management on other chains has not been verified."),
+    securityAudit: fact("unknown", "No independent report has been verified for this wallet release."),
   });
   return [
     { walletName: "Matched wallet", availability: fact("supported"), platforms: { android: platform("supported") } },
@@ -23,7 +24,7 @@ const fixtures = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/wallet-finder/evidence", () => ({ WALLET_EVIDENCE: fixtures }));
-vi.mock("../catalog-data", () => ({ SOFTWARE: [], HARDWARE: [] }));
+vi.mock("../catalog-data", () => ({ SOFTWARE: [], HARDWARE: [], EDITORIAL_HIGHLIGHTS: new Set(["Matched wallet"]) }));
 vi.mock("next/navigation", async () => {
   const { useSyncExternalStore } = await import("react");
   return {
@@ -55,7 +56,7 @@ function open(query: string) {
 }
 
 describe("Wallet Finder interactions", () => {
-  it("guides four labeled questions, retains answers in the URL and focuses each new question", () => {
+  it("guides five labeled questions, retains answers in the URL and focuses each new question", () => {
     open("");
     expect(screen.getByRole("group", { name: /Where do you want to use Zcash/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("radio", { name: /^Android / }));
@@ -68,6 +69,8 @@ describe("Wallet Finder interactions", () => {
     expect(screen.getByRole("group", { name: /Do you need a hardware signer/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     expect(screen.getByRole("group", { name: /Do you also need to manage other coins/ })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
+    expect(screen.getByRole("group", { name: /Need a public audit report/ })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "See matching wallets" }));
     expect(screen.getByRole("heading", { name: "1 wallet matches your choices" })).toHaveFocus();
     expect(window.location.search).toBe("?platform=android&privacy=both&view=results");
@@ -83,6 +86,7 @@ describe("Wallet Finder interactions", () => {
     expect(screen.getByRole("radio", { name: /^Send and receive privately/ })).toBeChecked();
     fireEvent.click(screen.getByRole("radio", { name: /^Receive privately/ }));
     expect(new URLSearchParams(window.location.search).get("privacy")).toBe("receive");
+    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     fireEvent.click(screen.getByRole("button", { name: "Continue" }));
     fireEvent.click(screen.getByRole("button", { name: "See matching wallets" }));
@@ -113,6 +117,41 @@ describe("Wallet Finder interactions", () => {
     const source = within(wallet).getAllByRole("link", { name: /Primary capability documentation/ })[0];
     expect(source).toHaveAttribute("href", "https://example.org/primary-documentation");
     expect(source).toHaveAttribute("rel", "noopener noreferrer");
+  });
+
+  it("keeps editorial stars distinct from linked, version-scoped audit reports", () => {
+    const original = fixtures[0].platforms.android.securityAudit;
+    fixtures[0].platforms.android.securityAudit = {
+      ...original,
+      status: "supported",
+      scope: "Android 2.1 public release; older code reviewed",
+      checkedAt: "2026-10-15",
+      sources: [{ url: "https://example.org/audit-report.pdf", title: "Independent audit report" }],
+    };
+    try {
+      open("?platform=android&privacy=both&view=results");
+      const wallet = screen.getByRole("article", { name: "Matched wallet" });
+      expect(within(wallet).getByRole("img", { name: "Editorial highlight" })).toHaveTextContent("⭐");
+      const report = within(wallet).getByRole("link", { name: "Audit report for Matched wallet on Android" });
+      expect(report).toHaveAttribute("href", "https://example.org/audit-report.pdf");
+      expect(wallet).toHaveTextContent("Android 2.1 public release; older code reviewed");
+      expect(wallet).toHaveTextContent("Past reports do not guarantee current safety.");
+      expect(within(screen.getByRole("article", { name: "Unknown wallet" })).queryByRole("link", { name: /Audit report/ })).not.toBeInTheDocument();
+    } finally {
+      fixtures[0].platforms.android.securityAudit = original;
+    }
+  });
+
+  it("requires documented audit evidence on the same platform and shares the choice", () => {
+    open("?platform=android&privacy=both&audit=required&view=results");
+    expect(screen.getByRole("heading", { name: "0 wallets match your choices" })).toBeInTheDocument();
+    expect(screen.getByText("2 wallets need more verification")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Edit audit" }));
+    expect(screen.getByRole("radio", { name: /^Public report required/ })).toBeChecked();
+    fireEvent.click(screen.getByRole("radio", { name: /^No audit requirement/ }));
+    expect(new URLSearchParams(window.location.search).get("audit")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "See matching wallets" }));
+    expect(screen.getByRole("heading", { name: "1 wallet matches your choices" })).toBeInTheDocument();
   });
 
   it("shows platform, version and channel scope without opening source details", () => {
@@ -202,6 +241,7 @@ describe("Wallet Finder interactions", () => {
     expect(screen.getByRole("heading", { name: "Receive shielded ZEC · Android" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Sign with a hardware device · Android" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Manage native assets on multiple blockchains · Android" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Public independent security audit · Android" })).toBeInTheDocument();
     expect(screen.getAllByText("Not yet verified").length).toBeGreaterThan(0);
     expect(screen.getAllByText("No primary source recorded for this capability.").length).toBeGreaterThan(0);
     fireEvent.change(screen.getByRole("combobox", { name: "Wallet evidence" }), { target: { value: "Excluded wallet" } });
@@ -240,6 +280,7 @@ describe("Wallet Finder automated accessibility", () => {
     ["privacy question", "?platform=android&view=privacy"],
     ["hardware question", "?platform=android&privacy=both&view=hardware"],
     ["multichain question", "?platform=android&privacy=both&view=multichain"],
+    ["audit question", "?platform=android&privacy=both&view=audit"],
     ["matching results", "?platform=android&privacy=both&view=results"],
     ["empty results", "?platform=android&privacy=both&hardware=required&view=results"],
     ["all capability evidence", "?view=evidence&wallet=Unknown%20wallet"],

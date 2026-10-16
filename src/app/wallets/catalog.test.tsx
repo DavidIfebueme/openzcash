@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import "@testing-library/jest-dom/vitest";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import WalletCatalog from "./catalog";
 import { HARDWARE, SOFTWARE, walletPrivacy } from "./catalog-data";
@@ -30,6 +30,17 @@ describe("Evidence-aligned wallet catalog", () => {
     expect(screen.getByRole("link", { name: "Brave Wallet website" })).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Cake Wallet website" })).not.toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Zingo! website" })).not.toBeInTheDocument();
+  });
+
+  it("shows only a scoped public audit report, not a legacy report as a current safety badge", () => {
+    render(<WalletCatalog />);
+    const wallet = (name: string) => within(screen.getByRole("link", { name: `${name} website` }).closest(".ws-wallet-card") as HTMLElement);
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "Android" } });
+    expect(wallet("Ywallet").getByRole("link", { name: "🛡️ Audit report" })).toHaveAttribute("href", expect.stringContaining("YWalletAuditReport"));
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "Desktop" } });
+    expect(wallet("Ywallet").queryByRole("link", { name: "🛡️ Audit report" })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "" } });
+    expect(wallet("Ledger").queryByRole("link", { name: "🛡️ Audit report" })).not.toBeInTheDocument();
   });
 
   it("keeps unknown and unavailable support separate from explicit transparent-only support", () => {

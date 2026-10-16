@@ -3,14 +3,14 @@ import type { CapabilityEvidence, CapabilityKey, WalletEvidenceProfile, WalletPl
 // Manual source review, not a transaction test or a claim that upstream pages stay current.
 const CHECKED_AT = "2026-10-15";
 type Source = CapabilityEvidence["sources"][number];
-type Fact = Omit<CapabilityEvidence, "scope">;
+type Fact = Omit<CapabilityEvidence, "scope"> & { scope?: string };
 const source = (url: string, title: string): Source => ({ url, title });
 const yes = (sources: Source[], note: string): Fact => ({ status: "supported", sources, checkedAt: CHECKED_AT, note });
 const no = (sources: Source[], note: string): Fact => ({ status: "unsupported", sources, checkedAt: CHECKED_AT, note });
 const unknown = (note: string, sources: Source[] = []): Fact => ({
   status: "unknown", sources, checkedAt: sources.length ? CHECKED_AT : null, note,
 });
-const scoped = (scope: string, fact: Fact): CapabilityEvidence => ({ ...fact, scope });
+const scoped = (scope: string, fact: Fact): CapabilityEvidence => ({ ...fact, scope: fact.scope ?? scope });
 function platform(scope: string, availability: Fact, facts: Partial<Record<CapabilityKey, Fact>> = {}): WalletPlatformEvidence {
   return {
     availability: scoped(scope, availability),
@@ -18,6 +18,7 @@ function platform(scope: string, availability: Fact, facts: Partial<Record<Capab
     shieldedReceive: scoped(scope, facts.shieldedReceive ?? unknown("Shielded receiving has not been verified for this platform and channel.")),
     hardwareSigning: scoped(scope, facts.hardwareSigning ?? unknown("A working dedicated hardware signer for Zcash has not been verified for this platform.")),
     multichain: scoped(scope, facts.multichain ?? unknown("Native assets on other blockchains have not been verified. Swaps alone do not establish this capability.")),
+    securityAudit: scoped(scope, facts.securityAudit ?? unknown("A public independent security audit report covering this wallet product and platform was not verified. This does not establish that no audit exists.")),
   };
 }
 
@@ -52,6 +53,8 @@ const s = {
   snap: source("https://snaps.metamask.io/snap/npm/chainsafe/webzjs-zcash-snap/", "MetaMask directory: ChainSafe Zcash Snap"),
   snapLaunch: source("https://blog.chainsafe.io/zcash-in-the-browser-bringing-shielded-zec-to-metamask/", "ChainSafe: Zcash Snap release announcement"),
   snapIssue: source("https://github.com/ChainSafe/WebZjs/issues/166", "WebZjs issue 166: unresolved user report of NU6.1 broadcast failures"),
+  snapIssue167: source("https://github.com/ChainSafe/WebZjs/issues/167", "WebZjs issue 167: later user report of Snap 0.3.0 broadcast and recovery failures"),
+  snapIssue168: source("https://github.com/ChainSafe/WebZjs/issues/168", "WebZjs issue 168: user report that the WebWallet companion is unavailable"),
   vizor: source("https://vizor.cash/", "Vizor: platform downloads, shielded transfers and Keystone"),
   cake: source("https://cakewallet.com/", "Cake Wallet: native assets and platform downloads"),
   cakeZcash: source("https://docs.cakewallet.com/cryptos/zcash", "Cake Wallet: Zcash addresses, shielding and sending"),
@@ -75,6 +78,14 @@ const s = {
   ledgerAssets: source("https://shop.ledger.com/pages/ledger-wallet", "Ledger Wallet: native assets across blockchains"),
   trezor: source("https://trezor.io/coins/wallet/zcash", "Trezor: supported devices and transparent-only Zcash"),
   trezorAssets: source("https://trezor.io/coins", "Trezor: supported native coins and wallet integrations"),
+  ywalletAudit: source("https://defuse.ca/zecsec/audits/YWalletAuditReport-FINALv3.pdf", "ZecSec: Ywallet security and privacy audit, January 2023"),
+  braveAudit: source("https://doyensec.com/resources/Doyensec_BraveWallet_TestingReport_Q32022_AfterRetest.pdf", "Doyensec: Brave Wallet desktop and mobile audit with retest, November 2022"),
+  snapAudit: source("https://hacken.io/audits/zcash/dapp-zcash-snap-may2025/", "Hacken: ChainSafe WebZjs Zcash Snap audit, May 2025"),
+  unstoppableAudit: source("https://hackmd.io/isboOL-tSK6QNJvimum5Jg", "CertiK: Unstoppable Mobile Wallet pentest report with retest, February 2021"),
+  unstoppableAuditNotice: source("https://www.certik.com/zh-CN/blog/unstoppablemobilewalletapppassesthroughformalvaptwithcertik", "CertiK: publication of Unstoppable mobile audit"),
+  gemAudit: source("https://static.gemwallet.com/audits/Gem-Wallet-CertiK-Security-Audit-April-2026.pdf", "CertiK: Gem Wallet iOS and Android security assessment, April 2026"),
+  keystoneAudit: source("https://leastauthority.com/wp-content/uploads/2025/03/Least-Authority-ZCG-Keystone-Hardware-Wallet-Final-Audit-Report.pdf", "Least Authority: Keystone Zcash integration audit, March 2025"),
+  ledgerLegacyAudit: source("https://defuse.ca/zecsec/audits/zcash-ledger-audit-report-v2.pdf", "ZecSec: legacy zcash-ledger app v1.0.1 audit, September 2023"),
 };
 
 const zodlAvailable = yes([s.zodl, s.zodlIos, s.zodlAndroid], "Public mobile app downloads are provided by the publisher.");
@@ -95,6 +106,11 @@ const ywalletFacts = {
   shieldedReceive: yes([s.ywalletReceive], "The receive workflow offers unified and Sapling addresses."),
   hardwareSigning: unknown("The documented cold wallet uses a second device running Ywallet; dedicated hardware signer support was not established.", [s.ywalletCold]),
   multichain: yes([s.ywallet], "Manages both Zcash and Ycash native funds."),
+  securityAudit: { ...yes([s.ywalletAudit], "ZecSec independently reviewed Ywallet's mobile code and published the final report in January 2023. The reviewed commits precede current 1.15.3; current builds were not audited by this report."), scope: "iOS / Android Ywallet code at the 2022 commits in the ZecSec report; not current 1.15.3" },
+};
+const ywalletDesktopFacts = {
+  ...ywalletFacts,
+  securityAudit: { ...unknown("The public ZecSec report describes the 2022 mobile Ywallet app. It does not establish an independent review of the current desktop release.", [s.ywalletAudit]), scope: "Windows, macOS and Linux Ywallet 1.15.3; historical report is mobile-focused" },
 };
 const zkoolAvailable = yes([s.zkoolInstall, s.zkoolRepo], "The publisher documents mobile stores and desktop builds; store versions can lag GitHub releases.");
 const zkoolFacts = {
@@ -105,8 +121,9 @@ const zkoolFacts = {
 const braveAvailable = yes([s.braveZcash, s.braveSupport], "Zcash is documented in the public desktop browser wallet.");
 const braveMobile = no([s.braveSupport, s.braveZcash], "The reviewed Zcash support documentation excludes Android and iOS. General mobile wallet availability does not establish Zcash availability.");
 const braveMultichain = yes([s.brave], "The wallet stores and sends native assets on Ethereum and Solana, among other chains.");
+const braveAudit = { ...unknown("Doyensec audited Brave Wallet desktop, Android and iOS with a November 2022 retest. This predates the Zcash integration in Brave 1.77; no independent report covering a Zcash-capable release was verified.", [s.braveAudit]), scope: "Brave Wallet 2022 development builds: brave-core 52aa957, brave-ios d30d8a7; before Zcash integration" };
 const noirAvailable = yes([s.noirInstall], "The publisher documents a public Chrome Web Store mainnet extension.");
-const snapUncertain = unknown("A published Snap exists, but unresolved network-upgrade reports prevent confirming current usability. Reports are not a maintainer-confirmed diagnosis.", [s.snap, s.snapIssue]);
+const snapUncertain = unknown("A published Snap exists, but open reports of rejected NU6.1 transactions and an unavailable WebWallet companion prevent confirming current usability. These user reports are not a maintainer-confirmed diagnosis.", [s.snap, s.snapIssue, s.snapIssue167, s.snapIssue168]);
 const vizorAvailable = yes([s.vizor], "The publisher provides downloads for this platform.");
 const vizorFacts = {
   shieldedSend: yes([s.vizor], "The wallet documents shielded ZEC sending."),
@@ -126,6 +143,7 @@ const edgeFacts = {
   shieldedReceive: yes([s.edgeZcash], "The publisher documents full shielded Zcash and shielded receiving addresses on both mobile platforms."),
   multichain: yes([s.edge], "The app manages native BTC, ETH, ZEC and other assets."),
 };
+const unstoppableAudit = { ...unknown("CertiK reviewed both mobile codebases at v0.17.1, then retested findings in February 2021. The review predates shielded Zcash support; no independent report covering a Zcash-capable release was verified.", [s.unstoppableAudit, s.unstoppableAuditNotice]), scope: "Unstoppable iOS/Android v0.17.1 code; December 2020 review, February 2021 retest; pre-shielded Zcash release" };
 const zipherAvailable = yes([s.zipher, s.zipherRepo], "The publisher distributes a mobile beta. This is not a stable-release claim.");
 const zipherFacts = {
   shieldedSend: yes([s.zipherRepo], "The mobile beta sends from the shielded pool."),
@@ -143,6 +161,7 @@ const gemFacts = {
   shieldedSend: no([s.gemZcash], "Gem explicitly supports only transparent Zcash sending."),
   shieldedReceive: no([s.gemZcash], "Gem explicitly does not receive at Sapling or Orchard shielded addresses."),
   multichain: yes([s.gem], "The mobile app manages native assets on multiple blockchains."),
+  securityAudit: { ...yes([s.gemAudit], "CertiK assessed Gem Wallet in November 2025 and published an April 2026 final report with remediation through later versions. The report reviews wallet security, not Zcash shielded transfers."), scope: "Gem Wallet iOS 1.3.292 / Android 1.3.47; remediation reviewed through iOS 1.3.355 / Android 2.0.16" },
 };
 const keystoneAvailable = yes([s.keystoneFirmware, s.keystoneMatrix], "Keystone 3 Pro and its public Cypherpunk firmware support Zcash through companion wallets.");
 const ledgerAvailable = yes([s.ledger], "Ledger offers Zcash hardware accounts with companion software; capabilities depend on the device and app.");
@@ -171,7 +190,7 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
     platforms: {
       ios: platform("iOS App Store; Ywallet documentation version 1.15.3", ywalletAvailable, ywalletFacts),
       android: platform("Android Google Play / APK; Ywallet documentation version 1.15.3", ywalletAvailable, ywalletFacts),
-      desktop: platform("Windows, macOS Intel/Apple Silicon and Linux; published installation docs version 1.15.3", ywalletAvailable, ywalletFacts),
+      desktop: platform("Windows, macOS Intel/Apple Silicon and Linux; published installation docs version 1.15.3", ywalletAvailable, ywalletDesktopFacts),
     },
   },
   {
@@ -190,14 +209,17 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
         shieldedReceive: yes([s.braveZcash, s.braveSupport], "Desktop Brave documents shielded Zcash receiving."),
         hardwareSigning: unknown("General desktop Ledger/Trezor support does not establish Zcash signing through those integrations.", [s.brave]),
         multichain: braveMultichain,
+        securityAudit: braveAudit,
       }),
       ios: platform("iOS public Brave Wallet; Zcash limitation in reviewed support docs", braveMobile, {
         shieldedSend: braveMobile, shieldedReceive: braveMobile,
         hardwareSigning: no([s.brave], "The vendor marks hardware wallet integration desktop-only."), multichain: braveMultichain,
+        securityAudit: braveAudit,
       }),
       android: platform("Android public Brave Wallet; Zcash limitation in reviewed support docs", braveMobile, {
         shieldedSend: braveMobile, shieldedReceive: braveMobile,
         hardwareSigning: no([s.brave], "The vendor marks hardware wallet integration desktop-only."), multichain: braveMultichain,
+        securityAudit: braveAudit,
       }),
     },
   },
@@ -216,6 +238,7 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
       shieldedSend: unknown("The release announced shielded sending, but unresolved NU6.1 broadcast reports leave current operation unverified.", [s.snapLaunch, s.snapIssue]),
       shieldedReceive: unknown("The release announced shielded receiving; current companion usability and recovery workflow were not verified.", [s.snapLaunch, s.snapIssue]),
       multichain: unknown("The host MetaMask wallet's other chains are not evidence of native multichain management inside this Zcash Snap.", [s.snap]),
+      securityAudit: { ...yes([s.snapAudit], "Hacken published an independent audit of the Zcash Snap package in May 2025, with seven findings marked resolved. The companion WebWallet and current network operation were outside this report."), scope: "ChainSafe WebZjs packages/snap; final audited commit 477f078 (May 2025), not the whole companion app" },
     }) },
   },
   {
@@ -252,11 +275,13 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
         shieldedSend: yes([s.unstoppableIos, s.unstoppableIosReleases], "Publisher documentation confirms full shielded Zcash transactions."),
         shieldedReceive: yes([s.unstoppableIosReleases], "Release notes document rotating shielded addresses and the Zcash Receive screen."),
         multichain: yes([s.unstoppableIos], "Native wallets include BTC, XMR, ZEC and other chains."),
+        securityAudit: unstoppableAudit,
       }),
       android: platform("Android Google Play listing updated 2026-09-30; releases include Ironwood support", yes([s.unstoppableAndroid, s.unstoppableAndroidReleases], "Public Android release."), {
         shieldedSend: yes([s.unstoppableAndroid, s.unstoppableAndroidReleases], "The current publisher listing confirms full shielded transactions; release notes record Ironwood support."),
         shieldedReceive: yes([s.unstoppableAndroid], "The publisher describes full shielded Zcash wallet support on Android."),
         multichain: yes([s.unstoppableAndroid], "Native wallets include BTC, XMR, ZEC and other chains."),
+        securityAudit: unstoppableAudit,
       }),
     },
   },
@@ -294,6 +319,7 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
       shieldedReceive: yes([s.zodlReceive, s.keystoneMatrix], "Zodl exposes shielded receiving addresses belonging to the Keystone wallet."),
       hardwareSigning: yes([s.keystoneZodl], "Zcash signing occurs on the offline Keystone device."),
       multichain: yes([s.keystoneFirmware], "The same Cypherpunk firmware supports native BTC, ZEC and XMR; companion apps differ by chain."),
+      securityAudit: { ...yes([s.keystoneAudit], "Least Authority published a final audit of Keystone's Zcash signing integration in March 2025. The report covers named firmware and SDK revisions; it does not attest current Cypherpunk 3.0.4 or the Zodl/Vizor apps."), scope: "Keystone 3 Zcash firmware 1.8.2 and SDK Rust 0.0.45, iOS 0.8.5, Android 0.7.8; March 2025" },
     }) },
   },
   {
@@ -302,6 +328,7 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
       shieldedSend: ledgerShielded, shieldedReceive: ledgerShielded,
       hardwareSigning: yes([s.ledger, s.ledgerSign], "Ledger accounts require on-device approval and signing; this does not establish shielded Zcash support."),
       multichain: yes([s.ledgerAssets], "Ledger Wallet manages native BTC, ETH, SOL and other assets using a Ledger signer."),
+      securityAudit: { ...unknown("A ZecSec audit covers hhanh00's legacy zcash-ledger shielded app v1.0.1. It does not establish an independent review of the current Ledger Zcash account, firmware or companion software.", [s.ledgerLegacyAudit]), scope: "Current Ledger Zcash account; cited historical report covers a separate 2023 app v1.0.1" },
     }) },
   },
   {

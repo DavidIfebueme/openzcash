@@ -7,17 +7,19 @@ The finder supplements the existing `/wallets` catalog. It matches explicit requ
 - `src/lib/wallet-finder/types.ts`: versioned TypeScript schema.
 - `src/lib/wallet-finder/evidence.ts`: reviewed facts and limitations for each catalog entry.
 - `src/lib/wallet-finder/matching.ts`: deterministic matching and validation.
-- `/api/wallets/capabilities`: reusable public JSON (`schemaVersion: 1`).
+- `/api/wallets/capabilities`: reusable public JSON (`schemaVersion: 2`).
 - `docs/wallet-finder-sources.md`: research decisions and source limitations.
 
-Availability, shielded send, shielded receive, hardware signing and multichain support are separate fields. Keep each field specific to a platform and release/channel. A wallet's Android send capability cannot be combined with its iOS receive capability to satisfy one request. Desktop means only the operating systems stated in the evidence scope; hardware means only the named model/integration/firmware.
+Availability, shielded send, shielded receive, hardware signing, multichain support and a public independent audit report are separate fields. Keep each field specific to a platform and release/channel. A wallet's Android send capability cannot be combined with its iOS receive capability to satisfy one request. Desktop means only the operating systems stated in the evidence scope; hardware means only the named model/integration/firmware.
 
 `multichain` means holding/managing native assets from more than one blockchain. A swap or cross-chain payment does not establish that capability. `hardwareSigning` means a confirmed external-device integration in software, or signing on the hardware device itself.
+
+`securityAudit` records whether a public independent security report actually covers that wallet product or integration on the selected platform. Name the reviewed release, revision, date, auditor and scope. A report for shared Zcash infrastructure, a host app, a generic hardware device or a different wallet is not automatically transferable. Old reports remain linked with their old scope; they do not warrant current release safety. When a current product cannot be tied to a report, retain `unknown`. Never derive a security score or general "safe" badge from this field.
 
 ## Update procedure
 
 1. Read the wallet maintainer's documentation, release notes or source implementation. Use precise primary URLs. Aggregators may help discover a source but cannot substantiate a positive match alone.
-2. Identify the exact platform, release/channel and required companion app/firmware. Distinguish announced, beta, available and interrupted workflows in the availability record.
+2. Identify the exact platform, release/channel and required companion app/firmware. Distinguish announced, beta, available and interrupted workflows in the availability record. For an audit, read the actual third-party report and compare the audited revisions and components to the named product.
 3. Update only facts actually checked. Record `checkedAt`, source title/URL, a useful `scope`, and the limitation in `note`. The checked date records source review; it is not a hands-on security audit or a promise of future functionality.
 4. Use `unknown` for missing/conflicting evidence or unresolved operational reports. Unknown is not unsupported. Use `unsupported` only when primary material explicitly establishes the limitation. Keep conflicting links and explain the uncertainty.
 5. Review the catalog headline and platform list for contradictions. Preserve capabilities that differ by platform in the detailed record; do not promote a desktop capability to mobile.

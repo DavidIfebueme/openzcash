@@ -37,10 +37,42 @@ describe("published wallet capability records", () => {
     expect(keystone?.reasons.map(r => r.evidence.scope).join(" ")).toMatch(/Cypherpunk/);
     expect(result("Ledger", { platform: "hardware", shielded: "both" })?.status).toBe("unknown");
   });
+  it("keeps published audit reports scoped to the product and historical platform release", () => {
+    expect(result("Ywallet", { platform: "ios", audit: "required" })?.status).toBe("match");
+    expect(result("Ywallet", { platform: "desktop", audit: "required" })?.status).toBe("unknown");
+    expect(result("Gem Wallet", { platform: "android", audit: "required" })?.status).toBe("match");
+    const keystoneAudit = result("Keystone", { platform: "hardware", audit: "required" });
+    expect(keystoneAudit?.status).toBe("match");
+    expect(keystoneAudit?.reasons.find(r => r.requirement.includes("audit"))?.evidence.scope).toMatch(/1\.8\.2/);
+  });
+  it("does not turn an old module audit or an audited unusable Snap into a current safety endorsement", () => {
+    expect(result("Ledger", { platform: "hardware", audit: "required" })?.status).toBe("unknown");
+    expect(result("MetaMask Snap", { platform: "browser", audit: "required" })?.status).toBe("unknown");
+    const snap = WALLET_EVIDENCE.find(w => w.walletName === "MetaMask Snap")?.platforms.browser;
+    expect(snap?.securityAudit.status).toBe("supported");
+    expect(snap?.securityAudit.scope).toMatch(/May 2025/);
+    expect(snap?.availability.status).toBe("unknown");
+    expect(snap?.availability.sources.map(source => source.url)).toContain("https://github.com/ChainSafe/WebZjs/issues/168");
+  });
+  it("does not count audits predating the wallet's Zcash integration as matches", () => {
+    expect(result("Brave Wallet", { platform: "desktop", shielded: "both", audit: "required" })?.status).toBe("unknown");
+    expect(result("Unstoppable Wallet", { platform: "ios", shielded: "both", audit: "required" })?.status).toBe("unknown");
+    expect(WALLET_EVIDENCE.find(w => w.walletName === "Brave Wallet")?.platforms.desktop?.securityAudit.sources[0].url).toMatch(/doyensec/);
+  });
+  it("leaves unverified reports unknown without equating absence of evidence with unaudited", () => {
+    expect(result("Zodl", { platform: "ios", audit: "required" })?.status).toBe("unknown");
+    expect(result("Edge", { platform: "ios", audit: "required" })?.status).toBe("unknown");
+    for (const profile of WALLET_EVIDENCE) {
+      for (const evidence of Object.values(profile.platforms)) {
+        expect(evidence?.securityAudit.status).not.toBe("unsupported");
+      }
+    }
+  });
   it("exports the same public evidence and methodology without personal search data", async () => {
     const response = GET();
     const body = await response.json();
     expect(response.status).toBe(200);
+    expect(body.schemaVersion).toBe(2);
     expect(body.profiles).toEqual(WALLET_EVIDENCE);
     expect(body.license).toBe("MIT");
     expect(body).not.toHaveProperty("answers");

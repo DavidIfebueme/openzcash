@@ -9,7 +9,7 @@ export const PLATFORM_LABELS: Record<WalletPlatform, string> = {
 };
 
 export const DEFAULT_REQUIREMENTS: WalletRequirements = {
-  platform: "any", shielded: "any", hardware: "any", multichain: "any",
+  platform: "any", shielded: "any", hardware: "any", multichain: "any", audit: "any",
 };
 
 export function parseWalletRequirements(params: Record<string, string | string[] | undefined>): WalletRequirements {
@@ -21,6 +21,7 @@ export function parseWalletRequirements(params: Record<string, string | string[]
     shielded: privacy === "send" || privacy === "receive" || privacy === "both" ? privacy : "any",
     hardware: one("hardware") === "required" ? "required" : "any",
     multichain: one("multichain") === "required" ? "required" : "any",
+    audit: one("audit") === "required" ? "required" : "any",
   };
 }
 
@@ -31,12 +32,14 @@ export function walletRequirementsQuery(requirements: WalletRequirements): strin
   if (requirements.shielded !== "any") params.set("privacy", requirements.shielded);
   if (requirements.hardware !== "any") params.set("hardware", requirements.hardware);
   if (requirements.multichain !== "any") params.set("multichain", requirements.multichain);
+  if (requirements.audit !== "any") params.set("audit", requirements.audit);
   return params.toString();
 }
 
 const REQUIREMENT_LABELS: Record<CapabilityKey, string> = {
   shieldedSend: "Send shielded ZEC", shieldedReceive: "Receive shielded ZEC",
   hardwareSigning: "Sign with a hardware device", multichain: "Manage assets on multiple blockchains",
+  securityAudit: "Public independent audit of this wallet",
 };
 
 function unknownPlatform(platform: WalletPlatform): WalletPlatformEvidence {
@@ -46,7 +49,7 @@ function unknownPlatform(platform: WalletPlatform): WalletPlatformEvidence {
     note: "This platform has not been confirmed in the evidence record. Check the wallet's official documentation.",
   };
   return { availability: evidence, shieldedSend: evidence, shieldedReceive: evidence,
-    hardwareSigning: evidence, multichain: evidence };
+    hardwareSigning: evidence, multichain: evidence, securityAudit: evidence };
 }
 
 export function capabilityReason(requirement: string, evidence: CapabilityEvidence, platform?: WalletPlatform): MatchReason {
@@ -74,6 +77,7 @@ export function matchWallets(profiles: WalletEvidenceProfile[], requirements: Wa
   if (requirements.shielded === "receive" || requirements.shielded === "both") needed.push("shieldedReceive");
   if (requirements.hardware === "required") needed.push("hardwareSigning");
   if (requirements.multichain === "required") needed.push("multichain");
+  if (requirements.audit === "required") needed.push("securityAudit");
   const rank = { match: 0, unknown: 1, excluded: 2 };
 
   return profiles.map(profile => {
@@ -134,7 +138,7 @@ export function validateWalletEvidence(profiles: WalletEvidenceProfile[], today 
     if (!Object.keys(profile.platforms).length) errors.push(`${profile.walletName}: at least one reviewed platform required`);
     for (const [platform, facts] of Object.entries(profile.platforms)) {
       if (!Object.hasOwn(PLATFORM_LABELS, platform)) errors.push(`${profile.walletName}: invalid platform ${platform}`);
-      for (const key of ["availability", "shieldedSend", "shieldedReceive", "hardwareSigning", "multichain"] as const) {
+      for (const key of ["availability", "shieldedSend", "shieldedReceive", "hardwareSigning", "multichain", "securityAudit"] as const) {
         if (!facts[key]) errors.push(`${profile.walletName}.${platform}.${key}: record required`);
         else check(facts[key], `${profile.walletName}.${platform}.${key}`);
       }

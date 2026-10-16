@@ -6,7 +6,7 @@ function fact(status: SupportState = "supported", overrides: Partial<CapabilityE
   return { status, sources: [{ url: "https://wallet.example/docs/release-1", title: "Official release 1 documentation" }], checkedAt: "2026-10-15", scope: "Test wallet v1 on the specified platform", note: status === "supported" ? "Explicitly documented in the official release." : status === "unsupported" ? "Official documentation excludes this capability." : "Documentation does not confirm this capability.", ...overrides };
 }
 function platform(overrides: Partial<WalletPlatformEvidence> = {}): WalletPlatformEvidence {
-  return { availability: fact(), shieldedSend: fact(), shieldedReceive: fact(), hardwareSigning: fact(), multichain: fact(), ...overrides };
+  return { availability: fact(), shieldedSend: fact(), shieldedReceive: fact(), hardwareSigning: fact(), multichain: fact(), securityAudit: fact(), ...overrides };
 }
 function wallet(name = "Example", platforms: WalletEvidenceProfile["platforms"] = { android: platform() }, availability = fact()): WalletEvidenceProfile {
   return { walletName: name, availability, platforms };
@@ -66,6 +66,25 @@ describe("wallet selection: documented, platform-specific requirements", () => {
     expect(result(outgoing, { shielded: "send" }).status).toBe("match");
     expect(result(outgoing, { shielded: "receive" }).status).toBe("excluded");
   });
+  it("treats a missing public audit as unknown rather than an unsafe verdict or match", () => {
+    const missing = wallet("No report verified", { android: platform({ securityAudit: fact("unknown", { sources: [], checkedAt: null }) }) });
+    expect(result(missing, { platform: "android", audit: "required" })).toMatchObject({ status: "unknown", platforms: [] });
+  });
+  it("requires the audit and wallet capabilities on the same platform", () => {
+    const split = wallet("Split audit", {
+      ios: platform({ securityAudit: fact("supported"), shieldedSend: fact("unsupported") }),
+      android: platform({ securityAudit: fact("unknown"), shieldedSend: fact("supported") }),
+    });
+    expect(result(split, { shielded: "send", audit: "required" })).toMatchObject({ status: "unknown", platforms: [] });
+  });
+  it("a published report does not override uncertain wallet availability", () => {
+    const uncertain = wallet("Audited old release", { browser: platform({ availability: fact("unknown") }) }, fact("unknown"));
+    expect(result(uncertain, { platform: "browser", audit: "required" })).toMatchObject({ status: "unknown", platforms: [] });
+  });
+  it("requires a report link and scope for audit matches", () => {
+    const unsourced = wallet("Bare audit flag", { android: platform({ securityAudit: fact("supported", { sources: [] }) }) });
+    expect(result(unsourced, { audit: "required" }).status).toBe("unknown");
+  });
   it("does not require unused optional features", () => {
     expect(result(wallet("Simple", { android: platform({ hardwareSigning: fact("unknown"), multichain: fact("unknown") }) }), { shielded: "both" }).status).toBe("match");
   });
@@ -113,14 +132,15 @@ describe("wallet selection: documented, platform-specific requirements", () => {
 
 describe("shareable answers", () => {
   it("round-trips all requirements", () => {
-    const selected = requirements({ platform: "ios", shielded: "both", hardware: "required", multichain: "required" });
+    const selected = requirements({ platform: "ios", shielded: "both", hardware: "required", multichain: "required", audit: "required" });
     expect(parseWalletRequirements(Object.fromEntries(new URLSearchParams(walletRequirementsQuery(selected))))).toEqual(selected);
   });
   it("ignores invalid and repeated URL values without enabling a requirement", () => {
-    expect(parseWalletRequirements({ platform: "__proto__", privacy: ["send", "receive"], hardware: "yes", multichain: "false" })).toEqual(DEFAULT_REQUIREMENTS);
+    expect(parseWalletRequirements({ platform: "__proto__", privacy: ["send", "receive"], hardware: "yes", multichain: "false", audit: ["required", "required"] })).toEqual(DEFAULT_REQUIREMENTS);
   });
   it("omits default answers from the URL", () => expect(walletRequirementsQuery(DEFAULT_REQUIREMENTS)).toBe(""));
   it("preserves directional privacy requirements", () => expect(parseWalletRequirements({ platform: "android", privacy: "receive" })).toEqual(requirements({ platform: "android", shielded: "receive" })));
+  it("preserves an independently audited requirement in a direct link", () => expect(parseWalletRequirements({ audit: "required" })).toEqual(requirements({ audit: "required" })));
 });
 
 describe("evidence schema validation", () => {

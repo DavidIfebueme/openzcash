@@ -6,6 +6,13 @@ import type { WalletPlatform } from "@/lib/wallet-finder/types";
 /** Date of the last edit to the entries below (maintainer-set, not a review pass): update it in the same commit that adds, removes or corrects a wallet. */
 export const WALLET_CATALOG_REVISED_ON = "2026-10-15";
 
+// Existing editorial highlights requested for the catalog. This is not a safety rating.
+export const EDITORIAL_HIGHLIGHTS = new Set([
+  "Zodl", "Zingo!", "zkool", "Vizor", "Edge", "Cake Wallet",
+  "Noir Wallet", "Brave Wallet", "Unstoppable Wallet",
+  "Keystone", "Ledger", "Trezor",
+]);
+
 export type Shielded = "full" | "partial" | "transparent" | "unknown" | "unavailable";
 
 export interface Wallet {
@@ -211,6 +218,21 @@ const PLATFORM_KEYS: Record<string, WalletPlatform> = {
   "Browser extension": "browser", Web: "web", Hardware: "hardware",
 };
 const PLATFORM_NAMES = Object.fromEntries(Object.entries(PLATFORM_KEYS).map(([label, key]) => [key, label]));
+
+/** The badge means a scoped public report exists; it is never a safety rating. */
+export function walletPublicAudit(walletName: string, selectedPlatform = "") {
+  const profile = WALLET_EVIDENCE.find((item) => item.walletName === walletName);
+  if (!profile) return null;
+  const platform = PLATFORM_KEYS[selectedPlatform];
+  const entries = Object.entries(profile.platforms).filter(([key]) => !platform || key === platform);
+  for (const [, facts] of entries) {
+    const record = facts?.securityAudit;
+    if (record?.status === "supported" && record.checkedAt && record.scope.trim() && record.sources.length) {
+      return { source: record.sources[0], scope: record.scope, checkedAt: record.checkedAt };
+    }
+  }
+  return null;
+}
 
 /** A label is valid only when availability and both directions are documented on the same platform. */
 export function walletPrivacy(walletName: string, selectedPlatform = ""): {

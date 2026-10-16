@@ -6,7 +6,7 @@ import type { CSSProperties } from "react";
 import { PageHeader, Stat } from "@/components/ui";
 import { IconShield } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import { HARDWARE, SOFTWARE, walletPrivacy, type Shielded, type Wallet } from "./catalog-data";
+import { EDITORIAL_HIGHLIGHTS, HARDWARE, SOFTWARE, walletPrivacy, walletPublicAudit, type Shielded, type Wallet } from "./catalog-data";
 
 // A distinct "LED" glow colour per wallet — everyone gets one, nobody is
 // singled out or promoted. Assigned by position so the grid never repeats.
@@ -28,21 +28,6 @@ const LED = [
   "#eab308",
   "#d946ef",
 ];
-
-// Wallets the user asked to mark with a star (plus the flagship, which always has one).
-const STARRED = new Set([
-  "Zingo!",
-  "zkool",
-  "Vizor",
-  "Edge",
-  "Cake Wallet",
-  "Noir Wallet",
-  "Brave Wallet",
-  "Unstoppable Wallet",
-  "Keystone",
-  "Ledger",
-  "Trezor",
-]);
 
 const SHIELDED: Record<
   Shielded,
@@ -78,8 +63,9 @@ const SHIELDED: Record<
 
 function WalletCard({ w, led, platform }: { w: Wallet; led: string; platform: string }) {
   const privacy = walletPrivacy(w.name, platform);
+  const publicAudit = walletPublicAudit(w.name, platform);
   const s = SHIELDED[privacy.level];
-  const star = w.flagship || STARRED.has(w.name);
+  const star = EDITORIAL_HIGHLIGHTS.has(w.name);
   return (
     // Stretched-link pattern: the whole card links to the wallet site via an
     // absolutely-positioned overlay, so the source badge can be its own real
@@ -125,7 +111,7 @@ function WalletCard({ w, led, platform }: { w: Wallet; led: string; platform: st
                 {w.name.toUpperCase()}
               </span>
               {star ? (
-                <span className="shrink-0 text-xs text-amber-500">★</span>
+                <span className="shrink-0 text-base text-amber-500" role="img" aria-label="Highlighted wallet" title="Highlighted wallet">⭐</span>
               ) : null}
               {w.tag ? (
                 <span className="shrink-0 rounded-full bg-stone-200/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-stone-600">
@@ -186,15 +172,15 @@ function WalletCard({ w, led, platform }: { w: Wallet; led: string; platform: st
                 Open source
               </a>
             ) : null}
-            {w.audit ? (
+            {publicAudit ? (
               <a
-                href={w.audit}
+                href={publicAudit.source.url}
                 target="_blank"
-                rel="noreferrer"
-                title="Opens the public third-party security audit report"
+                rel="noopener noreferrer"
+                title={`Public audit report: ${publicAudit.scope}. This is not a current safety rating.`}
                 className="relative z-20 rounded-md bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-800 ring-1 ring-inset ring-violet-500/20 transition hover:bg-violet-500/20"
               >
-                Audited
+                🛡️ Audit report
               </a>
             ) : null}
           </div>
@@ -383,12 +369,13 @@ export default function WalletCatalog() {
         license; Ledger is excluded because its device OS is proprietary, even
         though its Zcash app is open. The{" "}
         <span className="rounded-md bg-violet-500/10 px-1.5 py-px text-xs font-medium text-violet-800 ring-1 ring-inset ring-violet-500/20">
-          Audited
+          🛡️ Audit report
         </span>{" "}
-        badge links to a public third-party security audit of the wallet itself
-        (for Ledger, of its Zcash app). No badge means no public report was
-        found, not that the wallet is unsafe. Deprecated (Nighthawk) and
-        non-Zcash (Coinbase Wallet) options are omitted.
+        badge links to an independent report with a stated historic product,
+        platform and version. It is not a current safety rating. No badge means
+        this review could not verify a qualifying report. ⭐ marks an editorial
+        highlight. Deprecated (Nighthawk) and non-Zcash (Coinbase Wallet)
+        options are omitted.
       </p>
     </>
   );

@@ -1,6 +1,6 @@
 /** Evidence is reviewed per platform. A catalog badge is not evidence for a capability. */
 export type WalletPlatform = "ios" | "android" | "desktop" | "browser" | "web" | "hardware";
-export type CapabilityKey = "shieldedSend" | "shieldedReceive" | "hardwareSigning" | "multichain";
+export type CapabilityKey = "shieldedSend" | "shieldedReceive" | "hardwareSigning" | "multichain" | "securityAudit";
 export type SupportState = "supported" | "unsupported" | "unknown";
 
 export interface CapabilityEvidence {
@@ -19,6 +19,8 @@ export interface WalletPlatformEvidence {
   shieldedReceive: CapabilityEvidence;
   hardwareSigning: CapabilityEvidence;
   multichain: CapabilityEvidence;
+  /** A public independent report, scoped to this product and platform; not a safety rating. */
+  securityAudit: CapabilityEvidence;
 }
 
 export interface WalletEvidenceProfile {
@@ -34,6 +36,7 @@ export interface WalletRequirements {
   hardware: "any" | "required";
   /** Manage native assets on multiple chains; swaps alone do not satisfy this. */
   multichain: "any" | "required";
+  audit: "any" | "required";
 }
 
 export interface MatchReason {
