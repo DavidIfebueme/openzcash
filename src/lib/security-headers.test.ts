@@ -10,7 +10,7 @@ describe("Content Security Policy environment gate", () => {
       vi.resetModules();
       const { default: config } = await import("../../next.config");
       const rules = await config.headers!();
-      const headers = rules.find((rule) => rule.source === "/:path*")!.headers;
+      const headers = rules.find((rule) => rule.source === "/((?!private-chat$).*)")!.headers;
       const csp = headers.find((header) => header.key === "Content-Security-Policy")!.value;
       const script = csp.split("; ").find((directive) => directive.startsWith("script-src "));
       expect(script).toBe(mode === "development"

@@ -13,7 +13,7 @@ describe("Participate headers and redirects", () => {
     );
     const { default: config } = await import("../../../next.config");
     const headers = await config.headers!();
-    const general = headers.find((row) => row.source === "/:path*")!;
+    const general = headers.find((row) => row.source === "/((?!private-chat$).*)")!;
     const policy = general.headers.find(
       (header) => header.key === "Content-Security-Policy",
     )!.value;
