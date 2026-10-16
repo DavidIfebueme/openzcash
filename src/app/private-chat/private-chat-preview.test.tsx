@@ -63,8 +63,31 @@ afterEach(() => {
   cleanup();
   window.history.replaceState(null, "", "/private-chat");
   vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 });
 describe("Private Chat interface", () => {
+  it("keeps a session until the user confirms leaving through the portal menu", async () => {
+    const parent = { postMessage: vi.fn() } as unknown as Window;
+    vi.stubGlobal("parent", parent);
+    render(<PrivateChatPreview createTransport={factory} directory={directory()} parentOrigin="https://openzcash.org" portalShell />);
+    await enter();
+    const request = (id: string, origin = "https://openzcash.org") => act(() => {
+      window.dispatchEvent(new MessageEvent("message", { origin, source: parent, data: { type: "openzcash-chat-leave-request-v1", id } }));
+    });
+    request("forged", "https://evil.example");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    request("cancelled");
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(parent.postMessage).not.toHaveBeenCalledWith(expect.objectContaining({ approved: true }), expect.anything());
+    fireEvent.click(screen.getByRole("button", { name: "Keep chatting" }));
+    expect(parent.postMessage).toHaveBeenLastCalledWith({ type: "openzcash-chat-leave-result-v1", id: "cancelled", approved: false }, "https://openzcash.org");
+    expect(screen.getByText("Alice")).toBeInTheDocument();
+    request("confirmed");
+    fireEvent.click(screen.getByRole("button", { name: "Leave & clear" }));
+    expect(parent.postMessage).toHaveBeenLastCalledWith({ type: "openzcash-chat-leave-result-v1", id: "confirmed", approved: true }, "https://openzcash.org");
+    expect(screen.getByLabelText("Your alias")).toHaveValue("");
+    expect(parent.postMessage).not.toHaveBeenCalledWith(expect.objectContaining({ alias: expect.anything() }), expect.anything());
+  });
   it("keeps generated invitations on the branded parent address", async () => {
     render(<PrivateChatPreview createTransport={factory} directory={directory()} parentOrigin="https://openzcash.org" />);
     await enter();

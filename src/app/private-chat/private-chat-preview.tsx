@@ -23,7 +23,7 @@ import {
   INVITE_TTL_MS,
 } from "@/lib/private-chat/live-invite";
 import type { DirectoryConfig } from "@/lib/private-chat/directory-wire";
-import { CHAT_READY_MESSAGE, embeddedInvitation } from "@/lib/private-chat/embedding";
+import { CHAT_READY_MESSAGE, CHAT_LEAVE_RESULT, embeddedInvitation, embeddedShellRequest } from "@/lib/private-chat/embedding";
 import { roomUrl } from "@/lib/private-chat/discovery-room";
 import { normalizeAlias } from "@/lib/private-chat/session";
 import { ChatComposer } from "./chat-composer";
@@ -77,11 +77,13 @@ export function PrivateChatPreview({
   directory,
   directoryConfig = null,
   parentOrigin = null,
+  portalShell = false,
 }: {
   createTransport?: typeof createNymTransport;
   directory?: PresenceService;
   directoryConfig?: DirectoryConfig | null;
   parentOrigin?: string | null;
+  portalShell?: boolean;
 }) {
   const [chat] = useState(
     () =>
@@ -149,7 +151,7 @@ export function PrivateChatPreview({
       if (invitation) captureInvitation(invitation.kind, invitation.token);
     };
     window.addEventListener("message", receive);
-    // Only readiness leaves the frame; no identity, keys or chat contents.
+    // No identity, keys or chat contents leave the frame.
     window.parent.postMessage({ type: CHAT_READY_MESSAGE }, parentOrigin);
     return () => window.removeEventListener("message", receive);
   }, [captureInvitation, parentOrigin]);
@@ -166,6 +168,7 @@ export function PrivateChatPreview({
   const [unread, setUnread] = useState(false);
   const [clearAction, setClearAction] = useState<"session" | "identity" | "conversation" | null>(null);
   const [clearTarget, setClearTarget] = useState<string | null>(null);
+  const [leaveRequest, setLeaveRequest] = useState<string | null>(null);
   const endingConversation = state.conversations.find(conversation => conversation.id === clearTarget);
   const session = useChatSession();
   const setSessionActive = session?.setActive;
@@ -218,6 +221,23 @@ export function PrivateChatPreview({
     setEditing(true);
     clearChatFragment();
   }, [chat, setClearAction]);
+
+  const answerLeaveRequest = useCallback((id: string, approved: boolean) => {
+    if (parentOrigin) window.parent.postMessage({ type: CHAT_LEAVE_RESULT, id, approved }, parentOrigin);
+    setLeaveRequest(null);
+  }, [parentOrigin]);
+
+  useEffect(() => {
+    if (!portalShell || !parentOrigin || window.parent === window) return;
+    const receive = (event: MessageEvent) => {
+      const request = embeddedShellRequest(event, window.parent, parentOrigin);
+      if (request?.type !== "leave") return;
+      if (alias || state.alias || state.room || join || roomInput) setLeaveRequest(current => current ?? request.id);
+      else answerLeaveRequest(request.id, true);
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [portalShell, parentOrigin, alias, state.alias, state.room, join, roomInput, answerLeaveRequest]);
 
   useEffect(() => {
     chat.start();
@@ -373,7 +393,7 @@ export function PrivateChatPreview({
   );
 
   return (
-    <section className={styles.page} aria-labelledby="private-chat-title">
+    <section className={styles.page} data-portal-shell={portalShell || undefined} aria-labelledby="private-chat-title">
       <header className={styles.heading}>
         <div>
           <h1 id="private-chat-title">
@@ -1246,6 +1266,13 @@ export function PrivateChatPreview({
         </section>
       </div>
       <ChatHelp />
+      {leaveRequest && <ChatConfirm
+        title="Leave this session?"
+        description="Your alias, invites and messages will be cleared from this tab. You cannot restore them here."
+        action="Leave & clear"
+        onCancel={() => answerLeaveRequest(leaveRequest, false)}
+        onConfirm={() => { leave(); answerLeaveRequest(leaveRequest, true); }}
+      />}
       {clearAction && <ChatConfirm
         title={clearAction === "conversation" ? endingConversation?.status === "ended" ? "Start a new conversation?" : "End this conversation?" : "Leave this session?"}
         description={clearAction === "conversation" ? "Messages in this conversation will be cleared from this tab. Your alias and room stay available." : "Your alias, invites and messages will be cleared from this tab. You cannot restore them here."}

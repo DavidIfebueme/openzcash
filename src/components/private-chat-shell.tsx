@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type MouseEvent, type ReactNode } from "re
 import { useThemeColor } from "./use-theme-color";
 import { ChatSessionProvider, useChatSession } from "./private-chat-session";
 import { ChatConfirm } from "./private-chat-confirm";
+import { chatParentOrigin, embeddedShellRequest } from "@/lib/private-chat/embedding";
 import styles from "./private-chat-shell.module.css";
 
 type Theme = "light" | "dark";
@@ -34,6 +35,17 @@ function ChatShellContent({ children }: { children: ReactNode }) {
     } catch {
       /* Browser storage can be unavailable. */
     }
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (window.parent === window || params.get("embedded") !== "1" || params.get("shell") !== "portal") return;
+    const receive = (event: MessageEvent) => {
+      const request = embeddedShellRequest(event, window.parent, chatParentOrigin({ NODE_ENV: process.env.NODE_ENV }));
+      if (request?.type === "theme") setTheme(request.theme);
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
   }, []);
 
   useEffect(() => {

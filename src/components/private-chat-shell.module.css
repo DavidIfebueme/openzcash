@@ -4,6 +4,16 @@
   width: 100%;
   min-height: 100dvh;
 }
+/* The portal already provides navigation, branding and the theme control. */
+.shell:global(.rd-shell):has([data-portal-shell="true"]) {
+  min-height: 100dvh;
+}
+.shell:has([data-portal-shell="true"]) .header { display: none; }
+.shell:has([data-portal-shell="true"]) .main {
+  width: 100%;
+  max-width: none;
+  padding: 0;
+}
 .header {
   display: flex;
   align-items: center;

@@ -3,6 +3,11 @@
   color: var(--ink);
   padding-bottom: 12px;
 }
+@media (min-width: 761px) {
+  .page[data-portal-shell="true"] .workspace {
+    height: max(500px, calc(100dvh - 102px));
+  }
+}
 .page button,
 .page input,
 .page textarea {

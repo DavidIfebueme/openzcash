@@ -34,6 +34,7 @@ export default async function PrivateChatPage({ searchParams }: {
   } catch {
     /* Discover stays unavailable until a Nym provider is configured. */
   }
-  const embedded = (await searchParams).embedded === "1";
-  return <PrivateChatPreview directoryConfig={directoryConfig} parentOrigin={embedded ? chatParentOrigin() : null} />;
+  const params = await searchParams;
+  const embedded = params.embedded === "1";
+  return <PrivateChatPreview directoryConfig={directoryConfig} parentOrigin={embedded ? chatParentOrigin() : null} portalShell={embedded && params.shell === "portal"} />;
 }
