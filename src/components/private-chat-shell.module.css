@@ -111,3 +111,9 @@
     transition: none;
   }
 }
+
+@media (max-width: 760px) {
+  .shell:has([data-chat-active="true"]) { height: var(--chat-viewport-height, 100dvh); min-height: 0; overflow: hidden; }
+  .shell:has([data-chat-active="true"]) .header { min-height: 56px; padding: 6px 14px; flex-shrink: 0; }
+  .shell:has([data-chat-active="true"]) .main { display: flex; flex-direction: column; min-height: 0; padding: 8px 8px 0; }
+}

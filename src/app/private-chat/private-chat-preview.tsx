@@ -27,6 +27,8 @@ import { roomUrl } from "@/lib/private-chat/discovery-room";
 import { normalizeAlias } from "@/lib/private-chat/session";
 import { ChatComposer } from "./chat-composer";
 import { ChatHelp } from "./chat-help";
+import { ChatConfirm } from "@/components/private-chat-confirm";
+import { useChatSession } from "@/components/private-chat-session";
 import {
   ChatIcon,
   ClockIcon,
@@ -106,6 +108,8 @@ export function PrivateChatPreview({
     : "";
   const view = selectedView ?? (incomingRoom ? "discover" : "conversations");
   const [roomDraft, setRoomDraft] = useState<string | null>(null);
+  const [roomFromLink, setRoomFromLink] = useState(false);
+  const [inviteFromLink, setInviteFromLink] = useState(false);
   const [roomBusy, setRoomBusy] = useState(false);
   const [roomCopied, setRoomCopied] = useState(false);
   const roomInput = roomDraft ?? incomingRoom;
@@ -114,21 +118,36 @@ export function PrivateChatPreview({
   const joinOpen = joinVisible ?? !!incomingInvite;
   const join = joinDraft ?? incomingInvite;
   useEffect(() => {
-    if (!incomingInvite) return;
+    if (!incomingInvite && !incomingRoom) return;
     // Keep the token in this tab while the person connects, but remove the
     // shareable secret from the address bar as soon as it is captured.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setJoin(incomingInvite);
-    setJoinOpen(true);
+    /* eslint-disable react-hooks/set-state-in-effect -- Capture a URL fragment in memory before removing it. */
+    if (incomingRoom) {
+      setRoomDraft(incomingRoom);
+      setRoomFromLink(true);
+      setView("discover");
+    } else {
+      setJoin(incomingInvite);
+      setJoinOpen(true);
+      setInviteFromLink(true);
+    }
+    /* eslint-enable react-hooks/set-state-in-effect */
     clearChatFragment();
-  }, [incomingInvite]);
+  }, [incomingInvite, incomingRoom]);
   const [draft, setDraft] = useState("");
   const origin = location ? new URL(location).origin : "";
   const [copied, setCopied] = useState(false);
   const [requestBusy, setRequestBusy] = useState(false);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const aliasInput = useRef<HTMLInputElement>(null);
   const thread = useRef<HTMLOListElement>(null);
+  const followingMessages = useRef(true);
+  const [unread, setUnread] = useState(false);
+  const [clearAction, setClearAction] = useState<"session" | "identity" | "conversation" | null>(null);
+  const session = useChatSession();
+  const setSessionActive = session?.setActive;
   const lastLine = state.lines.at(-1)?.id;
+  const lastDirection = state.lines.at(-1)?.direction;
   const now = state.now;
   const connected = state.link === "connected";
   const connecting = ["connecting", "checking", "reconnecting"].includes(
@@ -140,11 +159,17 @@ export function PrivateChatPreview({
     disconnected: "Not connected",
     connecting: "Connecting…",
     checking: "Checking route…",
-    connected: "Route verified",
+    connected: "Connected via Nym",
     failed: "Connection paused",
     reconnecting: `Reconnecting · ${state.retry}/3`,
     offline: "You’re offline",
   }[state.link];
+  const gettingStarted = !state.keyReady || (!connected && !state.contact && !state.room);
+
+  useEffect(() => {
+    setSessionActive?.(!!state.alias || !!state.room || !!join || !!roomInput);
+    return () => setSessionActive?.(false);
+  }, [setSessionActive, state.alias, state.room, join, roomInput]);
 
   const leave = useCallback(() => {
     chat.leave();
@@ -156,12 +181,18 @@ export function PrivateChatPreview({
     setRoomDraft("");
     setRoomBusy(false);
     setRoomCopied(false);
+    setRoomFromLink(false);
+    setInviteFromLink(false);
+    setClearAction(null);
+    setUnread(false);
+    followingMessages.current = true;
     setCopied(false);
     setRequestBusy(false);
+    setAcceptingId(null);
     setView(null);
     setEditing(true);
     clearChatFragment();
-  }, [chat]);
+  }, [chat, setClearAction]);
 
   useEffect(() => {
     chat.start();
@@ -190,8 +221,15 @@ export function PrivateChatPreview({
     chat.setDiscover(view === "discover");
   }, [chat, view]);
   useEffect(() => {
-    if (thread.current) thread.current.scrollTop = thread.current.scrollHeight;
-  }, [lastLine]);
+    if (!thread.current) return;
+    if (followingMessages.current || lastDirection === "out") {
+      thread.current.scrollTop = thread.current.scrollHeight;
+    } else if (lastDirection === "in") {
+      // Reflect an external scroll position without interrupting history reading.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setUnread(true);
+    }
+  }, [lastLine, lastDirection, view]);
 
   async function enter(event: FormEvent) {
     event.preventDefault();
@@ -209,6 +247,8 @@ export function PrivateChatPreview({
   }
   function changeView(next: typeof view) {
     setView(next);
+    followingMessages.current = true;
+    setUnread(false);
   }
   async function joinRoom(value?: string) {
     if (roomBusy) return;
@@ -217,11 +257,9 @@ export function PrivateChatPreview({
       if (await chat.joinRoom(value)) {
         setRoomDraft("");
         setRoomCopied(false);
-        if (incomingRoom) {
-          window.history.replaceState(null, "", window.location.pathname);
-          window.dispatchEvent(new HashChangeEvent("hashchange"));
-          setView("discover");
-        }
+        setRoomFromLink(false);
+        clearChatFragment();
+        setView("discover");
       }
     } catch {
       chat.setNote("Could not open the room. Please try again.");
@@ -236,6 +274,7 @@ export function PrivateChatPreview({
       if (await chat.requestChat(value)) {
         setJoinOpen(false);
         setJoin("");
+        setInviteFromLink(false);
         clearChatFragment();
         changeView("conversations");
       }
@@ -246,8 +285,18 @@ export function PrivateChatPreview({
   async function send(event: FormEvent) {
     event.preventDefault();
     const text = draft;
+    followingMessages.current = true;
+    setUnread(false);
     if (await chat.send(text))
       setDraft((current) => (current === text ? "" : current));
+  }
+
+  function clearConversation() {
+    chat.endConversation();
+    setDraft("");
+    setUnread(false);
+    followingMessages.current = true;
+    setClearAction(null);
   }
 
   const inviteActions = (
@@ -286,6 +335,7 @@ export function PrivateChatPreview({
       <div
         className={styles.workspace}
         data-ready={!!state.alias}
+        data-onboarding={gettingStarted}
         data-chat-active={view === "conversations" && !!state.contact}
       >
         <aside
@@ -293,7 +343,7 @@ export function PrivateChatPreview({
           aria-label="Your chat identity"
         >
           <section className={styles.identityCard}>
-            {editing ? (
+            {editing || !state.alias ? (
               <form className={styles.aliasForm} onSubmit={enter}>
                 <label htmlFor="chat-alias">Your alias</label>
                 <input
@@ -321,15 +371,13 @@ export function PrivateChatPreview({
                     Changing your alias keeps the same chat identity. Your current contact may still see your old alias.
                     <button
                       type="button"
-                      onClick={() => {
-                        leave();
-                        aliasInput.current?.focus();
-                      }}
+                      onClick={() => setClearAction("identity")}
                     >
                       Start a new identity
                     </button>
                   </p>
                 )}
+                {!state.alias && <p className={styles.aliasHint}>No account. Just a name for this session.</p>}
                 <button className={styles.primaryButton} disabled={state.busy}>
                   {state.busy
                     ? "Preparing…"
@@ -422,7 +470,7 @@ export function PrivateChatPreview({
               </span>
             </button>
           </section>
-          <nav
+          {state.keyReady && <nav
             className={styles.viewControls}
             role="tablist"
             aria-label="Chat views"
@@ -496,8 +544,8 @@ export function PrivateChatPreview({
                 />
               )}
             </button>
-          </nav>
-          <section
+          </nav>}
+          {state.room && <section
             className={styles.availabilityCard}
             data-available={state.availableUntil !== null}
             aria-labelledby="availability-title"
@@ -540,7 +588,7 @@ export function PrivateChatPreview({
                 ? "Room only · off revokes your invite."
                 : "Join a room to appear."}
             </p>
-          </section>
+          </section>}
           <div className={styles.sidebarFooter}>
             <span>
               <IconPrivateChat />
@@ -550,10 +598,7 @@ export function PrivateChatPreview({
               <button
                 className={styles.leaveButton}
                 aria-label="Leave & clear session"
-                onClick={() => {
-                  leave();
-                  aliasInput.current?.focus();
-                }}
+                onClick={() => setClearAction("session")}
               >
                 <ExitIcon />
                 Leave & clear
@@ -566,11 +611,11 @@ export function PrivateChatPreview({
           className={styles.conversationCard}
           aria-label="Chat workspace"
         >
-          {!(view === "conversations" && state.contact) && (
+          {!gettingStarted && !(view === "conversations" && state.contact) && (
             <header className={styles.paneHeading}>
               <span>
                 {view === "discover" ? <IconUsers /> : <ChatIcon />}
-                {view === "discover" ? "Discover" : "Direct messages"}
+                {view === "discover" ? "People in your room" : "Direct messages"}
               </span>
               <span className={styles.paneMeta}>
                 <IconShield />
@@ -580,9 +625,9 @@ export function PrivateChatPreview({
           )}
           <div
             id="chat-panel"
-            role="tabpanel"
+            role={gettingStarted ? "region" : "tabpanel"}
             aria-labelledby={
-              view === "discover" ? "discover-tab" : "conversation-tab"
+              gettingStarted ? "onboarding-title" : view === "discover" ? "discover-tab" : "conversation-tab"
             }
             className={styles.panel}
             data-chat={view === "conversations" && !!state.contact}
@@ -609,12 +654,18 @@ export function PrivateChatPreview({
                   </button>
                   <button
                     className={styles.primaryButton}
-                    onClick={() => {
+                    disabled={acceptingId !== null}
+                    onClick={async () => {
+                      setAcceptingId(item.packet.id);
                       changeView("conversations");
-                      void chat.acceptRequest(item.packet.id);
+                      try {
+                        await chat.acceptRequest(item.packet.id);
+                      } finally {
+                        setAcceptingId(null);
+                      }
                     }}
                   >
-                    Accept
+                    {acceptingId === item.packet.id ? "Accepting…" : "Accept"}
                   </button>
                 </div>
               </section>
@@ -622,6 +673,7 @@ export function PrivateChatPreview({
             {state.note &&
               ![
                 "Disconnected.",
+                "Conversation kept in this tab. Reconnect when you’re ready.",
                 "Invite revoked.",
                 "Accepted. Confirming the connection…",
                 "Checking the other person’s connection…",
@@ -632,7 +684,25 @@ export function PrivateChatPreview({
                   {state.note}
                 </p>
               )}
-            {view === "discover" ? (
+            {gettingStarted ? (
+              <div className={styles.onboarding}>
+                <ol className={styles.steps} aria-label="Getting started progress">
+                  {["Alias", "Connect", "Chat"].map((label, index) => (
+                    <li key={label} aria-current={index === (state.keyReady ? 1 : 0) ? "step" : undefined} data-complete={index === 0 && state.keyReady}>
+                      <span>{index === 0 && state.keyReady ? "✓" : `0${index + 1}`}</span>{label}
+                    </li>
+                  ))}
+                </ol>
+                <span className={styles.onboardingMark}><IconPrivateChat /></span>
+                {(roomFromLink || inviteFromLink) && <span className={styles.invitationBadge}><LinkIcon />{roomFromLink ? "Room invitation received" : "Chat invitation received"}</span>}
+                <h2 id="onboarding-title">{!state.keyReady ? "Start with your alias." : connecting ? "Making a private connection…" : "Connect. Then say hello."}</h2>
+                <p>{!state.keyReady ? "Choose an alias to get started. Your messages stay in this tab." : connecting ? "Waiting for a signal to return through Nym. This can take a moment." : "Switch on Nym to continue. Your presence stays hidden until you choose to share it."}</p>
+                {state.keyReady && <button className={styles.primaryButton} disabled={state.link === "offline" && !state.connectionWanted} onClick={state.connectionWanted ? chat.disconnect : chat.reconnect}>
+                  <PowerIcon />{state.connectionWanted ? "Cancel connection" : state.link === "failed" ? "Try again" : "Connect to Nym"}
+                </button>}
+                <span className={styles.onboardingFoot}><IconShield />End-to-end encrypted · One to one</span>
+              </div>
+            ) : view === "discover" ? (
               <>
                 {!state.room ? (
                   <div className={styles.roomWelcome}>
@@ -640,9 +710,13 @@ export function PrivateChatPreview({
                       <IconPrivateChat />
                     </span>
                     <div>
-                      <h2>Find your people</h2>
-                      <p>Share a room link to find people, then chat one to one.</p>
+                      <h2>{roomFromLink ? "Your room is ready to join" : "Find your people"}</h2>
+                      <p>{roomFromLink ? "Enter to find people. You stay unlisted unless you turn on availability." : "Share a room link to find people, then chat one to one."}</p>
                     </div>
+                    {roomFromLink ? <>
+                      <button className={styles.primaryButton} disabled={!connected || roomBusy} onClick={() => void joinRoom(roomInput)}>{roomBusy ? "Opening room…" : "Join room"}</button>
+                      <button className={styles.textButton} onClick={() => { setRoomFromLink(false); setRoomDraft(""); }}>Use another link</button>
+                    </> : <>
                     {process.env.NEXT_PUBLIC_PRIVATE_CHAT_PILOT !== "true" && <button
                       className={styles.primaryButton}
                       disabled={roomBusy}
@@ -678,6 +752,7 @@ export function PrivateChatPreview({
                         </button>
                       </div>
                     </form>
+                    </>}
                     <p className={styles.roomBoundary}>
                       Anyone with the link can enter.
                     </p>
@@ -835,12 +910,9 @@ export function PrivateChatPreview({
                   </div>
                   <button
                     className={styles.textButton}
-                    onClick={() => {
-                      chat.endConversation();
-                      setDraft("");
-                    }}
+                    onClick={() => setClearAction("conversation")}
                   >
-                    End chat
+                    {state.contact.status === "ended" ? "New conversation" : "End chat"}
                   </button>
                 </header>
                 <details className={styles.safety}>
@@ -880,6 +952,11 @@ export function PrivateChatPreview({
                       aria-label="Messages"
                       aria-live="polite"
                       aria-relevant="additions text"
+                      onScroll={(event) => {
+                        const element = event.currentTarget;
+                        followingMessages.current = element.scrollHeight - element.scrollTop - element.clientHeight < 72;
+                        if (followingMessages.current) setUnread(false);
+                      }}
                     >
                       {state.lines.map((line, index) => (
                         <li
@@ -955,6 +1032,17 @@ export function PrivateChatPreview({
                         </li>
                       )}
                     </ol>
+                    {unread && <button className={styles.unreadButton} onClick={() => {
+                      if (thread.current) thread.current.scrollTop = thread.current.scrollHeight;
+                      followingMessages.current = true;
+                      setUnread(false);
+                    }}>↓ New messages</button>}
+                    {state.contact.status === "ended" && <p className={styles.conversationNotice}>This conversation has ended. Choose “New conversation” to start again.</p>}
+                    {state.contact.status === "active" && !connected && <div className={styles.conversationNotice} role="status">
+                      <span>{state.link === "offline" ? "You’re offline. Messages are paused." : connecting ? "Reconnecting through Nym…" : "Connection paused. Your messages stay in this tab."}</span>
+                      {!state.connectionWanted && state.link !== "offline" && <button className={styles.textButton} onClick={chat.reconnect}>Reconnect</button>}
+                      {state.link === "failed" && state.connectionWanted && <button className={styles.textButton} onClick={chat.reconnect}>Try again</button>}
+                    </div>}
                     {state.contact.status === "active" &&
                       !state.contact.ready &&
                       connected && (
@@ -989,7 +1077,7 @@ export function PrivateChatPreview({
                     {inviteActions}
                   </div>
                 ) : (
-                  inviteActions
+                  !inviteFromLink && inviteActions
                 )}
                 {state.invite && (
                   <section className={styles.invitePanel}>
@@ -1042,6 +1130,7 @@ export function PrivateChatPreview({
                       void request(join);
                     }}
                   >
+                    {inviteFromLink ? <div className={styles.receivedInvite}><span className={styles.roomMark}><LinkIcon /></span><h2>You received a chat invite</h2><p>Send a request. The other person chooses whether to accept.</p></div> : <>
                     <label htmlFor="join-invite">Chat invite</label>
                     <input
                       id="join-invite"
@@ -1052,12 +1141,14 @@ export function PrivateChatPreview({
                       autoComplete="off"
                       maxLength={2200}
                     />
+                    </>}
                     <button
                       className={styles.primaryButton}
                       disabled={!connected || !join.trim() || requestBusy}
                     >
                       {requestBusy ? "Checking…" : "Request chat"}
                     </button>
+                    {inviteFromLink && <button type="button" className={styles.textButton} onClick={() => { setInviteFromLink(false); setJoin(""); }}>Use another link</button>}
                     {!connected && (
                       <p className={styles.fieldHint}>
                         Connect to Nym to send your request.
@@ -1071,6 +1162,13 @@ export function PrivateChatPreview({
         </section>
       </div>
       <ChatHelp />
+      {clearAction && <ChatConfirm
+        title={clearAction === "conversation" ? state.contact?.status === "ended" ? "Start a new conversation?" : "End this conversation?" : "Leave this session?"}
+        description={clearAction === "conversation" ? "Messages in this conversation will be cleared from this tab. Your alias and room stay available." : "Your alias, invites and messages will be cleared from this tab. You cannot restore them here."}
+        action={clearAction === "conversation" ? state.contact?.status === "ended" ? "New conversation" : "End & clear chat" : clearAction === "identity" ? "Start a new identity" : "Leave & clear"}
+        onCancel={() => setClearAction(null)}
+        onConfirm={clearAction === "conversation" ? clearConversation : leave}
+      />}
     </section>
   );
 }

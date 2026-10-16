@@ -25,7 +25,7 @@ const QUESTIONS = [
   ],
   [
     "Why can delivery take a little longer?",
-    "Nym routes messages through a mixnet. Route verified means a signal returned through Nym; your contact is checked separately. Delivered confirms arrival, not that the message was read. If confirmation is missing, check the connection before retrying.",
+    "Nym routes messages through a mixnet. Connected via Nym means a signal returned through Nym; your contact is checked separately. Delivered confirms arrival, not that the message was read. If confirmation is missing, check the connection before retrying.",
   ],
   [
     "Can I trust an alias?",
@@ -83,7 +83,7 @@ export function ChatHelp() {
               <h3>Choose & connect</h3>
               <p>
                 Pick an alias and tap Continue. Switch Nym on below your alias,
-                then wait for Route verified.
+                then wait for Connected via Nym.
               </p>
             </div>
           </li>

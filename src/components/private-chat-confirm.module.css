@@ -1,0 +1,17 @@
+.dialog {
+  width: min(440px, calc(100vw - 32px));
+  margin: auto;
+  padding: 28px;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 24px 80px #0004;
+}
+.dialog::backdrop { background: #0008; }
+.dialog h2 { margin: 0 0 12px; font-size: 22px; letter-spacing: -.03em; }
+.dialog p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.actions button { min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
+.actions .confirm { background: var(--ink); border-color: var(--ink); color: var(--surface); }
+.actions button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
