@@ -38,7 +38,7 @@ describe("New public-data topics through the tool boundary", () => {
   });
   it("reads the wallet catalog offline and the community directory with the ledger's funding", async () => {
     const wallets = await read("wallets", "shielded on iOS");
-    expect(wallets.data.catalogRevisedOn).toBe("2026-07-08"); expect(wallets.data.wallets.shown.length).toBeGreaterThan(5); expect(wallets.data.wallets.shown.every((w: { shielded: string }) => w.shielded === "full")).toBe(true);
+    expect(wallets.data.catalogRevisedOn).toBe("2026-10-15"); expect(wallets.data.wallets.shown.length).toBeGreaterThan(5); expect(wallets.data.wallets.shown.every((w: { shielded: string }) => w.shielded === "full")).toBe(true);
     const communities = await read("communities", "Zcash Brasil");
     expect(communities.data.verifiedOn).toBe("2026-09-20"); expect(communities.data.communities.shown[0].name).toBe("Zcash Brazil");
     expect(communities.data.fundingSource).toBe("ledger"); expect(communities.data.communities.shown[0]).toMatchObject({ lastPaidDate: "2026-09-01", zcgBudgetedUsd: 655955.43 });

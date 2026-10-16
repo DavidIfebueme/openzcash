@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 /* eslint-disable @next/next/no-img-element */
 import type { CSSProperties } from "react";
 import { PageHeader, Stat } from "@/components/ui";
 import { IconShield } from "@/components/icons";
 import { cn } from "@/lib/utils";
-import { HARDWARE, SOFTWARE, type Shielded, type Wallet } from "./catalog-data";
+import { HARDWARE, SOFTWARE, walletPrivacy, type Shielded, type Wallet } from "./catalog-data";
 
 // A distinct "LED" glow colour per wallet — everyone gets one, nobody is
 // singled out or promoted. Assigned by position so the grid never repeats.
@@ -50,7 +51,7 @@ const SHIELDED: Record<
   full: {
     ringColor: "ring-emerald-400/70",
     monoBg: "bg-[var(--pos-soft)] text-[var(--pos)]",
-    label: "Full shielded",
+    label: "Shielded both ways",
     text: "text-[var(--pos)]",
   },
   partial: {
@@ -59,16 +60,25 @@ const SHIELDED: Record<
     label: "Partial",
     text: "text-amber-700",
   },
+  unknown: {
+    ringColor: "ring-stone-300", monoBg: "bg-[var(--panel-2)] text-[var(--muted)]",
+    label: "Not verified", text: "text-[var(--muted)]",
+  },
+  unavailable: {
+    ringColor: "ring-stone-300", monoBg: "bg-[var(--panel-2)] text-[var(--muted)]",
+    label: "Not available", text: "text-[var(--muted)]",
+  },
   transparent: {
     ringColor: "ring-stone-300",
     monoBg: "bg-stone-100 text-stone-600",
-    label: "Transparent",
+    label: "Transparent only",
     text: "text-stone-600",
   },
 };
 
-function WalletCard({ w, led }: { w: Wallet; led: string }) {
-  const s = SHIELDED[w.shielded];
+function WalletCard({ w, led, platform }: { w: Wallet; led: string; platform: string }) {
+  const privacy = walletPrivacy(w.name, platform);
+  const s = SHIELDED[privacy.level];
   const star = w.flagship || STARRED.has(w.name);
   return (
     // Stretched-link pattern: the whole card links to the wallet site via an
@@ -147,7 +157,14 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
           {w.note}
         </p>
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-3.5">
+        <Link
+          href={`/wallets/find?view=evidence&wallet=${encodeURIComponent(w.name)}`}
+          className="relative z-20 mt-2 inline-flex min-h-11 items-center self-start text-[13px] text-[var(--accent-ink)] underline underline-offset-4"
+        >
+          Capability evidence
+        </Link>
+
+        <div className="mt-auto flex flex-wrap items-start justify-between gap-2 pt-3.5">
           <div className="flex min-w-0 flex-wrap items-center gap-1">
             {w.platforms.map((p) => (
               <span
@@ -183,12 +200,17 @@ function WalletCard({ w, led }: { w: Wallet; led: string }) {
           </div>
           <span
             className={cn(
-              "flex shrink-0 items-center gap-1.5 text-xs font-semibold",
+              "flex max-w-full items-start gap-1.5 text-xs font-semibold",
               s.text,
             )}
           >
-            <span className="h-2 w-2 rounded-full bg-current" />
-            {s.label}
+            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-current" />
+            <span>
+              {s.label}
+              {privacy.level === "full" && !platform && (
+                <span className="mt-0.5 block text-[11px] font-normal">{privacy.platforms.join(", ")}</span>
+              )}
+            </span>
           </span>
         </div>
       </div>
@@ -207,14 +229,15 @@ export default function WalletCatalog() {
         .toLowerCase()
         .includes(query.toLowerCase())) &&
     (!platform || w.platforms.includes(platform)) &&
-    (!shielded || w.shielded === shielded);
+    (!shielded || walletPrivacy(w.name, platform).level === shielded);
   const software = kind === "hardware" ? [] : SOFTWARE.filter(matches);
   const hardware = kind === "software" ? [] : HARDWARE.filter(matches);
   return (
     <>
       <PageHeader
         title="Zcash Wallets"
-        subtitle="Self-custody wallets for ZEC. Only shielded (z-address) support makes Zcash private, so prefer a 'Full shielded' wallet."
+        subtitle="Explore Zcash wallets with platform-specific evidence for shielded sending and receiving."
+        actions={<Link href="/wallets/find" className="inline-flex min-h-11 items-center gap-3 rounded-lg border border-[var(--accent-muted)] bg-[var(--accent-soft)] px-4 py-2.5 text-base font-medium text-[var(--accent-ink)]">Find a wallet for your needs <span aria-hidden="true">→</span></Link>}
       />
 
       <section className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -224,12 +247,12 @@ export default function WalletCatalog() {
           sub="software and hardware"
         />
         <Stat
-          label="Full shielded"
+          label="Shielded both ways"
           value={
-            [...SOFTWARE, ...HARDWARE].filter((w) => w.shielded === "full")
+            [...SOFTWARE, ...HARDWARE].filter((w) => walletPrivacy(w.name, platform).level === "full")
               .length
           }
-          sub="shielded send and receive"
+          sub={platform ? `confirmed on ${platform}` : "confirmed on at least one platform"}
           tone="in"
         />
         <Stat
@@ -278,9 +301,11 @@ export default function WalletCatalog() {
           onChange={(e) => setShielded(e.target.value)}
         >
           <option value="">All privacy levels</option>
-          <option value="full">Full shielded</option>
+          <option value="full">Shielded send + receive</option>
           <option value="partial">Partial shielded</option>
           <option value="transparent">Transparent only</option>
+          <option value="unknown">Not verified</option>
+          <option value="unavailable">Not available</option>
         </select>
         <button
           className="ws-button"
@@ -303,8 +328,9 @@ export default function WalletCatalog() {
           <span className="font-semibold">
             Shielded = private.
           </span>{" "}
-          Only shielded (Orchard/Sapling) transactions hide the amount, sender
-          and receiver. Transparent (t-address) ZEC is public like Bitcoin.
+          Shielded transactions protect on-chain payment details. Transparent
+          ZEC exposes them. Labels require documented support; check the evidence
+          for platform, release and integration limits.
         </p>
       </aside>
 
@@ -315,7 +341,7 @@ export default function WalletCatalog() {
           </h2>
           <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
             {software.map((w, i) => (
-              <WalletCard key={w.name} w={w} led={LED[i % LED.length]} />
+              <WalletCard key={w.name} w={w} platform={platform} led={LED[i % LED.length]} />
             ))}
           </div>
         </section>
@@ -331,6 +357,7 @@ export default function WalletCatalog() {
               <WalletCard
                 key={w.name}
                 w={w}
+                platform={platform}
                 led={LED[(SOFTWARE.length + i) % LED.length]}
               />
             ))}
@@ -345,7 +372,9 @@ export default function WalletCatalog() {
 
       <p className="mt-7 text-[13px] leading-relaxed text-stone-600">
         {SOFTWARE.length + HARDWARE.length} wallets · curated from official
-        sources, 2026 · shielded support verified per wallet. The{" "}
+        sources. Privacy labels use the same evidence as the finder, for the selected platform. With all platforms selected, confirmed platforms appear below the label. Check the{" "}
+        <Link href="/wallets/find?view=evidence" className="underline underline-offset-4">capability evidence</Link>{" "}
+        for source dates, scope and unknowns. The{" "}
         <span className="rounded-md bg-sky-500/10 px-1.5 py-px text-xs font-medium text-sky-800 ring-1 ring-inset ring-sky-500/20">
           Open source
         </span>{" "}

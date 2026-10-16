@@ -1,8 +1,12 @@
-/** The wallet catalog behind /wallets: plain data, so the server (Zarvis) and the client page read the same list. */
-/** Date of the last edit to the entries below (maintainer-set, not a review pass): update it in the same commit that adds, removes or corrects a wallet. */
-export const WALLET_CATALOG_REVISED_ON = "2026-07-08";
+import { WALLET_EVIDENCE } from "@/lib/wallet-finder/evidence";
+import { DEFAULT_REQUIREMENTS, matchWallets } from "@/lib/wallet-finder/matching";
+import type { WalletPlatform } from "@/lib/wallet-finder/types";
 
-export type Shielded = "full" | "partial" | "transparent";
+/** Shared catalog and evidence-derived privacy labels for /wallets and Zarvis. */
+/** Date of the last edit to the entries below (maintainer-set, not a review pass): update it in the same commit that adds, removes or corrects a wallet. */
+export const WALLET_CATALOG_REVISED_ON = "2026-10-15";
+
+export type Shielded = "full" | "partial" | "transparent" | "unknown" | "unavailable";
 
 export interface Wallet {
   name: string;
@@ -23,10 +27,8 @@ export interface Wallet {
   audit?: string;
 }
 
-// Curated from official sources + a multi-agent research pass (2026), seeded by
-// the community wallet list. Shielded support is the headline: "full" = send AND
-// receive shielded (Orchard/Sapling); "partial" = limited; "transparent" = t-addr only.
-export const SOFTWARE: Wallet[] = [
+// Descriptive catalog entries. Privacy labels are derived from reviewed evidence below.
+const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   {
     name: "Zodl",
     maker: "Zcash Open Development Lab",
@@ -34,7 +36,6 @@ export const SOFTWARE: Wallet[] = [
     // Official iOS AppIcon (zodl-inc/zodl-ios); content version refreshes cached artwork.
     logo: "/wallet-logos/zodl.png?v=1ae79a66",
     platforms: ["iOS", "Android"],
-    shielded: "full",
     flagship: true,
     note: "Formerly Zashi. Shielded by default, from the original core team.",
     source: "https://github.com/zodl-inc",
@@ -44,9 +45,8 @@ export const SOFTWARE: Wallet[] = [
     maker: "Zingo Labs",
     url: "https://zingolabs.org/zingo/",
     logo: "/wallet-logos/zingo.png",
-    platforms: ["iOS", "Android", "Desktop"],
-    shielded: "full",
-    note: "Open-source, shielded by default, with view-only UFVK import.",
+    platforms: ["iOS", "Android"],
+    note: "Shielded sending and receiving on iOS and Android. Desktop availability is not verified.",
     source: "https://github.com/zingolabs",
   },
   {
@@ -55,8 +55,7 @@ export const SOFTWARE: Wallet[] = [
     url: "https://ywallet.app",
     logo: "/wallet-logos/ywallet.png",
     platforms: ["iOS", "Android", "Desktop"],
-    shielded: "full",
-    note: "Fast shielded send/receive with an encrypted messenger.",
+    note: "Zcash and Ycash wallet with shielded sending and receiving. Check the evidence for supported desktop systems.",
     source: "https://github.com/hhanh00/zwallet",
     audit: "https://defuse.ca/zecsec/audits/YWalletAuditReport-FINALv3.pdf",
   },
@@ -66,8 +65,7 @@ export const SOFTWARE: Wallet[] = [
     url: "https://github.com/hhanh00/zkool2",
     logo: "/wallet-logos/zkool.png",
     platforms: ["iOS", "Android", "Desktop"],
-    shielded: "full",
-    note: "hanh's successor to Ywallet. Full shielded, with UFVK import.",
+    note: "Shielded software wallet on mobile and desktop. Current Ledger shielded signing is not verified.",
     source: "https://github.com/hhanh00/zkool2",
   },
   {
@@ -75,9 +73,8 @@ export const SOFTWARE: Wallet[] = [
     maker: "Brave Software",
     url: "https://brave.com/wallet/",
     logo: "/wallet-logos/brave.png",
-    platforms: ["Desktop", "iOS", "Android"],
-    shielded: "full",
-    note: "Shielded ZEC built into the Brave browser, via zk-proofs.",
+    platforms: ["Desktop"],
+    note: "Shielded ZEC in the desktop Brave browser. Reviewed support documentation excludes mobile Zcash.",
     source: "https://github.com/brave/brave-core",
   },
   {
@@ -86,8 +83,7 @@ export const SOFTWARE: Wallet[] = [
     url: "https://www.zknoir.com/",
     logo: "/wallet-logos/noir.png",
     platforms: ["Browser extension"],
-    shielded: "full",
-    note: "First browser-extension wallet with shielded ZEC and DeFi.",
+    note: "Chrome extension with shielded ZEC and documented hardware flows. Integration limits apply.",
   },
   {
     name: "MetaMask Snap",
@@ -95,8 +91,7 @@ export const SOFTWARE: Wallet[] = [
     url: "https://snaps.metamask.io/snap/npm/chainsafe/webzjs-zcash-snap/",
     logo: "/wallet-logos/metamask.png",
     platforms: ["Browser extension"],
-    shielded: "full",
-    note: "Shielded ZEC inside MetaMask. ZCG-funded, Hacken-audited.",
+    note: "Published Zcash Snap for MetaMask. Current usability is unverified after unresolved network-upgrade reports.",
     source: "https://github.com/ChainSafe/WebZjs",
     audit: "https://hacken.io/audits/zcash/dapp-zcash-snap-may2025/",
   },
@@ -106,7 +101,6 @@ export const SOFTWARE: Wallet[] = [
     url: "https://vizor.cash/",
     logo: "/wallet-logos/vizor.png",
     platforms: ["iOS", "Android", "Desktop"],
-    shielded: "full",
     note: "Shielded by default with Keystone support, from the Keplr team.",
     source: "https://github.com/chainapsis/vizor-wallet",
   },
@@ -116,8 +110,7 @@ export const SOFTWARE: Wallet[] = [
     url: "https://cakewallet.com",
     logo: "/wallet-logos/cake.png",
     platforms: ["iOS", "Android", "Desktop"],
-    shielded: "full",
-    note: "Multi-coin privacy wallet; auto-shields and always sends shielded.",
+    note: "Multi-coin wallet with documented shielded mobile transfers. Linux shielded parity is not verified.",
     source: "https://github.com/cake-tech/cake_wallet",
   },
   {
@@ -126,7 +119,6 @@ export const SOFTWARE: Wallet[] = [
     url: "https://edge.app",
     logo: "/wallet-logos/edge.png",
     platforms: ["iOS", "Android"],
-    shielded: "full",
     note: "Mainstream multi-asset wallet defaulting to shielded z-addresses.",
     source: "https://github.com/EdgeApp/edge-react-gui",
   },
@@ -136,8 +128,7 @@ export const SOFTWARE: Wallet[] = [
     url: "https://unstoppable.money/",
     logo: "/wallet-logos/unstoppable.png",
     platforms: ["iOS", "Android"],
-    shielded: "full",
-    note: "Multi-coin wallet with full shielded ZEC and auto-shielding.",
+    note: "Multi-coin mobile wallet with documented shielded Zcash sending and receiving.",
     source: "https://github.com/horizontalsystems/unstoppable-wallet-android",
   },
   {
@@ -145,10 +136,9 @@ export const SOFTWARE: Wallet[] = [
     maker: "Atmosphere Labs",
     url: "https://zipher.to/",
     logo: "/wallet-logos/zipher.png",
-    platforms: ["iOS", "Android", "Desktop", "Web"],
-    shielded: "full",
+    platforms: ["iOS", "Android"],
     tag: "Beta",
-    note: "Shielded-by-default Orchard wallet with a CLI for AI agents.",
+    note: "Mobile beta with shielded sending; receiving remains unverified. A separate CLI is in alpha.",
     source: "https://github.com/atmospherelabs-dev/zipher-app",
   },
   {
@@ -157,19 +147,16 @@ export const SOFTWARE: Wallet[] = [
     url: "https://zstash.app/",
     logo: "/wallet-logos/zstash.png",
     platforms: ["Desktop"],
-    shielded: "full",
     tag: "Coming soon",
-    note: "Native Rust desktop wallet with hardware support and DEX swaps.",
+    note: "Announced desktop wallet. No public usable release or planned capabilities are confirmed.",
   },
   {
     name: "Zapp",
     maker: "JustZappIt",
     url: "https://www.justzappit.xyz/",
     logo: "/wallet-logos/zappit.png",
-    platforms: ["Android"],
-    shielded: "full",
-    // In production on Google Play (Aug 2026); rail count per the maker.
-    note: "P2P messenger with a shielded Zodl-based wallet; no-KYC offramp across 7 local rails, including UPI, PIX and QRIS.",
+    platforms: ["Android", "iOS"],
+    note: "Shielded Zcash mobile wallet. Android public app and iOS public TestFlight beta.",
   },
   {
     name: "Gem Wallet",
@@ -180,7 +167,6 @@ export const SOFTWARE: Wallet[] = [
     // Verified in the source: Zcash lives in the gem_bitcoin UTXO crate, only
     // t1/t3 address scripts are parsed, and the v5 sighash passes EMPTY
     // sapling/orchard digests — transparent send and receive, no shielded.
-    shielded: "transparent",
     note: "Multi-chain self-custodial wallet; transparent (t-address) ZEC only.",
     source: "https://github.com/gemwalletcom/wallet",
     audit:
@@ -188,15 +174,14 @@ export const SOFTWARE: Wallet[] = [
   },
 ];
 
-export const HARDWARE: Wallet[] = [
+const HARDWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   {
     name: "Keystone",
     maker: "Keystone",
     url: "https://keyst.one",
     logo: "/wallet-logos/keystone.png",
     platforms: ["Hardware"],
-    shielded: "full",
-    note: "First air-gapped hardware wallet with native shielded (Orchard) ZEC.",
+    note: "Keystone 3 Pro with Cypherpunk firmware and a compatible Zodl or Vizor companion supports shielded ZEC.",
     source: "https://github.com/KeystoneHQ/keystone3-firmware",
     audit:
       "https://blog.keyst.one/deep-dive-into-next-gen-hardware-wallet-crashing-keystone3-pro-audit-2729bc551d7b",
@@ -207,8 +192,7 @@ export const HARDWARE: Wallet[] = [
     url: "https://www.ledger.com/coin/wallet/zcash",
     logo: "/wallet-logos/ledger.png",
     platforms: ["Hardware"],
-    shielded: "partial",
-    note: "Transparent by default; a Zondax app adds Sapling on some models.",
+    note: "Hardware Zcash accounts. Current shielded support depends on the model and companion and remains unverified.",
     audit: "https://defuse.ca/zecsec/audits/zcash-ledger-audit-report-v2.pdf",
   },
   {
@@ -217,8 +201,39 @@ export const HARDWARE: Wallet[] = [
     url: "https://trezor.io/coins/wallet/zcash",
     logo: "/wallet-logos/trezor.png",
     platforms: ["Hardware"],
-    shielded: "transparent",
     note: "Transparent (t-address) only; no shielded support.",
     source: "https://github.com/trezor/trezor-firmware",
   },
 ];
+
+const PLATFORM_KEYS: Record<string, WalletPlatform> = {
+  iOS: "ios", Android: "android", Desktop: "desktop",
+  "Browser extension": "browser", Web: "web", Hardware: "hardware",
+};
+const PLATFORM_NAMES = Object.fromEntries(Object.entries(PLATFORM_KEYS).map(([label, key]) => [key, label]));
+
+/** A label is valid only when availability and both directions are documented on the same platform. */
+export function walletPrivacy(walletName: string, selectedPlatform = ""): {
+  level: Shielded; platforms: string[]; availability: "match" | "unknown" | "excluded";
+} {
+  const profile = WALLET_EVIDENCE.find((item) => item.walletName === walletName);
+  if (!profile) return { level: "unknown", platforms: [], availability: "unknown" };
+  const requirements = { ...DEFAULT_REQUIREMENTS, platform: PLATFORM_KEYS[selectedPlatform] ?? "any" } as const;
+  const available = matchWallets([profile], requirements)[0];
+  const both = matchWallets([profile], { ...requirements, shielded: "both" })[0];
+  const result = { platforms: both.platforms.map((key) => PLATFORM_NAMES[key]), availability: available.status };
+  if (both.status === "match") return { ...result, level: "full" };
+  if (available.status === "excluded") return { ...result, level: "unavailable" };
+  if (available.status === "unknown" || both.status === "unknown") return { ...result, level: "unknown" };
+  // Only explicit, sourced rejection of both directions establishes transparent-only support.
+  const candidates = available.platforms.map((key) => profile.platforms[key]!);
+  const documentedNo = (fact: typeof profile.availability) => fact.status === "unsupported" && fact.sources.length > 0 && !!fact.checkedAt && !!fact.scope.trim();
+  if (candidates.length && candidates.every((facts) => documentedNo(facts.shieldedSend) && documentedNo(facts.shieldedReceive))) {
+    return { ...result, level: "transparent" };
+  }
+  const directionConfirmed = ["send", "receive"].some((shielded) => matchWallets([profile], { ...requirements, shielded: shielded as "send" | "receive" })[0].status === "match");
+  return { ...result, level: directionConfirmed ? "partial" : "unknown" };
+}
+
+export const SOFTWARE: Wallet[] = SOFTWARE_ENTRIES.map((wallet) => ({ ...wallet, shielded: walletPrivacy(wallet.name).level }));
+export const HARDWARE: Wallet[] = HARDWARE_ENTRIES.map((wallet) => ({ ...wallet, shielded: walletPrivacy(wallet.name).level }));

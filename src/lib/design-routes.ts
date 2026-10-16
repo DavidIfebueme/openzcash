@@ -230,6 +230,7 @@ export function childAppsOf(app: AppDef, apps: AppDef[] = APPS): AppDef[] {
 
 /** Detail routes and the list page they belong to. */
 const DETAILS: Record<string, { parent: string; label: string }> = {
+  "/wallets/find": { parent: "/wallets", label: "Find a wallet" },
   "/zcg/grant": { parent: "/zcg/grants", label: "Grant detail" },
   "/zcg/recipient": { parent: "/zcg/recipients", label: "Recipient detail" },
 };

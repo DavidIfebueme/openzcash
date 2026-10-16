@@ -122,3 +122,9 @@ describe("backOf", () => {
     }
   });
 });
+
+
+it("returns the wallet finder to the wallet catalog", () => {
+  expect(backOf("/wallets/find")).toEqual({ href: "/wallets", label: "Wallets" });
+  expect(placeOf("/wallets/find")?.detail?.label).toBe("Find a wallet");
+});

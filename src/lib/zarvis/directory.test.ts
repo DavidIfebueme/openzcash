@@ -76,7 +76,7 @@ describe("Wallet catalog lookup", () => {
     );
     expect(ios.allWallets.split(", ")).toHaveLength(SOFTWARE.length + HARDWARE.length);
     expect(ios).toMatchObject({
-      catalogRevisedOn: "2026-07-08",
+      catalogRevisedOn: "2026-10-15",
       totalWallets: 18,
       hardwareWallets: 3,
     });
@@ -95,7 +95,9 @@ describe("Wallet catalog lookup", () => {
     expect(zingo.wallets).toHaveLength(1);
     expect(zingo.wallets[0]).toMatchObject({
       maker: "Zingo Labs",
-      platforms: expect.stringContaining("Desktop"),
+      platforms: "iOS, Android",
+      shielded: "unknown",
+      availability: "unknown",
       site: "https://zingolabs.org/zingo/",
       sourceCode: "https://github.com/zingolabs",
     });
@@ -108,12 +110,23 @@ describe("Wallet catalog lookup", () => {
     expect(zashi.wallets.map((w) => w.name)).toEqual(["Zodl"]);
     expect(walletsContext("open source wallet with audit").filter.names).toEqual([]);
   });
+  it("does not offer Brave, unknown Snap or unreleased wallets for Android shielded requests", () => {
+    const android = walletsContext("android shielded");
+    const names = android.wallets.map((wallet) => wallet.name);
+    expect(names).toContain("Zodl");
+    expect(names).not.toContain("Brave Wallet");
+    expect(android.allWallets).toContain("Brave Wallet:unavailable");
+    expect(names).not.toContain("MetaMask Snap");
+    expect(names).not.toContain("Zipher");
+    expect(names).not.toContain("zSTASH");
+    expect(walletsContext("Ledger wallet").wallets[0]).toMatchObject({ shielded: "unknown" });
+  });
   it("keeps the inventory, revision date and note ahead of the rows when many wallets match", () => {
     for (const q of ["", "Android"]) {
       const out = compactData(walletsContext(q), q, charBudget("wallets"), rowLimit("wallets"));
       const shown = out.data as { allWallets: string; catalogRevisedOn: string; note: string; wallets: { shown: unknown[] } };
       expect(shown.allWallets.split(", "), q).toHaveLength(18);
-      expect(shown.catalogRevisedOn).toBe("2026-07-08");
+      expect(shown.catalogRevisedOn).toBe("2026-10-15");
       expect(shown.note).toContain("last edit");
       expect(shown.wallets.shown.length, q).toBeGreaterThanOrEqual(10);
     }

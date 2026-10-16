@@ -8,7 +8,7 @@
   "scripts": {
     "predev": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs && npm run errors:check && npm run check:proposal-cards",
+    "prebuild": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs && npm run errors:check && npm run check:proposal-cards && npm run wallets:check",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -35,7 +35,8 @@
     "errors:build": "tsx scripts/build-error-fallback.tsx",
     "errors:check": "tsx scripts/build-error-fallback.tsx --check",
     "test:errors": "vitest run src/components/errors/error-state.test.tsx && node --test ops/error-fallback/handler.test.mjs && npm run errors:check",
-    "check:proposal-cards": "node scripts/check-proposal-cards.mjs"
+    "check:proposal-cards": "node scripts/check-proposal-cards.mjs",
+    "wallets:check": "tsx scripts/validate-wallet-evidence.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.132.0",
@@ -74,6 +75,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "axe-core": "4.12.1",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.8",

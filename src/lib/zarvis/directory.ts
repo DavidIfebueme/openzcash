@@ -2,6 +2,7 @@ import {
   HARDWARE,
   SOFTWARE,
   WALLET_CATALOG_REVISED_ON,
+  walletPrivacy,
   type Wallet,
 } from "@/app/wallets/catalog-data";
 import {
@@ -73,15 +74,16 @@ export function walletsContext(query: string) {
   const pool = named.length ? named : all;
   const matched = pool.filter(
     ({ w, kind: k }) =>
-      (!platform || w.platforms.includes(platform)) &&
-      (!shielded || w.shielded === shielded) &&
+      (!platform || named.length > 0 || w.platforms.includes(platform)) &&
+      (!shielded || walletPrivacy(w.name, platform ?? "").level === shielded) &&
       (!kind || k === kind),
   );
   const row = ({ w }: { w: Wallet }) => ({
     name: w.name,
     maker: w.maker,
     platforms: w.platforms.join(", "),
-    shielded: w.shielded,
+    shielded: walletPrivacy(w.name, platform ?? "").level,
+    availability: walletPrivacy(w.name, platform ?? "").availability,
     ...(w.tag ? { status: w.tag } : {}),
     note: w.note,
     site: w.url,
@@ -91,10 +93,10 @@ export function walletsContext(query: string) {
   return {
     catalogRevisedOn: WALLET_CATALOG_REVISED_ON,
     totalWallets: all.length,
-    fullShielded: all.filter(({ w }) => w.shielded === "full").length,
+    fullShielded: all.filter(({ w }) => walletPrivacy(w.name, platform ?? "").level === "full").length,
     hardwareWallets: HARDWARE.length,
-    allWallets: all.map(({ w }) => `${w.name}:${w.shielded}`).join(", "),
-    note: "Curated catalog; catalogRevisedOn is the date of the last edit to its entries, not a review of every wallet. full = shielded send and receive (Orchard/Sapling); partial = limited; transparent = t-addresses only. Absent from allWallets = not catalogued, not nonexistent. Not an audit or endorsement; confirm platforms and releases on each wallet's site.",
+    allWallets: all.map(({ w }) => `${w.name}:${walletPrivacy(w.name, platform ?? "").level}`).join(", "),
+    note: "catalogRevisedOn is the last edit, not a review of every wallet. Privacy labels/count use platform-specific evidence: full = available with shielded send and receive on the same selected platform (any confirmed platform if none selected); transparent requires explicit evidence; unknown/unavailable never imply transparent. Named wallets remain visible to explain platform uncertainty. Absent from allWallets = not catalogued, not nonexistent. Not an audit or endorsement; consult /wallets/find for source dates and limits.",
     filter: { platform, shielded, kind, names: named.map(({ w }) => w.name) },
     matched: matched.length,
     wallets: matched.map(row),
