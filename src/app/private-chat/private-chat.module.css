@@ -1529,7 +1529,7 @@
 }
 
 /* Independent direct conversations share one ephemeral Nym session. */
-.chatList { min-height: 0; margin: 18px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); }
+.chatList { flex-shrink: 0; margin: 18px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); }
 .chatListHeading { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 10px 10px; }
 .chatListHeading h2 { margin: 0; font-size: 12px; font-weight: 650; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
 .newChatButton { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 4px 7px; border: 0; border-radius: 6px; color: var(--accent-ink); background: transparent; font-size: 13px !important; font-weight: 600 !important; }
