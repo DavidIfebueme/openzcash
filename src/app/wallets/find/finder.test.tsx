@@ -2,6 +2,8 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import "@testing-library/jest-dom/vitest";
 import axe from "axe-core";
+import { renderToString } from "react-dom/server";
+import { hydrateRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { CapabilityEvidence, WalletPlatformEvidence } from "@/lib/wallet-finder/types";
 
@@ -47,12 +49,14 @@ import { WalletFinder } from "./finder";
 const nativePush = window.history.pushState.bind(window.history);
 beforeEach(() => {
   window.history.replaceState(null, "", "/wallets/find");
+  Object.defineProperty(HTMLDialogElement.prototype, "showModal", { configurable: true, value(this: HTMLDialogElement) { this.setAttribute("open", ""); } });
+  Object.defineProperty(HTMLDialogElement.prototype, "close", { configurable: true, value(this: HTMLDialogElement) { this.removeAttribute("open"); this.dispatchEvent(new Event("close")); } });
   vi.spyOn(window.history, "pushState").mockImplementation((data, unused, url) => {
     nativePush(data, unused, url);
     window.dispatchEvent(new PopStateEvent("popstate"));
   });
 });
-afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+afterEach(() => { cleanup(); vi.restoreAllMocks(); document.documentElement.style.removeProperty("--sheet-gutter"); });
 
 function open(query: string) {
   window.history.replaceState(null, "", `/wallets/find${query}`);
@@ -60,6 +64,23 @@ function open(query: string) {
 }
 
 describe("Wallet Finder interactions", () => {
+  it("hydrates platform SVG titles without replacing server-rendered cards", async () => {
+    const host = document.createElement("div");
+    host.innerHTML = renderToString(<WalletFinder />);
+    document.body.append(host);
+    const failures: unknown[] = [];
+    let root: ReturnType<typeof hydrateRoot> | undefined;
+    try {
+      await act(async () => {
+        root = hydrateRoot(host, <WalletFinder />, { onRecoverableError: error => failures.push(error) });
+      });
+      expect(failures).toEqual([]);
+    } finally {
+      if (root) act(() => root!.unmount());
+      host.remove();
+    }
+  });
+
   it("preserves catalog order on any platform, while filtering and after reset", () => {
     open("");
     const expected = ["Matched wallet", "Unknown wallet", "Excluded wallet"];
@@ -137,10 +158,11 @@ describe("Wallet Finder interactions", () => {
     expect(screen.getByText("1 wallet needs more verification")).toBeInTheDocument();
     expect(screen.getByText("1 wallet does not meet these filters")).toBeInTheDocument();
     const wallet = screen.getByRole("article", { name: "Matched wallet" });
-    fireEvent.click(within(wallet).getByText("Sources, dates & limits"));
-    expect(within(wallet).getAllByText("Oct 15, 2026").length).toBeGreaterThan(0);
-    expect(within(wallet).getAllByText("Android · reviewed public release").length).toBeGreaterThan(0);
-    const source = within(wallet).getAllByRole("link", { name: /Primary capability documentation/ })[0];
+    fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
+    const details = screen.getByRole("dialog", { name: "Matched wallet details" });
+    expect(within(details).getAllByText("Oct 15, 2026").length).toBeGreaterThan(0);
+    expect(within(details).getAllByText("Android · reviewed public release").length).toBeGreaterThan(0);
+    const source = within(details).getAllByRole("link", { name: /Primary capability documentation/ })[0];
     expect(source).toHaveAttribute("href", "https://example.org/primary-documentation");
     expect(source).toHaveAttribute("rel", "noopener noreferrer");
   });
@@ -160,9 +182,13 @@ describe("Wallet Finder interactions", () => {
       expect(within(wallet).getByRole("img", { name: "Editorial highlight" })).toHaveTextContent("⭐");
       const report = within(wallet).getByRole("link", { name: "Audit report for Matched wallet on Android" });
       expect(report).toHaveAttribute("href", "https://example.org/audit-report.pdf");
-      expect(wallet).toHaveTextContent("Android 2.1 public release; older code reviewed");
-      expect(wallet).toHaveTextContent("Past reports do not guarantee current safety.");
+      expect(report).toHaveTextContent("Past audit");
+      expect(report).toHaveAttribute("title", expect.stringContaining("Android 2.1 public release; older code reviewed"));
       expect(within(screen.getByRole("article", { name: "Unknown wallet" })).queryByRole("link", { name: /Audit report/ })).not.toBeInTheDocument();
+      fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
+      const details = screen.getByRole("dialog", { name: "Matched wallet details" });
+      expect(details).toHaveTextContent("Android 2.1 public release; older code reviewed");
+      expect(details).toHaveTextContent("Past reports do not guarantee current safety.");
     } finally {
       fixtures[0].platforms.android.securityAudit = original;
     }
@@ -179,23 +205,30 @@ describe("Wallet Finder interactions", () => {
     expect(screen.getByRole("heading", { name: "1 wallet matches your filters" })).toBeInTheDocument();
   });
 
-  it("shows platform, version and channel scope without opening source details", () => {
+  it("keeps cards concise, gives platform logos accessible names and opens scope in details", () => {
     const availability = fixtures[0].platforms.android.availability;
     const scope = "Android public beta 2.1; Keystone 3 Pro firmware 3.0.4 required";
     fixtures[0].platforms.android.availability = { ...availability, scope };
     try {
-      open("?platform=android&privacy=both&view=results");
+      open("?platform=android&privacy=both");
       const wallet = screen.getByRole("article", { name: "Matched wallet" });
-      expect(within(wallet).getByText("Android reviewed scope")).toBeVisible();
-      const visibleScope = within(wallet).getAllByText(scope).find(element => !element.closest("details"));
-      expect(visibleScope).toBeVisible();
-      expect(wallet.querySelector("details")).not.toHaveAttribute("open");
+      expect(within(wallet).getByRole("img", { name: "Android" }).tagName.toLowerCase()).toBe("svg");
+      expect(within(wallet).getByText("Shielded")).toBeVisible();
+      expect(within(wallet).queryByText(scope)).not.toBeInTheDocument();
+      fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
+      const details = screen.getByRole("dialog", { name: "Matched wallet details" });
+      expect(within(details).getByText("Android reviewed scope")).toBeVisible();
+      expect(within(details).getAllByText(scope)[0]).toBeVisible();
+      expect(within(details).getByRole("link", { name: /All capability records/ })).toHaveAttribute("href", "/wallets/find?platform=android&privacy=both&view=evidence&wallet=Matched+wallet");
+      fireEvent.click(within(details).getByRole("button", { name: "Close Matched wallet details" }));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+      expect(screen.getByRole("combobox", { name: "Platform" })).toHaveValue("android");
     } finally {
       fixtures[0].platforms.android.availability = availability;
     }
   });
 
-  it("shows each claimed platform's own visible scope and source links", () => {
+  it("keeps each platform's own scope and sources behind its concise icon row", () => {
     const iosSources = [{ url: "https://example.org/ios-beta", title: "Official iOS beta documentation" }];
     const iosFacts = Object.fromEntries(Object.entries(fixtures[0].platforms.android).map(([key, fact]) => [key, {
       ...fact,
@@ -204,18 +237,39 @@ describe("Wallet Finder interactions", () => {
     }])) as WalletPlatformEvidence;
     Object.assign(fixtures[0].platforms, { ios: iosFacts });
     try {
-      open("?privacy=both&view=results");
+      open("?privacy=both");
       const wallet = screen.getByRole("article", { name: "Matched wallet" });
-      expect(within(wallet).getByText("Matches on Android, iPhone / iPad.")).toBeVisible();
-      expect(within(wallet).getByText("Android reviewed scope")).toBeVisible();
-      expect(within(wallet).getByText("iPhone / iPad reviewed scope")).toBeVisible();
-      const visibleIosScope = within(wallet).getAllByText("iOS TestFlight 2.1; separate beta channel").find(element => !element.closest("details"));
-      expect(visibleIosScope).toBeVisible();
-      fireEvent.click(within(wallet).getByText("Sources, dates & limits"));
-      expect(within(wallet).getByRole("heading", { name: "Send shielded ZEC · Android" })).toBeVisible();
-      expect(within(wallet).getByRole("heading", { name: "Send shielded ZEC · iPhone / iPad" })).toBeVisible();
-      expect(within(wallet).getAllByRole("link", { name: /Primary capability documentation/ }).length).toBeGreaterThan(0);
-      expect(within(wallet).getAllByRole("link", { name: /Official iOS beta documentation/ }).length).toBeGreaterThan(0);
+      expect(within(wallet).getByRole("img", { name: "Android" }).tagName.toLowerCase()).toBe("svg");
+      expect(within(wallet).getByRole("img", { name: "iPhone / iPad" }).tagName.toLowerCase()).toBe("svg");
+      fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
+      const details = screen.getByRole("dialog", { name: "Matched wallet details" });
+      expect(within(details).getByText("Matches on Android, iPhone / iPad.")).toBeVisible();
+      expect(within(details).getByText("Android reviewed scope")).toBeVisible();
+      expect(within(details).getByText("iPhone / iPad reviewed scope")).toBeVisible();
+      expect(within(details).getByRole("heading", { name: "Send shielded ZEC · Android" })).toBeVisible();
+      expect(within(details).getByRole("heading", { name: "Send shielded ZEC · iPhone / iPad" })).toBeVisible();
+      expect(within(details).getAllByRole("link", { name: /Primary capability documentation/ }).length).toBeGreaterThan(0);
+      expect(within(details).getAllByRole("link", { name: /Official iOS beta documentation/ }).length).toBeGreaterThan(0);
+    } finally {
+      delete (fixtures[0].platforms as Record<string, WalletPlatformEvidence>).ios;
+    }
+  });
+
+  it("does not show a blanket shielded badge when the displayed platforms have different privacy support", () => {
+    const iosFacts = { ...fixtures[0].platforms.android,
+      shieldedSend: fixtures[2].platforms.android.shieldedSend,
+      shieldedReceive: fixtures[2].platforms.android.shieldedReceive,
+    };
+    Object.assign(fixtures[0].platforms, { ios: iosFacts });
+    try {
+      open("");
+      const wallet = screen.getByRole("article", { name: "Matched wallet" });
+      expect(within(wallet).getByRole("img", { name: "Android" })).toBeVisible();
+      expect(within(wallet).getByRole("img", { name: "iPhone / iPad" })).toBeVisible();
+      expect(within(wallet).queryByText("Shielded", { exact: true })).not.toBeInTheDocument();
+      expect(within(wallet).getByText("Privacy unverified")).toBeVisible();
+      fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "android" } });
+      expect(within(wallet).getByText("Shielded", { exact: true })).toBeVisible();
     } finally {
       delete (fixtures[0].platforms as Record<string, WalletPlatformEvidence>).ios;
     }
@@ -307,12 +361,14 @@ describe("Wallet Finder automated accessibility", () => {
     ["legacy step link", "?platform=android&view=privacy"],
     ["empty results", "?platform=android&privacy=both&hardware=required"],
     ["all capability evidence", "?view=evidence&wallet=Unknown%20wallet"],
+    ["wallet details", "?platform=android&privacy=both"],
   ])("has no WCAG A/AA violations in %s", async (_name, query) => {
     window.history.replaceState(null, "", `/wallets/find${query}`);
     const { container } = render(<main><WalletFinder /></main>);
     // Expand disclosures too: accessible names and evidence semantics must work
     // when the user opens unknown/excluded groups and their source records.
     container.querySelectorAll("details").forEach(details => { details.open = true; });
+    if (_name === "wallet details") fireEvent.click(screen.getByRole("button", { name: "Details for Matched wallet" }));
     const report = await axe.run(container, {
       runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"] },
       // jsdom has no rendered color/layout; both themes receive browser QA.

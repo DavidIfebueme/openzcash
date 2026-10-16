@@ -20,7 +20,6 @@
 .filterOption input { width: 17px; height: 17px; margin: 0; flex: none; accent-color: var(--accent-ink); }
 .filterOption input:focus-visible { outline: none; }
 .filterOption span { min-width: 0; }
-.filterNote { margin: 11px 0 0; padding-top: 9px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; line-height: 1.5; }
 .secondaryButton { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 8px 15px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; line-height: 1.4; cursor: pointer; text-align: center; }
 .secondaryButton:hover { border-color: var(--accent); background: var(--surface2); }
 .results { margin-top: 24px; }
@@ -30,39 +29,41 @@
 .resultHeading > button { flex-shrink: 0; font-size: 14px; }
 .shareMessage { margin: 8px 0; color: var(--muted); font-size: 13px; text-align: right; line-height: 1.5; }
 .shareMessage:empty { display: none; }
-.walletList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 10px; }
-.wallet { min-width: 0; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 16px; box-shadow: 0 6px 18px -17px var(--ink); }
-.walletHeading { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
-.walletHeading img { width: 38px; height: 38px; border-radius: 9px; object-fit: contain; flex-shrink: 0; }
-.walletHeading > div { flex: 1; min-width: 150px; }
-.walletName { display: flex; align-items: baseline; gap: 5px; }
-.walletHeading h3 { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.35; letter-spacing: -.02em; overflow-wrap: anywhere; }
-.editorialStar { flex: none; font-size: 13px; line-height: 1; }
-.walletHeading p { margin: 2px 0 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
-.officialLink { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent-ink); font-size: 13px; line-height: 1.5; }
-.auditBlock { display: flex; align-items: center; flex-wrap: wrap; gap: 4px 8px; margin-top: 6px; }
-.auditBadge { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 6px; color: var(--accent-ink); background: var(--accent-soft); font-size: 13px; line-height: 1.3; text-decoration: none; white-space: nowrap; }
+.walletList { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 12px; margin-top: 16px; }
+.wallet { min-width: 0; aspect-ratio: 1; display: flex; flex-direction: column; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); box-shadow: 0 6px 18px -17px var(--ink); }
+.walletHeading { display: flex; align-items: center; gap: 11px; min-height: 52px; }
+.walletHeading img { width: 44px; height: 44px; border-radius: 10px; object-fit: contain; flex-shrink: 0; padding: 4px; background: #fff; border: 1px solid var(--line); }
+.walletName { display: flex; align-items: baseline; gap: 5px; min-width: 0; }
+.walletHeading h3 { margin: 0; font-size: 19px; font-weight: 600; line-height: 1.25; letter-spacing: -.025em; overflow-wrap: anywhere; }
+.editorialStar { flex: none; font-size: 14px; line-height: 1; }
+.walletSummary { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; min-height: 32px; margin-top: auto; padding-top: 12px; }
+.privacyBadge, .auditBadge { display: inline-flex; align-items: center; gap: 5px; min-height: 30px; padding: 4px 8px; border-radius: 6px; color: var(--muted); background: var(--surface2); font-size: 13px; line-height: 1.35; text-decoration: none; }
+.privacyBadge[data-private] { color: var(--pos); background: var(--pos-soft); }
+.auditBadge { color: var(--accent-ink); background: var(--accent-soft); }
 .auditBadge:hover { text-decoration: underline; text-underline-offset: 3px; }
-.auditContext { flex: 1 1 220px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+.platformIcons { display: flex; align-items: center; gap: 10px; min-height: 32px; margin: 13px 0; }
+.platformIcons > [role="img"] { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 32px; font-size: 23px; line-height: 1; }
+.platformIcons > svg { padding: 3px; color: var(--ink); }
+.platformIcons > svg[data-platform="android"] { color: var(--pos); }
+.unverifiedPlatform { color: var(--muted); font-size: 13px; }
+.walletActions { display: flex; align-items: center; justify-content: space-between; gap: 8px; border-top: 1px solid var(--line); padding-top: 7px; }
+.officialLink { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; color: var(--accent-ink); font-size: 14px; line-height: 1.5; }
+.walletActions button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 0 0 10px; color: var(--ink); background: transparent; font: inherit; font-size: 14px; cursor: pointer; }
+.walletActions button:hover { color: var(--accent-ink); }
+.walletDetails { padding: 18px 20px 24px; font-size: 14px; line-height: 1.6; }
+.walletDetails > p { margin: 0 0 12px; }
+.walletDetails > h3 { margin: 20px 0 8px; font-size: 17px; font-weight: 600; }
+.walletDetails .maker { color: var(--muted); font-size: 13px; }
+.auditBlock { margin-top: 14px; }
+.auditContext { margin: 4px 0 12px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 .matchPlatform { margin: 9px 0 0; font-size: 13px; line-height: 1.45; color: var(--accent-ink); }
 .reviewedScope { margin: 7px 0 0; font-size: 13px; line-height: 1.5; }
 .reviewedScope > div + div { margin-top: 4px; }
 .reviewedScope dt { display: inline; color: var(--muted); font-size: 13px; }
 .reviewedScope dt::after { content: ": "; }
 .reviewedScope dd { display: inline; margin: 0; color: var(--ink); overflow-wrap: anywhere; }
-.representative { margin: 14px 0 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
-.representative a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
-.reasons { display: grid; gap: 4px; list-style: none; margin: 12px 0; padding: 0; }
-.reasons li { display: flex; align-items: baseline; gap: 7px; color: var(--muted); font-size: 13px; line-height: 1.5; }
-.reasons li > span:first-child { flex: 0 0 13px; font-weight: 600; color: var(--accent-ink); }
-.reasons li[data-state="unknown"] > span:first-child { color: var(--muted); }
-.reasons li[data-state="unsupported"] > span:first-child { color: var(--neg); }
-.evidence { border-top: 1px solid var(--line); margin-top: 12px; }
-.evidence > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; padding: 12px 0 0; color: var(--accent-ink); font-size: 14px; line-height: 1.5; cursor: pointer; list-style: none; }
-.evidence > summary::-webkit-details-marker { display: none; }
-.evidence[open] > summary { margin-bottom: 10px; }
 .evidenceIntro { font-size: 13px; line-height: 1.7; color: var(--muted); margin: 0 0 15px; }
-.evidence > ul, .recordFacts { list-style: none; margin: 0; padding: 0; }
+.recordFacts { list-style: none; margin: 0; padding: 0; }
 .evidenceItem { padding: 16px 0; border-top: 1px solid var(--line); }
 .evidenceHeading { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 12px; }
 .evidenceHeading h4 { margin: 0; flex: 1; min-width: 160px; font-size: 14px; font-weight: 600; line-height: 1.5; }
@@ -101,7 +102,6 @@
 @media (max-width: 850px) {
   .filterGrid { grid-template-columns: minmax(160px, 200px) minmax(0, 1fr); }
   .filterOptions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .walletList { grid-template-columns: minmax(0, 1fr); }
   .resultHeading { flex-wrap: wrap; }
   .shareMessage { text-align: left; }
 }
@@ -111,10 +111,9 @@
   .filterGrid { grid-template-columns: minmax(0, 1fr); gap: 10px; }
   .filterOptions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .filterOption { min-height: 48px; padding: 8px; gap: 7px; }
-  .filterNote { margin-top: 9px; }
   .results { margin-top: 19px; }
-  .wallet, .record { padding: 14px; }
-  .walletHeading > div { min-width: 110px; }
+  .record { padding: 14px; }
+  .platformField select { font-size: 16px; }
   .empty { padding: 18px; }
   .recordHeader label { width: 100%; }
   .finder .recordHeader select:not(#_) { width: 100%; }
