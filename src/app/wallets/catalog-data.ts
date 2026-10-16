@@ -219,12 +219,12 @@ const HARDWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Ledger",
-    summary: "Hardware ZEC wallet; shielded support remains unverified.",
-    maker: "Ledger · Zondax",
+    summary: "Shielded ZEC with Ledger Wallet Desktop and a compatible device.",
+    maker: "Ledger",
     url: "https://www.ledger.com/coin/wallet/zcash",
     logo: "/wallet-logos/ledger.png",
     platforms: ["Hardware"],
-    note: "Hardware Zcash accounts. Current shielded support depends on the model and companion and remains unverified.",
+    note: "Shielded send and receive in Ironwood via Ledger Wallet Desktop 4.21+ and the Ledger Zcash (ZEC) app 3.9.4+, with current Ledger OS. Excludes original Nano S and mobile. Legacy Zondax accounts use a separate app.",
     audit: "https://defuse.ca/zecsec/audits/zcash-ledger-audit-report-v2.pdf",
   },
   {

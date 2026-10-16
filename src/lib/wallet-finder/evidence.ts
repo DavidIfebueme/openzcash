@@ -75,8 +75,8 @@ const s = {
   zapp: source("https://www.justzappit.xyz/", "Zapp: Android, iOS beta and shielded Zcash payments"),
   gem: source("https://gemwallet.com/", "Gem Wallet: mobile platforms and native blockchains"),
   gemZcash: source("https://docs.gemwallet.com/blockchains/zcash/", "Gem Wallet: transparent-only Zcash support"),
-  ledger: source("https://www.ledger.com/coin/wallet/zcash", "Ledger: Zcash hardware products and wallet"),
-  ledgerSign: source("https://support.ledger.com/article/4404382228753-zd?redirect=false", "Ledger: device approval and signing"),
+  ledgerShielded: source("https://www.ledger.com/blog-native-shielded-zcash-support", "Ledger: native shielded Zcash on desktop, September 23, 2026"),
+  ledgerShieldedGuide: source("https://support.ledger.com/tr/article/How-to-use-your-private-ZEC-balance-through-Ledger-Wallet-desktop", "Ledger: private ZEC requirements, sending and receiving"),
   ledgerAssets: source("https://shop.ledger.com/pages/ledger-wallet", "Ledger Wallet: native assets across blockchains"),
   trezor: source("https://trezor.io/coins/wallet/zcash", "Trezor: supported devices and transparent-only Zcash"),
   trezorAssets: source("https://trezor.io/coins", "Trezor: supported native coins and wallet integrations"),
@@ -167,8 +167,9 @@ const gemFacts = {
   securityAudit: { ...yes([s.gemAudit], "CertiK assessed Gem Wallet in November 2025 and published an April 2026 final report with remediation through later versions. The report reviews wallet security, not Zcash shielded transfers."), scope: "Gem Wallet iOS 1.3.292 / Android 1.3.47; remediation reviewed through iOS 1.3.355 / Android 2.0.16" },
 };
 const keystoneAvailable = yes([s.keystoneFirmware, s.keystoneMatrix], "Keystone 3 Pro and its public Cypherpunk firmware support Zcash through companion wallets.");
-const ledgerAvailable = yes([s.ledger], "Ledger offers Zcash hardware accounts with companion software; capabilities depend on the device and app.");
-const ledgerShielded = unknown("Shielded support varies by integration. zkool documents a broken legacy Ledger app, while newer Noir documents PCZT flows; no single model/app combination was verified here.", [s.zkoolLedger, s.noirHardware]);
+const ledgerScope = "Ledger signer with current Ledger OS, Zcash (ZEC) app 3.9.4+ and Ledger Wallet Desktop 4.21+; excludes original Nano S and mobile";
+const ledgerAvailable = yes([s.ledgerShielded, s.ledgerShieldedGuide], "Native shielded Zcash is released in Ledger Wallet Desktop with the Ledger-developed Zcash (ZEC) app. The latest app is unavailable on the original Nano S; mobile is not supported.");
+const ledgerShielded = yes([s.ledgerShielded, s.ledgerShieldedGuide], "Enable shielded to send and receive private ZEC in the Ironwood pool. Requires Ledger Wallet Desktop 4.21+, Zcash (ZEC) app 3.9.4+ and current Ledger OS; excludes original Nano S and mobile. Only Ironwood private balances are shown; older pools and legacy Zondax shielded balances require a separate migration.");
 const trezorAvailable = yes([s.trezor], "The vendor lists Zcash support for Safe 3, Safe 5 and Safe 7 through Trezor Suite.");
 const trezorShielded = no([s.trezor], "The vendor explicitly limits Zcash to transparent addresses and excludes shielded transactions.");
 
@@ -336,10 +337,10 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
     }) },
   },
   {
-    walletName: "Ledger", availability: scoped("Public Ledger devices and companion software; model/app-specific support", ledgerAvailable),
-    platforms: { hardware: platform("Ledger Zcash hardware account; shielded app/integration not verified as a single supported combination", ledgerAvailable, {
+    walletName: "Ledger", availability: scoped(ledgerScope, ledgerAvailable),
+    platforms: { hardware: platform(ledgerScope, ledgerAvailable, {
       shieldedSend: ledgerShielded, shieldedReceive: ledgerShielded,
-      hardwareSigning: yes([s.ledger, s.ledgerSign], "Ledger accounts require on-device approval and signing; this does not establish shielded Zcash support."),
+      hardwareSigning: yes([s.ledgerShielded, s.ledgerShieldedGuide], "Private Zcash transactions are approved and signed on the Ledger device; the desktop app handles transaction computation."),
       multichain: yes([s.ledgerAssets], "Ledger Wallet manages native BTC, ETH, SOL and other assets using a Ledger signer."),
       securityAudit: { ...unknown("A ZecSec audit covers hhanh00's legacy zcash-ledger shielded app v1.0.1. It does not establish an independent review of the current Ledger Zcash account, firmware or companion software.", [s.ledgerLegacyAudit]), scope: "Current Ledger Zcash account; cited historical report covers a separate 2023 app v1.0.1" },
     }) },

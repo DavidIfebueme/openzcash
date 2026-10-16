@@ -135,7 +135,7 @@ describe("Wallet catalog lookup", () => {
     expect(names).not.toContain("MetaMask Snap");
     expect(names).not.toContain("Zipher");
     expect(names).not.toContain("zSTASH");
-    expect(walletsContext("Ledger wallet").wallets[0]).toMatchObject({ shielded: "unknown" });
+    expect(walletsContext("Ledger wallet").wallets[0]).toMatchObject({ shielded: "full", note: expect.stringContaining("Ledger Wallet Desktop 4.21+") });
   });
   it("keeps the inventory, revision date and note ahead of the rows when many wallets match", () => {
     for (const q of ["", "Android"]) {

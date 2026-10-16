@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "9fa7b51eb7586885",
+  "sourceRevision": "d6b62379d4811267",
   "sourceFiles": 56,
   "documents": [
     {
@@ -1597,7 +1597,7 @@
       "id": "src/app/wallets/catalog-data.ts:17",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Ledger",
-      "text": "Ledger\nHardware ZEC wallet; shielded support remains unverified.\nMaker: Ledger · Zondax\nHardware\nHardware Zcash accounts. Current shielded support depends on the model and companion and remains unverified."
+      "text": "Ledger\nShielded ZEC with Ledger Wallet Desktop and a compatible device.\nMaker: Ledger\nHardware\nShielded send and receive in Ironwood via Ledger Wallet Desktop 4.21+ and the Ledger Zcash (ZEC) app 3.9.4+, with current Ledger OS. Excludes original Nano S and mobile. Legacy Zondax accounts use a separate app."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:18",

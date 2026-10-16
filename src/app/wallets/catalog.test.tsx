@@ -67,7 +67,7 @@ describe("Evidence-aligned wallet catalog", () => {
   });
 
   it("keeps unknown and unavailable support separate from explicit transparent-only support", () => {
-    expect(walletPrivacy("Ledger").level).toBe("unknown");
+    expect(walletPrivacy("Ledger").level).toBe("full");
     expect(walletPrivacy("MetaMask Snap").level).toBe("unknown");
     expect(walletPrivacy("Zipher").level).toBe("unknown");
     expect(walletPrivacy("zSTASH").level).toBe("unavailable");

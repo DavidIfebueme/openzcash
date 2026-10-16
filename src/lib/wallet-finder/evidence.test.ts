@@ -40,11 +40,26 @@ describe("published wallet capability records", () => {
     expect(result("Zodl", { platform: "ios", multichain: "required" })?.status).toBe("unknown");
     expect(result("Cake Wallet", { platform: "ios", multichain: "required", shielded: "both" })?.status).toBe("match");
   });
-  it("requires hardware firmware and companion scope without granting generic Ledger shielding", () => {
+  it("requires the documented hardware firmware and companion scope", () => {
     const keystone = result("Keystone", { platform: "hardware", hardware: "required", shielded: "both" });
     expect(keystone?.status).toBe("match");
     expect(keystone?.reasons.map(r => r.evidence.scope).join(" ")).toMatch(/Cypherpunk/);
-    expect(result("Ledger", { platform: "hardware", shielded: "both" })?.status).toBe("unknown");
+  });
+  it("matches Ledger's native desktop shielded integration without extending it to mobile or legacy apps", () => {
+    expect(result("Ledger", { platform: "hardware", shielded: "both", hardware: "required" })?.status).toBe("match");
+    expect(result("Ledger", { platform: "any", shielded: "both" })?.status).toBe("match");
+    for (const platform of ["ios", "android"] as const) {
+      expect(result("Ledger", { platform, shielded: "both" })?.status).not.toBe("match");
+    }
+    const facts = WALLET_EVIDENCE.find(w => w.walletName === "Ledger")!.platforms.hardware!;
+    for (const fact of [facts.shieldedSend, facts.shieldedReceive]) {
+      expect(fact.scope).toContain("Desktop 4.21+");
+      expect(fact.scope).toContain("3.9.4+");
+      expect(fact.scope).toContain("excludes original Nano S and mobile");
+      expect(fact.note).toContain("Ironwood");
+      expect(fact.note).toContain("legacy Zondax shielded balances");
+      expect(fact.sources.some(source => source.url.includes("blog-native-shielded-zcash-support"))).toBe(true);
+    }
   });
   it("keeps published audit reports scoped to the product and historical platform release", () => {
     expect(result("Ywallet", { platform: "ios", audit: "required" })?.status).toBe("match");
