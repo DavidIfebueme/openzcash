@@ -18,6 +18,16 @@ This isolates an honest chat document from unrelated portal scripts. It does not
 - 55 entry/navigation tests passed, including fragment clearing, forged readiness rejection, one-time handoff and oversized token rejection.
 - Type checks and changed-file lint passed in both worktrees.
 - Served preview headers verified: the dedicated parent policy and the child policy permit only the intended frame relationship.
-- The embedded preview connected through the real Nym network. Additional release checks are recorded below when complete.
+- Both production builds passed.
+- Two synthetic preview sessions connected through the real Nym network. The branded fragment was removed from the parent address, appeared as a received invitation, and required request/accept. Alice's message arrived in Bob's session. Bob's reply was submitted, but the browser harness detached Alice's tab before a reply receipt was verified; this is not recorded as a bidirectional delivery test.
+- A 390 x 844 viewport showed the full conversation/composer without horizontal overflow. The exit confirmation navigated the top-level page back to the portal and cleared the test session. This is viewport emulation, not a physical phone test.
+
+## Release
+
+- Chat source: `2266fdd`; Railway deployment `fdbceb8e-f5f8-49d8-9324-86475ff2c534` succeeded. Public standalone and embedded documents return 200, with their respective strict ancestor rules and no-referrer. Readiness returns 200.
+- Portal change: PR #169, merged as `1a36aeb8a1af252c89e0a94dfb646cec06503382`; Railway deployment `4c5d1c55-f782-4ce9-a106-e9e1d7d341c3` succeeded.
+- Public HTTP checks passed for the branded route, fresh CSP nonces, frame destination, no-referrer/no-store, absence of portal scripts, the relative menu link and the unchanged anti-framing policy on `/zcg`.
+- Browser verification: clicked Private Chat below Monthly in the public menu; the chat rendered while the top-level URL remained `https://openzcash.org/private-chat`. No redirect to the service hostname occurred.
+- The public embedded page created a synthetic identity and reached `Connected via Nym`. Its generated invite used origin `https://openzcash.org` and path `/private-chat`. The invite was revoked, the session was explicitly cleared, and the page was left at the empty alias form. This public check is separate from the two-session local preview test above.
 
 References: [iframe sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/iframe), [CSP frame ancestors](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Security-Policy/frame-ancestors).
