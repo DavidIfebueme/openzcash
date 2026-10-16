@@ -1,7 +1,7 @@
-# Multiple conversations and compact invites — preview validation
+# Multiple conversations and compact invites — release validation
 
 Date: 2026-10-15. Branch: `michae2xl/private-chat-conversations`.
-Scope: local preview only. This change has not been deployed to the production pilot.
+Scope: local preview and isolated production pilot, published after user approval.
 
 ## Product behavior
 
@@ -50,8 +50,9 @@ Scope: local preview only. This change has not been deployed to the production p
 - Measured fixture: 622-character legacy token becomes 341 characters (45.2%
   smaller). The local full URL is 383 characters instead of 664 (42.3% smaller).
   A short opaque code would require a separate resolver; this format does not.
-- Clients predating this change cannot read `ozc3.`. Compact links are for this
-  preview until the receiving production client is upgraded as well.
+- Clients predating this change cannot read `ozc3.`. The production client now
+  supports compact links. Existing old tabs must reload before receiving them;
+  users should finish current conversations first because reloading clears them.
 
 ## Validation
 
@@ -74,6 +75,42 @@ Scope: local preview only. This change has not been deployed to the production p
 - Desktop 1440 × 900 and mobile 390 × 844 were checked in light and dark themes.
   No horizontal page overflow. Screenshots contain synthetic conversations only.
 
-This is an implementation review and local transport exercise, not an independent
-security audit or a new physical-device/cross-network qualification. A production
-build and release verification remain part of the subsequent deployment step.
+This is an implementation review and transport exercise, not an independent
+security audit or a new physical-device/cross-network qualification.
+
+## Production release
+
+- Feature source: `df390428e65941be74aa1a1cbecd647bb4b5fc28`. Final source includes
+  CSS correction `e684624`, on the same branch pushed to the private repository.
+- Final Railway deployment: `82ddbd12-dbf3-40cc-83f9-56da37d27610`, `SUCCESS`,
+  service `private-chat`, environment `production`. Next.js/Docker production
+  build and healthcheck passed. The directory and main portal were not redeployed.
+- Public URL: `https://private-chat-production-b8bd.up.railway.app/private-chat`.
+  The main portal's Private Chat menu below Monthly was followed to this URL;
+  the link retains `noreferrer`.
+- The staged source was built from committed files. Its 1,782-file
+  [manifest](private-chat-conversations-2026-10-15/web-artifact-sha256.json)
+  has SHA-256 `d782e27c47b9d6f270382243f2b74746256798b01e64300cedbe5b0d604d058e`.
+  No `.env`, database, room secret, chat history or local runtime state was sent.
+- Final HTTP checks at `2026-10-16T01:58:47.719Z`: chat 200, health ready, root
+  redirect 307, portal and direct presence endpoints 404, Nym worker/WASM 200.
+  Nonce CSP, pinned gateway, no-store, no-referrer, noindex, and blocked
+  camera/microphone permissions remained intact.
+- Three synthetic browser identities on the public site used real Nym. One tab
+  retained two accepted conversations. Bidirectional messages, delivery receipts,
+  a background unread badge and isolated transcripts were observed. Both peers
+  received new messages after the central session disconnected and reconnected;
+  offline sending was disabled. These sessions used one computer and network.
+- The first production check exposed a layout bug at 1280 × 720: the chat list
+  could shrink below its contents and the footer intercepted conversation clicks.
+  The final CSS prevents that shrinkage and lets the sidebar scroll. Both contacts
+  were clicked successfully after deployment; DOM hit testing confirmed neither
+  button was covered. Both conversations exchanged messages on the final release.
+- Mobile 390 × 844: returning to the list and selecting either conversation
+  worked; document width remained 390px. No console errors were recorded in the
+  final client. [Desktop](private-chat-conversations-2026-10-15/desktop.png),
+  [mobile list](private-chat-conversations-2026-10-15/mobile-list.png),
+  [mobile conversation](private-chat-conversations-2026-10-15/mobile-chat.png).
+- All synthetic sessions were cleared and extra test tabs closed. No participant
+  room or existing real conversation was accessed. Physical-phone and separate-
+  network testing remains the user pilot's next step, not a completed result here.
