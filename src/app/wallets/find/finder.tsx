@@ -16,6 +16,7 @@ import { EDITORIAL_HIGHLIGHTS, HARDWARE, SOFTWARE } from "../catalog-data";
 import styles from "./finder.module.css";
 
 const CATALOG = new Map([...SOFTWARE, ...HARDWARE].map(wallet => [wallet.name, wallet]));
+const CATALOG_ORDER = new Map([...CATALOG.keys()].map((name, index) => [name, index]));
 const STATE_LABELS = { supported: "Supported", unsupported: "Not supported", unknown: "Unknown" } as const;
 
 function readParams(params: Pick<URLSearchParams, "forEach" | "getAll">): Record<string, string | string[]> {
@@ -139,7 +140,11 @@ export function WalletFinder() {
   const requirements = parseWalletRequirements(readParams(params));
   const viewingEvidence = params.get("view") === "evidence";
   const [shareMessage, setShareMessage] = useState("");
-  const results = matchWallets(WALLET_EVIDENCE, requirements);
+  // Keep the familiar catalog sequence as filters narrow each result group.
+  const results = matchWallets(WALLET_EVIDENCE, requirements).sort((a, b) =>
+    (CATALOG_ORDER.get(a.walletName) ?? Infinity) - (CATALOG_ORDER.get(b.walletName) ?? Infinity)
+    || a.walletName.localeCompare(b.walletName, "en"),
+  );
   const matches = results.filter(result => result.status === "match");
   const unknown = results.filter(result => result.status === "unknown");
   const excluded = results.filter(result => result.status === "excluded");
@@ -213,7 +218,7 @@ export function WalletFinder() {
       </section>
       <section className={styles.results} aria-labelledby="matching-wallets">
         <div className={styles.resultHeading}>
-          <div><h2 id="matching-wallets" aria-live="polite" aria-atomic="true">{matches.length} {matches.length === 1 ? "wallet matches" : "wallets match"} your filters</h2><p>Confirmed matches are alphabetical. Wallets with missing evidence appear below.</p></div>
+          <div><h2 id="matching-wallets" aria-live="polite" aria-atomic="true">{matches.length} {matches.length === 1 ? "wallet matches" : "wallets match"} your filters</h2><p>Matches follow the catalog order. Wallets with missing evidence appear below.</p></div>
           <button type="button" className={styles.secondaryButton} onClick={share}>Copy result link</button>
         </div>
         <p role="status" className={styles.shareMessage}>{shareMessage}</p>

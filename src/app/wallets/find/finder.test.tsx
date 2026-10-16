@@ -24,7 +24,11 @@ const fixtures = vi.hoisted(() => {
 });
 
 vi.mock("@/lib/wallet-finder/evidence", () => ({ WALLET_EVIDENCE: fixtures }));
-vi.mock("../catalog-data", () => ({ SOFTWARE: [], HARDWARE: [], EDITORIAL_HIGHLIGHTS: new Set(["Matched wallet"]) }));
+vi.mock("../catalog-data", () => ({
+  SOFTWARE: ["Matched wallet", "Unknown wallet"].map(name => ({ name, maker: "Fixture publisher", url: "https://example.org/wallet" })),
+  HARDWARE: [{ name: "Excluded wallet", maker: "Fixture publisher", url: "https://example.org/hardware" }],
+  EDITORIAL_HIGHLIGHTS: new Set(["Matched wallet"]),
+}));
 vi.mock("next/navigation", async () => {
   const { useSyncExternalStore } = await import("react");
   return {
@@ -56,6 +60,23 @@ function open(query: string) {
 }
 
 describe("Wallet Finder interactions", () => {
+  it("preserves catalog order on any platform, while filtering and after reset", () => {
+    open("");
+    const expected = ["Matched wallet", "Unknown wallet", "Excluded wallet"];
+    const names = () => within(screen.getByRole("region", { name: /wallets? match/ }))
+      .queryAllByRole("heading", { level: 3 }).map(heading => heading.textContent);
+    expect(names()).toEqual(expected);
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "android" } });
+    expect(names()).toEqual(expected);
+    fireEvent.click(screen.getByRole("checkbox", { name: "Send ZEC privately" }));
+    expect(names()).toEqual(["Matched wallet"]);
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "any" } });
+    expect(names()).toEqual(["Matched wallet"]);
+    fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
+    expect(screen.getByRole("combobox", { name: "Platform" })).toHaveValue("any");
+    expect(names()).toEqual(expected);
+  });
+
   it("shows one compact filter panel and updates results as filters change", () => {
     open("");
     const filters = screen.getByRole("region", { name: "Filters" });
