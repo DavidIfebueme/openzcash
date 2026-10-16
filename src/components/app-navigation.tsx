@@ -18,6 +18,9 @@ type Props = {
 export function AppNavigation({ apps, place, counts, openApps, compact, onToggle, onOpen }: Props) {
   function renderApp(app: AppDef, nested = false) {
     const isZcg = app.id === "zcg";
+    const isPrivateChat = app.id === "private-chat";
+    // The chat opens its own document, outside the portal's session and scripts.
+    const HeaderLink = isPrivateChat ? "a" : Link;
     const children = childAppsOf(app, apps);
     const showCounts = app.id !== "zcg" && app.id !== "ecosystem" && app.parentId !== "ecosystem";
     const directChildren = children.filter((child) => child.parentGroup === "pages");
@@ -45,10 +48,11 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
     const groupId = `${app.id}:organizations`;
     const groupOpen = openApps[groupId] ?? containsCurrentOrganization;
     return (
-      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined}>
+      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined} data-separated={isPrivateChat || undefined}>
         <div className="rd-side-app-row">
-          <Link
+          <HeaderLink
             href={isZcg ? "/zcg/participate" : app.href}
+            rel={isPrivateChat ? "noreferrer" : undefined}
             className="rd-side-item"
             aria-current={headerActive ? "page" : undefined}
             title={app.sub}
@@ -70,7 +74,7 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
               </small>
             ) : null}
             {showCounts && counts[app.href] ? <small className="tnum">{counts[app.href]}</small> : null}
-          </Link>
+          </HeaderLink>
           {expandable ? (
             <button
               type="button"
