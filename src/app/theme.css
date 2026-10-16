@@ -1096,6 +1096,11 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   display: flex;
   flex-direction: column;
 }
+.rd-side-app[data-separated] {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+}
 .rd-side-app-row {
   display: flex;
   align-items: center;

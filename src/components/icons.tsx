@@ -30,6 +30,15 @@ export const IconBook = svg(
   </>,
 );
 
+/** A private conversation, with the lock contained inside the speech bubble. */
+export const IconPrivateChat = svg(
+  <>
+    <path d="M6 3.5h12a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8L3 22V6.5a3 3 0 0 1 3-3Z" />
+    <rect x="9" y="10" width="6" height="5.5" rx="1" />
+    <path d="M10 10V8a2 2 0 0 1 4 0v2M12 12.5v.5" />
+  </>,
+);
+
 /** Connected participants: projects, teams and organizations in one ecosystem. */
 export const IconEcosystem = svg(
   <>
