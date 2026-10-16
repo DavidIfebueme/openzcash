@@ -39,15 +39,13 @@ export const IconPrivateChat = svg(
   </>,
 );
 
-/** Connected participants: projects, teams and organizations in one ecosystem. */
+/** Growing branches: different projects sharing a living ecosystem. */
 export const IconEcosystem = svg(
   <>
-    <path d="M10 10 6 6m8 4 4-4m-8 8-4 4m8-4 4 4" />
-    <circle cx="12" cy="12" r="3" />
-    <circle cx="4.5" cy="4.5" r="2.2" />
-    <circle cx="19.5" cy="4.5" r="2.2" />
-    <circle cx="4.5" cy="19.5" r="2.2" />
-    <circle cx="19.5" cy="19.5" r="2.2" />
+    <path d="M12 21v-7" />
+    <path d="M12 15C6 15 3 11 3 6c6 0 9 3 9 9Z" />
+    <path d="M12 12c0-6 3-9 9-9 0 6-3 9-9 9Z" />
+    <path d="m7 10 5 5m5-8-5 5" />
   </>,
 );
 
