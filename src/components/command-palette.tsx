@@ -141,7 +141,8 @@ export function CommandPalette({
       const row = rows[current];
       if (!row) return;
       choose(row);
-      router.push(row.href);
+      if (row.href === "/private-chat") window.location.assign(row.href);
+      else router.push(row.href);
       return;
     }
     const typing =
@@ -234,8 +235,9 @@ export function CommandPalette({
                 </div>
                 {group.rows.map((row, r) => {
                   const index = offsets[g] + r;
+                  const RowLink = row.href === "/private-chat" ? "a" : Link;
                   return (
-                    <Link
+                    <RowLink
                       key={row.href}
                       id={optionId(index)}
                       href={row.href}
@@ -252,7 +254,7 @@ export function CommandPalette({
                         <RowMark row={row} />
                       </span>
                       <span className={styles.rowLabel}>{row.label}</span>
-                    </Link>
+                    </RowLink>
                   );
                 })}
               </div>

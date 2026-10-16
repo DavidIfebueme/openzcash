@@ -102,7 +102,8 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/:path*", headers: securityHeaders },
+      // The dedicated chat document supplies its own nonce and isolated policy.
+      { source: "/((?!private-chat$).*)", headers: securityHeaders },
       ...["agent-skills", "skills"].map((directory) => ({
         source: `/.well-known/${directory}/:path*`,
         headers: [{ key: "Cache-Control", value: "public, max-age=300" }],
