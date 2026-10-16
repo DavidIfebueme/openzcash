@@ -5,6 +5,7 @@ const jobs = vi.hoisted(() => ({
   startMarketSnapshots: vi.fn(),
   startNewsSchedule: vi.fn(),
   startLegalSchedule: vi.fn(),
+  startEcosystemSchedule: vi.fn(),
   refreshZcg: vi.fn(async () => ({
     ok: true,
     ms: 1,
@@ -20,6 +21,7 @@ const jobs = vi.hoisted(() => ({
   startCanarySchedule: vi.fn(() => true),
 }));
 vi.mock("@/lib/news/feed", () => ({ startNewsSchedule: jobs.startNewsSchedule }));
+vi.mock("@/lib/ecosystem/schedule", () => ({ startEcosystemSchedule: jobs.startEcosystemSchedule }));
 vi.mock("@/lib/legal/schedule", () => ({ startLegalSchedule: jobs.startLegalSchedule }));
 vi.mock("@/lib/markets/sources", () => ({ startMarketSnapshots: jobs.startMarketSnapshots }));
 vi.mock("@/lib/zcg/refresh", () => ({ refreshZcg: jobs.refreshZcg }));
@@ -59,6 +61,7 @@ describe("server data collection scheduling", () => {
     // The cycle still runs, but nothing that writes to the database does.
     expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(jobs.startLegalSchedule).toHaveBeenCalledTimes(1);
+    expect(jobs.startEcosystemSchedule).toHaveBeenCalledTimes(1);
     // The canary reads public data only; a frozen snapshot still gets probed.
     expect(jobs.startCanarySchedule).toHaveBeenCalledTimes(1);
     expect(vi.getTimerCount()).toBe(2);
@@ -77,6 +80,7 @@ describe("server data collection scheduling", () => {
     expect(jobs.startNewsSchedule).toHaveBeenCalledTimes(1);
     expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(jobs.startLegalSchedule).toHaveBeenCalledTimes(1);
+    expect(jobs.startEcosystemSchedule).toHaveBeenCalledTimes(1);
     expect(jobs.startCanarySchedule).toHaveBeenCalledTimes(1);
     expect(vi.getTimerCount()).toBe(2);
     await vi.advanceTimersByTimeAsync(30_000);
@@ -92,6 +96,7 @@ describe("server data collection scheduling", () => {
     expect(jobs.startNewsSchedule).not.toHaveBeenCalled();
     expect(jobs.startMarketSnapshots).not.toHaveBeenCalled();
     expect(jobs.startLegalSchedule).not.toHaveBeenCalled();
+    expect(jobs.startEcosystemSchedule).not.toHaveBeenCalled();
     expect(jobs.startCanarySchedule).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
   });

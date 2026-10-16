@@ -25,7 +25,7 @@ export async function lookupProjectHistory(raw: unknown, signal: AbortSignal): P
   const parsed = projectHistoryQuerySchema.safeParse(raw);
   if (!parsed.success) return { content: JSON.stringify({ error: "Use a project name and an optional YYYY-MM event month." }) };
   signal.throwIfAborted();
-  const matches = searchHistoryIdentities(projectHistoryDirectory(), parsed.data.query);
+  const matches = searchHistoryIdentities(await projectHistoryDirectory(), parsed.data.query);
   if (matches.length !== 1) return { content: JSON.stringify({ data: { kind: "project_history_choices", matchCount: matches.length, choices: matches.slice(0, 15).map(({ id, name }) => ({ id, name, url: `https://openzcash.org/ecosystem/history/${id}` })), note: "Choose a specific identity; never merge these projects or infer no funding from no search match." } }), source: { title: "OpenZcash project histories", url: "https://openzcash.org/ecosystem/history", retrievedAt: new Date().toISOString() } };
   const id = matches[0].id, url = `https://openzcash.org/ecosystem/history/${id}`;
   try {

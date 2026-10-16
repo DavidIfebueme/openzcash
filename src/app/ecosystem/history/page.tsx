@@ -11,7 +11,7 @@ export const metadata = { title: "Project histories · OpenZcash", description: 
 export const dynamic = "force-dynamic";
 export default async function HistoryPage() {
   const index = await readHistoryIndex();
-  const identities = projectHistoryDirectory();
+  const identities = await projectHistoryDirectory();
   const brands = Object.fromEntries(identities.map(item => [item.id, historyBrand(item)]));
   const communityMarks = Object.fromEntries(identities.filter(item => item.communityId).map(item => [item.id, historyCommunityMark(item)]));
   return <div className={`${styles.page} ${styles.directoryPage}`}>

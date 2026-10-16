@@ -6,6 +6,8 @@
  * na leitura. Camadas separadas: chave de visualização, raw on-chain, e estado de scan.
  */
 
+import type { EcosystemCheckpoint } from "../ecosystem/checkpoint";
+import type { Snapshot as EcosystemSnapshot } from "../ecosystem/types";
 import type { LegalArchiveSource } from "../legal/archive";
 
 import {
@@ -626,5 +628,14 @@ export const zarvisCanary = pgTable("zarvis_canary", {
 export const legalPublicArchive = pgTable("legal_public_archive", {
   sourceId: text("source_id").primaryKey(),
   payload: jsonb("payload").$type<LegalArchiveSource>().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Public GitHub snapshot and durable daily checkpoint; independent of accounting. */
+export const ecosystemPublicSnapshots = pgTable("ecosystem_public_snapshots", {
+  registryHash: text("registry_hash").primaryKey(),
+  checkpoint: jsonb("checkpoint").$type<EcosystemCheckpoint>().notNull(),
+  collectedAt: timestamp("collected_at", { withTimezone: true }),
+  snapshot: jsonb("snapshot").$type<EcosystemSnapshot>(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

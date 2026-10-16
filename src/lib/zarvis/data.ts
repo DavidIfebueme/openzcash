@@ -194,7 +194,7 @@ async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], quer
     case "proposals": return (await (await import("@/app/api/zcg/office/route")).GET()).json();
     case "coinholder": return (await (await import("@/app/api/zcg/coinholder/round/route")).GET()).json();
     case "zechub": return (await (await import("@/app/api/zechub/treasury/route")).GET()).json();
-    case "ecosystem": return ecosystemContext((await import("@/lib/ecosystem/data")).loadEcosystemCatalog());
+    case "ecosystem": return ecosystemContext(await (await import("@/lib/ecosystem/data")).loadEcosystemCatalog());
     case "news": {
       const { getNews, newsFetchedAt } = await import("@/lib/news/feed");
       const items = await getNews();

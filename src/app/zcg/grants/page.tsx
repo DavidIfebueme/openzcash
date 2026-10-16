@@ -49,6 +49,7 @@ export default async function GrantsPage({
     ),
   ]);
 
+  const historyDirectory = await projectHistoryDirectory();
   const rows: GrantTableRow[] = grants.map((g) => {
     // A coinholder grant approved in a closed round and not yet paid, also
     // when FPF's tab files it under the name of an earlier, paid grant.
@@ -69,7 +70,7 @@ export default async function GrantsPage({
       milestonesText: `${g.paidCount}/${g.milestoneCount}`,
       _usd: Number(g.usdCents),
       _zec: Number(g.zecZat),
-      histories: historyLinksForGrant(projectHistoryDirectory(), { title: g.grantKey, program: g.program === "coinholder" ? "coinholder" : "zcg", recipientKey: normalizeKey(g.grantee) }),
+      histories: historyLinksForGrant(historyDirectory, { title: g.grantKey, program: g.program === "coinholder" ? "coinholder" : "zcg", recipientKey: normalizeKey(g.grantee) }),
     };
   });
 

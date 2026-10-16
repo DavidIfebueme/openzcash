@@ -11,14 +11,14 @@ import styles from "@/components/project-history/history.module.css";
 export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const identity = projectHistoryDirectory().find(item => item.id === id);
+  const identity = (await projectHistoryDirectory()).find(item => item.id === id);
   return { title: `${identity?.name ?? "Project"} history · OpenZcash` };
 }
 export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const history = await readProjectHistory(id);
   if (!history) notFound();
-  const identity = projectHistoryDirectory().find(item => item.id === id)!;
+  const identity = (await projectHistoryDirectory()).find(item => item.id === id)!;
   const community = historyCommunityMark(identity);
   return <div className={styles.page}>
     <header className={styles.hero}>

@@ -21,7 +21,7 @@
     "import-zcg": "node --conditions=react-server --import tsx scripts/import-zcg.ts",
     "sync-ecosystem": "node scripts/sync-ecosystem.mjs",
     "audit:ecosystem": "tsx scripts/audit-ecosystem.ts",
-    "test:ecosystem-sync": "node --test scripts/lib/ecosystem-collection.test.mjs",
+    "test:ecosystem-sync": "node --test scripts/lib/ecosystem-collection.test.mjs scripts/lib/ecosystem-sync.test.mjs",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "knowledge:build": "node scripts/build-zarvis-knowledge.mjs",

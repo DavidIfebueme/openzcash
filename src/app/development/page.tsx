@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { EcosystemExplorer } from "@/components/ecosystem/explorer";
 import { loadEcosystemCatalog } from "@/lib/ecosystem/data";
@@ -10,11 +11,13 @@ export const metadata = pageMetadata({
   path: "/development",
 });
 
-export default function DevelopmentPage() {
+export default async function DevelopmentPage() {
+  await connection();
+  const catalog = await loadEcosystemCatalog();
   return (
     // useSearchParams inside the explorer needs a boundary for the static shell.
     <Suspense fallback={null}>
-      <EcosystemExplorer catalog={explorerCatalog(loadEcosystemCatalog())} mode="development" />
+      <EcosystemExplorer catalog={explorerCatalog(catalog)} mode="development" />
     </Suspense>
   );
 }

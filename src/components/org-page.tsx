@@ -1,3 +1,4 @@
+import { connection } from "next/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SectionHeading, SourceNote } from "@/components/workspace";
@@ -16,8 +17,9 @@ function displayDate(iso: string | null | undefined): string {
  * public addresses, its projects and repositories, funding history and
  * sources. The explorer stays the place to browse everything at once.
  */
-export function OrgPage({ orgId, logo, tagline }: { orgId: string; logo: string; tagline?: string }) {
-  const catalog = loadEcosystemCatalog();
+export async function OrgPage({ orgId, logo, tagline }: { orgId: string; logo: string; tagline?: string }) {
+  await connection();
+  const catalog = await loadEcosystemCatalog();
   const org = catalog.registry.organizations.find((o) => o.id === orgId);
   if (!org) notFound();
   const projects = catalog.registry.projects.filter((p) => p.organizationId === org.id);

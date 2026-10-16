@@ -62,8 +62,9 @@ export default async function GrantDetailPage({
   const milestones = await loadGrant(g);
   if (milestones.length === 0) notFound();
 
+  const historyDirectory = await projectHistoryDirectory();
   const head = milestones[0];
-  const histories = [...new Map(milestones.flatMap(row => historyLinksForGrant(projectHistoryDirectory(), {
+  const histories = [...new Map(milestones.flatMap(row => historyLinksForGrant(historyDirectory, {
     title: row.project ?? g, program: row.sourceSheet === "coinholder_grants" ? "coinholder" : "zcg", recipientKey: row.recipientKey,
   })).map(item => [item.id, item])).values()];
   const totalUsd = milestones.reduce(

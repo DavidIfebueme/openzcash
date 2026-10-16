@@ -71,6 +71,13 @@
       "when": 1791434002490,
       "tag": "0009_zarvis_topic_daily",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792122064611,
+      "tag": "0010_ecosystem_public_snapshots",
+      "breakpoints": true
     }
   ]
 }

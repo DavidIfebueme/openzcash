@@ -1,5 +1,5 @@
 // Pure collection boundaries shared by the collector and offline regression tests.
-export const ACTIVITY_CACHE_VERSION = 3;
+export const ACTIVITY_CACHE_VERSION = 4;
 
 export function resumeCollectionCache(value, now = new Date()) {
   const cutoff = Date.parse(value?.collectedAt);
@@ -9,7 +9,7 @@ export function resumeCollectionCache(value, now = new Date()) {
   return {
     version: ACTIVITY_CACHE_VERSION, collectedAt: value.collectedAt,
     owners: value.owners ?? {}, repositories: value.repositories ?? {},
-    // v3 proves complete release pagination, draft exclusion and a shared cutoff.
+    // v4 also verifies public visibility and stable identity on every GraphQL page.
     activity: value.version === ACTIVITY_CACHE_VERSION ? value.activity ?? {} : {},
   };
 }
@@ -103,8 +103,13 @@ export function unlistedReleaseHistory(currentReleases, previousActivity, cutoff
 const repositoryByName = (repositories, name) => repositories.find(repo =>
   [repo.fullName, ...(repo.aliases ?? [])].some(alias => alias.toLowerCase() === name.toLowerCase()));
 
+/**
+ * @param {import("../../src/lib/ecosystem/types").Snapshot} snapshot
+ * @param {{ requiredRepositories?: string[], previousSnapshot?: import("../../src/lib/ecosystem/types").Snapshot | null }} [options]
+ */
 export function snapshotPublicationIssues(snapshot, { requiredRepositories = [], previousSnapshot = null } = {}) {
   const issues = [];
+  if (snapshot.problems?.length) issues.push("Source collection reported failures");
   if (!snapshot.repositories.length) issues.push("Empty repository inventory");
   if (snapshot.owners.some(owner => !owner.complete)) issues.push("Incomplete owner inventory");
   for (const repo of snapshot.repositories) {

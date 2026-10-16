@@ -43,9 +43,9 @@ async function compute(): Promise<Record<string, string>> {
   const investments = mayaRows
     ? new Set(mayaRows.map((r) => (r.project ?? "").trim().toLowerCase()).filter(Boolean)).size
     : null;
-  let catalog: ReturnType<typeof loadEcosystemCatalog> | null = null;
+  let catalog: Awaited<ReturnType<typeof loadEcosystemCatalog>> | null = null;
   try {
-    catalog = loadEcosystemCatalog();
+    catalog = await loadEcosystemCatalog();
   } catch {
     catalog = null;
   }

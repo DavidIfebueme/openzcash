@@ -91,16 +91,17 @@ Other suites:
 - `npm run eval:zarvis` (Zarvis answer evaluation)
 
 To add tests, colocate a `*.test.ts` (or `.tsx`) file next to the module; vitest
-picks up `src/**/*.test.{ts,tsx}` (`vitest.config.ts`). Three PostgreSQL suites
+picks up `src/**/*.test.{ts,tsx}` (`vitest.config.ts`). Four PostgreSQL suites
 are independently skipped unless their environment variable is set:
 
 | Variable | Required local database | Suite |
 | --- | --- | --- |
 | `ZCG_SNAPSHOT_TEST_DB_URL` | A migrated database on a loopback host; uses temporary tables | `src/lib/zcg/import-snapshots.integration.test.ts` |
 | `ZCG_PUBLICATION_TEST_DB_URL` | Host `127.0.0.1`, database name starting with `openzcash_d1_test` | `src/lib/zcg/publications.integration.test.ts` |
+| `ECOSYSTEM_TEST_DB_URL` | Host `127.0.0.1`, database `openzcash_ecosystem_test` | `src/lib/ecosystem/snapshot-store.integration.test.ts` |
 | `LEGAL_ARCHIVE_TEST_DB_URL` | Host `127.0.0.1`, database `openzcash_legal_test` | `src/lib/legal/archive-store.integration.test.ts` |
 
-Use disposable local databases only. The publication and legal suites apply
+Use disposable local databases only. The publication, legal and ecosystem suites apply
 migrations and clear their test tables. Setting one variable does not enable
 the other suites; report any skipped suites with your validation results.
 

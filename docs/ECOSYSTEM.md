@@ -15,9 +15,11 @@ the same public dataset.
 - `scripts/sync-ecosystem.mjs`: read-only, repeatable GitHub collection using the
   existing `gh` authentication. No discovered repository is cloned or executed.
 
-The app renders a dated snapshot, not an automatically refreshing live feed.
-Page requests do not run collectors, read GitHub credentials, or write to the
-grant accounting database. A registry/snapshot hash mismatch fails validation
+The production server refreshes public repository metadata, default-branch
+activity and releases automatically once per São Paulo calendar day. The app
+renders the latest complete, dated collection. Page requests read its public
+Postgres snapshot; they do not run collectors, read GitHub credentials or write
+to the grant accounting tables. A registry/snapshot hash mismatch fails validation
 instead of publishing a mixture of different inventories.
 
 ## Coverage
@@ -131,6 +133,36 @@ different measurements.
 Sources: [GitHub repository REST API](https://docs.github.com/en/rest/repos/repos)
 and [GitHub GraphQL commit history](https://docs.github.com/en/graphql/reference/commits#commit).
 
+## Daily collection
+
+`src/lib/ecosystem/schedule.ts` checks the durable checkpoint one minute after
+production startup and every 15 minutes thereafter. A completed day is not
+collected again after a process restart or overlapping deployment. A missed day
+is caught up on the next check; failures retry after one hour. The collection has
+a 20-minute deadline and a 30-minute durable lease. Expired/replaced workers cannot
+publish. `DISABLE_AUTO_REFRESH=true` also pauses this schedule in previews.
+
+The server uses the existing `GITHUB_TOKEN` and native HTTPS to `api.github.com`;
+`gh` is only required for the optional local CLI. CLI and server share the same
+collector, pagination, identity, draft exclusion and public-visibility checks.
+Credentials never reach the browser or the stored snapshot. Redirects are
+restricted to the GitHub API host, and errors are logged without source bodies.
+
+Migration `0010_ecosystem_public_snapshots` adds one public-only snapshot and
+checkpoint row per registry hash. A complete, validated collection and its daily
+checkpoint publish atomically. Partial source reads, identity changes or storage
+failures preserve the prior publication. The bundled snapshot is a fallback for
+a fresh install or unavailable storage; an already running reader retains its
+last valid snapshot. Pages/API/history/organizations/Zarvis read the same runtime
+source through a one-minute cache, fetching full release history only when the
+publication changes. `/development` and organization pages render at request time.
+
+`/api/ecosystem/status` exposes the served cutoff, last attempt/success, daily
+checkpoint, pause state and whether a collection is running. It is read-only and
+contains no credentials or lease IDs. A stale-source warning remains visible
+when the served data exceeds seven days. Automatic collection does not rereview
+editorial descriptions, classifications, registry dates or funding evidence.
+
 ## Refresh and verify
 
 With GitHub CLI already authenticated for public read access:
@@ -171,7 +203,7 @@ X/Social Radar ingestion and its API are outside this implementation.
 
 ### Source freshness and history audit
 
-`npm run audit:ecosystem` checks the catalog-to-snapshot hash, all mapped repository names, complete source reads and a seven-day repository freshness budget. It exits nonzero on stale/incomplete data. Run it before publishing ecosystem/history changes. It does not schedule a refresh or validate milestone delivery. History screens also disclose when repository data is more than seven days old.
+`npm run audit:ecosystem` checks the catalog-to-snapshot hash, all mapped repository names, complete source reads and a seven-day repository freshness budget. It exits nonzero on stale/incomplete data. Run it before publishing ecosystem/history changes. The audit itself does not start the daily collector or validate milestone delivery. History screens also disclose when repository data is more than seven days old.
 
 To produce an inspectable per-identity map with an explicitly supplied public ledger export:
 
@@ -184,3 +216,13 @@ The output includes every catalog identity, canonical repository, collection tim
 `activity.releases` remains the 90-day activity measurement. `activity.releaseHistory` preserves the complete currently listed published release history fetched through the common cutoff. Tags without published releases and drafts are excluded. Previously observed records absent from a successful new listing are retained in `unlistedReleases`, with their original observation time and missing-as-of date; they remain traceable but do not become current release claims. A new measurement cutoff is not a rereview of all manually curated descriptions or financial associations.
 
 Raw GitHub prerelease flags are preserved. Presentation also recognizes explicit alpha/beta/RC/preview markers in version tags, because maintainers can leave GitHub's flag unset. A non-preview marker alone is not proof of a stable package, mainnet activation or production deployment. App Store versions remain separately scoped by platform and storefront.
+
+### Daily refresh regression tests
+
+`npm run test:ecosystem-sync` covers the shared CLI/server collector.
+`npx vitest run src/lib/ecosystem` covers scheduling, failure preservation,
+public-only HTTP transport and runtime cache refresh. The PostgreSQL adapter
+suite runs only with `ECOSYSTEM_TEST_DB_URL` pointing to the disposable local
+`postgres://127.0.0.1:5432/openzcash_ecosystem_test` database. It applies migrations
+and clears only the test snapshot table, then checks simultaneous leases,
+restart checkpoints, atomic publication and stale-worker rejection.

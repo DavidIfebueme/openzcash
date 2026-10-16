@@ -15,6 +15,9 @@ export async function register() {
     const { startNewsSchedule } = await import("@/lib/news/feed");
     startNewsSchedule();
   }
+  // GitHub repository/release collection has a durable daily checkpoint.
+  const { startEcosystemSchedule } = await import("@/lib/ecosystem/schedule");
+  startEcosystemSchedule();
   // Public policy collection has its own durable daily checkpoint.
   const { startLegalSchedule } = await import("@/lib/legal/schedule");
   startLegalSchedule();

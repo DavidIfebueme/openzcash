@@ -1,13 +1,13 @@
 import { Suspense } from "react";
 import { EcosystemExplorer } from "@/components/ecosystem/explorer";
 import { EcosystemOverview } from "@/components/ecosystem/overview";
-import { loadEcosystemCatalog } from "@/lib/ecosystem/data";
+import { loadEcosystemCatalog, ecosystemRegistry } from "@/lib/ecosystem/data";
 import { explorerCatalog } from "@/lib/ecosystem/explorer-catalog";
 import { ecosystemView, type EcosystemSearchParams } from "@/lib/ecosystem/overview-route";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 
 // The explorer's headline count, from the same checked snapshot.
-const PROJECTS = loadEcosystemCatalog().registry.projects.length;
+const PROJECTS = ecosystemRegistry.projects.length;
 
 export const metadata = pageMetadata({
   title: "Ecosystem · OpenZcash",
@@ -17,8 +17,9 @@ export const metadata = pageMetadata({
 });
 
 export default async function EcosystemPage({ searchParams }: { searchParams: Promise<EcosystemSearchParams> }) {
-  const catalog = loadEcosystemCatalog();
-  if (ecosystemView(await searchParams) === "overview") {
+  const params = await searchParams;
+  const catalog = await loadEcosystemCatalog();
+  if (ecosystemView(params) === "overview") {
     return <EcosystemOverview catalog={catalog} />;
   }
   return (

@@ -16,12 +16,19 @@ import { projectInsights, type HistoryIndexItem } from "./insights";
 import { monthlyProjectActivity } from "./activity";
 import type { FinanceRecords, PaymentRecord, ProposalRecord } from "./types";
 
-const catalog = loadEcosystemCatalog();
-const identities = historyIdentities(catalog);
 const reviewed = evidenceSchema.parse(evidenceData).entries;
-for (const entry of reviewed) if (!identities.some(item => item.id === entry.projectId)) throw new Error("Unknown project in reviewed history evidence");
-
-export function projectHistoryDirectory() { return identities; }
+const directoryCache = new WeakMap<Awaited<ReturnType<typeof loadEcosystemCatalog>>, ReturnType<typeof historyIdentities>>();
+async function historyContext() {
+  const catalog = await loadEcosystemCatalog();
+  let identities = directoryCache.get(catalog);
+  if (!identities) {
+    identities = historyIdentities(catalog);
+    for (const entry of reviewed) if (!identities.some(item => item.id === entry.projectId)) throw new Error("Unknown project in reviewed history evidence");
+    directoryCache.set(catalog, identities);
+  }
+  return { catalog, identities };
+}
+export async function projectHistoryDirectory() { return (await historyContext()).identities; }
 
 async function readPayments(): Promise<PaymentRecord[]> {
   // Explicit public projection; no viewing keys, admin overrides or private fields.
@@ -68,6 +75,7 @@ export async function readHistoryFinance(): Promise<FinanceRecords> {
 }
 
 export async function readProjectHistory(id: string) {
+  const { catalog, identities } = await historyContext();
   const identity = identities.find(item => item.id === id);
   if (!identity) return null;
   const finance = await readHistoryFinance();
@@ -75,6 +83,7 @@ export async function readProjectHistory(id: string) {
 }
 
 export async function readMonthlyProjectActivity(month: string) {
+  const { catalog, identities } = await historyContext();
   const finance = await readHistoryFinance(), now = new Date();
   const index = prepareHistoryBindings(identities, finance);
   const histories = identities.map(identity => buildProjectHistory(identity, identities, finance, catalog.snapshot.collectedAt, reviewed, now, index));
@@ -82,6 +91,7 @@ export async function readMonthlyProjectActivity(month: string) {
 }
 
 export async function readHistoryIndex() {
+  const { catalog, identities } = await historyContext();
   const finance = await readHistoryFinance();
   const index = prepareHistoryBindings(identities, finance), now = new Date();
   const items: HistoryIndexItem[] = identities.map(identity => {

@@ -1,23 +1,14 @@
 import "server-only";
-import { createHash } from "node:crypto";
-import registryData from "@/data/ecosystem/registry.json";
-import snapshotData from "@/data/ecosystem/snapshot.json";
-import type { Catalog } from "./types";
-import { validateCatalog } from "./catalog";
+import { ecosystemSeed, ecosystemRegistryHash, ecosystemRegistry, validateEcosystemSnapshot } from "./seed";
+import { readEcosystemSnapshot } from "./snapshot-store";
+import { createEcosystemReader } from "./snapshot-reader";
 
-// A checked, reproducible public snapshot. Page requests cannot execute a
-// collector, read credentials, or write to the existing grant database.
-const catalog = {
-  registry: registryData,
-  snapshot: snapshotData,
-} as unknown as Catalog;
-validateCatalog(catalog);
-if (createHash("sha256").update(JSON.stringify(catalog.registry)).digest("hex") !== catalog.snapshot.registryHash)
-  throw new Error("Ecosystem registry changed. Run npm run sync-ecosystem before publishing.");
-
-export function loadEcosystemCatalog(): Catalog {
-  return catalog;
-}
+export { ecosystemRegistry };
+export const readEcosystemState = createEcosystemReader({
+  seed: ecosystemSeed, read: knownCollectedAt => readEcosystemSnapshot(ecosystemRegistryHash, knownCollectedAt), validate: validateEcosystemSnapshot,
+});
+// Requests read the published public snapshot; they never run GitHub collection.
+export async function loadEcosystemCatalog() { return (await readEcosystemState()).catalog; }
 
 /**
  * The registry's line about an organisation, as its page shows it under the
@@ -28,7 +19,7 @@ export function organizationDescription(
   id: string,
   max = 200,
 ): string | undefined {
-  const line = catalog.registry.organizations.find((o) => o.id === id)?.description;
+  const line = ecosystemRegistry.organizations.find((o) => o.id === id)?.description;
   if (!line || line.length <= max) return line;
   const sentences = line.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g) ?? [line];
   let fitted = "";
