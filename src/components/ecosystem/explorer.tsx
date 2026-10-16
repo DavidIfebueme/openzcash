@@ -1358,7 +1358,7 @@ export function EcosystemExplorer({
       <footer className={styles.footer}>
         <span>OpenZcash · Public data</span>
         <div className={styles.footerLinks}>
-          <Link href="/wallets">Wallets →</Link>
+          <Link href="/wallets/find">Wallets →</Link>
           <Link href={isDevelopment ? "/ecosystem" : "/development"}>
             {isDevelopment ? "Ecosystem" : "Development"} →
           </Link>

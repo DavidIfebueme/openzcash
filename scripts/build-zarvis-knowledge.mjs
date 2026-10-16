@@ -12,7 +12,7 @@ export const routes = [
   "/zcg/decisions", "/zcg/totals", "/zcg/analytics", "/zcg/reconciliation", "/zcg/budget",
   "/zcg/stipends", "/zcg/investments", "/zcg/fpf", "/coinholders", "/coinholders/results", "/coinholders/activity",
   "/coinholders/fund", "/coinholders/verify", "/zcg/treasury-calculator", "/funding-history", "/governance",
-  "/zec-observatory", "/ecosystem", "/wallets", "/development", "/news",
+  "/zec-observatory", "/ecosystem", "/wallets/find", "/development", "/news",
   "/monthly", "/lockbox", "/zf", "/zodl", "/shielded-labs", "/zakura", "/tachyon",
   "/zechub", "/arborist", "/communities", "/ceremony", "/ceremony/people", "/ceremony/road",
   "/ceremony/record", "/ceremony/ten-years", "/ceremony/watch",
@@ -24,7 +24,7 @@ const references = [
   ["src/lib/ceremony/films.ts", "/ceremony/watch"],
   ["src/data/governance/record.json", "/governance"],
   ["src/lib/monthly/reading-sets.json", "/monthly"],
-  ["src/app/wallets/catalog-data.ts", "/wallets"],
+  ["src/app/wallets/catalog-data.ts", "/wallets/find"],
   ["src/lib/communities/data.ts", "/communities"],
 ];
 const textFields = new Set(["title", "subtitle", "description", "what", "label", "name", "detail", "text", "note", "body", "summary", "contents", "licence", "role", "outcome", "decidedBy", "status", "date", "evidenceCutoff", "reviewedAt", "era", "who", "knownAs", "public", "year", "by", "caption", "claim", "fact", "papers", "item", "lede", "maker", "shielded", "tag", "country", "region", "language", "about", "recipient"]);

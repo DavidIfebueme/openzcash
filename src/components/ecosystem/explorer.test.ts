@@ -15,7 +15,7 @@ const render = (mode: "ecosystem" | "development") => renderToStaticMarkup(
 describe("compact catalog presentation", () => {
   it("ships real app links without preview-only flags or destinations", () => {
     const html = render("development");
-    for (const href of ["/ecosystem", "/development", "/wallets", "/zcg/proposals", "/zcg/grants"])
+    for (const href of ["/ecosystem", "/development", "/wallets/find", "/zcg/proposals", "/zcg/grants"])
       expect(html).toContain(`href="${href}"`);
     expect(html).not.toContain("Preview");
     expect(html).not.toContain("127.0.0.1");

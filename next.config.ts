@@ -83,6 +83,7 @@ const nextConfig: NextConfig = {
       { source: "/zcg/coinholder/pool", destination: "/coinholders/fund", permanent: true },
       { source: "/coinholder", destination: "/coinholders", permanent: true },
       // Retired standalone pages keep existing bookmarks pointing to their records.
+      { source: "/wallets", destination: "/wallets/find", permanent: true },
       { source: "/z3", destination: "/ecosystem/history/z3", permanent: true },
       { source: "/defi", destination: "/zec-observatory#liquidity", permanent: true },
       { source: "/zcg/maya", destination: "/zec-observatory#liquidity", permanent: true },

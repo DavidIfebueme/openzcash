@@ -52,7 +52,7 @@ describe("the navigation hierarchy", () => {
     const ecosystem = appOf("ecosystem");
     expect([overviewEntry(ecosystem), ...ecosystem.pages].slice(0, 2)).toMatchObject([
       { href: "/ecosystem", label: "Overview" },
-      { href: "/wallets", label: "Wallets" },
+      { href: "/wallets/find", label: "Wallets" },
     ]);
   });
 
@@ -109,7 +109,7 @@ describe("backOf", () => {
   });
 
   it("preserves the list and app steps for Ecosystem pages and records", () => {
-    expect(backOf("/wallets")).toEqual({ href: "/ecosystem", label: "Ecosystem" });
+    expect(backOf("/wallets/find")).toEqual({ href: "/ecosystem", label: "Ecosystem" });
     expect(backOf("/ecosystem/history/zaino")).toEqual({
       href: "/ecosystem/history", label: "Project histories",
     });
@@ -124,7 +124,8 @@ describe("backOf", () => {
 });
 
 
-it("returns the wallet finder to the wallet catalog", () => {
-  expect(backOf("/wallets/find")).toEqual({ href: "/wallets", label: "Wallets" });
-  expect(placeOf("/wallets/find")?.detail?.label).toBe("Find a wallet");
+it("makes the finder the Wallets page directly under Ecosystem", () => {
+  expect(backOf("/wallets/find")).toEqual({ href: "/ecosystem", label: "Ecosystem" });
+  expect(placeOf("/wallets/find")?.page?.label).toBe("Wallets");
+  expect(placeOf("/wallets/find")?.detail).toBeUndefined();
 });

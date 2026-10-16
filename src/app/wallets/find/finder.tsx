@@ -229,7 +229,6 @@ export function WalletFinder() {
     <PageHeader
       title={viewingEvidence ? "Wallet capability evidence" : "Wallet Finder"}
       subtitle={viewingEvidence ? "Sources, dates and limits, by wallet and platform." : undefined}
-      actions={<Link href="/wallets" className={styles.catalogLink}>All wallets <span aria-hidden="true">↗</span></Link>}
     />
     {viewingEvidence ? <CapabilityRecords selectedName={params.get("wallet")} onSelect={selectRecord} onFind={() => updateRequirements(requirements)} /> : <>
       <section className={styles.filterPanel} aria-labelledby="wallet-filters">
@@ -273,7 +272,7 @@ export function WalletFinder() {
         {excluded.length > 0 && <details><summary>Not matched · {excluded.length}<span aria-hidden="true"> +</span></summary><p>A selected requirement is not supported. Details include the evidence.</p><WalletGroups results={excluded} query={walletRequirementsQuery(requirements)} idPrefix="excluded" /></details>}
       </div>}
     </>}
-    <aside className={styles.method}><details><summary>How matching works</summary><p>Results keep the catalog order. Only documented capabilities count: availability, platform and selected capabilities are checked against the linked sources. Unknown or incomplete evidence stays unknown. Capabilities from different platforms are never combined into one match. Other blockchains means managing native assets, not swaps.</p><p>A public audit report covers its stated product and release; it is not a safety guarantee. The ⭐ is an editorial highlight. Read source dates and limits before choosing. <Link href="/wallets/find?view=evidence">Browse all capability records</Link> or <Link href="/wallets">open the full wallet catalog</Link>.</p><p>No account or wallet connection is needed. Your filters stay in this page’s address so you can revisit or share them.</p></details></aside>
+    <aside className={styles.method}><details><summary>How matching works</summary><p>Results keep the catalog order. Only documented capabilities count: availability, platform and selected capabilities are checked against the linked sources. Unknown or incomplete evidence stays unknown. Capabilities from different platforms are never combined into one match. Other blockchains means managing native assets, not swaps.</p><p>A public audit report covers its stated product and release; it is not a safety guarantee. The ⭐ is an editorial highlight. Read source dates and limits before choosing. <Link href="/wallets/find?view=evidence">Browse all capability records</Link>.</p><p>No account or wallet connection is needed. Your filters stay in this page’s address so you can revisit or share them.</p></details></aside>
     <CommunityCredit screen="wallet-finder" />
   </div>;
 }

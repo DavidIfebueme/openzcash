@@ -1,6 +1,6 @@
 # Wallet Finder: evidence maintenance
 
-The finder supplements the existing `/wallets` catalog. It matches explicit requirements against platform-specific source records. It does not rank security, hold keys, connect a wallet, process transactions, or infer truth from a badge or URL.
+The finder at `/wallets/find` is the Wallets page. The retired `/wallets` catalog redirects permanently to it. It matches explicit requirements against platform-specific source records. It does not rank security, hold keys, connect a wallet, process transactions, or infer truth from a badge or URL.
 
 ## Source of truth
 

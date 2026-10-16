@@ -1,6 +1,6 @@
 # Reuse and integration review package
 
-This implementation lives inside OpenZcash's existing wallet catalog. It is provided under the repository MIT license. No upstream ZecHub PR or maintainer acceptance is claimed.
+This implementation powers OpenZcash's Wallets page at `/wallets/find`, using the shared wallet catalog. It is provided under the repository MIT license. No upstream ZecHub PR or maintainer acceptance is claimed.
 
 ## Portable core
 

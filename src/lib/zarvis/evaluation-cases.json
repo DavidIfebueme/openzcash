@@ -261,15 +261,15 @@
   },
   {
     "question": "Which wallets support shielded ZEC on iOS?",
-    "sourceContains": "/wallets"
+    "sourceContains": "/wallets/find"
   },
   {
     "question": "Quais carteiras Zcash são shielded por padrão?",
-    "sourceContains": "/wallets"
+    "sourceContains": "/wallets/find"
   },
   {
     "question": "Is Keystone a hardware wallet with Orchard support?",
-    "sourceContains": "/wallets"
+    "sourceContains": "/wallets/find"
   },
   {
     "question": "Tell me about the Zcash Brazil community",

@@ -4,11 +4,11 @@ Status: prepared; **0 participants tested**. Automated tests and agent browser c
 
 ## Goal and sample
 
-Recruit at least five consenting volunteers who can use a browser, including newcomers and phone users. Compare the existing wallet catalog with the capability finder. No seed phrase, address, balance, account login, personal identifier or transaction is needed. Store only pseudonymous participant IDs and anonymous notes; obtain consent before retaining or publishing notes. The task owner coordinates recruitment; this document does not authorize unsolicited outreach.
+Recruit at least five consenting volunteers who can use a browser, including newcomers and phone users. Compare an archived wallet catalog with the capability finder. No seed phrase, address, balance, account login, personal identifier or transaction is needed. Store only pseudonymous participant IDs and anonymous notes; obtain consent before retaining or publishing notes. The task owner coordinates recruitment; this document does not authorize unsolicited outreach.
 
 ## Conditions
 
-- A: `/wallets`, existing catalog and filters.
+- A: the archived `/wallets` catalog and filters from commit `ca9137c`, served only in a separate local checkout. The live `/wallets` URL now redirects to the finder.
 - B: `/wallets/find`, direct capability filters with evidence.
 - Alternate condition order: P01 A→B, P02 B→A, P03 A→B, P04 B→A, P05 A→B.
 - Use equivalent tasks in reversed order to reduce learning effects. Keep browser/device, source dataset revision and facilitator help consistent. Record any interruption or help given.

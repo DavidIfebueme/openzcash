@@ -177,7 +177,7 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
   const blossomSpacing = /\bblossom\b/.test(normalizedQuery) && /block|bloco|spacing|intervalo|seconds|segundos/.test(normalizedQuery);
   const monthly = /\b(?:monthly|mensais|mensal)\b/.test(normalizedQuery);
   // The wallet catalog and community directory are indexed per record; a question naming them should reach those records before generic ZIP text.
-  const directory = /\b(?:wallets?|carteiras?)\b/.test(normalizedQuery) ? "https://openzcash.org/wallets" : /\b(?:communit(?:y|ies)|comunidades?|embaixador\w*|ambassadors?)\b/.test(normalizedQuery) ? "https://openzcash.org/communities" : null;
+  const directory = /\b(?:wallets?|carteiras?)\b/.test(normalizedQuery) ? "https://openzcash.org/wallets/find" : /\b(?:communit(?:y|ies)|comunidades?|embaixador\w*|ambassadors?)\b/.test(normalizedQuery) ? "https://openzcash.org/communities" : null;
   // Provenance-aware nudges: announcement questions prefer the organizations' own posts, forum questions the forum, and a question naming ZecHub its wiki.
   const news = matchingConcepts.some(([id]) => id === "news");
   const fees = matchingConcepts.some(([id]) => id === "fees");

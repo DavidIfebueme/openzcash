@@ -34,7 +34,7 @@ describe("grouped ecosystem navigation", () => {
   });
   it("interleaves direct destinations in reading order and keeps the curated organization order", () => {
     const html = render("/communities", { "ecosystem:organizations": true }, { "/ecosystem": "127", "/development": "579", "/communities": "27", "/arborist": "133" });
-    const links = ["/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl", "/wallets", "/ecosystem/history", "/communities", "/development", "/arborist"];
+    const links = ["/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl", "/wallets/find", "/ecosystem/history", "/communities", "/development", "/arborist"];
     links.forEach((href, i) => {
       expect(html.split(`href="${href}"`)).toHaveLength(2);
       if (i) expect(html.indexOf(`href="${href}"`)).toBeGreaterThan(html.indexOf(`href="${links[i - 1]}"`));
@@ -58,10 +58,10 @@ describe("grouped ecosystem navigation", () => {
     expect(linkTag(page, '/zechub/copilot')).toContain('aria-current="page"');
   });
   it("keeps the organization list collapsed by default and honors a user's expansion", () => {
-    expect(render("/wallets")).not.toContain('href="/zf"');
-    const open = render("/wallets", { "ecosystem:organizations": true });
+    expect(render("/wallets/find")).not.toContain('href="/zf"');
+    const open = render("/wallets/find", { "ecosystem:organizations": true });
     expect(open).toContain('href="/zf"');
-    expect(linkTag(open, '/wallets')).toContain('aria-current="page"');
+    expect(linkTag(open, '/wallets/find')).toContain('aria-current="page"');
     expect(render("/zf", { "ecosystem:organizations": false })).not.toContain('href="/zf"');
   });
   it("keeps Communities directly accessible inside Ecosystem and FPF with the organizations", () => {

@@ -27,7 +27,7 @@ export const links: Record<z.infer<typeof lookupSchema>["topic"], string> = {
   grants: "/api/zcg/data/grants", recipients: "/api/zcg/data/recipients",
   disbursements: "/api/zcg/data/disbursements", proposals: "/api/zcg/office", decisions: "/zcg/participate?view=history",
   coinholder: "/api/zcg/coinholder/round", zechub: "/api/zechub/treasury",
-  ecosystem: "/api/ecosystem", wallets: "/wallets", communities: "/communities", arborist: "/arborist",
+  ecosystem: "/api/ecosystem", wallets: "/wallets/find", communities: "/communities", arborist: "/arborist",
   news: "/news", forum: "https://forum.zcashcommunity.com", zechub_dao: "https://daodao.zone/dao/juno1nktrulhakwm0n3wlyajpwxyg54n39xx4y8hdaqlty7mymf85vweq7m6t0y", funding_history: "/api/funding/history", price_history: "/funding-history", chain: "/zec-observatory",
   site: "/zcg/methodology", meetings: "/zcg/meetings", elections: "/zcg/committee", totals: "/zcg/totals",
   schedule: "/zcg/schedule", investments: "/zcg/investments", governance: "/governance", monthly: "/monthly",

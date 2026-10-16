@@ -140,11 +140,11 @@ export const APPS: AppDef[] = [
     sub: "Projects, teams & organizations",
     icon: "ecosystem",
     navigationOrder: [
-      "/wallets", "/ecosystem/history", "/communities", "/development", "/arborist",
+      "/wallets/find", "/ecosystem/history", "/communities", "/development", "/arborist",
       "/zcg/fpf", "/shielded-labs", "/tachyon", "/zf", "/zakura", "/zechub", "/zodl",
     ],
     pages: [
-      { href: "/wallets", label: "Wallets", mark: "/logos/glyphs/wallets.png" },
+      { href: "/wallets/find", label: "Wallets", mark: "/logos/glyphs/wallets.png" },
       { href: "/ecosystem/history", label: "Project histories", mark: "/logos/glyphs/grants.png" },
       { href: "/development", label: "Development", mark: "/logos/glyphs/development.png" },
       { href: "/ecosystem/history/z3", label: "Z3 stack", mark: "/logos/glyphs/z3.png", hidden: true, palette: true },
@@ -231,7 +231,6 @@ export function childAppsOf(app: AppDef, apps: AppDef[] = APPS): AppDef[] {
 
 /** Detail routes and the list page they belong to. */
 const DETAILS: Record<string, { parent: string; label: string }> = {
-  "/wallets/find": { parent: "/wallets", label: "Find a wallet" },
   "/zcg/grant": { parent: "/zcg/grants", label: "Grant detail" },
   "/zcg/recipient": { parent: "/zcg/recipients", label: "Recipient detail" },
 };

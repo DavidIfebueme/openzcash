@@ -2,7 +2,7 @@ import { WALLET_EVIDENCE } from "@/lib/wallet-finder/evidence";
 import { DEFAULT_REQUIREMENTS, matchWallets } from "@/lib/wallet-finder/matching";
 import type { WalletPlatform } from "@/lib/wallet-finder/types";
 
-/** Shared catalog and evidence-derived privacy labels for /wallets and Zarvis. */
+/** Shared catalog and evidence-derived privacy labels for /wallets/find and Zarvis. */
 /** Date of the last edit to the entries below (maintainer-set, not a review pass): update it in the same commit that adds, removes or corrects a wallet. */
 export const WALLET_CATALOG_REVISED_ON = "2026-10-15";
 
