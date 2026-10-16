@@ -1,6 +1,6 @@
 # Private Chat: guided entry and responsive conversation
 
-Date: 2026-10-15. Branch: `michae2xl/private-chat`. Local preview only; this refinement has not been deployed.
+Date: 2026-10-15 (America/Sao_Paulo). Branch: `michae2xl/private-chat`. Published to the isolated production pilot after approval of the desktop/mobile preview.
 
 ## Changes
 
@@ -22,7 +22,18 @@ No changes to the Nym transport, directory protocol, ratchet, network fallback p
 - Captured desktop at 1440 × 900 and mobile at 390 × 844, in both themes. The mobile entry and active conversation had no horizontal overflow. At 390 × 520, the message input remained inside the viewport (bottom approximately 442px).
 - Synthetic sessions were cleared after the exercise. No existing private room or real participant was accessed.
 
-These were browser sessions on one computer, not two physical phones or networks. Virtual keyboard, background suspension and touch ergonomics still need iOS/Android device testing. No claim of a new independent security audit or production deployment is made here.
+These were browser sessions on one computer, not two physical phones or networks. Virtual keyboard, background suspension and touch ergonomics still need iOS/Android device testing. This interface refinement is not a new independent security audit.
+
+## Production release
+
+- Source commit: `6f55eb8` (`feat(chat): simplify entry and improve mobile conversations`), pushed to the private repository.
+- Railway web deployment: `8fe62ede-7abf-475f-b049-24d95a09ab18`, status `SUCCESS`. Build completed with Next.js 16.3.8. The directory service and its persistent volume were not redeployed or reconfigured.
+- Public URL: `https://private-chat-production-b8bd.up.railway.app/private-chat`.
+- HTTP verification at `2026-10-16T01:16:10Z`: updated onboarding returned 200; health returned ready; root redirected to the chat; `/zcg` and the direct presence endpoint returned 404; Nym worker and WASM returned 200.
+- Response retained nonce-based CSP, pinned gateway, no-store, no-referrer, noindex and blocked camera/microphone permissions. Inline nonce matched the response policy.
+- A fresh synthetic browser session on the public URL reached **Connected via Nym** after an explicit connection. Cancelling the exit dialog preserved the connection; confirming exit subsequently cleared the synthetic session.
+- Hosted desktop and 390 × 844 mobile screens were captured. Mobile content width was 390px, with no horizontal overflow. No participant room was entered and no existing conversation was inspected.
+- The two-person message/reconnection evidence above was obtained in the local app before release. The public check verifies connection and interface behavior; the user's physical-device/cross-network test remains separate.
 
 ## Preview artifacts
 
