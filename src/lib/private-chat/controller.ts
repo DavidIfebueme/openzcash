@@ -35,6 +35,7 @@ import { openRoom, type DiscoveryRoom } from "./discovery-room";
 export const ROUTE_CHECK_INTERVAL_MS = 30_000;
 export const ROUTE_CHECK_TIMEOUT_MS = 60_000;
 export const ACK_TIMEOUT_MS = 60_000;
+export const MAX_CONVERSATIONS = 8;
 const RETRY_DELAYS = [2000, 5000, 10_000];
 export type ChatLine = {
   id: string;
@@ -64,7 +65,28 @@ export type Contact = {
   requestSequence?: number;
   request?: RequestPacket;
 };
+export type ConversationSummary = {
+  id: string;
+  alias: string;
+  status: Contact["status"];
+  ready: boolean;
+  unread: number;
+  lastMessage: string | null;
+};
+type ConversationState = {
+  contact: Contact;
+  lines: ChatLine[];
+  note: string;
+  sending: boolean;
+  unread: number;
+  probe: { id: string; deadline: number } | null;
+  seen: Map<string, string>;
+  ratchet: { engine: ConversationRatchet; peer: RatchetBundle | null } | null;
+};
 export type ChatSnapshot = {
+  conversations: ConversationSummary[];
+  activeConversationId: string | null;
+  canStartConversation: boolean;
   alias: string | null;
   keyReady: boolean;
   busy: boolean;
@@ -92,6 +114,9 @@ export type ChatSnapshot = {
   now: number;
 };
 const initial = (): ChatSnapshot => ({
+  conversations: [],
+  activeConversationId: null,
+  canStartConversation: true,
   alias: null,
   keyReady: false,
   busy: false,
@@ -133,9 +158,11 @@ export class ChatController {
   private roomIdentity: DeviceIdentity | null = null;
   private roomEpoch = 0;
   private inviteEpoch = 0;
-  private probe: { id: string; deadline: number } | null = null;
+  private conversations = new Map<string, ConversationState>();
+  private activeConversationId: string | null = null;
+  private conversationVisible = true;
+  private globalNote = "";
   private receiveChain: Promise<void> = Promise.resolve();
-  private seen = new Map<string, string>();
   private refused = new Set<string>();
   private timer: ReturnType<typeof setInterval> | null = null;
   private discover = false;
@@ -152,13 +179,58 @@ export class ChatController {
   private accepting = false;
   private conversationEpoch = 0;
   private preparing = false;
-  private ratchet: { conversation: string; publicKey: string; engine: ConversationRatchet; peer: RatchetBundle | null } | null = null;
-  private clearRatchet() {
-    this.ratchet?.engine.close();
-    this.ratchet = null;
-    this.conversationEpoch++;
-    this.preparing = false;
-    this.accepting = false;
+  private current(id = this.activeConversationId) {
+    return id ? this.conversations.get(id) : undefined;
+  }
+  private hasPeer(publicKey: string) {
+    return [...this.conversations.values()].some(c =>
+      c.contact.publicKey === publicKey && c.contact.status !== "ended");
+  }
+  private isCurrent(conversation: ConversationState) {
+    return this.current(conversation.contact.conversation) === conversation;
+  }
+  private clearRatchet(conversation: ConversationState) {
+    conversation.ratchet?.engine.close();
+    conversation.ratchet = null;
+    conversation.probe = null;
+    conversation.sending = false;
+  }
+  private updateConversation(conversation: ConversationState, patch: Partial<ConversationState>) {
+    if (!this.isCurrent(conversation)) return;
+    Object.assign(conversation, patch);
+    this.patch({});
+  }
+  private addConversation(contact: Contact, engine: ConversationRatchet, peer: RatchetBundle | null, note: string) {
+    const conversation: ConversationState = {
+      contact, lines: [], note, sending: false, unread: 0,
+      probe: null, seen: new Map(), ratchet: { engine, peer },
+    };
+    this.conversations.set(contact.conversation, conversation);
+    this.activeConversationId = contact.conversation;
+    this.patch({ note: "" });
+    return conversation;
+  }
+  private removeConversation(conversation: ConversationState, note = "") {
+    this.clearRatchet(conversation);
+    this.conversations.delete(conversation.contact.conversation);
+    const selected = this.activeConversationId === conversation.contact.conversation;
+    if (selected) this.activeConversationId = null;
+    this.patch(selected ? { note } : {});
+  }
+  selectConversation(id: string | null) {
+    if (id !== null && !this.conversations.has(id)) return;
+    this.activeConversationId = id;
+    const conversation = this.current();
+    if (conversation && this.conversationVisible) conversation.unread = 0;
+    this.patch({ note: "" });
+  }
+  setConversationVisible(visible: boolean) {
+    this.conversationVisible = visible;
+    const conversation = this.current();
+    if (visible && conversation?.unread) {
+      conversation.unread = 0;
+      this.patch({});
+    }
   }
   private invitationWork: Promise<LiveInvite | null> | null = null;
 
@@ -197,7 +269,21 @@ export class ChatController {
     };
   };
   private patch(patch: Partial<ChatSnapshot>) {
-    this.state = { ...this.state, ...patch };
+    if (patch.note !== undefined) this.globalNote = patch.note;
+    const active = this.current();
+    this.state = {
+      ...this.state, ...patch,
+      conversations: [...this.conversations.values()].map(({ contact, lines, unread }) => ({
+        id: contact.conversation, alias: contact.alias, status: contact.status,
+        ready: contact.ready, unread, lastMessage: lines.at(-1)?.body ?? null,
+      })),
+      activeConversationId: this.activeConversationId,
+      canStartConversation: this.conversations.size < MAX_CONVERSATIONS,
+      contact: active?.contact ?? null,
+      lines: active?.lines ?? [],
+      sending: active?.sending ?? false,
+      note: this.globalNote || active?.note || "",
+    };
     this.listeners.forEach((listener) => listener());
   }
   start() {
@@ -303,8 +389,8 @@ export class ChatController {
     this.patch({
       link: "disconnected",
       retry: 0,
-      note: this.state.contact
-        ? "Conversation kept in this tab. Reconnect when you’re ready."
+      note: this.conversations.size
+        ? "Conversations kept in this tab. Reconnect when you’re ready."
         : "Disconnected.",
     });
   };
@@ -319,7 +405,14 @@ export class ChatController {
     this.transport = null;
     this.address = null;
     this.retryAt = 0;
-    this.probe = null;
+    for (const conversation of this.conversations.values()) {
+      conversation.probe = null;
+      conversation.sending = false;
+      conversation.contact = { ...conversation.contact, ready: false };
+      conversation.lines = conversation.lines.map(line =>
+        line.direction === "out" && line.delivery !== "delivered"
+          ? { ...line, delivery: "unconfirmed" } : line);
+    }
     this.routeProbe = null;
     this.nextRouteCheck = 0;
     this.patch({
@@ -327,15 +420,6 @@ export class ChatController {
       directory: "idle",
       invite: null,
       requests: [],
-      sending: false,
-      contact: this.state.contact
-        ? { ...this.state.contact, ready: false }
-        : null,
-      lines: this.state.lines.map((line) =>
-        line.direction === "out" && line.delivery !== "delivered"
-          ? { ...line, delivery: "unconfirmed" }
-          : line,
-      ),
     });
   }
   network(online: boolean) {
@@ -346,7 +430,7 @@ export class ChatController {
       this.wanted = wanted;
       this.patch({
         link: "offline",
-        note: "You’re offline. Your conversation stays in this tab.",
+        note: "You’re offline. Your conversations stay in this tab.",
       });
     } else if (this.wanted) {
       this.patch({ retry: 0 });
@@ -358,12 +442,15 @@ export class ChatController {
     this.epoch += 1;
     this.disconnect();
     this.leaveRoom();
-    this.clearRatchet();
+    for (const conversation of this.conversations.values()) this.clearRatchet(conversation);
+    this.conversations.clear();
+    this.activeConversationId = null;
+    this.conversationEpoch++;
+    this.preparing = false;
     wipeIdentity(this.identity);
     this.identity = null;
     this.credentials = null;
     this.sequence = 0;
-    this.seen.clear();
     this.refused.clear();
     this.accepting = false;
     this.invitationWork = null;
@@ -388,17 +475,15 @@ export class ChatController {
         });
     } else if (event.type === "submitted" || event.type === "submit-failed") {
       if (event.type === "submit-failed") this.nymDirectory?.fail(event.id);
-      this.patch({
-        lines: this.state.lines.map((line) =>
-          line.id === event.id && line.delivery !== "delivered"
-            ? {
-                ...line,
-                delivery:
-                  event.type === "submitted" ? "waiting" : "unconfirmed",
-              }
-            : line,
-        ),
-      });
+      for (const conversation of this.conversations.values()) {
+        if (!conversation.lines.some(line => line.id === event.id)) continue;
+        this.updateConversation(conversation, {
+          lines: conversation.lines.map(line =>
+            line.id === event.id && line.delivery !== "delivered"
+              ? { ...line, delivery: event.type === "submitted" ? "waiting" : "unconfirmed" }
+              : line),
+        });
+      }
     } else if (event.status === "connected" && event.address) {
       this.address = event.address;
       this.sequence += 1;
@@ -445,13 +530,17 @@ export class ChatController {
         !(packet.t === "probe" && this.state.link === "checking"))
     )
       return false;
-    const ratchet = this.ratchet;
+    const conversation = this.current("c" in packet ? packet.c
+      : packet.t === "request" ? packet.id
+      : packet.t === "accept" || packet.t === "reject" ? packet.ref : null);
+    const ratchet = conversation?.ratchet;
     let wire = packet;
     if ("c" in packet) {
       if (packet.t === "ratchet" || !ratchet ||
-          ratchet.conversation !== packet.c || ratchet.publicKey !== publicKey) return false;
+          conversation?.contact.publicKey !== publicKey) return false;
       const content = await ratchet.engine.encrypt(JSON.stringify(packet));
-      if (!content || (packet.t !== "bye" && ratchet !== this.ratchet)) return false;
+      if (!content || (packet.t !== "bye" &&
+        (!conversation || !this.isCurrent(conversation) || ratchet !== conversation.ratchet))) return false;
       wire = { v: 3, t: "ratchet", id: packet.id, c: packet.c, content };
     }
     const bytes = await sealEnvelope({
@@ -469,7 +558,7 @@ export class ChatController {
       return false;
     // Encryption is asynchronous. Recheck consent and the intended peer
     // immediately before queuing a packet after a state change.
-    const contact = this.state.contact;
+    const contact = conversation && this.isCurrent(conversation) ? conversation.contact : null;
     if (
       "c" in packet &&
       packet.t !== "bye" &&
@@ -530,7 +619,7 @@ export class ChatController {
       !address ||
       !alias ||
       this.state.link !== "connected" ||
-      this.state.contact
+      !this.state.canStartConversation
     )
       return null;
     if (this.state.invite && this.state.invite.expiresAt > this.clock())
@@ -545,7 +634,7 @@ export class ChatController {
       ticket !== this.connection ||
       identity !== this.identity ||
       generation !== this.inviteEpoch ||
-      this.state.contact
+      !this.state.canStartConversation
     )
       return null;
     this.patch({ invite, note: "", requests: [] });
@@ -561,7 +650,7 @@ export class ChatController {
       !this.identity ||
       !this.address ||
       this.state.link !== "connected" ||
-      this.state.contact || this.preparing
+      !this.state.canStartConversation || this.preparing || this.accepting
     )
       return false;
     const ticket = this.connection,
@@ -579,12 +668,16 @@ export class ChatController {
       this.patch({ note: "That invite belongs to this tab." });
       return false;
     }
+    if (this.hasPeer(invite.publicKey)) {
+      this.patch({ note: "A conversation with this person is already open. Choose it from Chats." });
+      return false;
+    }
     const code = await safetyCode(identity.publicKey, invite.publicKey);
     if (
       !code ||
       ticket !== this.connection ||
       identity !== this.identity ||
-      this.state.contact || this.preparing ||
+      !this.state.canStartConversation || this.hasPeer(invite.publicKey) || this.preparing || this.accepting ||
       !this.address
     )
       return false;
@@ -602,14 +695,13 @@ export class ChatController {
       return false;
     }
     if (generation !== this.conversationEpoch || ticket !== this.connection ||
-        identity !== this.identity || this.state.contact || !this.address ||
+        identity !== this.identity || !this.state.canStartConversation || this.hasPeer(invite.publicKey) || !this.address ||
         invite.expiresAt <= this.clock()) {
       engine.close();
       if (generation === this.conversationEpoch) this.preparing = false;
       return false;
     }
     this.preparing = false;
-    this.ratchet = { conversation, publicKey: invite.publicKey, engine, peer: null };
     const request: RequestPacket = {
       v: 3,
       t: "request",
@@ -622,8 +714,7 @@ export class ChatController {
       sequence: this.sequence,
     };
     this.revokeInvite();
-    this.patch({
-      contact: {
+    this.addConversation({
         alias: invite.alias,
         publicKey: invite.publicKey,
         address: invite.address,
@@ -634,17 +725,15 @@ export class ChatController {
         ready: false,
         remoteSequence: 0,
         request,
-      },
-      lines: [],
-      note: "Waiting for the other person to accept.",
-    });
+      }, engine, null, "Waiting for the other person to accept.");
     await this.sendPacket(invite.publicKey, invite.address, request);
     return true;
   }
-  async retryRequest() {
-    const contact = this.state.contact;
+  async retryRequest(id = this.activeConversationId) {
+    const conversation = this.current(id);
+    const contact = conversation?.contact;
     if (
-      contact?.status !== "requesting" ||
+      !conversation || contact?.status !== "requesting" ||
       !contact.request ||
       contact.request.expiresAt <= this.clock() ||
       !this.address ||
@@ -657,22 +746,22 @@ export class ChatController {
       address: this.address,
       sequence: this.sequence,
     };
-    this.patch({ contact: { ...contact, request } });
+    this.updateConversation(conversation, { contact: { ...contact, request } });
     const sent = await this.sendPacket(contact.publicKey, contact.address, request);
-    if (this.state.contact?.conversation === contact.conversation &&
-        this.state.contact.status === "requesting") {
-      this.patch({ note: sent
+    if (this.isCurrent(conversation) && conversation.contact.status === "requesting") {
+      this.updateConversation(conversation, { note: sent
         ? "Request sent again. Waiting for acceptance."
         : "Could not resend the request. Try again while connected." });
     }
   }
   async acceptRequest(id: string) {
-    if (this.accepting || this.preparing || this.state.contact || this.state.link !== "connected")
+    if (this.accepting || this.preparing || !this.state.canStartConversation || this.state.link !== "connected")
       return;
     const item = this.state.requests.find((item) => item.packet.id === id);
     const invite = this.state.invite;
     if (
       !item ||
+      this.hasPeer(item.publicKey) || this.conversations.has(id) ||
       !invite ||
       invite.expiresAt <= this.clock() ||
       item.packet.inviteId !== invite.id ||
@@ -698,12 +787,12 @@ export class ChatController {
     if (generation !== this.conversationEpoch || ticket !== this.connection ||
         identity !== this.identity || this.state.invite !== invite ||
         !this.state.requests.includes(item) || this.refused.has(item.publicKey) ||
-        invite.expiresAt <= this.clock() || this.state.contact || !this.address) {
+        invite.expiresAt <= this.clock() || !this.state.canStartConversation ||
+        this.hasPeer(item.publicKey) || this.conversations.has(id) || !this.address) {
       engine.close();
       if (generation === this.conversationEpoch) this.accepting = false;
       return;
     }
-    this.ratchet = { conversation: item.packet.id, publicKey: item.publicKey, engine, peer: item.packet.ratchet };
     this.setAvailable(false);
     const contact: Contact = {
       alias: item.packet.alias,
@@ -718,23 +807,17 @@ export class ChatController {
       acceptedUntil: item.packet.expiresAt,
       requestSequence: item.packet.sequence,
     };
-    this.seen.clear();
-    this.patch({
-      contact,
-      invite: null,
-      requests: [],
-      lines: [],
-      note: "Accepted. Confirming the connection…",
-    });
+    this.addConversation(contact, engine, item.packet.ratchet, "Accepted. Confirming the connection…");
+    this.patch({ invite: null, requests: [] });
     await this.sendPacket(contact.publicKey, contact.address, {
       v: 3,
       t: "accept",
-        ratchet: this.ratchet!.engine.bundle,
+      ratchet: engine.bundle,
       id: messageId(),
       ref: contact.conversation,
       address: this.address,
     });
-    this.accepting = false;
+    if (generation === this.conversationEpoch) this.accepting = false;
   }
   async rejectRequest(id: string) {
     const item = this.state.requests.find((item) => item.packet.id === id);
@@ -750,24 +833,26 @@ export class ChatController {
       ref: id,
     });
   }
-  endConversation = () => {
-    const contact = this.state.contact;
-    const ratchet = this.ratchet;
-    // Capture the old engine for this final authenticated control. New work is
-    // invalidated immediately; the old engine closes when its queued send ends.
-    const ending = contact?.status === "active"
+  endConversation = (id = this.activeConversationId) => {
+    const conversation = this.current(id);
+    if (!conversation) {
+      if (id !== null) return;
+      this.conversationEpoch++;
+      this.preparing = false;
+      this.accepting = false;
+      return;
+    }
+    const { contact, ratchet } = conversation;
+    // Capture this engine for the final authenticated control; removing the
+    // context immediately cancels its other queued work, never another chat's.
+    const ending = contact.status === "active"
       ? this.sendPacket(contact.publicKey, contact.address, {
           v: 3, t: "bye", id: messageId(), c: contact.conversation,
         })
       : Promise.resolve(false);
-    this.ratchet = null;
-    this.conversationEpoch++;
-    this.preparing = false;
-    this.accepting = false;
+    conversation.ratchet = null;
+    this.removeConversation(conversation);
     void ending.finally(() => ratchet?.engine.close());
-    this.patch({ contact: null, lines: [], note: "", sending: false });
-    this.seen.clear();
-    this.probe = null;
   };
 
   private async receive(bytes: Uint8Array, ticket: number) {
@@ -788,12 +873,13 @@ export class ChatController {
     let p: ChatPacket = opened.plaintext;
     const key = opened.senderPublicKey;
     if (p.t === "ratchet") {
-      const ratchet = this.ratchet;
-      const contact = this.state.contact;
-      if (!ratchet || ratchet.publicKey !== key || ratchet.conversation !== p.c ||
-          contact?.status !== "active" || contact.conversation !== p.c) return;
+      const conversation = this.current(p.c);
+      const ratchet = conversation?.ratchet;
+      if (!conversation || !ratchet || conversation.contact.publicKey !== key ||
+          conversation.contact.status !== "active") return;
       const plain = await ratchet.engine.decrypt(p.content);
-      if (!plain || ratchet !== this.ratchet || ticket !== this.connection) return;
+      if (!plain || !this.isCurrent(conversation) || ratchet !== conversation.ratchet ||
+          ticket !== this.connection) return;
       let inner: ChatPacket | null;
       try { inner = readPacket(JSON.parse(plain)); } catch { return; }
       if (!inner || !("c" in inner) || inner.t === "ratchet" ||
@@ -816,17 +902,18 @@ export class ChatController {
         ...(wasChecking ? { note: "" } : {}),
       });
       if (wasChecking && this.discover) void this.loadDirectory();
-      if (wasChecking && this.state.contact?.status === "active")
-        void this.restorePeerAfterReconnect();
-      if (wasChecking && this.state.contact?.status === "requesting")
-        void this.retryRequest();
+      if (wasChecking) for (const conversation of this.conversations.values()) {
+        if (conversation.contact.status === "active") void this.restorePeerAfterReconnect(conversation);
+        if (conversation.contact.status === "requesting") void this.retryRequest(conversation.contact.conversation);
+      }
       return;
     }
     if (this.state.link !== "connected" || p.t === "probe") return;
-    let contact = this.state.contact;
+    const conversation = this.current("c" in p ? p.c : p.t === "request" ? p.id : p.ref);
+    let contact = conversation?.contact;
     if (p.t === "request") {
       if (
-        contact?.publicKey === key &&
+        conversation && contact?.publicKey === key &&
         contact.conversation === p.id &&
         contact.status === "active" &&
         contact.role === "inviter" &&
@@ -835,18 +922,18 @@ export class ChatController {
         this.address
       ) {
         const previous = Math.max(contact.requestSequence ?? 0, contact.remoteSequence);
-        if (!this.ratchet || JSON.stringify(p.ratchet) !== JSON.stringify(this.ratchet.peer)) return;
+        if (!conversation.ratchet || JSON.stringify(p.ratchet) !== JSON.stringify(conversation.ratchet.peer)) return;
         if (p.sequence < previous ||
             (p.sequence === previous && p.address !== contact.address)) return;
         if (p.sequence > previous) {
           contact = { ...contact, address: p.address,
             requestSequence: p.sequence, ready: false };
-          this.patch({ contact });
+          this.updateConversation(conversation, { contact });
         }
         await this.sendPacket(key, contact.address, {
           v: 3,
           t: "accept",
-        ratchet: this.ratchet!.engine.bundle,
+          ratchet: conversation.ratchet.engine.bundle,
           id: messageId(),
           ref: p.id,
           address: this.address,
@@ -855,7 +942,7 @@ export class ChatController {
       }
       const invite = this.state.invite;
       if (
-        contact ||
+        !this.state.canStartConversation || this.hasPeer(key) || this.conversations.has(p.id) ||
         !invite ||
         invite.id !== p.inviteId ||
         invite.expiresAt !== p.expiresAt ||
@@ -881,7 +968,7 @@ export class ChatController {
         ticket !== this.connection ||
         this.state.invite !== invite ||
         invite.expiresAt <= this.clock() ||
-        this.state.contact
+        !this.state.canStartConversation || this.hasPeer(key) || this.conversations.has(p.id)
       )
         return;
       this.patch({
@@ -889,7 +976,7 @@ export class ChatController {
       });
       return;
     }
-    if (!contact || contact.publicKey !== key || contact.status === "ended")
+    if (!conversation || !contact || contact.publicKey !== key || contact.status === "ended")
       return;
     if (
       p.t === "accept" &&
@@ -898,17 +985,17 @@ export class ChatController {
       contact.request &&
       contact.request.expiresAt > this.clock()
     ) {
-      const ratchet = this.ratchet;
-      if (!ratchet || ratchet.conversation !== contact.conversation) return;
+      const ratchet = conversation.ratchet;
+      if (!ratchet) return;
       try { await ratchet.engine.setPeer(p.ratchet, true); }
       catch {
-        if (ratchet === this.ratchet) this.patch({ note: "Encryption handshake failed. Start a new conversation." });
+        if (ratchet === conversation.ratchet) this.updateConversation(conversation, { note: "Encryption handshake failed. Start a new conversation." });
         return;
       }
-      if (ratchet !== this.ratchet || ticket !== this.connection ||
-          this.state.contact !== contact || contact.request.expiresAt <= this.clock()) return;
+      if (!this.isCurrent(conversation) || ratchet !== conversation.ratchet || ticket !== this.connection ||
+          conversation.contact !== contact || contact.request.expiresAt <= this.clock()) return;
       ratchet.peer = p.ratchet;
-      this.patch({
+      this.updateConversation(conversation, {
         contact: {
           ...contact,
           status: "active",
@@ -917,7 +1004,7 @@ export class ChatController {
         },
         note: "Accepted. Confirming the connection…",
       });
-      await this.checkPeer();
+      await this.checkPeer(contact.conversation);
       return;
     }
     if (
@@ -925,14 +1012,13 @@ export class ChatController {
       p.ref === contact.conversation &&
       contact.status === "requesting"
     ) {
-      this.clearRatchet();
-      this.patch({ contact: null, note: "The chat request was declined." });
+      this.removeConversation(conversation, "The chat request was declined.");
       return;
     }
     if (!("c" in p) || p.c !== contact.conversation) return;
     if (p.t === "bye") {
-      this.clearRatchet();
-      this.patch({
+      this.clearRatchet(conversation);
+      this.updateConversation(conversation, {
         contact: { ...contact, status: "ended", ready: false },
         note: "The other person ended this conversation.",
       });
@@ -949,7 +1035,7 @@ export class ChatController {
         return;
       if (
         p.t === "ready" &&
-        (p.ref !== this.probe?.id || this.probe.deadline <= this.clock())
+        (p.ref !== conversation.probe?.id || conversation.probe.deadline <= this.clock())
       )
         return;
       const resumed = p.sequence > contact.remoteSequence;
@@ -959,8 +1045,8 @@ export class ChatController {
         remoteSequence: p.sequence,
         ready: p.t === "ready" || (contact.ready && !resumed),
       };
-      this.patch({ contact, ...(contact.ready ? { note: "" } : {}) });
-      if (p.t === "ready") this.probe = null;
+      this.updateConversation(conversation, { contact, ...(contact.ready ? { note: "" } : {}) });
+      if (p.t === "ready") conversation.probe = null;
       else if (this.address) {
         await this.sendPacket(key, p.address, {
           v: 3,
@@ -973,22 +1059,22 @@ export class ChatController {
         });
         // A fresh peer route must also answer our challenge. Reuse an existing
         // probe on the new route so a lost pre-reconnect probe cannot strand us.
-        if (resumed && this.probe) {
+        if (resumed && conversation.probe) {
           await this.sendPacket(key, p.address, {
             v: 3,
             t: "resume",
-            id: this.probe.id,
+            id: conversation.probe.id,
             c: p.c,
             address: this.address,
             sequence: this.sequence,
           });
-        } else if (!contact.ready && !this.probe) await this.checkPeer();
+        } else if (!contact.ready && !conversation.probe) await this.checkPeer(contact.conversation);
       }
       return;
     }
     if (p.t === "ack") {
-      this.patch({
-        lines: this.state.lines.map((line) =>
+      this.updateConversation(conversation, {
+        lines: conversation.lines.map((line) =>
           line.direction === "out" && line.id === p.ref
             ? { ...line, delivery: "delivered" }
             : line,
@@ -997,19 +1083,20 @@ export class ChatController {
       return;
     }
     if (p.t !== "text") return;
-    const known = this.seen.get(p.id);
+    const known = conversation.seen.get(p.id);
     if (known !== undefined && known !== p.body) return;
     if (known === undefined) {
-      if (this.state.lines.length >= 200) {
-        this.patch({
-          note: "This session has reached 200 messages. Start a new conversation.",
+      if (conversation.lines.length >= 200) {
+        this.updateConversation(conversation, {
+          note: "This conversation has reached 200 messages. Start a new conversation.",
         });
         return;
       }
-      this.seen.set(p.id, p.body);
-      this.patch({
+      conversation.seen.set(p.id, p.body);
+      this.updateConversation(conversation, {
+        unread: conversation.unread + (this.activeConversationId === contact.conversation && this.conversationVisible ? 0 : 1),
         lines: [
-          ...this.state.lines,
+          ...conversation.lines,
           {
             id: p.id,
             direction: "in",
@@ -1059,10 +1146,10 @@ export class ChatController {
       .catch(failed);
   }
 
-  private async restorePeerAfterReconnect() {
-    const contact = this.state.contact;
+  private async restorePeerAfterReconnect(conversation: ConversationState) {
+    const contact = conversation.contact;
     if (
-      contact?.status === "active" &&
+      this.isCurrent(conversation) && conversation.ratchet && contact.status === "active" &&
       contact.role === "inviter" &&
       contact.remoteSequence === 0 &&
       contact.acceptedUntil &&
@@ -1074,27 +1161,28 @@ export class ChatController {
       await this.sendPacket(contact.publicKey, contact.address, {
         v: 3,
         t: "accept",
-        ratchet: this.ratchet!.engine.bundle,
+          ratchet: conversation.ratchet.engine.bundle,
         id: messageId(),
         ref: contact.conversation,
         address: this.address,
       });
     }
-    await this.checkPeer();
+    await this.checkPeer(contact.conversation);
   }
 
-  async checkPeer() {
-    const contact = this.state.contact;
+  async checkPeer(conversationId = this.activeConversationId) {
+    const conversation = this.current(conversationId);
+    const contact = conversation?.contact;
     if (
-      !contact ||
+      !conversation || !contact ||
       contact.status !== "active" ||
       !this.address ||
       this.state.link !== "connected"
     )
       return;
     const id = messageId();
-    this.probe = { id, deadline: this.clock() + ACK_TIMEOUT_MS };
-    this.patch({
+    conversation.probe = { id, deadline: this.clock() + ACK_TIMEOUT_MS };
+    this.updateConversation(conversation, {
       contact: { ...contact, ready: false },
       note: "Checking the other person’s connection…",
     });
@@ -1108,21 +1196,22 @@ export class ChatController {
     });
   }
   async send(body: string, retryId?: string) {
-    const contact = this.state.contact;
+    const conversation = this.current();
+    const contact = conversation?.contact;
     const trimmed = body.trim();
     if (
-      !contact ||
+      !conversation || !contact ||
       contact.status !== "active" ||
       !contact.ready ||
       this.state.link !== "connected" ||
-      this.state.sending ||
+      conversation.sending ||
       !trimmed ||
       trimmed.length > 400 ||
-      (!retryId && this.state.lines.length >= 200)
+      (!retryId && conversation.lines.length >= 200)
     )
       return false;
     const existing = retryId
-      ? this.state.lines.find(
+      ? conversation.lines.find(
           (line) =>
             line.id === retryId &&
             line.direction === "out" &&
@@ -1140,11 +1229,11 @@ export class ChatController {
       deadline: this.clock() + ACK_TIMEOUT_MS,
       delivery: "sending",
     };
-    this.patch({
+    this.updateConversation(conversation, {
       sending: true,
       lines: existing
-        ? this.state.lines.map((l) => (l.id === id ? line : l))
-        : [...this.state.lines, line],
+        ? conversation.lines.map((l) => (l.id === id ? line : l))
+        : [...conversation.lines, line],
     });
     const sent = await this.sendPacket(contact.publicKey, contact.address, {
       v: 3,
@@ -1155,14 +1244,14 @@ export class ChatController {
     });
     if (
       ticket !== this.connection ||
-      this.state.contact?.conversation !== contact.conversation
+      !this.isCurrent(conversation)
     )
       return false;
-    this.patch({
+    this.updateConversation(conversation, {
       sending: false,
       ...(!sent
         ? {
-            lines: this.state.lines.map((l) =>
+            lines: conversation.lines.map((l) =>
               l.id === id ? { ...l, delivery: "unconfirmed" } : l,
             ),
           }
@@ -1326,7 +1415,7 @@ export class ChatController {
       !this.room ||
       !this.roomIdentity ||
       this.state.link !== "connected" ||
-      this.state.contact
+      !this.state.canStartConversation
     )
       return;
     const ticket = this.presenceEpoch;
@@ -1406,32 +1495,28 @@ export class ChatController {
       changes.note =
         "Your invite expired. Create a new one to receive requests.";
     }
-    if (
-      this.state.contact?.status === "requesting" &&
-      this.state.contact.request!.expiresAt <= now
-    ) {
-      this.clearRatchet();
-      changes.contact = null;
-      changes.note = "The request expired before it was accepted.";
+    const checkPeers: string[] = [];
+    for (const conversation of this.conversations.values()) {
+      const { contact } = conversation;
+      if (contact.status === "requesting" && contact.request!.expiresAt <= now) {
+        this.removeConversation(conversation, "The request expired before it was accepted.");
+        continue;
+      }
+      if (conversation.probe && conversation.probe.deadline <= now) {
+        conversation.probe = null;
+        conversation.note = "The other person has not responded. Check again when they reconnect.";
+      }
+      let missedAck = false;
+      conversation.lines = conversation.lines.map(line => {
+        if (line.direction === "out" && ["sending", "waiting"].includes(line.delivery) &&
+            (line.deadline ?? Infinity) <= now) {
+          missedAck = true;
+          return { ...line, delivery: "unconfirmed" };
+        }
+        return line;
+      });
+      if (missedAck && contact.ready) checkPeers.push(contact.conversation);
     }
-    if (this.probe && this.probe.deadline <= now) {
-      this.probe = null;
-      changes.note =
-        "The other person has not responded. Check again when they reconnect.";
-    }
-    const missedAck = this.state.lines.some(
-      (line) =>
-        line.direction === "out" &&
-        ["sending", "waiting"].includes(line.delivery) &&
-        (line.deadline ?? Infinity) <= now,
-    );
-    changes.lines = this.state.lines.map((line) =>
-      line.direction === "out" &&
-      ["sending", "waiting"].includes(line.delivery) &&
-      (line.deadline ?? Infinity) <= now
-        ? { ...line, delivery: "unconfirmed" }
-        : line,
-    );
     this.patch(changes);
     if (this.routeProbe && this.routeProbe.deadline <= now) {
       this.handleTransport(
@@ -1439,7 +1524,7 @@ export class ChatController {
         this.connection,
       );
     } else {
-      if (missedAck && this.state.contact?.ready) void this.checkPeer();
+      for (const id of checkPeers) void this.checkPeer(id);
       if (this.state.link === "connected" && now >= this.nextRouteCheck)
         this.checkRoute();
     }

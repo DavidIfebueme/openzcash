@@ -13,7 +13,11 @@ const QUESTIONS = [
   ],
   [
     "Is a private room a group chat?",
-    "No. The room helps people with the link find each other. Only members who turn on availability appear in Discover. A request opens a one-to-one chat after acceptance, with one active conversation per tab. There is no public people list or group chat.",
+    "No. The room helps people with the link find each other. Only members who turn on availability appear in Discover. A request opens a one-to-one chat after acceptance, and each person has a separate conversation in your Chats list. There is no public people list or group chat.",
+  ],
+  [
+    "Can I talk to several people in one tab?",
+    "Yes. Choose New chat to create another invite or join with a link. Switch between people in Your chats; unread badges show new messages. You can keep up to 8 separate conversations open, each with its own message keys. On a phone, tap Chats above the conversation to return to the list. Reloading or leaving clears every chat in this tab.",
   ],
   [
     "How private is it?",

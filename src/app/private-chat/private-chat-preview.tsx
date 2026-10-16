@@ -117,6 +117,7 @@ export function PrivateChatPreview({
   const [joinDraft, setJoin] = useState<string | null>(null);
   const joinOpen = joinVisible ?? !!incomingInvite;
   const join = joinDraft ?? incomingInvite;
+  const [mobileList, setMobileList] = useState(false);
   useEffect(() => {
     if (!incomingInvite && !incomingRoom) return;
     // Keep the token in this tab while the person connects, but remove the
@@ -127,14 +128,19 @@ export function PrivateChatPreview({
       setRoomFromLink(true);
       setView("discover");
     } else {
+      chat.selectConversation(null);
       setJoin(incomingInvite);
       setJoinOpen(true);
       setInviteFromLink(true);
+      setView("conversations");
+      setMobileList(false);
     }
     /* eslint-enable react-hooks/set-state-in-effect */
     clearChatFragment();
-  }, [incomingInvite, incomingRoom]);
-  const [draft, setDraft] = useState("");
+  }, [chat, incomingInvite, incomingRoom]);
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const draft = state.activeConversationId ? drafts[state.activeConversationId] ?? "" : "";
+  const unreadCount = state.conversations.reduce((total, conversation) => total + conversation.unread, 0);
   const origin = location ? new URL(location).origin : "";
   const [copied, setCopied] = useState(false);
   const [requestBusy, setRequestBusy] = useState(false);
@@ -144,6 +150,8 @@ export function PrivateChatPreview({
   const followingMessages = useRef(true);
   const [unread, setUnread] = useState(false);
   const [clearAction, setClearAction] = useState<"session" | "identity" | "conversation" | null>(null);
+  const [clearTarget, setClearTarget] = useState<string | null>(null);
+  const endingConversation = state.conversations.find(conversation => conversation.id === clearTarget);
   const session = useChatSession();
   const setSessionActive = session?.setActive;
   const lastLine = state.lines.at(-1)?.id;
@@ -164,7 +172,7 @@ export function PrivateChatPreview({
     reconnecting: `Reconnecting · ${state.retry}/3`,
     offline: "You’re offline",
   }[state.link];
-  const gettingStarted = !state.keyReady || (!connected && !state.contact && !state.room);
+  const gettingStarted = !state.keyReady || (!connected && !state.conversations.length && !state.room);
 
   useEffect(() => {
     setSessionActive?.(!!state.alias || !!state.room || !!join || !!roomInput);
@@ -175,7 +183,8 @@ export function PrivateChatPreview({
     chat.leave();
     setAlias("");
     setAliasError("");
-    setDraft("");
+    setDrafts({});
+    setMobileList(false);
     setJoin("");
     setJoinOpen(false);
     setRoomDraft("");
@@ -184,6 +193,7 @@ export function PrivateChatPreview({
     setRoomFromLink(false);
     setInviteFromLink(false);
     setClearAction(null);
+    setClearTarget(null);
     setUnread(false);
     followingMessages.current = true;
     setCopied(false);
@@ -221,6 +231,14 @@ export function PrivateChatPreview({
     chat.setDiscover(view === "discover");
   }, [chat, view]);
   useEffect(() => {
+    const updateVisibility = () => chat.setConversationVisible(
+      view === "conversations" && !mobileList && document.visibilityState !== "hidden",
+    );
+    updateVisibility();
+    document.addEventListener("visibilitychange", updateVisibility);
+    return () => document.removeEventListener("visibilitychange", updateVisibility);
+  }, [chat, view, mobileList]);
+  useEffect(() => {
     if (!thread.current) return;
     if (followingMessages.current || lastDirection === "out") {
       thread.current.scrollTop = thread.current.scrollHeight;
@@ -229,7 +247,7 @@ export function PrivateChatPreview({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setUnread(true);
     }
-  }, [lastLine, lastDirection, view]);
+  }, [lastLine, lastDirection, view, state.activeConversationId, mobileList]);
 
   async function enter(event: FormEvent) {
     event.preventDefault();
@@ -247,8 +265,22 @@ export function PrivateChatPreview({
   }
   function changeView(next: typeof view) {
     setView(next);
+    setMobileList(false);
     followingMessages.current = true;
     setUnread(false);
+  }
+  function selectConversation(id: string | null) {
+    chat.selectConversation(id);
+    changeView("conversations");
+    setCopied(false);
+  }
+  function updateDraft(value: string) {
+    const id = state.activeConversationId;
+    if (!id) return;
+    setDrafts(current => ({
+      ...Object.fromEntries(Object.entries(current).filter(([key]) => state.conversations.some(c => c.id === key))),
+      [id]: value,
+    }));
   }
   async function joinRoom(value?: string) {
     if (roomBusy) return;
@@ -285,15 +317,17 @@ export function PrivateChatPreview({
   async function send(event: FormEvent) {
     event.preventDefault();
     const text = draft;
+    const id = state.activeConversationId;
     followingMessages.current = true;
     setUnread(false);
-    if (await chat.send(text))
-      setDraft((current) => (current === text ? "" : current));
+    if (id && await chat.send(text))
+      setDrafts(current => current[id] === text ? { ...current, [id]: "" } : current);
   }
 
   function clearConversation() {
-    chat.endConversation();
-    setDraft("");
+    const id = clearTarget;
+    if (id) chat.endConversation(id);
+    setDrafts(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
     setUnread(false);
     followingMessages.current = true;
     setClearAction(null);
@@ -303,7 +337,7 @@ export function PrivateChatPreview({
     <div className={styles.newChatActions}>
       <button
         className={styles.primaryButton}
-        disabled={!connected}
+        disabled={!connected || !state.canStartConversation}
         onClick={() => {
           setCopied(false);
           void chat.makeInvite();
@@ -314,7 +348,7 @@ export function PrivateChatPreview({
       </button>
       <button
         className={styles.secondaryButton}
-        disabled={!state.keyReady}
+        disabled={!state.keyReady || !state.canStartConversation}
         aria-expanded={joinOpen}
         onClick={() => setJoinOpen(!joinOpen)}
       >
@@ -336,7 +370,8 @@ export function PrivateChatPreview({
         className={styles.workspace}
         data-ready={!!state.alias}
         data-onboarding={gettingStarted}
-        data-chat-active={view === "conversations" && !!state.contact}
+        data-chat-active={view === "conversations" && !!state.contact && !mobileList}
+        data-chat-list={view === "conversations" && mobileList}
       >
         <aside
           className={styles.identityColumn}
@@ -514,11 +549,11 @@ export function PrivateChatPreview({
             >
               <ChatIcon />
               <span>
-                <strong>Chat</strong>
-                <small>{state.contact?.alias || "One to one"}</small>
+                <strong>Chats</strong>
+                <small>{state.conversations.length ? `${state.conversations.length} in this tab` : "One to one"}</small>
               </span>
-              {state.requests.length > 0 && (
-                <span className={styles.count}>{state.requests.length}</span>
+              {state.requests.length + unreadCount > 0 && (
+                <span className={styles.count} aria-label={`${unreadCount} unread messages, ${state.requests.length} requests`}>{state.requests.length + unreadCount}</span>
               )}
             </button>
             <button
@@ -545,6 +580,34 @@ export function PrivateChatPreview({
               )}
             </button>
           </nav>}
+          {state.keyReady && <section className={styles.chatList} aria-label="Conversations in this tab">
+            <div className={styles.chatListHeading}>
+              <h2>Your chats</h2>
+              <button type="button" className={styles.newChatButton}
+                disabled={!state.canStartConversation}
+                onClick={() => selectConversation(null)}>
+                <span aria-hidden="true">+</span> New chat
+              </button>
+            </div>
+            {state.conversations.length ? <ul>
+              {state.conversations.map(conversation => <li key={conversation.id}>
+                <button type="button" className={styles.conversationLink}
+                  aria-current={state.activeConversationId === conversation.id ? "true" : undefined}
+                  aria-label={`Chat with ${conversation.alias}${conversation.unread ? `, ${conversation.unread} unread` : ""}`}
+                  onClick={() => selectConversation(conversation.id)}>
+                  <span className={styles.chatAvatar} aria-hidden="true">{conversation.alias.slice(0, 1)}</span>
+                  <span className={styles.chatPreview}>
+                    <strong>{conversation.alias}</strong>
+                    <small>{conversation.status === "ended" ? "Conversation ended"
+                      : conversation.status === "requesting" ? "Waiting for acceptance"
+                      : conversation.lastMessage || (connected && conversation.ready ? "Ready to chat" : "Waiting for connection")}</small>
+                  </span>
+                  {conversation.unread > 0 && <span className={styles.unreadCount}>{conversation.unread}</span>}
+                </button>
+              </li>)}
+            </ul> : <p className={styles.chatListEmpty}>Your conversations appear here.</p>}
+            {!state.canStartConversation && <p className={styles.chatListEmpty}>8 chats open. End one to start another.</p>}
+          </section>}
           {state.room && <section
             className={styles.availabilityCard}
             data-available={state.availableUntil !== null}
@@ -572,7 +635,7 @@ export function PrivateChatPreview({
                   state.availableUntil !== null ||
                   state.presence === "publishing"
                 }
-                disabled={!connected || !!state.contact || !state.room}
+                disabled={!connected || (!state.canStartConversation && !state.availableUntil) || !state.room}
                 onClick={() =>
                   chat.setAvailable(
                     state.availableUntil === null &&
@@ -765,7 +828,7 @@ export function PrivateChatPreview({
                       </span>
                       <div>
                         <h2>Private room</h2>
-                        <p>Find people here · talk to one person at a time</p>
+                        <p>Find people here · chat privately with each person</p>
                       </div>
                       <div className={styles.roomActions}>
                         <button
@@ -860,7 +923,7 @@ export function PrivateChatPreview({
                             <button
                               className={styles.secondaryButton}
                               disabled={
-                                !connected || !!state.contact || requestBusy
+                                !connected || !state.canStartConversation || requestBusy
                               }
                               onClick={() => void request(inviteToken(person))}
                             >
@@ -889,6 +952,11 @@ export function PrivateChatPreview({
             ) : state.contact ? (
               <>
                 <header className={styles.contactCard}>
+                  <button type="button" className={styles.backToChats} aria-label="Back to chats"
+                    onClick={() => { setMobileList(true); chat.setConversationVisible(false); }}>
+                    <span aria-hidden="true">‹</span><span>Chats</span>
+                    {unreadCount > 0 && <span className={styles.unreadCount}>{unreadCount}</span>}
+                  </button>
                   <div className={styles.identityRow}>
                     <span className={styles.avatar}>
                       {state.contact.alias.slice(0, 1)}
@@ -910,7 +978,7 @@ export function PrivateChatPreview({
                   </div>
                   <button
                     className={styles.textButton}
-                    onClick={() => setClearAction("conversation")}
+                    onClick={() => { setClearTarget(state.activeConversationId); setClearAction("conversation"); }}
                   >
                     {state.contact.status === "ended" ? "New conversation" : "End chat"}
                   </button>
@@ -1055,8 +1123,9 @@ export function PrivateChatPreview({
                       )}
                     {state.contact.status === "active" && (
                       <ChatComposer
+                        key={state.activeConversationId}
                         value={draft}
-                        onChange={setDraft}
+                        onChange={updateDraft}
                         onSend={send}
                         enabled={!!canSend}
                         sending={state.sending}
@@ -1073,7 +1142,7 @@ export function PrivateChatPreview({
                       <IconPrivateChat />
                     </span>
                     <h2>Start a private chat</h2>
-                    <p>Invite someone. Talk one to one.</p>
+                    <p>One person per chat. All your chats in this tab.</p>
                     {inviteActions}
                   </div>
                 ) : (
@@ -1144,7 +1213,7 @@ export function PrivateChatPreview({
                     </>}
                     <button
                       className={styles.primaryButton}
-                      disabled={!connected || !join.trim() || requestBusy}
+                      disabled={!connected || !state.canStartConversation || !join.trim() || requestBusy}
                     >
                       {requestBusy ? "Checking…" : "Request chat"}
                     </button>
@@ -1163,9 +1232,9 @@ export function PrivateChatPreview({
       </div>
       <ChatHelp />
       {clearAction && <ChatConfirm
-        title={clearAction === "conversation" ? state.contact?.status === "ended" ? "Start a new conversation?" : "End this conversation?" : "Leave this session?"}
+        title={clearAction === "conversation" ? endingConversation?.status === "ended" ? "Start a new conversation?" : "End this conversation?" : "Leave this session?"}
         description={clearAction === "conversation" ? "Messages in this conversation will be cleared from this tab. Your alias and room stay available." : "Your alias, invites and messages will be cleared from this tab. You cannot restore them here."}
-        action={clearAction === "conversation" ? state.contact?.status === "ended" ? "New conversation" : "End & clear chat" : clearAction === "identity" ? "Start a new identity" : "Leave & clear"}
+        action={clearAction === "conversation" ? endingConversation?.status === "ended" ? "New conversation" : "End & clear chat" : clearAction === "identity" ? "Start a new identity" : "Leave & clear"}
         onCancel={() => setClearAction(null)}
         onConfirm={clearAction === "conversation" ? clearConversation : leave}
       />}

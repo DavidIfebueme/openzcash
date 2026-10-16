@@ -3,9 +3,11 @@ import { sodiumReady, type DeviceIdentity } from "./identity";
 import { isNymAddress } from "./nym-address";
 import { normalizeAlias } from "./session";
 import { messageId, isMessageId } from "./messages";
+import { packInvite, unpackInvite } from "./invite-codec";
 
 export const INVITE_TTL_MS = 5 * 60_000;
 const PREFIX = "ozchat3.";
+const COMPACT_PREFIX = "ozc3.";
 export type LiveInvite = {
   v: 3;
   id: string;
@@ -41,7 +43,7 @@ function unsigned(invite: Omit<LiveInvite, "signature">) {
     signingKey: invite.signingKey,
   });
 }
-export function inviteToken(invite: LiveInvite) {
+function legacyToken(invite: LiveInvite) {
   return (
     PREFIX +
     encodeKey(
@@ -53,6 +55,10 @@ export function inviteToken(invite: LiveInvite) {
       ),
     )
   );
+}
+export function inviteToken(invite: LiveInvite) {
+  const packed = invite.expiresAt - invite.createdAt === INVITE_TTL_MS ? packInvite(invite) : null;
+  return packed ? COMPACT_PREFIX + encodeKey(packed) : legacyToken(invite);
 }
 export async function sign(identity: DeviceIdentity, value: string) {
   return encodeKey(
@@ -98,8 +104,9 @@ export async function createLiveInvite(
   return { ...body, signature: await sign(identity, unsigned(body)) };
 }
 export function parseLiveInvite(value: string): LiveInvite | null {
+  if (value.length > 2200) return null;
   let token = value.trim();
-  if (!token.startsWith(PREFIX)) {
+  if (!token.startsWith(PREFIX) && !token.startsWith(COMPACT_PREFIX)) {
     try {
       token =
         new URLSearchParams(new URL(token).hash.slice(1)).get("invite") || "";
@@ -107,11 +114,12 @@ export function parseLiveInvite(value: string): LiveInvite | null {
       return null;
     }
   }
-  if (!token.startsWith(PREFIX) || token.length > 1800) return null;
-  const bytes = decodeBytes(token.slice(PREFIX.length));
+  const compact = token.startsWith(COMPACT_PREFIX);
+  if ((!compact && !token.startsWith(PREFIX)) || token.length > 1800) return null;
+  const bytes = decodeBytes(token.slice(compact ? COMPACT_PREFIX.length : PREFIX.length));
   if (!bytes) return null;
   try {
-    const p = JSON.parse(new TextDecoder().decode(bytes));
+    const p = compact ? unpackInvite(bytes, INVITE_TTL_MS) : JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes));
     if (
       !p ||
       Object.keys(p).sort().join(",") !==
@@ -135,7 +143,7 @@ export function parseLiveInvite(value: string): LiveInvite | null {
       p.createdAt < 0
     )
       return null;
-    return inviteToken(p) === token ? p : null;
+    return (compact ? inviteToken(p) : legacyToken(p)) === token ? p : null;
   } catch {
     return null;
   }

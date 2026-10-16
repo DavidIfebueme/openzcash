@@ -246,7 +246,7 @@ describe("Private Chat interface", () => {
     fireEvent.click(screen.getByRole("button", { name: "Create invite" }));
     expect(
       ((await screen.findByLabelText("Invite link")) as HTMLInputElement).value,
-    ).toContain("#invite=ozchat3.");
+    ).toContain("#invite=ozc3.");
     expect(screen.getByText(/Expires in/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Revoke" }));
     expect(screen.queryByLabelText("Invite link")).not.toBeInTheDocument();
@@ -357,13 +357,13 @@ it("preserves history reading, signals new messages and offers a new conversatio
     await act(async () => { await peer.acceptRequest(peer.getSnapshot().requests[0].packet.id); });
     await waitFor(() => expect(screen.getByRole("textbox", { name: "Message" })).toBeEnabled());
     await act(async () => { await peer.send("First message"); });
-    await screen.findByText("First message");
+    await within(screen.getByRole("list", { name: "Messages" })).findByText("First message");
     const messages = screen.getByRole("list", { name: "Messages" });
     Object.defineProperties(messages, { scrollHeight: { configurable: true, value: 1200 }, clientHeight: { configurable: true, value: 400 } });
     messages.scrollTop = 100;
     fireEvent.scroll(messages);
     await act(async () => { await peer.send("Another message"); });
-    await screen.findByText("Another message");
+    await within(screen.getByRole("list", { name: "Messages" })).findByText("Another message");
     expect(messages.scrollTop).toBe(100);
     fireEvent.click(await screen.findByRole("button", { name: "↓ New messages" }));
     expect(messages.scrollTop).toBe(1200);
@@ -378,4 +378,52 @@ it("preserves history reading, signals new messages and offers a new conversatio
     expect(screen.getByRole("heading", { name: "Alice" })).toBeInTheDocument();
     expect(screen.queryByText("First message")).not.toBeInTheDocument();
   } finally { peer.dispose(); }
+});
+
+
+it("switches between people with independent drafts and unread messages", async () => {
+  const routes = new Map<string, (event: TransportEvent) => void>();
+  const transport = (ownAddress: string) => (listener: (event: TransportEvent) => void): NymTransport => ({
+    connect() { routes.set(ownAddress, listener); listener({ type: "status", status: "connected", address: ownAddress }); },
+    send(input) {
+      listener({ type: "submitted", id: input.id });
+      queueMicrotask(() => routes.get(input.recipient)?.({ type: "bytes", bytes: input.bytes }));
+    },
+    disconnect() { routes.delete(ownAddress); },
+  });
+  const bob = new ChatController(transport("E" + address.slice(1)), directory());
+  const carol = new ChatController(transport("F" + address.slice(1)), directory());
+  try {
+    await bob.enter("Bob"); bob.connect();
+    await carol.enter("Carol"); carol.connect();
+    await waitFor(() => expect(bob.getSnapshot().link).toBe("connected"));
+    await waitFor(() => expect(carol.getSnapshot().link).toBe("connected"));
+    render(<PrivateChatPreview createTransport={transport(address)} directory={directory()} />);
+    await enter();
+    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
+    await screen.findByText("Connected via Nym");
+    for (const peer of [bob, carol]) {
+      fireEvent.click(screen.getByRole("button", { name: "New chat" }));
+      fireEvent.click(screen.getByRole("button", { name: "Create invite" }));
+      const input = await screen.findByRole("textbox", { name: "Invite link" });
+      await act(async () => { await peer.requestChat((input as HTMLInputElement).value); });
+      const accept = await screen.findByRole("button", { name: "Accept" });
+      fireEvent.click(accept);
+      await waitFor(() => expect(screen.getByRole("textbox", { name: "Message" })).toBeEnabled());
+    }
+    fireEvent.change(screen.getByRole("textbox", { name: "Message" }), { target: { value: "Draft for Carol" } });
+    fireEvent.click(screen.getByRole("button", { name: "Chat with Bob" }));
+    expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("");
+    fireEvent.change(screen.getByRole("textbox", { name: "Message" }), { target: { value: "Draft for Bob" } });
+    await act(async () => { await carol.send("Carol in background"); });
+    fireEvent.click(await screen.findByRole("button", { name: "Chat with Carol, 1 unread" }));
+    expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Draft for Carol");
+    expect(within(screen.getByRole("list", { name: "Messages" })).getByText("Carol in background")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Chat with Carol" })).toHaveAttribute("aria-current", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Back to chats" }));
+    expect(screen.getByRole("region", { name: "Conversations in this tab" }).closest("[data-chat-list]")).toHaveAttribute("data-chat-list", "true");
+    fireEvent.click(screen.getByRole("button", { name: "Chat with Bob" }));
+    expect(screen.getByRole("textbox", { name: "Message" })).toHaveValue("Draft for Bob");
+    expect(within(screen.getByRole("list", { name: "Messages" })).queryByText("Carol in background")).not.toBeInTheDocument();
+  } finally { bob.dispose(); carol.dispose(); }
 });

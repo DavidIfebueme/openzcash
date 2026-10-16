@@ -93,7 +93,7 @@ async function run(command: Command): Promise<object> {
     return { token: inviteToken(invite), state: state() };
   }
   if (action === "request") {
-    assert.ok(token && token.startsWith("ozchat3."));
+    assert.ok(token && /^(?:ozc3|ozchat3)\./.test(token));
     await chat.requestChat(token);
     await until(() => chat.getSnapshot().contact !== null, "invite submission");
     return { state: state() };

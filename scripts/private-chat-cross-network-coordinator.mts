@@ -15,6 +15,7 @@ const sources: Record<string, string> = {};
 for (const file of [
   "scripts/private-chat-cross-network-role.mts", "scripts/private-chat-real-nym-worker.mjs",
   "src/lib/private-chat/controller.ts", "src/lib/private-chat/protocol.ts", "src/lib/private-chat/ratchet.ts",
+  "src/lib/private-chat/live-invite.ts", "src/lib/private-chat/invite-codec.ts",
   "src/lib/private-chat/envelope.ts", "src/lib/private-chat/transport.ts",
   "public/private-chat-nym/worker.js", "public/private-chat-nym/nym_client_wasm_bg.wasm",
   "package-lock.json",
@@ -107,7 +108,7 @@ try {
   });
   await step("Signed invitation requires explicit acceptance across networks", async () => {
     const invite = await local.call("invite");
-    assert.ok(invite.token?.startsWith("ozchat3."));
+    assert.ok(invite.token && /^(?:ozc3|ozchat3)\./.test(invite.token));
     await remote.call("request", { token: invite.token });
     await local.call("waitRequest");
     await local.call("accept");

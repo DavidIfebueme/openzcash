@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   ChatController,
   ACK_TIMEOUT_MS,
+  MAX_CONVERSATIONS,
   ROUTE_CHECK_INTERVAL_MS,
   ROUTE_CHECK_TIMEOUT_MS,
 } from "./controller";
@@ -42,7 +43,7 @@ function harness() {
     failNext = false;
   let clientNumber = 0;
   function client() {
-    const address = String.fromCharCode(68 + clientNumber++) + base.slice(1);
+    const address = "DEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"[clientNumber++] + base.slice(1);
     let nextAddress = address;
     const listeners: Array<(event: TransportEvent) => void> = [];
     const factory = (
@@ -79,7 +80,7 @@ function harness() {
     const chat = new ChatController(factory, directory, () => now);
     controllers.push(chat);
     return { chat, address, listeners, rotateAddress: () => {
-      nextAddress = String.fromCharCode(68 + clientNumber++) + base.slice(1);
+      nextAddress = "DEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"[clientNumber++] + base.slice(1);
       return nextAddress;
     } };
   }
@@ -663,4 +664,165 @@ it("removes an expired presence locally even while the next directory lookup is 
   h.setTime(h.time() + 120_000);
   b.chat.tick();
   expect(b.chat.getSnapshot().peers).toEqual([]);
+});
+
+
+async function addPeer(h: ReturnType<typeof harness>, host: ChatController, name: string) {
+  const peer = h.client();
+  await ready(peer.chat, name);
+  const invite = await host.makeInvite();
+  expect(invite).not.toBeNull();
+  expect(await peer.chat.requestChat(inviteToken(invite!))).toBe(true);
+  await vi.waitFor(() => expect(host.getSnapshot().requests).toHaveLength(1));
+  await host.acceptRequest(host.getSnapshot().requests[0].packet.id);
+  await vi.waitFor(() => expect(peer.chat.getSnapshot().contact?.ready).toBe(true));
+  await vi.waitFor(() => expect(host.getSnapshot().contact?.ready).toBe(true));
+  return peer;
+}
+
+describe("multiple independent conversations", () => {
+  it("keeps two accepted chats, messages and unread counts separate on one connection", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    const bob = a.chat.getSnapshot().activeConversationId!;
+    const c = await addPeer(h, a.chat, "Carol");
+    const carol = a.chat.getSnapshot().activeConversationId!;
+    expect(bob).not.toBe(carol);
+    expect(h.connects).toHaveLength(3);
+    await b.chat.send("Only Alice and Bob");
+    await c.chat.send("Only Alice and Carol");
+    await vi.waitFor(() => expect(a.chat.getSnapshot().conversations.find(c => c.id === bob)?.unread).toBe(1));
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines.map(l => l.body)).toEqual(["Only Alice and Carol"]));
+    a.chat.selectConversation(bob);
+    expect(a.chat.getSnapshot().lines.map(l => l.body)).toEqual(["Only Alice and Bob"]);
+    expect(a.chat.getSnapshot().conversations.find(c => c.id === bob)?.unread).toBe(0);
+    await a.chat.send("Reply to Bob");
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines.at(-1)?.body).toBe("Reply to Bob"));
+    expect(c.chat.getSnapshot().lines).toHaveLength(1);
+    a.chat.setConversationVisible(false);
+    await b.chat.send("While viewing Discover");
+    await vi.waitFor(() => expect(a.chat.getSnapshot().conversations.find(c => c.id === bob)?.unread).toBe(1));
+    a.chat.setConversationVisible(true);
+    expect(a.chat.getSnapshot().conversations.find(c => c.id === bob)?.unread).toBe(0);
+  });
+
+  it("never redirects an asynchronous send when the user switches conversations", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    const bob = a.chat.getSnapshot().activeConversationId!;
+    const c = await addPeer(h, a.chat, "Carol");
+    const carol = a.chat.getSnapshot().activeConversationId!;
+    const original = envelope.sealEnvelope;
+    let release: (() => void) | undefined;
+    vi.spyOn(envelope, "sealEnvelope").mockImplementation(async input => {
+      if (input.plaintext.t === "ratchet" && input.plaintext.c === bob &&
+          input.senderPublicKey === b.chat.getSnapshot().contact!.publicKey) {
+        await new Promise<void>(resolve => { release = resolve; });
+      }
+      return original(input);
+    });
+    a.chat.selectConversation(bob);
+    const sending = a.chat.send("For Bob, even after switching");
+    await vi.waitFor(() => expect(release).toBeDefined());
+    a.chat.selectConversation(carol);
+    expect(a.chat.getSnapshot().sending).toBe(false);
+    await a.chat.send("For Carol");
+    release!();
+    expect(await sending).toBe(true);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines[0]?.body).toBe("For Bob, even after switching"));
+    await vi.waitFor(() => expect(c.chat.getSnapshot().lines[0]?.body).toBe("For Carol"));
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines[0]?.delivery).toBe("delivered"));
+    a.chat.selectConversation(bob);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines[0]?.delivery).toBe("delivered"));
+    expect(a.chat.getSnapshot().sending).toBe(false);
+  });
+
+  it("rejects cross-conversation ciphertext even with authentic sender keys", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    const bob = a.chat.getSnapshot().activeConversationId!;
+    const c = await addPeer(h, a.chat, "Carol");
+    const carol = a.chat.getSnapshot().activeConversationId!;
+    const spy = vi.spyOn(envelope, "sealEnvelope");
+    await b.chat.send("Bob ciphertext");
+    await c.chat.send("Carol ciphertext");
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines).toHaveLength(1));
+    const captures = spy.mock.calls.map(([input]) => input);
+    const fromBob = captures.find(input => input.plaintext.t === "ratchet" && input.plaintext.c === bob && input.recipientPublicKey === b.chat.getSnapshot().contact!.publicKey)!;
+    const fromCarol = captures.find(input => input.plaintext.t === "ratchet" && input.plaintext.c === carol && input.recipientPublicKey === c.chat.getSnapshot().contact!.publicKey)!;
+    expect(fromBob.plaintext.t).toBe("ratchet");
+    if (fromBob.plaintext.t !== "ratchet") throw new Error("missing ciphertext");
+    for (const sender of [fromBob, fromCarol]) {
+      const forged = await envelope.sealEnvelope({ ...sender, plaintext: { ...fromBob.plaintext, c: carol } });
+      a.listeners.at(-1)!({ type: "bytes", bytes: forged! });
+    }
+    await new Promise(resolve => setTimeout(resolve, 30));
+    expect(a.chat.getSnapshot().lines.map(l => l.body)).toEqual(["Carol ciphertext"]);
+    a.chat.selectConversation(bob);
+    expect(a.chat.getSnapshot().lines.map(l => l.body)).toEqual(["Bob ciphertext"]);
+    await b.chat.send("Bob still works");
+    await c.chat.send("Carol still works");
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines.at(-1)?.body).toBe("Bob still works"));
+    a.chat.selectConversation(carol);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines.at(-1)?.body).toBe("Carol still works"));
+  });
+
+  it("rechecks every peer on a new Nym route and preserves all histories", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    const bob = a.chat.getSnapshot().activeConversationId!;
+    const c = await addPeer(h, a.chat, "Carol");
+    const carol = a.chat.getSnapshot().activeConversationId!;
+    await c.chat.send("Before reconnect");
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines).toHaveLength(1));
+    a.chat.selectConversation(null);
+    a.chat.network(false);
+    expect(a.chat.getSnapshot().conversations.every(c => !c.ready)).toBe(true);
+    a.rotateAddress();
+    a.chat.network(true);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().conversations.every(c => c.ready)).toBe(true));
+    expect(h.connects).toHaveLength(4);
+    await b.chat.send("Bob reconnected");
+    await c.chat.send("Carol reconnected");
+    a.chat.selectConversation(carol);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines.map(l => l.body)).toEqual(["Before reconnect", "Carol reconnected"]));
+    a.chat.selectConversation(bob);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines[0]?.body).toBe("Bob reconnected"));
+  });
+
+  it("ending one chat leaves another active, and leaving clears every chat", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    const bob = a.chat.getSnapshot().activeConversationId!;
+    const c = await addPeer(h, a.chat, "Carol");
+    const carol = a.chat.getSnapshot().activeConversationId!;
+    // The confirmation targets Bob even if Carol became selected meanwhile.
+    a.chat.endConversation(bob);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().contact?.status).toBe("ended"));
+    expect(a.chat.getSnapshot().conversations.map(c => c.id)).toEqual([carol]);
+    expect(a.chat.getSnapshot().activeConversationId).toBe(carol);
+    a.chat.selectConversation(carol);
+    expect(await a.chat.send("Still here, Carol")).toBe(true);
+    await vi.waitFor(() => expect(c.chat.getSnapshot().lines[0]?.body).toBe("Still here, Carol"));
+    a.chat.leave();
+    expect(a.chat.getSnapshot()).toMatchObject({ conversations: [], activeConversationId: null, lines: [], keyReady: false });
+    expect(await a.chat.send("Must not send")).toBe(false);
+  });
+
+  it("bounds open chats, refuses duplicate peers and recovers capacity after expiration", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    const bob = a.chat.getSnapshot().activeConversationId!;
+    const duplicate = await b.chat.makeInvite();
+    expect(await a.chat.requestChat(inviteToken(duplicate!))).toBe(false);
+    expect(a.chat.getSnapshot().conversations).toHaveLength(1);
+    for (let i = 1; i < MAX_CONVERSATIONS; i++) {
+      const peer = h.client();
+      await ready(peer.chat, `Peer ${i}`);
+      expect(await a.chat.requestChat(inviteToken((await peer.chat.makeInvite())!))).toBe(true);
+    }
+    expect(a.chat.getSnapshot().canStartConversation).toBe(false);
+    expect(await a.chat.makeInvite()).toBeNull();
+    const extra = h.client();
+    await ready(extra.chat, "Extra peer");
+    expect(await a.chat.requestChat(inviteToken((await extra.chat.makeInvite())!))).toBe(false);
+    h.setTime(h.time() + INVITE_TTL_MS);
+    a.chat.tick();
+    expect(a.chat.getSnapshot().conversations.map(c => c.id)).toEqual([bob]);
+    expect(a.chat.getSnapshot().canStartConversation).toBe(true);
+  });
 });
