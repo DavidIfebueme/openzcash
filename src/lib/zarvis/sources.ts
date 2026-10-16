@@ -10,7 +10,7 @@ export const SEARCH_DOMAINS = [
 /** Hosts the site's own curated datasets and readers cite: recordings, explorers, vote tallies, wallet makers' sites and audits, community sites. Social profiles stay links on /communities, not citations. */
 export const CITATION_DOMAINS = [
   ...SEARCH_DOMAINS, "shieldedscan.xyz", "zecblock.com", "daodao.zone", "youtube.com", "youtu.be", "cipherscan.app", "zcashcommunitygrants.org", "vote.heliosvoting.org", "siv.org", "valargroup.org",
-  "zodl.com", "zingolabs.org", "ywallet.app", "brave.com", "zknoir.com", "snaps.metamask.io", "vizor.cash", "cakewallet.com", "edge.app", "unstoppable.money", "zipher.to", "zstash.app", "justzappit.xyz", "gemwallet.com", "keyst.one", "ledger.com", "trezor.io", "defuse.ca", "hacken.io",
+  "zodl.com", "zingolabs.org", "ywallet.app", "brave.com", "zknoir.com", "zucchinifi.xyz", "snaps.metamask.io", "vizor.cash", "cakewallet.com", "edge.app", "unstoppable.money", "zipher.to", "zstash.app", "justzappit.xyz", "gemwallet.com", "keyst.one", "ledger.com", "trezor.io", "defuse.ca", "hacken.io",
   "zcashbrasil.com.br", "zcashesp.com", "zkav.club", "free2z.cash", "zcashjapan.com", "zcashind.com", "zcasharabia.xyz", "pro.zcash.ru", "zechub.substack.com", "zcashbrazil.substack.com", "zcashesp.substack.com", "zechubnigeria.substack.com", "zcashukraine.substack.com", "zcashidn.substack.com", "zcasheastafrica.substack.com",
 ];
 /** GitHub organizations the site imports from or lists as a project's source: applications, coinholder rounds, Arborist notes, core teams and the catalogued wallets. */

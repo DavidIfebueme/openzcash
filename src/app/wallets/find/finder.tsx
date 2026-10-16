@@ -3,7 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { CommunityCredit } from "@/components/community-credit";
 import { PageHeader } from "@/components/ui";
 import { WALLET_EVIDENCE } from "@/lib/wallet-finder/evidence";
@@ -16,64 +16,7 @@ import { EDITORIAL_HIGHLIGHTS, HARDWARE, SOFTWARE } from "../catalog-data";
 import styles from "./finder.module.css";
 
 const CATALOG = new Map([...SOFTWARE, ...HARDWARE].map(wallet => [wallet.name, wallet]));
-const STEPS = ["platform", "privacy", "hardware", "multichain", "audit"] as const;
-type Question = typeof STEPS[number];
-type View = Question | "results" | "evidence";
-const STEP_NAMES: Record<Question, string> = {
-  platform: "Platform", privacy: "Privacy", hardware: "Hardware", multichain: "Other coins", audit: "Audit",
-};
-const PRIVACY_LABELS: Record<WalletRequirements["shielded"], string> = {
-  any: "No privacy requirement", send: "Send privately", receive: "Receive privately", both: "Send and receive privately",
-};
 const STATE_LABELS = { supported: "Supported", unsupported: "Not supported", unknown: "Unknown" } as const;
-const QUESTIONS: Record<Question, { title: string; description: string; options: { value: string; label: string; detail: string }[] }> = {
-  platform: {
-    title: "Where do you want to use Zcash?",
-    description: "Choose the platform you will use. A wallet must meet all your requirements on the same platform.",
-    options: [
-      { value: "any", label: "Any platform", detail: "Show every platform with matching evidence." },
-      ...Object.entries(PLATFORM_LABELS).map(([value, label]) => ({ value, label, detail: {
-        ios: "An app for iPhone or iPad.", android: "An app for an Android phone.",
-        desktop: "A desktop app; check the listed operating systems.", browser: "An extension in a supported browser.",
-        web: "A wallet accessed through a website.", hardware: "A physical device, with its required companion app.",
-      }[value] ?? "" })),
-    ],
-  },
-  privacy: {
-    title: "What do you want to do privately?",
-    description: "Private means shielded Zcash transactions. Sending and receiving are checked separately; transparent-only support does not qualify.",
-    options: [
-      { value: "both", label: PRIVACY_LABELS.both, detail: "Require both shielded sending and shielded receiving." },
-      { value: "send", label: PRIVACY_LABELS.send, detail: "Require shielded sending." },
-      { value: "receive", label: PRIVACY_LABELS.receive, detail: "Require shielded receiving." },
-      { value: "any", label: PRIVACY_LABELS.any, detail: "Include transparent-only wallets if they meet your other choices." },
-    ],
-  },
-  hardware: {
-    title: "Do you need a hardware signer?",
-    description: "A separate device signs your Zcash transactions. The evidence must confirm the wallet, device and any companion app needed.",
-    options: [
-      { value: "any", label: "No hardware requirement", detail: "Software and hardware options can both match." },
-      { value: "required", label: "I need a hardware signer", detail: "Only confirmed hardware signing can meet this requirement." },
-    ],
-  },
-  multichain: {
-    title: "Do you also need to manage other coins?",
-    description: "This means managing native assets on other blockchains in the wallet. Swaps, CrossPay and paying out to another coin do not establish this capability.",
-    options: [
-      { value: "any", label: "Zcash is enough", detail: "No requirement to manage coins on other blockchains." },
-      { value: "required", label: "I also need other blockchains", detail: "Require verified native asset management on more than one blockchain." },
-    ],
-  },
-  audit: {
-    title: "Need a public audit report?",
-    description: "Find wallets with a published independent report. Check its version and scope; a past audit cannot guarantee current safety.",
-    options: [
-      { value: "any", label: "No audit requirement", detail: "Include wallets with or without a verified public report." },
-      { value: "required", label: "Public report required", detail: "A past audit does not guarantee current safety." },
-    ],
-  },
-};
 
 function readParams(params: Pick<URLSearchParams, "forEach" | "getAll">): Record<string, string | string[]> {
   const values: Record<string, string | string[]> = {};
@@ -82,19 +25,6 @@ function readParams(params: Pick<URLSearchParams, "forEach" | "getAll">): Record
     values[key] = all.length === 1 ? all[0] : all;
   });
   return values;
-}
-
-function queryView(value: string | null, requirements: WalletRequirements): View {
-  if (value === "results" || value === "evidence" || STEPS.includes(value as Question)) return value as View;
-  return walletRequirementsQuery(requirements) ? "results" : "platform";
-}
-
-function answer(requirements: WalletRequirements, question: Question): string {
-  if (question === "platform") return requirements.platform === "any" ? "Any platform" : PLATFORM_LABELS[requirements.platform];
-  if (question === "privacy") return PRIVACY_LABELS[requirements.shielded];
-  if (question === "hardware") return requirements.hardware === "required" ? "Hardware signer required" : "No hardware requirement";
-  if (question === "multichain") return requirements.multichain === "required" ? "Other blockchains required" : "Zcash is enough";
-  return requirements.audit === "required" ? "Public report required" : "No audit requirement";
 }
 
 function checkedDate(date: CapabilityEvidence["checkedAt"]): string {
@@ -207,30 +137,27 @@ function CapabilityRecords({ selectedName, onSelect, onFind }: { selectedName: s
 export function WalletFinder() {
   const params = useSearchParams();
   const requirements = parseWalletRequirements(readParams(params));
-  const view = queryView(params.get("view"), requirements);
-  const step = STEPS.indexOf(view as Question);
+  const viewingEvidence = params.get("view") === "evidence";
   const [shareMessage, setShareMessage] = useState("");
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const legendRef = useRef<HTMLLegendElement>(null);
-  const shouldFocus = useRef(false);
   const results = matchWallets(WALLET_EVIDENCE, requirements);
   const matches = results.filter(result => result.status === "match");
   const unknown = results.filter(result => result.status === "unknown");
   const excluded = results.filter(result => result.status === "excluded");
+  const sendingPrivately = requirements.shielded === "send" || requirements.shielded === "both";
+  const receivingPrivately = requirements.shielded === "receive" || requirements.shielded === "both";
+  const hasFilters = !!walletRequirementsQuery(requirements);
 
-  useEffect(() => {
-    if (shouldFocus.current) {
-      (view === "results" ? headingRef.current : legendRef.current)?.focus();
-      shouldFocus.current = false;
-    }
-  }, [view]);
-
-  function navigate(nextView: View, nextRequirements = requirements, focus = true) {
-    const query = new URLSearchParams(walletRequirementsQuery(nextRequirements));
-    query.set("view", nextView);
-    shouldFocus.current = focus;
+  function updateRequirements(next: WalletRequirements) {
+    const query = walletRequirementsQuery(next);
+    window.history.pushState(null, "", `/wallets/find${query ? `?${query}` : ""}`);
     setShareMessage("");
-    window.history.pushState(null, "", `/wallets/find?${query.toString()}`);
+  }
+
+  function togglePrivacy(direction: "send" | "receive", checked: boolean) {
+    const send = direction === "send" ? checked : sendingPrivately;
+    const receive = direction === "receive" ? checked : receivingPrivately;
+    const shielded = send && receive ? "both" : send ? "send" : receive ? "receive" : "any";
+    updateRequirements({ ...requirements, shielded });
   }
 
   function selectRecord(name: string) {
@@ -240,69 +167,67 @@ export function WalletFinder() {
     window.history.pushState(null, "", `/wallets/find?${query.toString()}`);
   }
 
-  function select(question: Question, value: string) {
-    const field = question === "privacy" ? "shielded" : question;
-    navigate(view, { ...requirements, [field]: value }, false);
-  }
-
   async function share() {
     try {
-      await navigator.clipboard.writeText(window.location.href);
+      const query = walletRequirementsQuery(requirements);
+      const link = new URL(`/wallets/find${query ? `?${query}` : ""}`, window.location.origin);
+      await navigator.clipboard.writeText(link.href);
       setShareMessage("Link copied.");
     } catch {
-      setShareMessage("Copy the address from your browser to share these choices.");
+      setShareMessage("Copy the address from your browser to share these filters.");
     }
   }
 
   return <div className={styles.finder}>
-    <PageHeader title={view === "evidence" ? "Wallet capability evidence" : "Wallet Finder"} subtitle={view === "evidence" ? "Sources, dates and limits, by wallet and platform." : "Five quick questions. Every match has a source."} actions={<Link href="/wallets" className={styles.catalogLink}>Browse all wallets <span aria-hidden="true">↗</span></Link>} />
-    {view !== "evidence" && <nav aria-label="Wallet Finder steps" className={styles.steps}>
-      <ol>{STEPS.map((question, index) => <li key={question}>
-        <button type="button" onClick={() => navigate(question)} aria-current={view === question ? "step" : undefined}>
-          <span className={styles.stepNumber}>{index + 1}</span><span>{STEP_NAMES[question]}</span>
-        </button>
-      </li>)}</ol>
-    </nav>}
-
-    {view === "evidence" ? <CapabilityRecords selectedName={params.get("wallet")} onSelect={selectRecord} onFind={() => navigate("platform")} /> : view !== "results" ? <form className={styles.questionPanel} onSubmit={event => {
-      event.preventDefault();
-      navigate(step === STEPS.length - 1 ? "results" : STEPS[step + 1]);
-    }}>
-      <fieldset aria-describedby={`question-${view}-description`}>
-        <legend ref={legendRef} tabIndex={-1}><span className={styles.stepHint}>Step {step + 1} of {STEPS.length}</span><span className={styles.questionTitle}>{QUESTIONS[view].title}</span></legend>
-        <p id={`question-${view}-description`} className={styles.questionDescription}>{QUESTIONS[view].description}</p>
-        <div className={styles.options} data-count={QUESTIONS[view].options.length}>{QUESTIONS[view].options.map(option => <label key={option.value} className={styles.option}>
-          <input type="radio" name={view} value={option.value} checked={(view === "privacy" ? requirements.shielded : requirements[view]) === option.value} onChange={() => select(view, option.value)} />
-          <span><strong>{option.label}</strong><small>{option.detail}</small></span>
-        </label>)}</div>
-      </fieldset>
-      <div className={styles.questionActions}>
-        {step > 0 ? <button type="button" className={styles.secondaryButton} onClick={() => navigate(STEPS[step - 1])}>Back</button> : <span />}
-        <button type="submit" className={styles.primaryButton}>{step === STEPS.length - 1 ? "See matching wallets" : "Continue"}<span aria-hidden="true"> →</span></button>
-      </div>
-    </form> : <>
-      <section className={styles.answers} aria-labelledby="your-choices">
-        <div className={styles.sectionHeading}><h2 id="your-choices">Your choices</h2><button type="button" className={styles.textButton} onClick={() => navigate("platform", DEFAULT_REQUIREMENTS)}>Start over</button></div>
-        <dl>{STEPS.map(question => <div key={question}><dt>{STEP_NAMES[question]}</dt><dd><span className={styles.answerValue}>{answer(requirements, question)}</span><button type="button" aria-label={`Edit ${STEP_NAMES[question].toLowerCase()}`} onClick={() => navigate(question)}>Edit<span aria-hidden="true"> ↗</span></button></dd></div>)}</dl>
+    <PageHeader
+      title={viewingEvidence ? "Wallet capability evidence" : "Wallet Finder"}
+      subtitle={viewingEvidence ? "Sources, dates and limits, by wallet and platform." : "Choose what matters. The results update as you filter."}
+      actions={<Link href="/wallets" className={styles.catalogLink}>Browse all wallets <span aria-hidden="true">↗</span></Link>}
+    />
+    {viewingEvidence ? <CapabilityRecords selectedName={params.get("wallet")} onSelect={selectRecord} onFind={() => updateRequirements(requirements)} /> : <>
+      <section className={styles.filterPanel} aria-labelledby="wallet-filters">
+        <div className={styles.filterHeading}>
+          <h2 id="wallet-filters">Filters</h2>
+          <button type="button" className={styles.textButton} onClick={() => updateRequirements(DEFAULT_REQUIREMENTS)} disabled={!hasFilters}>Clear filters</button>
+        </div>
+        <div className={styles.filterGrid}>
+          <label className={styles.platformField}>
+            <span>Platform</span>
+            <select value={requirements.platform} onChange={event => updateRequirements({ ...requirements, platform: event.target.value as WalletRequirements["platform"] })}>
+              <option value="any">Any platform</option>
+              {Object.entries(PLATFORM_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          <fieldset className={styles.filterGroup}>
+            <legend>Capabilities</legend>
+            <div className={styles.filterOptions}>
+              <label className={styles.filterOption}><input type="checkbox" checked={sendingPrivately} onChange={event => togglePrivacy("send", event.target.checked)} /><span>Send ZEC privately</span></label>
+              <label className={styles.filterOption}><input type="checkbox" checked={receivingPrivately} onChange={event => togglePrivacy("receive", event.target.checked)} /><span>Receive ZEC privately</span></label>
+              <label className={styles.filterOption}><input type="checkbox" checked={requirements.hardware === "required"} onChange={event => updateRequirements({ ...requirements, hardware: event.target.checked ? "required" : "any" })} /><span>Hardware signer</span></label>
+              <label className={styles.filterOption}><input type="checkbox" checked={requirements.multichain === "required"} onChange={event => updateRequirements({ ...requirements, multichain: event.target.checked ? "required" : "any" })} /><span>Other blockchains</span></label>
+              <label className={styles.filterOption}><input type="checkbox" checked={requirements.audit === "required"} onChange={event => updateRequirements({ ...requirements, audit: event.target.checked ? "required" : "any" })} /><span>Public audit report</span></label>
+            </div>
+          </fieldset>
+        </div>
+        <p className={styles.filterNote}>Only documented capabilities count. Open a wallet’s sources for scope and limits.</p>
       </section>
       <section className={styles.results} aria-labelledby="matching-wallets">
         <div className={styles.resultHeading}>
-          <div><h2 id="matching-wallets" ref={headingRef} tabIndex={-1}>{matches.length} {matches.length === 1 ? "wallet matches" : "wallets match"} your choices</h2><p>Every selected requirement must have supporting evidence on the same platform. Results are alphabetical, with no paid ranking.</p></div>
+          <div><h2 id="matching-wallets" aria-live="polite" aria-atomic="true">{matches.length} {matches.length === 1 ? "wallet matches" : "wallets match"} your filters</h2><p>Confirmed matches are alphabetical. Wallets with missing evidence appear below.</p></div>
           <button type="button" className={styles.secondaryButton} onClick={share}>Copy result link</button>
         </div>
         <p role="status" className={styles.shareMessage}>{shareMessage}</p>
         {matches.length ? <div className={styles.walletList}>{matches.map(result => <WalletResult key={result.walletName} result={result} />)}</div> : <div className={styles.empty}>
           <h3>No confirmed matches for this combination</h3>
-          <p>You can edit a requirement above. Wallets with missing evidence are kept below; unknown support never counts as a match.</p>
-          <button type="button" className={styles.secondaryButton} onClick={() => navigate("platform")}>Edit your choices</button>
+          <p>Change a filter above to widen the results. Unknown support never counts as a match.</p>
         </div>}
       </section>
       <div className={styles.otherResults}>
-        <details><summary>{unknown.length} {unknown.length === 1 ? "wallet needs" : "wallets need"} more verification<span aria-hidden="true"> +</span></summary><p>At least one requirement is unconfirmed for these wallets. The available evidence does not establish a match.</p><div className={styles.walletList}>{unknown.map(result => <WalletResult key={result.walletName} result={result} />)}{!unknown.length && <p>No wallets in this group.</p>}</div></details>
-        <details><summary>{excluded.length} {excluded.length === 1 ? "wallet does" : "wallets do"} not meet these choices<span aria-hidden="true"> +</span></summary><p>The reviewed evidence shows at least one requirement is not supported. Expand a wallet’s sources to see the reason and scope.</p><div className={styles.walletList}>{excluded.map(result => <WalletResult key={result.walletName} result={result} />)}{!excluded.length && <p>No wallets in this group.</p>}</div></details>
+        <details><summary>{unknown.length} {unknown.length === 1 ? "wallet needs" : "wallets need"} more verification<span aria-hidden="true"> +</span></summary><p>At least one selected requirement is unconfirmed for these wallets.</p><div className={styles.walletList}>{unknown.map(result => <WalletResult key={result.walletName} result={result} />)}{!unknown.length && <p>No wallets in this group.</p>}</div></details>
+        <details><summary>{excluded.length} {excluded.length === 1 ? "wallet does" : "wallets do"} not meet these filters<span aria-hidden="true"> +</span></summary><p>Reviewed evidence shows at least one selected requirement is not supported. Expand a wallet’s sources for the scope.</p><div className={styles.walletList}>{excluded.map(result => <WalletResult key={result.walletName} result={result} />)}{!excluded.length && <p>No wallets in this group.</p>}</div></details>
       </div>
     </>}
-    <aside className={styles.method}><details><summary>How matching works</summary><p>We check availability, platform and your selected capabilities against the linked sources. Unknown or incomplete evidence stays unknown. Swaps do not establish multichain support, and capabilities from different platforms are never combined into one match.</p><p>A public audit report covers its stated product and release; it is not a safety guarantee. The ⭐ is an editorial highlight. Read source dates and limits before choosing. <Link href="/wallets/find?view=evidence">Browse all capability records</Link> or <Link href="/wallets">open the full wallet catalog</Link>.</p><p>No account or wallet connection is needed. Your choices stay in this page’s address so you can revisit or share them.</p></details></aside>
+    <aside className={styles.method}><details><summary>How matching works</summary><p>We check availability, platform and selected capabilities against the linked sources. Unknown or incomplete evidence stays unknown. Capabilities from different platforms are never combined into one match. Other blockchains means managing native assets, not swaps.</p><p>A public audit report covers its stated product and release; it is not a safety guarantee. The ⭐ is an editorial highlight. Read source dates and limits before choosing. <Link href="/wallets/find?view=evidence">Browse all capability records</Link> or <Link href="/wallets">open the full wallet catalog</Link>.</p><p>No account or wallet connection is needed. Your filters stay in this page’s address so you can revisit or share them.</p></details></aside>
     <CommunityCredit screen="wallet-finder" />
   </div>;
 }

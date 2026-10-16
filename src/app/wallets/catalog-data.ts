@@ -93,6 +93,15 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
     note: "Chrome extension with shielded ZEC and documented hardware flows. Integration limits apply.",
   },
   {
+    name: "Zucchini Wallet",
+    maker: "Zucchini",
+    url: "https://zucchinifi.xyz/",
+    logo: "/wallet-logos/zucchini.png",
+    platforms: ["Browser extension"],
+    note: "Chrome extension with shielded ZEC sending and receiving. Some swap routes use transparent addresses before shielding.",
+    // The current extension's linked source is unavailable; no verified license or audit badge.
+  },
+  {
     name: "MetaMask Snap",
     maker: "ChainSafe",
     url: "https://snaps.metamask.io/snap/npm/chainsafe/webzjs-zcash-snap/",

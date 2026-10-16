@@ -50,6 +50,8 @@ const s = {
   noirTransactions: source("https://docs.zknoir.com/wallet-guide/send-and-receive/", "Noir: shielded sending and receiving"),
   noirHardware: source("https://docs.zknoir.com/wallet-guide/security/", "Noir: hardware transaction limits"),
   noirOverview: source("https://docs.zknoir.com/overview/", "Noir: current wallet features"),
+  zucchini: source("https://zucchinifi.xyz/", "Zucchini: Chrome extension and shielded send/receive workflows"),
+  zucchiniStore: source("https://chromewebstore.google.com/detail/zucchini-wallet/khaifnjdhfaadfhgbilokobnaalmimad", "Zucchini Wallet: publisher Chrome Web Store listing and version"),
   snap: source("https://snaps.metamask.io/snap/npm/chainsafe/webzjs-zcash-snap/", "MetaMask directory: ChainSafe Zcash Snap"),
   snapLaunch: source("https://blog.chainsafe.io/zcash-in-the-browser-bringing-shielded-zec-to-metamask/", "ChainSafe: Zcash Snap release announcement"),
   snapIssue: source("https://github.com/ChainSafe/WebZjs/issues/166", "WebZjs issue 166: unresolved user report of NU6.1 broadcast failures"),
@@ -123,6 +125,7 @@ const braveMobile = no([s.braveSupport, s.braveZcash], "The reviewed Zcash suppo
 const braveMultichain = yes([s.brave], "The wallet stores and sends native assets on Ethereum and Solana, among other chains.");
 const braveAudit = { ...unknown("Doyensec audited Brave Wallet desktop, Android and iOS with a November 2022 retest. This predates the Zcash integration in Brave 1.77; no independent report covering a Zcash-capable release was verified.", [s.braveAudit]), scope: "Brave Wallet 2022 development builds: brave-core 52aa957, brave-ios d30d8a7; before Zcash integration" };
 const noirAvailable = yes([s.noirInstall], "The publisher documents a public Chrome Web Store mainnet extension.");
+const zucchiniAvailable = yes([s.zucchini, s.zucchiniStore], "The publisher links to a public Chrome Web Store extension, version 0.5.1 updated September 14, 2026. No native mobile or standalone desktop release was verified.");
 const snapUncertain = unknown("A published Snap exists, but open reports of rejected NU6.1 transactions and an unavailable WebWallet companion prevent confirming current usability. These user reports are not a maintainer-confirmed diagnosis.", [s.snap, s.snapIssue, s.snapIssue167, s.snapIssue168]);
 const vizorAvailable = yes([s.vizor], "The publisher provides downloads for this platform.");
 const vizorFacts = {
@@ -230,6 +233,16 @@ export const WALLET_EVIDENCE: WalletEvidenceProfile[] = [
       shieldedReceive: yes([s.noirTransactions], "The Receive screen offers a shielded address."),
       hardwareSigning: yes([s.noirHardware], "Keystone and Ledger use supported PCZT flows. Keystone cannot spend or shield transparent funds; hardware lending/message signing are unavailable."),
       multichain: unknown("Mainnet swaps are documented, but native multichain holdings were not verified.", [s.noirOverview]),
+    }) },
+  },
+  {
+    walletName: "Zucchini Wallet", availability: scoped("Chrome Web Store extension 0.5.1; updated September 14, 2026", zucchiniAvailable),
+    platforms: { browser: platform("Chrome side-panel extension 0.5.1; publisher website and store listing", zucchiniAvailable, {
+      shieldedSend: yes([s.zucchini, s.zucchiniStore], "The publisher explicitly documents shielded ZEC sending. Some provider swap/buy routes use a transparent receiver before shielding; those routes are not fully shielded end to end."),
+      shieldedReceive: yes([s.zucchini], "The publisher documents shielded receiving by sharing a Unified Address and syncing with the Zcash network."),
+      hardwareSigning: unknown("No dedicated hardware signer integration was verified in the publisher's website or extension listing.", [s.zucchini, s.zucchiniStore]),
+      multichain: unknown("Provider-based Swap and Buy flows are documented, but they do not establish native multichain balances managed by this wallet.", [s.zucchiniStore]),
+      securityAudit: unknown("No public independent audit report for the current extension was verified in the reviewed publisher sources.", [s.zucchini, s.zucchiniStore]),
     }) },
   },
   {

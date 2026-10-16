@@ -77,7 +77,7 @@ describe("Wallet catalog lookup", () => {
     expect(ios.allWallets.split(", ")).toHaveLength(SOFTWARE.length + HARDWARE.length);
     expect(ios).toMatchObject({
       catalogRevisedOn: "2026-10-15",
-      totalWallets: 18,
+      totalWallets: 19,
       hardwareWallets: 3,
     });
     const transparent = walletsContext("quais carteiras são só transparentes?");
@@ -103,12 +103,28 @@ describe("Wallet catalog lookup", () => {
     });
     const unknown = walletsContext("Is FooCoin Wallet safe?");
     expect(unknown.filter.names).toEqual([]);
-    expect(unknown.matched).toBe(18);
+    expect(unknown.matched).toBe(19);
     expect(unknown.note).toContain("not nonexistent");
     const zashi = walletsContext("Is Zashi available on Android?");
     expect(zashi.filter.names).toEqual(["Zodl"]);
     expect(zashi.wallets.map((w) => w.name)).toEqual(["Zodl"]);
     expect(walletsContext("open source wallet with audit").filter.names).toEqual([]);
+  });
+  it("finds Zucchini by name with its official site and no unverified source or audit claims", () => {
+    const zucchini = walletsContext("Zucchini browser wallet");
+    expect(zucchini.filter.names).toEqual(["Zucchini Wallet"]);
+    expect(zucchini.wallets).toHaveLength(1);
+    expect(zucchini.wallets[0]).toMatchObject({
+      name: "Zucchini Wallet",
+      maker: "Zucchini",
+      platforms: "Browser extension",
+      shielded: "full",
+      availability: "match",
+      site: "https://zucchinifi.xyz/",
+    });
+    expect(zucchini.wallets[0]).not.toHaveProperty("sourceCode");
+    expect(zucchini.wallets[0]).not.toHaveProperty("auditReport");
+    expect(safeSourceUrl(zucchini.wallets[0].site)).toBe("https://zucchinifi.xyz/");
   });
   it("does not offer Brave, unknown Snap or unreleased wallets for Android shielded requests", () => {
     const android = walletsContext("android shielded");
@@ -125,7 +141,7 @@ describe("Wallet catalog lookup", () => {
     for (const q of ["", "Android"]) {
       const out = compactData(walletsContext(q), q, charBudget("wallets"), rowLimit("wallets"));
       const shown = out.data as { allWallets: string; catalogRevisedOn: string; note: string; wallets: { shown: unknown[] } };
-      expect(shown.allWallets.split(", "), q).toHaveLength(18);
+      expect(shown.allWallets.split(", "), q).toHaveLength(19);
       expect(shown.catalogRevisedOn).toBe("2026-10-15");
       expect(shown.note).toContain("last edit");
       expect(shown.wallets.shown.length, q).toBeGreaterThanOrEqual(10);

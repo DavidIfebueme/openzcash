@@ -56,60 +56,65 @@ function open(query: string) {
 }
 
 describe("Wallet Finder interactions", () => {
-  it("guides five labeled questions, retains answers in the URL and focuses each new question", () => {
+  it("shows one compact filter panel and updates results as filters change", () => {
     open("");
-    expect(screen.getByRole("group", { name: /Where do you want to use Zcash/ })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("radio", { name: /^Android / }));
+    const filters = screen.getByRole("region", { name: "Filters" });
+    expect(within(filters).getByRole("combobox", { name: "Platform" })).toHaveValue("any");
+    expect(within(filters).getAllByRole("checkbox")).toHaveLength(5);
+    expect(screen.queryByRole("navigation", { name: /Wallet Finder steps/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "3 wallets match your filters" })).toBeInTheDocument();
+
+    fireEvent.change(within(filters).getByRole("combobox", { name: "Platform" }), { target: { value: "android" } });
     expect(new URLSearchParams(window.location.search).get("platform")).toBe("android");
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    const privacy = screen.getByRole("group", { name: /What do you want to do privately/ });
-    expect(privacy.querySelector("legend")).toHaveFocus();
-    fireEvent.click(screen.getByRole("radio", { name: /^Send and receive privately/ }));
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    expect(screen.getByRole("group", { name: /Do you need a hardware signer/ })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    expect(screen.getByRole("group", { name: /Do you also need to manage other coins/ })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    expect(screen.getByRole("group", { name: /Need a public audit report/ })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "See matching wallets" }));
-    expect(screen.getByRole("heading", { name: "1 wallet matches your choices" })).toHaveFocus();
-    expect(window.location.search).toBe("?platform=android&privacy=both&view=results");
-    const matches = screen.getByRole("region", { name: "1 wallet matches your choices" });
+    const send = within(filters).getByRole("checkbox", { name: "Send ZEC privately" });
+    send.focus();
+    fireEvent.click(send);
+    expect(send).toHaveFocus();
+    expect(new URLSearchParams(window.location.search).get("privacy")).toBe("send");
+    fireEvent.click(within(filters).getByRole("checkbox", { name: "Receive ZEC privately" }));
+    expect(new URLSearchParams(window.location.search).get("privacy")).toBe("both");
+    expect(screen.getByRole("heading", { name: "1 wallet matches your filters" })).toBeInTheDocument();
+    const matches = screen.getByRole("region", { name: "1 wallet matches your filters" });
     expect(within(matches).getByRole("heading", { name: "Matched wallet" })).toBeInTheDocument();
     expect(within(matches).queryByText("Unknown wallet")).not.toBeInTheDocument();
     expect(within(matches).queryByText("Excluded wallet")).not.toBeInTheDocument();
-  });
 
-  it("restores shared answers, allows editing and resets all requirements", () => {
-    open("?platform=android&privacy=both&view=results");
-    fireEvent.click(screen.getByRole("button", { name: "Edit privacy" }));
-    expect(screen.getByRole("radio", { name: /^Send and receive privately/ })).toBeChecked();
-    fireEvent.click(screen.getByRole("radio", { name: /^Receive privately/ }));
+    fireEvent.click(send);
     expect(new URLSearchParams(window.location.search).get("privacy")).toBe("receive");
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    fireEvent.click(screen.getByRole("button", { name: "See matching wallets" }));
-    expect(screen.getByText("Receive privately")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Start over" }));
-    expect(window.location.search).toBe("?view=platform");
-    expect(screen.getByRole("radio", { name: /^Any platform/ })).toBeChecked();
   });
 
-  it("restores the previous question and answers through browser history", async () => {
-    open("?platform=android&view=platform");
-    fireEvent.click(screen.getByRole("button", { name: "Continue" }));
-    fireEvent.click(screen.getByRole("radio", { name: /^Receive privately/ }));
+  it("restores a shared filter set, ignores legacy step views and clears everything", () => {
+    open("?platform=android&privacy=both&hardware=required&multichain=required&audit=required&view=audit");
+    const filters = screen.getByRole("region", { name: "Filters" });
+    expect(within(filters).getByRole("combobox", { name: "Platform" })).toHaveValue("android");
+    for (const label of ["Send ZEC privately", "Receive ZEC privately", "Hardware signer", "Other blockchains", "Public audit report"]) {
+      expect(within(filters).getByRole("checkbox", { name: label })).toBeChecked();
+    }
+    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
+    fireEvent.click(within(filters).getByRole("button", { name: "Clear filters" }));
+    expect(window.location.pathname + window.location.search).toBe("/wallets/find");
+    expect(within(filters).getByRole("combobox", { name: "Platform" })).toHaveValue("any");
+    expect(within(filters).getAllByRole("checkbox").every(control => !(control as HTMLInputElement).checked)).toBe(true);
+    expect(screen.getByRole("heading", { name: "3 wallets match your filters" })).toBeInTheDocument();
+  });
+
+  it("restores prior filters through browser back and forward", async () => {
+    open("");
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "android" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: "Send ZEC privately" }));
+    expect(new URLSearchParams(window.location.search).get("privacy")).toBe("send");
     act(() => window.history.back());
-    await waitFor(() => expect(screen.getByRole("radio", { name: /^No privacy requirement/ })).toBeChecked());
-    expect(new URLSearchParams(window.location.search).get("platform")).toBe("android");
-    expect(new URLSearchParams(window.location.search).get("view")).toBe("privacy");
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Send ZEC privately" })).not.toBeChecked());
+    expect(screen.getByRole("combobox", { name: "Platform" })).toHaveValue("android");
+    act(() => window.history.forward());
+    await waitFor(() => expect(screen.getByRole("checkbox", { name: "Send ZEC privately" })).toBeChecked());
+    expect(new URLSearchParams(window.location.search).get("privacy")).toBe("send");
   });
 
   it("keeps unknown and unsupported wallets separate, with source date and scope available", () => {
     open("?platform=android&privacy=both&view=results");
     expect(screen.getByText("1 wallet needs more verification")).toBeInTheDocument();
-    expect(screen.getByText("1 wallet does not meet these choices")).toBeInTheDocument();
+    expect(screen.getByText("1 wallet does not meet these filters")).toBeInTheDocument();
     const wallet = screen.getByRole("article", { name: "Matched wallet" });
     fireEvent.click(within(wallet).getByText("Sources, dates & limits"));
     expect(within(wallet).getAllByText("Oct 15, 2026").length).toBeGreaterThan(0);
@@ -144,14 +149,13 @@ describe("Wallet Finder interactions", () => {
 
   it("requires documented audit evidence on the same platform and shares the choice", () => {
     open("?platform=android&privacy=both&audit=required&view=results");
-    expect(screen.getByRole("heading", { name: "0 wallets match your choices" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
     expect(screen.getByText("2 wallets need more verification")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Edit audit" }));
-    expect(screen.getByRole("radio", { name: /^Public report required/ })).toBeChecked();
-    fireEvent.click(screen.getByRole("radio", { name: /^No audit requirement/ }));
+    const audit = screen.getByRole("checkbox", { name: "Public audit report" });
+    expect(audit).toBeChecked();
+    fireEvent.click(audit);
     expect(new URLSearchParams(window.location.search).get("audit")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "See matching wallets" }));
-    expect(screen.getByRole("heading", { name: "1 wallet matches your choices" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "1 wallet matches your filters" })).toBeInTheDocument();
   });
 
   it("shows platform, version and channel scope without opening source details", () => {
@@ -198,9 +202,9 @@ describe("Wallet Finder interactions", () => {
 
   it("does not substitute a verified platform for an unreviewed requested platform", () => {
     open("?platform=web&privacy=both&view=results");
-    expect(screen.getByRole("heading", { name: "0 wallets match your choices" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
     expect(screen.getByText("3 wallets need more verification")).toBeInTheDocument();
-    expect(screen.getByText("0 wallets do not meet these choices")).toBeInTheDocument();
+    expect(screen.getByText("0 wallets do not meet these filters")).toBeInTheDocument();
   });
 
   it("does not promote an undocumented positive fact into a confirmed result", () => {
@@ -208,7 +212,7 @@ describe("Wallet Finder interactions", () => {
     fixtures[0].platforms.android.shieldedReceive = { ...fact, sources: [], checkedAt: null };
     try {
       open("?platform=android&privacy=both&view=results");
-      expect(screen.getByRole("heading", { name: "0 wallets match your choices" })).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
       expect(screen.getByText("2 wallets need more verification")).toBeInTheDocument();
     } finally {
       fixtures[0].platforms.android.shieldedReceive = fact;
@@ -217,19 +221,19 @@ describe("Wallet Finder interactions", () => {
 
   it("explains an empty result without promoting unknown support", () => {
     open("?platform=android&privacy=both&hardware=required&view=results");
-    expect(screen.getByRole("heading", { name: "0 wallets match your choices" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No confirmed matches for this combination" })).toBeInTheDocument();
-    expect(screen.getByText(/unknown support never counts as a match/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Edit your choices" })).toBeInTheDocument();
+    expect(screen.getByText(/unknown support never counts as a match/i)).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Platform" })).toBeVisible();
   });
 
-  it("makes a completed no-preference search shareable and reports clipboard success", async () => {
+  it("shares a canonical filter link and reports clipboard success", async () => {
     open("?view=results");
     const writeText = vi.fn().mockResolvedValue(undefined);
     Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
     fireEvent.click(screen.getByRole("button", { name: "Copy result link" }));
     await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("Link copied."));
-    expect(writeText).toHaveBeenCalledWith(window.location.href);
+    expect(writeText).toHaveBeenCalledWith(new URL("/wallets/find", window.location.origin).href);
     expect(new URLSearchParams(window.location.search).get("view")).toBe("results");
   });
 
@@ -276,13 +280,11 @@ describe("Wallet Finder interactions", () => {
 
 describe("Wallet Finder automated accessibility", () => {
   it.each([
-    ["platform question", "?view=platform"],
-    ["privacy question", "?platform=android&view=privacy"],
-    ["hardware question", "?platform=android&privacy=both&view=hardware"],
-    ["multichain question", "?platform=android&privacy=both&view=multichain"],
-    ["audit question", "?platform=android&privacy=both&view=audit"],
-    ["matching results", "?platform=android&privacy=both&view=results"],
-    ["empty results", "?platform=android&privacy=both&hardware=required&view=results"],
+    ["unfiltered live results", ""],
+    ["privacy filters", "?platform=android&privacy=both"],
+    ["hardware and audit filters", "?platform=android&hardware=required&audit=required"],
+    ["legacy step link", "?platform=android&view=privacy"],
+    ["empty results", "?platform=android&privacy=both&hardware=required"],
     ["all capability evidence", "?view=evidence&wallet=Unknown%20wallet"],
   ])("has no WCAG A/AA violations in %s", async (_name, query) => {
     window.history.replaceState(null, "", `/wallets/find${query}`);

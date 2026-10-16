@@ -8,14 +8,28 @@ import { HARDWARE, SOFTWARE, walletPrivacy } from "./catalog-data";
 afterEach(cleanup);
 
 describe("Evidence-aligned wallet catalog", () => {
-  it("retains all 18 entries, including unknown and announced wallets", () => {
+  it("retains all 19 entries, including unknown and announced wallets", () => {
     render(<WalletCatalog />);
-    expect(screen.getByText("18 wallets match this view")).toBeInTheDocument();
-    expect([...SOFTWARE, ...HARDWARE]).toHaveLength(18);
+    expect(screen.getByText("19 wallets match this view")).toBeInTheDocument();
+    expect([...SOFTWARE, ...HARDWARE]).toHaveLength(19);
     expect(screen.getByRole("link", { name: "MetaMask Snap website" })).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "zSTASH website" })).toBeInTheDocument();
     expect(screen.getAllByText("Not verified").length).toBeGreaterThan(1);
     expect(screen.getAllByText("Not available").length).toBeGreaterThan(1);
+  });
+
+  it("includes Zucchini for browser shielding without unverified source or audit badges", () => {
+    render(<WalletCatalog />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "Browser extension" } });
+    fireEvent.change(screen.getByRole("combobox", { name: "Shielded support" }), { target: { value: "full" } });
+    const link = screen.getByRole("link", { name: "Zucchini Wallet website" });
+    expect(link).toHaveAttribute("href", "https://zucchinifi.xyz/");
+    const card = within(link.closest(".ws-wallet-card") as HTMLElement);
+    expect(card.getByRole("link", { name: "Capability evidence" })).toBeInTheDocument();
+    expect(card.queryByRole("link", { name: "Open source" })).not.toBeInTheDocument();
+    expect(card.queryByRole("link", { name: "🛡️ Audit report" })).not.toBeInTheDocument();
+    fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "Android" } });
+    expect(screen.queryByRole("link", { name: "Zucchini Wallet website" })).not.toBeInTheDocument();
   });
 
   it("requires documented sending and receiving on the selected platform", () => {

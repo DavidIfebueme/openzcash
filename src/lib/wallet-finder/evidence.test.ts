@@ -19,6 +19,15 @@ describe("published wallet capability records", () => {
     expect(result("Brave Wallet", { platform: "android", shielded: "both" })?.status).toBe("excluded");
     expect(result("Brave Wallet", { platform: "ios", shielded: "both" })?.status).toBe("excluded");
   });
+  it("matches Zucchini's documented browser shielding without inferring other integrations", () => {
+    expect(result("Zucchini Wallet", { platform: "browser", shielded: "both" })?.status).toBe("match");
+    expect(result("Zucchini Wallet", { platform: "android", shielded: "both" })?.status).toBe("unknown");
+    for (const requirement of ["hardware", "multichain", "audit"] as const) {
+      expect(result("Zucchini Wallet", { platform: "browser", shielded: "both", [requirement]: "required" })?.status).toBe("unknown");
+    }
+    const send = WALLET_EVIDENCE.find(w => w.walletName === "Zucchini Wallet")?.platforms.browser?.shieldedSend;
+    expect(send?.note).toContain("transparent receiver");
+  });
   it("does not recommend an unreleased wallet or a Snap with unresolved current compatibility", () => {
     expect(result("zSTASH", {})?.status).toBe("excluded");
     expect(result("MetaMask Snap", { platform: "browser", shielded: "both" })?.status).toBe("unknown");

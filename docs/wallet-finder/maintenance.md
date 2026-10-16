@@ -44,4 +44,4 @@ The finder and evidence data need no account, wallet keys or production database
 
 ## Community provenance
 
-The guided selection and field-level evidence requirements were informed by @Foreveranka's [Wallet Finder proposal](https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/495). OpenZcash implements this flow on its existing catalog. This credit is for requirements and community feedback, not authorship of OpenZcash code, wallet software, or independently reviewed facts.
+The capability filtering and field-level evidence requirements were informed by @Foreveranka's [Wallet Finder proposal](https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/495). OpenZcash implements this flow on its existing catalog. This credit is for requirements and community feedback, not authorship of OpenZcash code, wallet software, or independently reviewed facts.
