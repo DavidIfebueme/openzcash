@@ -18,6 +18,15 @@ describe("Evidence-aligned wallet catalog", () => {
     expect(screen.getAllByText("Not available").length).toBeGreaterThan(1);
   });
 
+  it("reserves editorial highlights for Zodl, Zingo! and Vizor without changing catalog order", () => {
+    render(<WalletCatalog />);
+    const highlights = screen.getAllByRole("img", { name: "Highlighted wallet" });
+    expect(highlights.map(star => star.closest(".ws-wallet-card")?.querySelector("a")?.getAttribute("aria-label")))
+      .toEqual(["Zodl website", "Zingo! website", "Vizor website"]);
+    expect(screen.getAllByRole("link", { name: / website$/ }).slice(0, 4).map(link => link.getAttribute("aria-label")))
+      .toEqual(["Zodl website", "Zingo! website", "Ywallet website", "zkool website"]);
+  });
+
   it("includes Zucchini for browser shielding without unverified source or audit badges", () => {
     render(<WalletCatalog />);
     fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "Browser extension" } });

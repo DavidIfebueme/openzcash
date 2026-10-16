@@ -6,12 +6,8 @@ import type { WalletPlatform } from "@/lib/wallet-finder/types";
 /** Date of the last edit to the entries below (maintainer-set, not a review pass): update it in the same commit that adds, removes or corrects a wallet. */
 export const WALLET_CATALOG_REVISED_ON = "2026-10-15";
 
-// Existing editorial highlights requested for the catalog. This is not a safety rating.
-export const EDITORIAL_HIGHLIGHTS = new Set([
-  "Zodl", "Zingo!", "zkool", "Vizor", "Edge", "Cake Wallet",
-  "Noir Wallet", "Brave Wallet", "Unstoppable Wallet",
-  "Keystone", "Ledger", "Trezor",
-]);
+// Editorial selection for discovery, kept separate from audit evidence.
+export const EDITORIAL_HIGHLIGHTS = new Set(["Zodl", "Zingo!", "Vizor"]);
 
 export type Shielded = "full" | "partial" | "transparent" | "unknown" | "unavailable";
 
@@ -22,6 +18,8 @@ export interface Wallet {
   platforms: string[];
   shielded: Shielded;
   note: string;
+  /** Short discovery copy; full platform and release limits stay in note/evidence. */
+  summary: string;
   logo?: string;
   flagship?: boolean;
   tag?: "Beta" | "Coming soon";
@@ -38,6 +36,7 @@ export interface Wallet {
 const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   {
     name: "Zodl",
+    summary: "Shielded by default, from the team behind Zashi.",
     maker: "Zcash Open Development Lab",
     url: "https://zodl.com",
     // Official iOS AppIcon (zodl-inc/zodl-ios); content version refreshes cached artwork.
@@ -49,6 +48,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Zingo!",
+    summary: "Shielded ZEC on iOS and Android, from Zingo Labs.",
     maker: "Zingo Labs",
     url: "https://zingolabs.org/zingo/",
     logo: "/wallet-logos/zingo.png",
@@ -58,6 +58,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Ywallet",
+    summary: "Shielded Zcash and Ycash on mobile and desktop.",
     maker: "hanh",
     url: "https://ywallet.app",
     logo: "/wallet-logos/ywallet.png",
@@ -68,6 +69,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "zkool",
+    summary: "Shielded Zcash on mobile and desktop, by hanh.",
     maker: "hanh",
     url: "https://github.com/hhanh00/zkool2",
     logo: "/wallet-logos/zkool.png",
@@ -77,6 +79,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Brave Wallet",
+    summary: "Shielded ZEC inside the Brave desktop browser.",
     maker: "Brave Software",
     url: "https://brave.com/wallet/",
     logo: "/wallet-logos/brave.png",
@@ -86,6 +89,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Noir Wallet",
+    summary: "Shielded ZEC in a Chrome extension by RHEA Finance.",
     maker: "RHEA Finance",
     url: "https://www.zknoir.com/",
     logo: "/wallet-logos/noir.png",
@@ -94,6 +98,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Zucchini Wallet",
+    summary: "Shielded ZEC in Chrome; swaps may use transparent addresses.",
     maker: "Zucchini",
     url: "https://zucchinifi.xyz/",
     logo: "/wallet-logos/zucchini.png",
@@ -103,6 +108,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "MetaMask Snap",
+    summary: "Zcash for MetaMask; current usability is unverified.",
     maker: "ChainSafe",
     url: "https://snaps.metamask.io/snap/npm/chainsafe/webzjs-zcash-snap/",
     logo: "/wallet-logos/metamask.png",
@@ -113,6 +119,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Vizor",
+    summary: "Shielded by default with Keystone support, from the Keplr team.",
     maker: "Chainapsis (Keplr)",
     url: "https://vizor.cash/",
     logo: "/wallet-logos/vizor.png",
@@ -122,6 +129,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Cake Wallet",
+    summary: "Shielded Zcash and other coins on iOS and Android.",
     maker: "Cake Labs",
     url: "https://cakewallet.com",
     logo: "/wallet-logos/cake.png",
@@ -131,6 +139,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Edge",
+    summary: "Multi-asset mobile wallet with shielded Zcash.",
     maker: "Edge",
     url: "https://edge.app",
     logo: "/wallet-logos/edge.png",
@@ -140,6 +149,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Unstoppable Wallet",
+    summary: "Multi-coin mobile wallet with shielded ZEC.",
     maker: "Horizontal Systems",
     url: "https://unstoppable.money/",
     logo: "/wallet-logos/unstoppable.png",
@@ -149,6 +159,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Zipher",
+    summary: "Mobile beta: private sending; receiving unverified.",
     maker: "Atmosphere Labs",
     url: "https://zipher.to/",
     logo: "/wallet-logos/zipher.png",
@@ -159,6 +170,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "zSTASH",
+    summary: "Desktop wallet announced; no usable public release.",
     maker: "Independent",
     url: "https://zstash.app/",
     logo: "/wallet-logos/zstash.png",
@@ -168,6 +180,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Zapp",
+    summary: "Shielded ZEC on Android and iOS TestFlight.",
     maker: "JustZappIt",
     url: "https://www.justzappit.xyz/",
     logo: "/wallet-logos/zappit.png",
@@ -176,6 +189,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Gem Wallet",
+    summary: "Multi-chain wallet with transparent ZEC only.",
     maker: "Gem Wallet",
     url: "https://gemwallet.com",
     logo: "/wallet-logos/gem.png",
@@ -193,6 +207,7 @@ const SOFTWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
 const HARDWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   {
     name: "Keystone",
+    summary: "Keystone 3 Pro: shielded ZEC with compatible firmware and wallet.",
     maker: "Keystone",
     url: "https://keyst.one",
     logo: "/wallet-logos/keystone.png",
@@ -204,6 +219,7 @@ const HARDWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Ledger",
+    summary: "Hardware ZEC wallet; shielded support remains unverified.",
     maker: "Ledger · Zondax",
     url: "https://www.ledger.com/coin/wallet/zcash",
     logo: "/wallet-logos/ledger.png",
@@ -213,6 +229,7 @@ const HARDWARE_ENTRIES: Omit<Wallet, "shielded">[] = [
   },
   {
     name: "Trezor",
+    summary: "Hardware storage for transparent ZEC; no shielded support.",
     maker: "SatoshiLabs",
     url: "https://trezor.io/coins/wallet/zcash",
     logo: "/wallet-logos/trezor.png",

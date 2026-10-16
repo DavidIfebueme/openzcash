@@ -18,6 +18,7 @@ import { EDITORIAL_HIGHLIGHTS, HARDWARE, SOFTWARE } from "../catalog-data";
 import styles from "./finder.module.css";
 
 const CATALOG = new Map([...SOFTWARE, ...HARDWARE].map(wallet => [wallet.name, wallet]));
+const HARDWARE_NAMES = new Set(HARDWARE.map(wallet => wallet.name));
 const CATALOG_ORDER = new Map([...CATALOG.keys()].map((name, index) => [name, index]));
 const PLATFORM_EMOJI: Record<WalletPlatform, string> = { ios: "", android: "", desktop: "🖥️", browser: "🧩", web: "🌐", hardware: "🔑" };
 const STATE_LABELS = { supported: "Supported", unsupported: "Not supported", unknown: "Unknown" } as const;
@@ -100,18 +101,18 @@ function WalletResult({ result, query }: { result: WalletMatch; query: string })
   recordQuery.set("wallet", result.walletName);
   const id = `wallet-${result.walletName.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
   return <>
-    <article className={styles.wallet} aria-labelledby={id}>
+    <article className={styles.wallet} aria-labelledby={id} data-highlighted={EDITORIAL_HIGHLIGHTS.has(result.walletName) || undefined}>
       <div className={styles.walletHeading}>
         {wallet?.logo ? <img src={wallet.logo} alt="" width={44} height={44} /> : null}
-        <div className={styles.walletName}><h3 id={id}>{result.walletName}</h3>{EDITORIAL_HIGHLIGHTS.has(result.walletName) && <span className={styles.editorialStar} role="img" aria-label="Editorial highlight" title="Editorial highlight, not a safety rating">⭐</span>}</div>
+        <div className={styles.walletName}><h3 id={id}>{result.walletName}</h3>{EDITORIAL_HIGHLIGHTS.has(result.walletName) && <span className={styles.editorialStar} role="img" aria-label="Editorial highlight" title="OpenZcash editorial pick">⭐</span>}</div>
+        {auditReport && auditedPlatform && auditEvidence && <a className={styles.auditBadge} href={auditReport.url} target="_blank" rel="noopener noreferrer" aria-label={`Audit report for ${result.walletName} on ${PLATFORM_LABELS[auditedPlatform]}`} title={`Past audit: ${auditEvidence.scope}. Historical report, not a current safety rating.`}><span aria-hidden="true">🛡️</span></a>}
       </div>
-      <div className={styles.walletSummary}>
+      <p className={styles.walletDescription}>{wallet?.summary}</p>
+      <div className={styles.walletMeta}>
         <span className={styles.privacyBadge} data-private={privateSend && privateReceive || undefined}><span aria-hidden="true">{privacy.icon}</span>{privacy.label}</span>
-        {auditReport && auditedPlatform && auditEvidence && <a className={styles.auditBadge} href={auditReport.url} target="_blank" rel="noopener noreferrer" aria-label={`Audit report for ${result.walletName} on ${PLATFORM_LABELS[auditedPlatform]}`} title={`${auditEvidence.scope}. Historical report, not a current safety rating.`}><span aria-hidden="true">🛡️</span> Past audit</a>}
-      </div>
-      <div className={styles.platformIcons} aria-label="Matching platforms">
-        {result.platforms.map(platform => <PlatformIcon key={platform} platform={platform} />)}
-        {result.status !== "match" && <span className={styles.unverifiedPlatform}>See scope in details</span>}
+        {result.platforms.length > 0 && <div className={styles.platformIcons} aria-label="Matching platforms">
+          {result.platforms.map(platform => <PlatformIcon key={platform} platform={platform} />)}
+        </div>}
       </div>
       <div className={styles.walletActions}>
         {wallet ? <a className={styles.officialLink} href={wallet.url} target="_blank" rel="noopener noreferrer" aria-label={`${result.walletName} website`}>Website<span aria-hidden="true"> ↗</span></a> : <span />}
@@ -131,6 +132,17 @@ function WalletResult({ result, query }: { result: WalletMatch; query: string })
       </div>
     </BottomSheet>}
   </>;
+}
+
+function WalletGroups({ results, query, idPrefix }: { results: WalletMatch[]; query: string; idPrefix: string }) {
+  const groups = [
+    { id: "software", label: "Software wallets", wallets: results.filter(result => !HARDWARE_NAMES.has(result.walletName)) },
+    { id: "hardware", label: "Hardware wallets", wallets: results.filter(result => HARDWARE_NAMES.has(result.walletName)) },
+  ];
+  return groups.filter(group => group.wallets.length > 0).map(group => <section key={group.id} className={styles.walletGroup} aria-labelledby={`${idPrefix}-${group.id}`}>
+    <div className={styles.groupHeading}><h2 id={`${idPrefix}-${group.id}`}>{group.label}</h2><span aria-hidden="true">{group.wallets.length}</span></div>
+    <div className={styles.walletList}>{group.wallets.map(result => <WalletResult key={result.walletName} result={result} query={query} />)}</div>
+  </section>);
 }
 
 const CAPABILITY_LABELS = {
@@ -216,8 +228,8 @@ export function WalletFinder() {
   return <div className={styles.finder}>
     <PageHeader
       title={viewingEvidence ? "Wallet capability evidence" : "Wallet Finder"}
-      subtitle={viewingEvidence ? "Sources, dates and limits, by wallet and platform." : "Choose what matters."}
-      actions={<Link href="/wallets" className={styles.catalogLink}>Browse all wallets <span aria-hidden="true">↗</span></Link>}
+      subtitle={viewingEvidence ? "Sources, dates and limits, by wallet and platform." : undefined}
+      actions={<Link href="/wallets" className={styles.catalogLink}>All wallets <span aria-hidden="true">↗</span></Link>}
     />
     {viewingEvidence ? <CapabilityRecords selectedName={params.get("wallet")} onSelect={selectRecord} onFind={() => updateRequirements(requirements)} /> : <>
       <section className={styles.filterPanel} aria-labelledby="wallet-filters">
@@ -247,19 +259,19 @@ export function WalletFinder() {
       </section>
       <section className={styles.results} aria-labelledby="matching-wallets">
         <div className={styles.resultHeading}>
-          <div><h2 id="matching-wallets" aria-live="polite" aria-atomic="true">{matches.length} {matches.length === 1 ? "wallet matches" : "wallets match"} your filters</h2></div>
-          <button type="button" className={styles.secondaryButton} onClick={share}>Copy result link</button>
+          <p id="matching-wallets" className={styles.resultCount} aria-live="polite" aria-atomic="true">{matches.length} {matches.length === 1 ? "wallet" : "wallets"}</p>
+          <div className={styles.resultTools}><div className={styles.resultLegend}><span>⭐ Editorial picks</span><span>🛡️ Past audit</span></div><button type="button" className={styles.textButton} aria-label="Copy result link" onClick={share}>Copy link <span aria-hidden="true">↗</span></button></div>
         </div>
         <p role="status" className={styles.shareMessage}>{shareMessage}</p>
-        {matches.length ? <div className={styles.walletList}>{matches.map(result => <WalletResult key={result.walletName} result={result} query={walletRequirementsQuery(requirements)} />)}</div> : <div className={styles.empty}>
+        {matches.length ? <WalletGroups results={matches} query={walletRequirementsQuery(requirements)} idPrefix="matches" /> : <div className={styles.empty}>
           <h3>No confirmed matches for this combination</h3>
           <p>Change a filter above to widen the results. Unknown support never counts as a match.</p>
         </div>}
       </section>
-      <div className={styles.otherResults}>
-        <details><summary>{unknown.length} {unknown.length === 1 ? "wallet needs" : "wallets need"} more verification<span aria-hidden="true"> +</span></summary><p>At least one selected requirement is unconfirmed for these wallets.</p><div className={styles.walletList}>{unknown.map(result => <WalletResult key={result.walletName} result={result} query={walletRequirementsQuery(requirements)} />)}{!unknown.length && <p>No wallets in this group.</p>}</div></details>
-        <details><summary>{excluded.length} {excluded.length === 1 ? "wallet does" : "wallets do"} not meet these filters<span aria-hidden="true"> +</span></summary><p>Reviewed evidence shows at least one selected requirement is not supported. Expand a wallet’s sources for the scope.</p><div className={styles.walletList}>{excluded.map(result => <WalletResult key={result.walletName} result={result} query={walletRequirementsQuery(requirements)} />)}{!excluded.length && <p>No wallets in this group.</p>}</div></details>
-      </div>
+      {(unknown.length > 0 || excluded.length > 0) && <div className={styles.otherResults}>
+        {unknown.length > 0 && <details><summary>Needs verification · {unknown.length}<span aria-hidden="true"> +</span></summary><p>At least one selected requirement is unconfirmed.</p><WalletGroups results={unknown} query={walletRequirementsQuery(requirements)} idPrefix="unknown" /></details>}
+        {excluded.length > 0 && <details><summary>Not matched · {excluded.length}<span aria-hidden="true"> +</span></summary><p>A selected requirement is not supported. Details include the evidence.</p><WalletGroups results={excluded} query={walletRequirementsQuery(requirements)} idPrefix="excluded" /></details>}
+      </div>}
     </>}
     <aside className={styles.method}><details><summary>How matching works</summary><p>Results keep the catalog order. Only documented capabilities count: availability, platform and selected capabilities are checked against the linked sources. Unknown or incomplete evidence stays unknown. Capabilities from different platforms are never combined into one match. Other blockchains means managing native assets, not swaps.</p><p>A public audit report covers its stated product and release; it is not a safety guarantee. The ⭐ is an editorial highlight. Read source dates and limits before choosing. <Link href="/wallets/find?view=evidence">Browse all capability records</Link> or <Link href="/wallets">open the full wallet catalog</Link>.</p><p>No account or wallet connection is needed. Your filters stay in this page’s address so you can revisit or share them.</p></details></aside>
     <CommunityCredit screen="wallet-finder" />

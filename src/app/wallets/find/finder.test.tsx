@@ -27,8 +27,8 @@ const fixtures = vi.hoisted(() => {
 
 vi.mock("@/lib/wallet-finder/evidence", () => ({ WALLET_EVIDENCE: fixtures }));
 vi.mock("../catalog-data", () => ({
-  SOFTWARE: ["Matched wallet", "Unknown wallet"].map(name => ({ name, maker: "Fixture publisher", url: "https://example.org/wallet" })),
-  HARDWARE: [{ name: "Excluded wallet", maker: "Fixture publisher", url: "https://example.org/hardware" }],
+  SOFTWARE: ["Matched wallet", "Unknown wallet"].map(name => ({ name, maker: "Fixture publisher", url: "https://example.org/wallet", summary: "A short wallet introduction.", note: "Full platform and release limitations." })),
+  HARDWARE: [{ name: "Excluded wallet", maker: "Fixture publisher", url: "https://example.org/hardware", summary: "A physical signing device.", note: "Full hardware compatibility details." }],
   EDITORIAL_HIGHLIGHTS: new Set(["Matched wallet"]),
 }));
 vi.mock("next/navigation", async () => {
@@ -84,7 +84,7 @@ describe("Wallet Finder interactions", () => {
   it("preserves catalog order on any platform, while filtering and after reset", () => {
     open("");
     const expected = ["Matched wallet", "Unknown wallet", "Excluded wallet"];
-    const names = () => within(screen.getByRole("region", { name: /wallets? match/ }))
+    const names = () => within(screen.getByRole("region", { name: /^\d+ wallets?$/ }))
       .queryAllByRole("heading", { level: 3 }).map(heading => heading.textContent);
     expect(names()).toEqual(expected);
     fireEvent.change(screen.getByRole("combobox", { name: "Platform" }), { target: { value: "android" } });
@@ -98,13 +98,37 @@ describe("Wallet Finder interactions", () => {
     expect(names()).toEqual(expected);
   });
 
+  it("separates physical hardware from software even when software supports hardware signing", () => {
+    const hardware = fixtures[0].platforms.android.hardwareSigning;
+    fixtures[0].platforms.android.hardwareSigning = { ...hardware, status: "supported" };
+    try {
+      open("");
+      const matches = within(screen.getByRole("region", { name: "3 wallets" }));
+      const software = within(matches.getByRole("region", { name: "Software wallets" }));
+      const devices = within(matches.getByRole("region", { name: "Hardware wallets" }));
+      expect(software.getAllByRole("article").map(card => card.getAttribute("aria-labelledby"))).toEqual(["wallet-matched-wallet", "wallet-unknown-wallet"]);
+      expect(devices.getByRole("article", { name: "Excluded wallet" })).toHaveTextContent("A physical signing device.");
+      expect(devices.queryByRole("article", { name: "Matched wallet" })).not.toBeInTheDocument();
+
+      fireEvent.click(screen.getByRole("checkbox", { name: "Hardware signer" }));
+      const filtered = within(screen.getByRole("region", { name: "1 wallet" }));
+      expect(within(filtered.getByRole("region", { name: "Software wallets" })).getByRole("article", { name: "Matched wallet" })).toBeInTheDocument();
+      expect(filtered.queryByRole("region", { name: "Hardware wallets" })).not.toBeInTheDocument();
+      fireEvent.click(screen.getByText("Not matched · 2"));
+      const excluded = screen.getByText("Not matched · 2").closest("details")!;
+      expect(within(within(excluded).getByRole("region", { name: "Hardware wallets" })).getByRole("article", { name: "Excluded wallet" })).toBeInTheDocument();
+    } finally {
+      fixtures[0].platforms.android.hardwareSigning = hardware;
+    }
+  });
+
   it("shows one compact filter panel and updates results as filters change", () => {
     open("");
     const filters = screen.getByRole("region", { name: "Filters" });
     expect(within(filters).getByRole("combobox", { name: "Platform" })).toHaveValue("any");
     expect(within(filters).getAllByRole("checkbox")).toHaveLength(5);
     expect(screen.queryByRole("navigation", { name: /Wallet Finder steps/ })).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "3 wallets match your filters" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "3 wallets" })).toBeInTheDocument();
 
     fireEvent.change(within(filters).getByRole("combobox", { name: "Platform" }), { target: { value: "android" } });
     expect(new URLSearchParams(window.location.search).get("platform")).toBe("android");
@@ -115,8 +139,8 @@ describe("Wallet Finder interactions", () => {
     expect(new URLSearchParams(window.location.search).get("privacy")).toBe("send");
     fireEvent.click(within(filters).getByRole("checkbox", { name: "Receive ZEC privately" }));
     expect(new URLSearchParams(window.location.search).get("privacy")).toBe("both");
-    expect(screen.getByRole("heading", { name: "1 wallet matches your filters" })).toBeInTheDocument();
-    const matches = screen.getByRole("region", { name: "1 wallet matches your filters" });
+    expect(screen.getByRole("region", { name: "1 wallet" })).toBeInTheDocument();
+    const matches = screen.getByRole("region", { name: "1 wallet" });
     expect(within(matches).getByRole("heading", { name: "Matched wallet" })).toBeInTheDocument();
     expect(within(matches).queryByText("Unknown wallet")).not.toBeInTheDocument();
     expect(within(matches).queryByText("Excluded wallet")).not.toBeInTheDocument();
@@ -132,12 +156,12 @@ describe("Wallet Finder interactions", () => {
     for (const label of ["Send ZEC privately", "Receive ZEC privately", "Hardware signer", "Other blockchains", "Public audit report"]) {
       expect(within(filters).getByRole("checkbox", { name: label })).toBeChecked();
     }
-    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "0 wallets" })).toBeInTheDocument();
     fireEvent.click(within(filters).getByRole("button", { name: "Clear filters" }));
     expect(window.location.pathname + window.location.search).toBe("/wallets/find");
     expect(within(filters).getByRole("combobox", { name: "Platform" })).toHaveValue("any");
     expect(within(filters).getAllByRole("checkbox").every(control => !(control as HTMLInputElement).checked)).toBe(true);
-    expect(screen.getByRole("heading", { name: "3 wallets match your filters" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "3 wallets" })).toBeInTheDocument();
   });
 
   it("restores prior filters through browser back and forward", async () => {
@@ -155,8 +179,8 @@ describe("Wallet Finder interactions", () => {
 
   it("keeps unknown and unsupported wallets separate, with source date and scope available", () => {
     open("?platform=android&privacy=both&view=results");
-    expect(screen.getByText("1 wallet needs more verification")).toBeInTheDocument();
-    expect(screen.getByText("1 wallet does not meet these filters")).toBeInTheDocument();
+    expect(screen.getByText("Needs verification · 1")).toBeInTheDocument();
+    expect(screen.getByText("Not matched · 1")).toBeInTheDocument();
     const wallet = screen.getByRole("article", { name: "Matched wallet" });
     fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
     const details = screen.getByRole("dialog", { name: "Matched wallet details" });
@@ -182,7 +206,8 @@ describe("Wallet Finder interactions", () => {
       expect(within(wallet).getByRole("img", { name: "Editorial highlight" })).toHaveTextContent("⭐");
       const report = within(wallet).getByRole("link", { name: "Audit report for Matched wallet on Android" });
       expect(report).toHaveAttribute("href", "https://example.org/audit-report.pdf");
-      expect(report).toHaveTextContent("Past audit");
+      expect(report).toHaveTextContent("🛡️");
+      expect(report).toHaveAttribute("title", expect.stringContaining("Past audit:"));
       expect(report).toHaveAttribute("title", expect.stringContaining("Android 2.1 public release; older code reviewed"));
       expect(within(screen.getByRole("article", { name: "Unknown wallet" })).queryByRole("link", { name: /Audit report/ })).not.toBeInTheDocument();
       fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
@@ -196,13 +221,13 @@ describe("Wallet Finder interactions", () => {
 
   it("requires documented audit evidence on the same platform and shares the choice", () => {
     open("?platform=android&privacy=both&audit=required&view=results");
-    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
-    expect(screen.getByText("2 wallets need more verification")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "0 wallets" })).toBeInTheDocument();
+    expect(screen.getByText("Needs verification · 2")).toBeInTheDocument();
     const audit = screen.getByRole("checkbox", { name: "Public audit report" });
     expect(audit).toBeChecked();
     fireEvent.click(audit);
     expect(new URLSearchParams(window.location.search).get("audit")).toBeNull();
-    expect(screen.getByRole("heading", { name: "1 wallet matches your filters" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "1 wallet" })).toBeInTheDocument();
   });
 
   it("keeps cards concise, gives platform logos accessible names and opens scope in details", () => {
@@ -214,9 +239,12 @@ describe("Wallet Finder interactions", () => {
       const wallet = screen.getByRole("article", { name: "Matched wallet" });
       expect(within(wallet).getByRole("img", { name: "Android" }).tagName.toLowerCase()).toBe("svg");
       expect(within(wallet).getByText("Shielded")).toBeVisible();
+      expect(within(wallet).getByText("A short wallet introduction.")).toBeVisible();
+      expect(within(wallet).queryByText("Full platform and release limitations.")).not.toBeInTheDocument();
       expect(within(wallet).queryByText(scope)).not.toBeInTheDocument();
       fireEvent.click(within(wallet).getByRole("button", { name: "Details for Matched wallet" }));
       const details = screen.getByRole("dialog", { name: "Matched wallet details" });
+      expect(within(details).getByText("Full platform and release limitations.")).toBeVisible();
       expect(within(details).getByText("Android reviewed scope")).toBeVisible();
       expect(within(details).getAllByText(scope)[0]).toBeVisible();
       expect(within(details).getByRole("link", { name: /All capability records/ })).toHaveAttribute("href", "/wallets/find?platform=android&privacy=both&view=evidence&wallet=Matched+wallet");
@@ -277,9 +305,9 @@ describe("Wallet Finder interactions", () => {
 
   it("does not substitute a verified platform for an unreviewed requested platform", () => {
     open("?platform=web&privacy=both&view=results");
-    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
-    expect(screen.getByText("3 wallets need more verification")).toBeInTheDocument();
-    expect(screen.getByText("0 wallets do not meet these filters")).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "0 wallets" })).toBeInTheDocument();
+    expect(screen.getByText("Needs verification · 3")).toBeInTheDocument();
+    expect(screen.queryByText(/Not matched ·/)).not.toBeInTheDocument();
   });
 
   it("does not promote an undocumented positive fact into a confirmed result", () => {
@@ -287,8 +315,8 @@ describe("Wallet Finder interactions", () => {
     fixtures[0].platforms.android.shieldedReceive = { ...fact, sources: [], checkedAt: null };
     try {
       open("?platform=android&privacy=both&view=results");
-      expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
-      expect(screen.getByText("2 wallets need more verification")).toBeInTheDocument();
+      expect(screen.getByRole("region", { name: "0 wallets" })).toBeInTheDocument();
+      expect(screen.getByText("Needs verification · 2")).toBeInTheDocument();
     } finally {
       fixtures[0].platforms.android.shieldedReceive = fact;
     }
@@ -296,7 +324,7 @@ describe("Wallet Finder interactions", () => {
 
   it("explains an empty result without promoting unknown support", () => {
     open("?platform=android&privacy=both&hardware=required&view=results");
-    expect(screen.getByRole("heading", { name: "0 wallets match your filters" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "0 wallets" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "No confirmed matches for this combination" })).toBeInTheDocument();
     expect(screen.getByText(/unknown support never counts as a match/i)).toBeInTheDocument();
     expect(screen.getByRole("combobox", { name: "Platform" })).toBeVisible();

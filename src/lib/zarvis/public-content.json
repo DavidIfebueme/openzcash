@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "4dad6a16f10e65c8",
+  "sourceRevision": "9fa7b51eb7586885",
   "sourceFiles": 56,
   "documents": [
     {
@@ -1495,115 +1495,115 @@
       "id": "src/app/wallets/catalog-data.ts:0",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Zodl",
-      "text": "Zodl\nMaker: Zcash Open Development Lab\niOS\nAndroid\nFormerly Zashi. Shielded by default, from the original core team."
+      "text": "Zodl\nShielded by default, from the team behind Zashi.\nMaker: Zcash Open Development Lab\niOS\nAndroid\nFormerly Zashi. Shielded by default, from the original core team."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:1",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Zingo!",
-      "text": "Zingo!\nMaker: Zingo Labs\niOS\nAndroid\nShielded sending and receiving on iOS and Android. Desktop availability is not verified."
+      "text": "Zingo!\nShielded ZEC on iOS and Android, from Zingo Labs.\nMaker: Zingo Labs\niOS\nAndroid\nShielded sending and receiving on iOS and Android. Desktop availability is not verified."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:2",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Ywallet",
-      "text": "Ywallet\nMaker: hanh\niOS\nAndroid\nDesktop\nZcash and Ycash wallet with shielded sending and receiving. Check the evidence for supported desktop systems."
+      "text": "Ywallet\nShielded Zcash and Ycash on mobile and desktop.\nMaker: hanh\niOS\nAndroid\nDesktop\nZcash and Ycash wallet with shielded sending and receiving. Check the evidence for supported desktop systems."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:3",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · zkool",
-      "text": "zkool\nMaker: hanh\niOS\nAndroid\nDesktop\nShielded software wallet on mobile and desktop. Current Ledger shielded signing is not verified."
+      "text": "zkool\nShielded Zcash on mobile and desktop, by hanh.\nMaker: hanh\niOS\nAndroid\nDesktop\nShielded software wallet on mobile and desktop. Current Ledger shielded signing is not verified."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:4",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Brave Wallet",
-      "text": "Brave Wallet\nMaker: Brave Software\nDesktop\nShielded ZEC in the desktop Brave browser. Reviewed support documentation excludes mobile Zcash."
+      "text": "Brave Wallet\nShielded ZEC inside the Brave desktop browser.\nMaker: Brave Software\nDesktop\nShielded ZEC in the desktop Brave browser. Reviewed support documentation excludes mobile Zcash."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:5",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Noir Wallet",
-      "text": "Noir Wallet\nMaker: RHEA Finance\nBrowser extension\nChrome extension with shielded ZEC and documented hardware flows. Integration limits apply."
+      "text": "Noir Wallet\nShielded ZEC in a Chrome extension by RHEA Finance.\nMaker: RHEA Finance\nBrowser extension\nChrome extension with shielded ZEC and documented hardware flows. Integration limits apply."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:6",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Zucchini Wallet",
-      "text": "Zucchini Wallet\nMaker: Zucchini\nBrowser extension\nChrome extension with shielded ZEC sending and receiving. Some swap routes use transparent addresses before shielding."
+      "text": "Zucchini Wallet\nShielded ZEC in Chrome; swaps may use transparent addresses.\nMaker: Zucchini\nBrowser extension\nChrome extension with shielded ZEC sending and receiving. Some swap routes use transparent addresses before shielding."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:7",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · MetaMask Snap",
-      "text": "MetaMask Snap\nMaker: ChainSafe\nBrowser extension\nPublished Zcash Snap for MetaMask. Current usability is unverified after unresolved network-upgrade reports."
+      "text": "MetaMask Snap\nZcash for MetaMask; current usability is unverified.\nMaker: ChainSafe\nBrowser extension\nPublished Zcash Snap for MetaMask. Current usability is unverified after unresolved network-upgrade reports."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:8",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Vizor",
-      "text": "Vizor\nMaker: Chainapsis (Keplr)\niOS\nAndroid\nDesktop\nShielded by default with Keystone support, from the Keplr team."
+      "text": "Vizor\nShielded by default with Keystone support, from the Keplr team.\nMaker: Chainapsis (Keplr)\niOS\nAndroid\nDesktop"
     },
     {
       "id": "src/app/wallets/catalog-data.ts:9",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Cake Wallet",
-      "text": "Cake Wallet\nMaker: Cake Labs\niOS\nAndroid\nDesktop\nMulti-coin wallet with documented shielded mobile transfers. Linux shielded parity is not verified."
+      "text": "Cake Wallet\nShielded Zcash and other coins on iOS and Android.\nMaker: Cake Labs\niOS\nAndroid\nDesktop\nMulti-coin wallet with documented shielded mobile transfers. Linux shielded parity is not verified."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:10",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Edge",
-      "text": "Edge\nMaker: Edge\niOS\nAndroid\nMainstream multi-asset wallet defaulting to shielded z-addresses."
+      "text": "Edge\nMulti-asset mobile wallet with shielded Zcash.\nMaker: Edge\niOS\nAndroid\nMainstream multi-asset wallet defaulting to shielded z-addresses."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:11",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Unstoppable Wallet",
-      "text": "Unstoppable Wallet\nMaker: Horizontal Systems\niOS\nAndroid\nMulti-coin mobile wallet with documented shielded Zcash sending and receiving."
+      "text": "Unstoppable Wallet\nMulti-coin mobile wallet with shielded ZEC.\nMaker: Horizontal Systems\niOS\nAndroid\nMulti-coin mobile wallet with documented shielded Zcash sending and receiving."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:12",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Zipher",
-      "text": "Zipher\nMaker: Atmosphere Labs\niOS\nAndroid\nStatus: Beta\nMobile beta with shielded sending; receiving remains unverified. A separate CLI is in alpha."
+      "text": "Zipher\nMobile beta: private sending; receiving unverified.\nMaker: Atmosphere Labs\niOS\nAndroid\nStatus: Beta\nMobile beta with shielded sending; receiving remains unverified. A separate CLI is in alpha."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:13",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · zSTASH",
-      "text": "zSTASH\nMaker: Independent\nDesktop\nStatus: Coming soon\nAnnounced desktop wallet. No public usable release or planned capabilities are confirmed."
+      "text": "zSTASH\nDesktop wallet announced; no usable public release.\nMaker: Independent\nDesktop\nStatus: Coming soon\nAnnounced desktop wallet. No public usable release or planned capabilities are confirmed."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:14",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Zapp",
-      "text": "Zapp\nMaker: JustZappIt\nAndroid\niOS\nShielded Zcash mobile wallet. Android public app and iOS public TestFlight beta."
+      "text": "Zapp\nShielded ZEC on Android and iOS TestFlight.\nMaker: JustZappIt\nAndroid\niOS\nShielded Zcash mobile wallet. Android public app and iOS public TestFlight beta."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:15",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Gem Wallet",
-      "text": "Gem Wallet\nMaker: Gem Wallet\niOS\nAndroid\nMulti-chain self-custodial wallet; transparent (t-address) ZEC only."
+      "text": "Gem Wallet\nMulti-chain wallet with transparent ZEC only.\nMaker: Gem Wallet\niOS\nAndroid\nMulti-chain self-custodial wallet; transparent (t-address) ZEC only."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:16",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Keystone",
-      "text": "Keystone\nMaker: Keystone\nHardware\nKeystone 3 Pro with Cypherpunk firmware and a compatible Zodl or Vizor companion supports shielded ZEC."
+      "text": "Keystone\nKeystone 3 Pro: shielded ZEC with compatible firmware and wallet.\nMaker: Keystone\nHardware\nKeystone 3 Pro with Cypherpunk firmware and a compatible Zodl or Vizor companion supports shielded ZEC."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:17",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Ledger",
-      "text": "Ledger\nMaker: Ledger · Zondax\nHardware\nHardware Zcash accounts. Current shielded support depends on the model and companion and remains unverified."
+      "text": "Ledger\nHardware ZEC wallet; shielded support remains unverified.\nMaker: Ledger · Zondax\nHardware\nHardware Zcash accounts. Current shielded support depends on the model and companion and remains unverified."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:18",
       "url": "https://openzcash.org/wallets",
       "title": "wallets · Trezor",
-      "text": "Trezor\nMaker: SatoshiLabs\nHardware\nTransparent (t-address) only; no shielded support."
+      "text": "Trezor\nHardware storage for transparent ZEC; no shielded support.\nMaker: SatoshiLabs\nHardware\nTransparent (t-address) only; no shielded support."
     },
     {
       "id": "src/app/wallets/catalog-data.ts:19",
