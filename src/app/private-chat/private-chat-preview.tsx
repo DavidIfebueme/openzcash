@@ -23,6 +23,7 @@ import {
   INVITE_TTL_MS,
 } from "@/lib/private-chat/live-invite";
 import type { DirectoryConfig } from "@/lib/private-chat/directory-wire";
+import { CHAT_READY_MESSAGE, embeddedInvitation } from "@/lib/private-chat/embedding";
 import { roomUrl } from "@/lib/private-chat/discovery-room";
 import { normalizeAlias } from "@/lib/private-chat/session";
 import { ChatComposer } from "./chat-composer";
@@ -75,10 +76,12 @@ export function PrivateChatPreview({
   createTransport = createNymTransport,
   directory,
   directoryConfig = null,
+  parentOrigin = null,
 }: {
   createTransport?: typeof createNymTransport;
   directory?: PresenceService;
   directoryConfig?: DirectoryConfig | null;
+  parentOrigin?: string | null;
 }) {
   const [chat] = useState(
     () =>
@@ -118,30 +121,42 @@ export function PrivateChatPreview({
   const joinOpen = joinVisible ?? !!incomingInvite;
   const join = joinDraft ?? incomingInvite;
   const [mobileList, setMobileList] = useState(false);
-  useEffect(() => {
-    if (!incomingInvite && !incomingRoom) return;
-    // Keep the token in this tab while the person connects, but remove the
-    // shareable secret from the address bar as soon as it is captured.
-    /* eslint-disable react-hooks/set-state-in-effect -- Capture a URL fragment in memory before removing it. */
-    if (incomingRoom) {
-      setRoomDraft(incomingRoom);
+  const captureInvitation = useCallback((kind: "room" | "invite", token: string) => {
+    if (kind === "room") {
+      setRoomDraft(token);
       setRoomFromLink(true);
       setView("discover");
     } else {
       chat.selectConversation(null);
-      setJoin(incomingInvite);
+      setJoin(token);
       setJoinOpen(true);
       setInviteFromLink(true);
       setView("conversations");
       setMobileList(false);
     }
-    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [chat]);
+  useEffect(() => {
+    if (!incomingInvite && !incomingRoom) return;
+    // Capture the fragment in memory, then remove it from the address bar.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    captureInvitation(incomingRoom ? "room" : "invite", incomingRoom || incomingInvite);
     clearChatFragment();
-  }, [chat, incomingInvite, incomingRoom]);
+  }, [captureInvitation, incomingInvite, incomingRoom]);
+  useEffect(() => {
+    if (!parentOrigin || window.parent === window) return;
+    const receive = (event: MessageEvent) => {
+      const invitation = embeddedInvitation(event, window.parent, parentOrigin);
+      if (invitation) captureInvitation(invitation.kind, invitation.token);
+    };
+    window.addEventListener("message", receive);
+    // Only readiness leaves the frame; no identity, keys or chat contents.
+    window.parent.postMessage({ type: CHAT_READY_MESSAGE }, parentOrigin);
+    return () => window.removeEventListener("message", receive);
+  }, [captureInvitation, parentOrigin]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
   const draft = state.activeConversationId ? drafts[state.activeConversationId] ?? "" : "";
   const unreadCount = state.conversations.reduce((total, conversation) => total + conversation.unread, 0);
-  const origin = location ? new URL(location).origin : "";
+  const origin = parentOrigin ?? (location ? new URL(location).origin : "");
   const [copied, setCopied] = useState(false);
   const [requestBusy, setRequestBusy] = useState(false);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);

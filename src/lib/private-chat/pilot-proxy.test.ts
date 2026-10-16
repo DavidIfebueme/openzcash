@@ -13,6 +13,14 @@ function pilot() {
 }
 afterEach(()=>vi.unstubAllEnvs());
 describe("isolated pilot boundary", () => {
+  it("allows only the official portal to frame the explicit embedded entry", () => {
+    pilot();
+    const policy = (query: string) => proxy(new NextRequest("https://chat.example/private-chat" + query)).headers.get("content-security-policy");
+    expect(policy("")).toContain("frame-ancestors 'none'");
+    expect(policy("?embedded=1")).toContain("frame-ancestors https://openzcash.org;");
+    expect(policy("?embedded=https://evil.example")).toContain("frame-ancestors 'none'");
+    expect(policy("?embedded=1&parent=https://evil.example")).not.toContain("evil.example");
+  });
   it("fails closed by default and rejects an unintended origin", () => {
     vi.stubEnv("NODE_ENV","production");
     vi.stubEnv("PRIVATE_CHAT_DEPLOYMENT","");

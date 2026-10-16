@@ -7,6 +7,7 @@ import {
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { chatEnabled, pilotDeployment } from "@/lib/private-chat/deployment";
+import { chatParentOrigin } from "@/lib/private-chat/embedding";
 import { PrivateChatPreview } from "./private-chat-preview";
 
 export const metadata: Metadata = {
@@ -17,7 +18,9 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default async function PrivateChatPage() {
+export default async function PrivateChatPage({ searchParams }: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   if (!chatEnabled()) notFound();
   let directoryConfig: DirectoryConfig | null = pilotDeployment()?.directory ?? null;
   if (process.env.NODE_ENV === "development") try {
@@ -31,5 +34,6 @@ export default async function PrivateChatPage() {
   } catch {
     /* Discover stays unavailable until a Nym provider is configured. */
   }
-  return <PrivateChatPreview directoryConfig={directoryConfig} />;
+  const embedded = (await searchParams).embedded === "1";
+  return <PrivateChatPreview directoryConfig={directoryConfig} parentOrigin={embedded ? chatParentOrigin() : null} />;
 }

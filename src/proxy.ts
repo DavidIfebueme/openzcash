@@ -83,7 +83,7 @@ export function proxy(req: NextRequest) {
   headers.delete("x-nonce");
   headers.delete("Content-Security-Policy");
   const chatPolicy = chatPath
-    ? chatCsp(process.env, Buffer.from(crypto.randomUUID()).toString("base64"))
+    ? chatCsp(process.env, Buffer.from(crypto.randomUUID()).toString("base64"), req.nextUrl.searchParams.get("embedded") === "1")
     : null;
   if (chatPolicy) headers.set("Content-Security-Policy", chatPolicy);
   headers.set("x-pathname", pathname);

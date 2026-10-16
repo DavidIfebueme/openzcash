@@ -65,7 +65,7 @@ function ChatShellContent({ children }: { children: ReactNode }) {
     <div ref={shell} className={`rd-shell ${styles.shell}`} data-theme={theme} data-chat-shell="">
       <a className={styles.skip} href="#main-content">Skip to chat</a>
       <header className={styles.header}>
-        <a className={styles.brand} href={homeHref} onClick={exit} referrerPolicy="no-referrer" aria-label="Return to OpenZcash">
+        <a className={styles.brand} href={homeHref} target="_top" onClick={exit} referrerPolicy="no-referrer" aria-label="Return to OpenZcash">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logos/marks/openzcash.png" width="29" height="29" alt="" />
           <span>OpenZcash</span>
@@ -76,11 +76,11 @@ function ChatShellContent({ children }: { children: ReactNode }) {
               {theme === "light" ? <path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5 0 1 0 20.5 14.5Z" /> : <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" /></>}
             </svg>
           </button>
-          <a className={styles.exit} href={homeHref} onClick={exit} referrerPolicy="no-referrer" aria-label="Exit chat and clear session">Exit</a>
+          <a className={styles.exit} href={homeHref} target="_top" onClick={exit} referrerPolicy="no-referrer" aria-label="Exit chat and clear session">Exit</a>
         </div>
       </header>
       <main id="main-content" className={styles.main}>{children}</main>
-      {exitRequested && <ChatConfirm title="Leave this session?" description="Your alias, invites and messages will be cleared from this tab. You cannot restore them here." action="Leave & clear" onCancel={() => setExitRequested(false)} onConfirm={() => window.location.assign(homeHref)} />}
+      {exitRequested && <ChatConfirm title="Leave this session?" description="Your alias, invites and messages will be cleared from this tab. You cannot restore them here." action="Leave & clear" onCancel={() => setExitRequested(false)} onConfirm={() => { (window.top ?? window).location.href = new URL(homeHref, window.location.href).href; }} />}
     </div>
   );
 }

@@ -163,7 +163,10 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     return [
-      { source: "/:path*", headers: securityHeaders },
+      // The chat uses its scoped frame-ancestors policy; every other page
+      // retains the legacy anti-framing header as well.
+      { source: "/:path*", headers: securityHeaders.filter(header => header.key !== "X-Frame-Options") },
+      { source: "/((?!private-chat$).*)", headers: [{ key: "X-Frame-Options", value: "DENY" }] },
       {
         source: "/private-chat-nym/:path*",
         headers: [

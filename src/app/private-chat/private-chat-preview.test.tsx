@@ -65,6 +65,15 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 describe("Private Chat interface", () => {
+  it("keeps generated invitations on the branded parent address", async () => {
+    render(<PrivateChatPreview createTransport={factory} directory={directory()} parentOrigin="https://openzcash.org" />);
+    await enter();
+    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
+    await screen.findByText("Connected via Nym");
+    fireEvent.click(screen.getByRole("button", { name: "Create invite" }));
+    const link = await screen.findByLabelText("Invite link") as HTMLInputElement;
+    expect(link.value).toMatch(/^https:\/\/openzcash\.org\/private-chat#invite=/);
+  });
   it("starts unlisted and sends no directory request before Discover or explicit availability", async () => {
     const service = directory();
     render(
