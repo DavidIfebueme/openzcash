@@ -73,7 +73,7 @@ export function CrosslinkGuide() {
         <div className={styles.actions}><Source variant="primary" href={RELEASE}>Download v15</Source><button onClick={() => {
           setTab("Test guide");
           content.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-        }}>Explore the test <span aria-hidden="true">↓</span></button></div>
+        }}>Explore the test <span aria-hidden="true">↓</span></button><Source className={styles.heroRules} href={`${FORUM}/39`}>Program rules</Source></div>
       </div>
       <div className={styles.art} aria-hidden="true">
         <div className={styles.orbit} /><div className={styles.orbitInner} />
@@ -158,7 +158,7 @@ export function CrosslinkGuide() {
     </div>
 
     <div role="tabpanel" id="crosslink-panel-2" aria-labelledby="crosslink-tab-2" hidden={tab !== "Incentives"} className={styles.panel}>
-      <div className={styles.sectionHeading}><h3 id="payouts-heading">Incentive pool</h3><Source href={`${FORUM}/39`}>Program rules</Source></div>
+      <div className={styles.sectionHeading}><h3 id="payouts-heading">Incentive pool</h3></div>
       <section className={styles.paymentOverview} aria-labelledby="payouts-heading">
         <div className={styles.paymentProgress}>
           <div className={styles.paymentProgressLabel}><span className={styles.paymentTotals}><strong>{reportedPaid}</strong><span>/ 500 <small>ZEC</small></span><small>reported paid</small></span><strong className={styles.paymentPercent}>{reportedPaid / 500 * 100}<small>%</small></strong></div>
