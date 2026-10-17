@@ -25,6 +25,9 @@ const paths: Record<string, string> = {
   check: "m5 12 4 4L19 6",
 };
 function Icon({ name }: { name: string }) { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={paths[name] ?? paths.network} /></svg>; }
+function ToggleMark() {
+  return <span className={styles.toggleMark} aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M3 8h10" /><path className={styles.toggleVertical} d="M8 3v10" /></svg></span>;
+}
 function Logo({ src, className = "" }: { src: string; className?: string }) {
   // Static, locally hosted organization assets; no third-party image requests.
   // eslint-disable-next-line @next/next/no-img-element
@@ -107,7 +110,7 @@ export function CrosslinkGuide() {
           <ol className={styles.steps}>{steps.map((step, index) => <li key={step.title} data-done={done.includes(index) || undefined} data-expanded={openStep === index || undefined}>
             <div className={styles.stepHeader}>
               <label className={styles.check}><input type="checkbox" checked={done.includes(index)} onChange={() => setDone((old) => old.includes(index) ? old.filter((n) => n !== index) : [...old, index])} aria-label={`Complete step ${index + 1}: ${step.title}`} /><span aria-hidden="true">{done.includes(index) ? <Icon name="check" /> : String(index + 1).padStart(2,"0")}</span></label>
-              <button type="button" className={styles.stepButton} aria-expanded={openStep === index} aria-controls={`step-${index}`} onClick={() => setOpenStep((current) => current === index ? null : index)}>{step.title}<span aria-hidden="true">{openStep === index ? "−" : "+"}</span></button>
+              <button type="button" className={styles.stepButton} aria-expanded={openStep === index} aria-controls={`step-${index}`} onClick={() => setOpenStep((current) => current === index ? null : index)}>{step.title}<ToggleMark /></button>
             </div>
             <div id={`step-${index}`} hidden={openStep !== index} className={styles.stepBody}><p>{step.body}</p><div className={styles.verify}><Icon name="check" /><span>{step.check}</span></div><Source href={step.href}>Source instructions</Source></div>
           </li>)}</ol>
@@ -173,14 +176,14 @@ export function CrosslinkGuide() {
             <span style={{ flexGrow: round.earned }} title={`Mining & staking: ${round.earned} ZEC`}><span className={styles.linkHint}>Mining & staking: </span>{round.earned}<span className={styles.linkHint}> ZEC</span></span>
             <span style={{ flexGrow: round.discretionary }} title={`Discretionary: ${round.discretionary} ZEC`}><span className={styles.linkHint}>Discretionary: </span>{round.discretionary}<span className={styles.linkHint}> ZEC</span></span>
           </div>
-          <details className={styles.paymentNotes}><summary>Details & sources</summary><p>{round.recipients} mining and staking recipients. {round.note}</p><p>Claims closed {round.claim}.</p><div><Source href={round.source}>Payout report</Source><Source href={round.claimSource}>Claim announcement</Source></div></details>
+          <details className={styles.paymentNotes}><summary>Details & sources<ToggleMark /></summary><p>{round.recipients} mining and staking recipients. {round.note}</p><p>Claims closed {round.claim}.</p><div><Source href={round.source}>Payout report</Source><Source href={round.claimSource}>Claim announcement</Source></div></details>
         </li>)}</ol>
       </section>
       <div className={styles.roundStatus}><span><b>Round 3</b> · Reward amount and claim dates pending.</span><Source href={`${FORUM}/101`}>Follow the round</Source></div>
       <div className={styles.rewardDetails}><section><h4>Earned cTAZ counts.</h4><p>Mining and staking earnings determine the proportional reward. Simply holding faucet or transferred funds does not qualify.</p><Source href={`${FORUM}/39`}>Eligibility</Source></section><section><h4>Claims stay with Shielded Labs.</h4><p>Wait for the round’s private submission instructions. Previous claims used test-wallet viewing keys and a mainnet payout address. Never share a seed or spending key.</p><Source href={`${FORUM}/94`}>Previous claim process</Source></section></div>
       <section className={styles.historySection} aria-labelledby="history-heading">
         <div className={styles.sectionHeading}><h3 id="history-heading">Timeline</h3><Source href={FORUM}>Forum</Source></div>
-        <ol className={styles.timeline}>{history.map((event) => <li key={event.title} data-kind={event.kind}><time>{event.date}</time><details><summary><span>{event.title}</span><small>{event.kind}</small></summary><p>{event.detail}</p><Source href={event.source}>Original source</Source></details></li>)}</ol>
+        <ol className={styles.timeline}>{history.map((event) => <li key={event.title} data-kind={event.kind}><time>{event.date}</time><details><summary><span>{event.title}</span><small>{event.kind}</small><ToggleMark /></summary><p>{event.detail}</p><Source href={event.source}>Original source</Source></details></li>)}</ol>
       </section>
     </div>
     <footer className={styles.footer}><span>Curated by OpenZcash · Sources checked 17 Oct 2026</span><Source href={FORUM}>Crosslink forum</Source><Source href="https://github.com/ShieldedLabs/crosslink_monolith/releases">All releases</Source></footer>

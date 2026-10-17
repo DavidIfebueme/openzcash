@@ -38,7 +38,7 @@
 .check input:checked + span { color:#264620; background:#d6e9c8; border-color:#bbd4ad; }
 .stepButton { display:flex; width:100%; justify-content:space-between; align-items:center; gap:15px; min-height:52px; padding:9px 11px 9px 57px; border-radius:9px; font-size:15px; font-weight:500; text-align:left; }
 .stepButton:hover { background:var(--surface2); }
-.stepButton > span { color:var(--muted); font-size:19px; font-weight:400; }
+
 .stepBody { padding:0 31px 13px 57px; color:var(--ink); font-size:14px; line-height:1.7; animation:reveal .2s ease-out; }
 .stepBody b { font-weight:500; color:var(--ink); }
 .stepBody > a { display:inline-block; margin-top:12px; font-size:12px; }
@@ -117,9 +117,9 @@
 .timeline details { padding-left:7px; }
 .timeline summary { display:flex; align-items:center; justify-content:space-between; gap:16px; font-size:13px; font-weight:500; list-style:none; min-height:23px; }
 .timeline summary::-webkit-details-marker { display:none; }
-.timeline summary::after { content:"+"; font-size:17px; font-weight:400; color:var(--muted); }
-.timeline details[open] summary::after { content:"−"; }
-.timeline summary > span { flex:1; }
+
+
+.timeline summary > span:first-child { flex:1; }
 .timeline summary small { color:var(--muted); font-size:9px; font-weight:400; }
 .timeline details p { color:var(--muted); font-size:11px; line-height:1.8; margin:12px 0 8px; max-width:650px; }
 .timeline details a { font-size:10px; }
@@ -232,8 +232,8 @@
 .paymentNotes { margin-top:6px; font-size:12px; color:var(--muted); }
 .paymentNotes summary { display:flex; justify-content:space-between; align-items:center; min-height:32px; list-style:none; cursor:pointer; }
 .paymentNotes summary::-webkit-details-marker { display:none; }
-.paymentNotes summary::after { content:"+"; font-size:17px; }
-.paymentNotes[open] summary::after { content:"−"; }
+
+
 .paymentNotes summary:hover { color:var(--ink); }
 .paymentNotes p { margin:8px 0; line-height:1.6; }
 .paymentNotes > div { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
@@ -252,3 +252,13 @@
 
 .hero .heroRules { color:#eceeeb; background:rgba(255,255,255,.07); font-size:12px; }
 .hero .heroRules:hover { background:rgba(255,255,255,.13); }
+
+/* The icon belongs to the full row's hit target, with no nested click handler. */
+.toggleMark { display:grid; place-items:center; flex:0 0 32px; width:32px; height:32px; color:var(--muted); pointer-events:none; }
+.toggleMark svg { width:16px; height:16px; }
+.stepButton[aria-expanded=true] .toggleVertical,
+.paymentNotes[open] > summary .toggleVertical,
+.timeline details[open] > summary .toggleVertical { display:none; }
+.stepButton,.paymentNotes summary,.timeline summary { touch-action:manipulation; user-select:none; }
+.paymentNotes summary,.timeline summary { min-height:44px; }
+.paymentNotes summary > *,.timeline summary > * { pointer-events:none; }
