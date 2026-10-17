@@ -166,19 +166,18 @@ export function CrosslinkGuide() {
       </div>
       <div className={styles.rewardDetails}><section><h4>Earned cTAZ counts.</h4><p>Mining and staking earnings determine the proportional reward. Simply holding faucet or transferred funds does not qualify.</p><Source href={`${FORUM}/39`}>Eligibility</Source></section><section><h4>Claims stay with Shielded Labs.</h4><p>Wait for the round’s private submission instructions. Previous claims used test-wallet viewing keys and a mainnet payout address. Never share a seed or spending key.</p><Source href={`${FORUM}/94`}>Previous claim process</Source></section></div>
       <section className={styles.payoutSection} aria-labelledby="payouts-heading">
-        <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>Payment archive</p><h3 id="payouts-heading">Every round, accounted for.</h3></div><span className={styles.archiveLabel}>Reported distributions</span></div>
+        <div className={styles.sectionHeading}><h3 id="payouts-heading">Paid rounds</h3></div>
         <div className={styles.payoutGrid}>{paidRounds.map((round) => <article className={styles.payoutCard} key={round.round}>
           <div className={styles.payoutHeader}><h4>Round {round.round}</h4><span>Paid</span></div>
           <strong className={styles.payoutAmount}>{round.total} <small>ZEC</small></strong><p className={styles.reportDate}>Reported {round.reported}</p>
           <div className={styles.splitBar} aria-hidden="true"><span style={{ width: `${round.earned / round.total * 100}%` }} /></div>
           <dl className={styles.breakdown}><div><dt><i />Mining & staking</dt><dd>{round.earned} ZEC</dd></div><div><dt><i />Discretionary</dt><dd>{round.discretionary} ZEC</dd></div></dl>
-          <details><summary>Claim window & distribution details</summary><p>{round.recipients} mining and staking recipients. {round.note}</p><p>Claims closed {round.claim}.</p><Source href={round.claimSource}>Claim announcement</Source></details>
-          <Source href={round.source}>Read the payout report</Source>
+          <details><summary>Distribution details</summary><p>{round.recipients} mining and staking recipients. {round.note}</p><p>Claims closed {round.claim}.</p><Source href={round.claimSource}>Claim announcement</Source></details>
+          <Source href={round.source}>Payout report</Source>
         </article>)}</div>
       </section>
       <section className={styles.historySection} aria-labelledby="history-heading">
-        <div className={styles.sectionHeading}><div><p className={styles.eyebrow}>The full journey</p><h3 id="history-heading">Crosslink timeline.</h3></div><Source href={FORUM}>Complete forum archive</Source></div>
-        <p className={styles.historyIntro}>Program milestones, claims, payouts and network changes. Historical instructions stay attached to their original round.</p>
+        <div className={styles.sectionHeading}><h3 id="history-heading">Timeline</h3><Source href={FORUM}>Forum</Source></div>
         <ol className={styles.timeline}>{history.map((event) => <li key={event.title} data-kind={event.kind}><time>{event.date}</time><details><summary><span>{event.title}</span><small>{event.kind}</small></summary><p>{event.detail}</p><Source href={event.source}>Original source</Source></details></li>)}</ol>
       </section>
     </div>
