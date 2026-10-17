@@ -8,9 +8,9 @@ import styles from "./ongoing-test.module.css";
 
 const FORUM = "https://forum.zcashcommunity.com/t/crosslink-incentivized-feature-net/55210";
 const RELEASE = "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v15";
-const V14 = "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v14";
+const ISSUES = "https://github.com/ShieldedLabs/crosslink_monolith/issues";
 const tabIcons: OngoingTestIconName[] = ["experiment", "tools", "rewards"];
-const tabs = ["Test guide", "Community tools", "Incentives"] as const;
+const tabs = ["Participate", "Community tools", "Incentives"] as const;
 type Tab = typeof tabs[number];
 const paths: Record<string, string> = {
   network: "M12 8v8M8 6H5v12h3m8-12h3v12h-3M9 3h6v5H9zM9 16h6v5H9z",
@@ -49,23 +49,57 @@ function Source({ href, children, variant = "source", className = "" }: {
   </a>;
 }
 
+// Exact titles checked against the upstream GitHub API on 17 Oct 2026.
+// This is a curated index, not an assignment board or live issue-status feed.
+const referencedIssues = [
+  { id: 255, title: "Crash After Clicking Edit Stake Button Due to Out-of-Bounds" },
+  { id: 231, title: "Reliable height/sync status" },
+  { id: 219, title: '\"You are on an old version; please upgrade\"' },
+];
+const participationPaths: { id: "test" | "build" | "operate"; title: string; detail: string; icon: OngoingTestIconName }[] = [
+  { id: "test", title: "Test", detail: "Follow the full cycle", icon: "experiment" },
+  { id: "build", title: "Build", detail: "Find a useful contribution", icon: "tools" },
+  { id: "operate", title: "Operate", detail: "Run a finalizer", icon: "finalizer" },
+];
+
 const steps = [
   { title: "Install & back up", body: <>Download the build for your OS. Open the app and privately back up your test-wallet seed. Use cTAZ only.</>, check: "Record your OS and build.", href: RELEASE },
   { title: "Sync the network", body: <>Let the node catch up. Compare a block’s height and hash with a same-network explorer. Check that finalized height advances too.</>, check: "Matching chain. Advancing finality.", href: `${FORUM}/66` },
   { title: "Get test funds", body: <>Request cTAZ from the app’s faucet, or mine. Desktop CPU mining starts after sync by default.</>, check: "Funds arrive in your own wallet.", href: RELEASE },
   { title: "Choose a finalizer & stake", body: <>Check recent votes, then copy a finalizer’s identity. During a staking window: <b>Stake → Paste Identity → amount.</b></>, check: "Confirm the bond and destination.", href: RELEASE },
-  { title: "Change your delegation", body: <>Open <b>Edit Stake</b>, select a bond and retarget it to another finalizer. Retargeting also works outside staking windows.</>, check: "Same bond, new destination.", href: V14 },
-  { title: "Unstake & withdraw", body: <>Begin unbonding in <b>Edit Stake</b>. Once the bond is withdrawable, withdraw during an allowed window.</>, check: "Confirm the transaction and returned funds.", href: V14 },
-  { title: "Share what you found", body: <>Record version, OS, time, transaction IDs and expected versus actual behavior. Recheck after restarting. Remove secrets before reporting.</>, check: "Post reproducible results in the forum.", href: FORUM },
+  { title: "Change your delegation", body: <>Open <b>Edit Stake</b>, select a bond and retarget it to another finalizer. Retargeting also works outside staking windows.</>, check: "Same bond, new destination.", href: RELEASE },
+  { title: "Unstake & withdraw", body: <>Begin unbonding in <b>Edit Stake</b>. Once the bond is withdrawable, withdraw during an allowed window.</>, check: "Confirm the transaction and returned funds.", href: RELEASE },
+  { title: "Share what you found", body: <>Record version, OS, time, transaction IDs and expected versus actual behavior. Recheck after restarting. Remove secrets before reporting.</>, check: "Report desktop-app problems in the official issue tracker.", href: ISSUES },
 ];
 
 export function CrosslinkGuide() {
-  const [tab, setTab] = useState<Tab>("Test guide");
+  const [tab, setTab] = useState<Tab>("Participate");
   const [category, setCategory] = useState<ToolCategory>("All");
+  const [path, setPath] = useState<"test" | "build" | "operate">("test");
+  const [communityView, setCommunityView] = useState<"tools" | "issues">("tools");
   const [done, setDone] = useState<number[]>([]);
   const [openStep, setOpenStep] = useState<number | null>(0);
   const content = useRef<HTMLDivElement>(null);
   const tabButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  const pathNotes = path === "build" ? [
+    ["Check the discussion", "Read the issue and coordinate with its maintainers."],
+    ["Keep evidence useful", "Include versions, reproduction steps and expected results."],
+    ["Confirm scope", "A listed issue does not imply funding or assignment."],
+  ] : path === "operate" ? [
+    ["Same network", "Match your release and explorer network."],
+    ["Stay available", "Keep the node online and watch its participation."],
+    ["Protect your keys", "Keep wallet seeds and private keys out of reports."],
+  ] : [
+    ["Separate wallet", "Use a test wallet. Keep its seed private."],
+    ["Allow time", "Follow the app’s staking windows."],
+    ["Verify results", "Save transaction IDs. Confirm each outcome."],
+  ];
+  const nextStep = steps.findIndex((_, index) => !done.includes(index));
+  function showIssues() {
+    setCommunityView("issues"); setTab("Community tools");
+    tabButtons.current[1]?.focus();
+    content.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
+  }
   const visibleTools = communityTools.filter((tool) => category === "All" || tool.category === category);
 
   return <>
@@ -74,9 +108,9 @@ export function CrosslinkGuide() {
         <Source className={styles.brand} variant="brand" href="https://shieldedlabs.net/"><Logo src="/logos/shielded-labs.png" /><span>Shielded Labs</span></Source>
         <div className={styles.heroTitle}><h2 id="crosslink-title">Crosslink<span>.</span></h2><p>Help shape the next layer of Zcash.</p></div>
         <div className={styles.actions}><Source variant="primary" href={RELEASE}>Download v15</Source><button onClick={() => {
-          setTab("Test guide");
+          setTab("Participate"); setPath("test");
           content.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-        }}>Explore the test <span aria-hidden="true">↓</span></button><Source className={styles.heroRules} href={`${FORUM}/39`}>Program rules</Source></div>
+        }} className={styles.internalLink}><span>Start testing</span><span className={styles.linkArrow}><Icon name="arrow" /></span></button><Source className={styles.heroRules} href={`${FORUM}/39`}>Program rules</Source></div>
       </div>
       <div className={styles.art} aria-hidden="true">
         <div className={styles.orbit} /><div className={styles.orbitInner} />
@@ -102,36 +136,58 @@ export function CrosslinkGuide() {
       </div>
     </div>
 
-    <div role="tabpanel" id="crosslink-panel-0" aria-labelledby="crosslink-tab-0" hidden={tab !== "Test guide"} className={styles.panel}>
+    <div role="tabpanel" id="crosslink-panel-0" aria-labelledby="crosslink-tab-0" hidden={tab !== "Participate"} className={styles.panel}>
+      <p className={styles.curationNote}>Guide curated by OpenZcash · Instructions linked below.</p>
+      <div className={styles.participationPaths} role="group" aria-label="Choose how to contribute">
+        {participationPaths.map((item) => <button type="button" key={item.id} aria-pressed={path === item.id} onClick={() => setPath(item.id)}>{item.title}</button>)}
+      </div>
       <div className={styles.guideGrid}>
-        <section className={styles.guide} aria-labelledby="guide-heading">
-          <div className={styles.sectionHeading}><h3 id="guide-heading" className={styles.guideEyebrow}>Start here</h3><span className={styles.count} aria-live="polite">{done.length}<span> / 07</span></span></div>
+        <section className={styles.guide} aria-labelledby={path === "test" ? "guide-heading" : "path-heading"}>
+          {path === "test" ? <>
+
+          <h3 id="guide-heading" className={styles.linkHint}>Testing checklist</h3>
           <progress className={styles.progress} max={steps.length} value={done.length} aria-label="Checklist progress" />
-          <ol className={styles.steps}>{steps.map((step, index) => <li key={step.title} data-done={done.includes(index) || undefined} data-expanded={openStep === index || undefined}>
+          <ol className={styles.steps}>{steps.map((step, index) => <li key={step.title} data-done={done.includes(index) || undefined} data-next={index === nextStep || undefined} data-expanded={openStep === index || undefined}>
             <div className={styles.stepHeader}>
               <label className={styles.check}><input type="checkbox" checked={done.includes(index)} onChange={() => setDone((old) => old.includes(index) ? old.filter((n) => n !== index) : [...old, index])} aria-label={`Complete step ${index + 1}: ${step.title}`} /><span aria-hidden="true">{done.includes(index) ? <Icon name="check" /> : String(index + 1).padStart(2,"0")}</span></label>
               <button type="button" className={styles.stepButton} aria-expanded={openStep === index} aria-controls={`step-${index}`} onClick={() => setOpenStep((current) => current === index ? null : index)}>{step.title}<ToggleMark /></button>
             </div>
             <div id={`step-${index}`} hidden={openStep !== index} className={styles.stepBody}><p>{step.body}</p><div className={styles.verify}><Icon name="check" /><span>{step.check}</span></div><Source href={step.href}>Source instructions</Source></div>
           </li>)}</ol>
-          <div className={styles.progressFoot}><span>{done.length === 7 ? "Cycle complete. Share your findings." : "Check off verified steps. Progress is for this visit."}</span>{done.length > 0 && <button onClick={() => setDone([])}>Reset</button>}</div>
+          <div className={styles.progressFoot}><span>{done.length === 7 ? "Cycle complete." : "Progress saved for this visit."}</span>{done.length > 0 && <button onClick={() => setDone([])}>Reset</button>}</div>
+          </> : path === "build" ? <div className={styles.pathContent}>
+            <div className={styles.sectionHeading}><h3 id="path-heading">Development resources</h3></div>
+            <p>Official repository and issue tracker, alongside tools shared by the community.</p>
+            <div className={styles.resourceRows}>
+              <div><h4>Shielded Labs repository</h4><Source href="https://github.com/ShieldedLabs/crosslink_monolith">Source code</Source></div>
+              <div><h4>Selected public issues</h4><button type="button" className={styles.internalLink} onClick={showIssues}><span>Issues &amp; discussions</span><span className={styles.linkArrow}><Icon name="arrow" /></span></button></div>
+              <div><h4>Community projects</h4><button type="button" className={styles.internalLink} onClick={() => { setTab("Community tools"); setCommunityView("tools"); tabButtons.current[1]?.focus(); }}><span>Browse tools</span><span className={styles.linkArrow}><Icon name="arrow" /></span></button></div>
+            </div>
+          </div> : <div className={styles.pathContent}>
+            <div className={styles.sectionHeading}><h3 id="path-heading">Prepare your finalizer.</h3></div>
+            <p>Use the release instructions for your network. Keep your node online and verify its participation.</p>
+            <ol className={styles.pathSteps}>
+              <li><span>01</span><div><h4>Confirm the release</h4><p>Check your build and network before following operator instructions.</p><Source href={RELEASE}>v15 release notes</Source></div></li>
+              <li><span>02</span><div><h4>Set up your identity</h4><p>Review the documented delegation and finalizer setup.</p><Source href={RELEASE}>v15 finalizer instructions</Source></div></li>
+              <li><span>03</span><div><h4>Observe participation</h4><p>Check roster membership, recent votes and advancing finality with same-network tools.</p><Source href="https://ctaz.cash/">Network diagnostics</Source></div></li>
+            </ol>
+            <p className={styles.directoryNote}>OpenZcash summary of the linked v15 instructions. Follow the documentation for the release you run.</p>
+          </div>}
         </section>
         <aside className={styles.guideAside} aria-labelledby="test-essentials-heading">
           <section className={styles.startNote}>
             <div className={styles.noteHeader}>
               <span className={styles.miniIcon}><OngoingTestIcon name="shield" /></span>
-              <div><h3 id="test-essentials-heading">Before you start</h3><p>Desktop app · cTAZ only</p></div>
+              <div><h3 id="test-essentials-heading">{path === "build" ? "Before contributing" : "Before you start"}</h3><p>{path === "build" ? "Work with the maintainers" : "Desktop app · cTAZ only"}</p></div>
             </div>
             <ul className={styles.noteRules}>
-              <li className={styles.noteRule}><span aria-hidden="true">01</span><div><h4>Separate wallet</h4><p>Use a test wallet. Keep its seed private.</p></div></li>
-              <li className={styles.noteRule}><span aria-hidden="true">02</span><div><h4>Allow time</h4><p>Follow the app’s staking windows.</p></div></li>
-              <li className={styles.noteRule}><span aria-hidden="true">03</span><div><h4>Verify results</h4><p>Save transaction IDs. Confirm each outcome.</p></div></li>
+              {pathNotes.map(([title, description], index) => <li key={title} className={styles.noteRule}><span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span><div><h4>{title}</h4><p>{description}</p></div></li>)}
             </ul>
           </section>
-          <div className={styles.asideOptions}>
+          <div className={styles.asideOptions} hidden={path !== "test"}>
             <details className={styles.compactDetail}>
               <summary><span className={styles.optionIcon}><OngoingTestIcon name="finalizer" /></span><span>Running a finalizer?</span><span className={styles.disclosureArrow}><Icon name="chevron" /></span></summary>
-              <div className={styles.optionBody}><p>Delegate to your own desktop identity and keep the node online. Verify active-roster membership and votes; the v14 network limits its active roster to 12.</p><Source href={V14}>Operator instructions</Source></div>
+              <div className={styles.optionBody}><p>The v15 instructions describe copying your desktop finalizer identity and staking to it during a Staking Day. A finalizer must be online to participate.</p><Source href={RELEASE}>v15 finalizer instructions</Source></div>
             </details>
             <details className={styles.compactDetail}>
               <summary><span className={styles.optionIcon}><OngoingTestIcon name="phone" /></span><span>Using a phone?</span><span className={styles.disclosureArrow}><Icon name="chevron" /></span></summary>
@@ -140,16 +196,21 @@ export function CrosslinkGuide() {
           </div>
           <button type="button" className={styles.asideLink} onClick={() => {
             setTab("Community tools");
-            setCategory("All");
+            setCategory("All"); setCommunityView("tools");
             tabButtons.current[1]?.focus();
             content.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
-          }}><span className={styles.optionIcon}><OngoingTestIcon name="tools" /></span><span>Explore community tools</span><span className={styles.disclosureArrow}><Icon name="arrow" /></span></button>
+          }}><span className={styles.optionIcon}><OngoingTestIcon name="tools" /></span><span>Explore community tools</span><span className={styles.linkArrow}><Icon name="arrow" /></span></button>
         </aside>
       </div>
     </div>
 
     <div role="tabpanel" id="crosslink-panel-1" aria-labelledby="crosslink-tab-1" hidden={tab !== "Community tools"} className={styles.panel}>
       <div className={styles.sectionHeading}><h3>Community tools</h3><Source href={FORUM}>Join the conversation</Source></div>
+      <div className={styles.communityViews} role="group" aria-label="Community resources">
+        <button type="button" aria-pressed={communityView === "tools"} onClick={() => setCommunityView("tools")}><Icon name="database" />Tools <span>{communityTools.length}</span></button>
+        <button type="button" aria-pressed={communityView === "issues"} onClick={() => setCommunityView("issues")}><Icon name="terminal" />Issues &amp; discussions <span>{referencedIssues.length}</span></button>
+      </div>
+      {communityView === "tools" ? <>
       <div className={styles.filters} role="group" aria-label="Filter community tools">{categories.map((item) => <button type="button" key={item} aria-pressed={category === item} onClick={() => setCategory(item)}>{item}</button>)}</div>
       <p className={styles.results} aria-live="polite">{visibleTools.length} resources · Confirm network compatibility in the project’s notes.</p>
       <div className={styles.toolGrid}>{visibleTools.map((tool) => <article className={styles.toolCard} key={tool.name}>
@@ -158,6 +219,14 @@ export function CrosslinkGuide() {
         <details><summary>Notes & source</summary><span className={styles.toolType}>{tool.category}</span><p>{tool.note}</p><Source href={tool.source}>Original contribution</Source></details>
       </article>)}</div>
       <p className={styles.directoryNote}>Public resources located in the forum and linked projects. Listing does not imply current-network support or endorsement.</p>
+      </> : <>
+        <p className={styles.results}>Selected by OpenZcash · Original GitHub titles. Check the source for current status.</p>
+        <div className={styles.referencedIssues}>{referencedIssues.map((issue) => <article key={issue.id}>
+          <span className={styles.taskNumber}>#{issue.id}</span>
+          <h4><Source variant="tool" href={`${ISSUES}/${issue.id}`}>{issue.title}</Source></h4>
+        </article>)}</div>
+        <div className={styles.taskFooter}><p className={styles.directoryNote}>Curated references · No assignment or funding implied.</p><Source href={ISSUES}>All issues</Source><Source href={FORUM}>Forum discussion</Source></div>
+      </>}
     </div>
 
     <div role="tabpanel" id="crosslink-panel-2" aria-labelledby="crosslink-tab-2" hidden={tab !== "Incentives"} className={styles.panel}>

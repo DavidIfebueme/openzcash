@@ -24,6 +24,10 @@ export function TopBarPlace({ place }: { place: Place | undefined }) {
   }
   const { level, app, over, title } = header;
   const mark = <AppMark app={app} size={PHONE_MARK_SIZE} />;
+  const overContent = <>
+    {level === "page" ? <span className="rd-place-mark">{mark}</span> : null}
+    <span className="rd-place-over-label">{over?.label}</span>
+  </>;
   return (
     // The level sizes the touch targets, the app singles out a mark (mobile-shell.css).
     <nav
@@ -39,14 +43,11 @@ export function TopBarPlace({ place }: { place: Place | undefined }) {
         </Link>
       ) : null}
       {level === "app" ? <span className="rd-place-mark">{mark}</span> : null}
-      {over ? (
-        <Link href={over.href} className="rd-place-over">
-          {level === "page" ? (
-            <span className="rd-place-mark">{mark}</span>
-          ) : null}
-          <span className="rd-place-over-label">{over.label}</span>
-        </Link>
-      ) : null}
+      {over ? (over.href ? (
+        <Link href={over.href} className="rd-place-over">{overContent}</Link>
+      ) : (
+        <span className="rd-place-over">{overContent}</span>
+      )) : null}
       <span className="rd-place-name">{title}</span>
     </nav>
   );

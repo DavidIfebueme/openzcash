@@ -118,8 +118,17 @@ describe("phoneHeaderOf", () => {
     const hrefs = APPS.flatMap((app) => [app.href, ...app.pages.map((page) => page.href)]);
     for (const href of [...hrefs, "/zcg/grant", "/ecosystem/history/zaino"]) {
       const header = phoneHeaderOf(placeOf(href));
-      if (header?.over) expect(header.over, href).toEqual(backOf(href));
+      if (header?.over?.href) expect(header.over, href).toEqual(backOf(href));
     }
+  });
+
+  it("keeps Ongoing Test as an unlinked category above Crosslink", () => {
+    const header = phoneHeaderOf(placeOf("/ongoing-test/crosslink"));
+    expect(header?.over).not.toHaveProperty("href");
+    expect(header).toMatchObject({
+      title: "Crosslink",
+      over: { label: "Ongoing Test" },
+    });
   });
 
   it("does not change the place it reads", () => {

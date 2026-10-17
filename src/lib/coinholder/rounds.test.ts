@@ -199,7 +199,8 @@ describe("Program navigation", () => {
     expect(overviewEntry(app("zcg"))).toMatchObject({ href: "/zcg", label: "Overview" });
     // An app without inner pages is its own page: nothing to list.
     expect(overviewEntry(app("news"))).toBeNull();
-    for (const a of APPS.filter((x) => x.pages.length))
+    expect(overviewEntry(app("ongoing-test"))).toBeNull();
+    for (const a of APPS.filter((x) => x.pages.length && !x.navigationOnly))
       expect(overviewEntry(a) !== null || a.pages.some((p) => p.href === a.href), a.id).toBe(true);
   });
   it("places the overview, results, fund and copilot inside the program", () => {

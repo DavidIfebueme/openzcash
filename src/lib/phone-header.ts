@@ -18,8 +18,8 @@ export type PhoneHeader = {
   level: "app" | "page" | "detail";
   /** The app the route belongs to; its mark is drawn beside the names. */
   app: AppDef;
-  /** The quiet first line, one step up the trail. None on a top-level app's landing page. */
-  over?: { label: string; href: string };
+  /** The quiet first line, one step up the trail. None on a top-level app's landing page. Navigation-only categories have no link. */
+  over?: { label: string; href?: string };
   /** The page the visitor is on. */
   title: string;
 };
@@ -46,7 +46,7 @@ export function phoneHeaderOf(
     return {
       level: "page",
       app,
-      over: { label: app.label, href: app.href },
+      over: app.navigationOnly ? { label: app.label } : { label: app.label, href: app.href },
       title: page.label,
     };
   }
