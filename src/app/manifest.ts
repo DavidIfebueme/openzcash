@@ -17,19 +17,19 @@ export default function manifest(): MetadataRoute.Manifest {
     theme_color: "#faf8f4",
     icons: [
       {
-        src: "/icons/icon-192.png",
+        src: "/icons/openzcash-v2-192.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/icon-512.png",
+        src: "/icons/openzcash-v2-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/icon-maskable-512.png",
+        src: "/icons/openzcash-v2-maskable-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

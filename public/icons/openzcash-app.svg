@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="OpenZcash">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#32322e"/><stop offset=".5" stop-color="#171815"/><stop offset="1" stop-color="#0c0e0b"/>
+    </linearGradient>
+    <linearGradient id="gold" x1=".15" y1="0" x2=".85" y2="1">
+      <stop stop-color="#ffe39a"/><stop offset=".45" stop-color="#f4bc43"/><stop offset="1" stop-color="#ca8c24"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#fff2c8" stop-opacity=".7"/><stop offset=".5" stop-color="#f4bc43" stop-opacity=".12"/><stop offset="1" stop-color="#efc66f" stop-opacity=".3"/>
+    </linearGradient>
+  </defs>
+  <!-- Opaque, full-bleed tile; the phone supplies its own corner mask. -->
+  <path fill="url(#tile)" d="M0 0h512v512H0z"/>
+  <!-- Essential artwork stays inside the maskable 40% radius safe zone. -->
+  <circle cx="256" cy="261" r="179" fill="#070906" opacity=".4"/>
+  <circle cx="256" cy="256" r="188" fill="none" stroke="url(#rim)" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="176" fill="url(#gold)"/>
+  <circle cx="256" cy="256" r="175" fill="none" stroke="#fff2c8" stroke-opacity=".45" stroke-width="2"/>
+  <!-- Original Zcash glyph geometry, optically centered and enlarged. -->
+  <g transform="translate(256 256) scale(.72) translate(-540 -540)">
+    <path fill="#171914" d="M636.31 414.7v41.09l-114.28 155h114.28v54.5h-73.67v45.16h-45.28v-45.16h-73.67V624.2l114.16-155H443.69v-54.5h73.67v-45.28h45.28v45.28h73.67Z"/>
+  </g>
+</svg>
