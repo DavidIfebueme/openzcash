@@ -3,7 +3,7 @@
 ## UI-01 — Padronizar botões de links externos em todo o sistema
 
 **Estado:** planejado. Padrão visual aprovado em 17 de outubro de 2026.
-**Referência aprovada:** links externos da página Ongoing Test / Crosslink (`/ongoing-test`).
+**Referência aprovada:** links externos da página Ongoing Test / Crosslink (`/ongoing-test/crosslink`).
 **Implementação atual:** somente a referência local do Crosslink; a adoção global fica para uma próxima entrega.
 
 ### Escopo aprovado

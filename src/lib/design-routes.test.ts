@@ -4,6 +4,7 @@ import {
   backOf,
   childAppsOf,
   overviewEntry,
+  paletteEntries,
   parentAppOf,
   placeOf,
   type AppDef,
@@ -128,4 +129,16 @@ it("makes the finder the Wallets page directly under Ecosystem", () => {
   expect(backOf("/wallets/find")).toEqual({ href: "/ecosystem", label: "Ecosystem" });
   expect(placeOf("/wallets/find")?.page?.label).toBe("Wallets");
   expect(placeOf("/wallets/find")?.detail).toBeUndefined();
+});
+
+it("keeps Crosslink under a project-specific route without a duplicate category destination", () => {
+  const category = appOf("ongoing-test");
+  expect(placeOf("/ongoing-test/crosslink")).toMatchObject({
+    app: { id: "ongoing-test" }, page: { label: "Crosslink" },
+  });
+  expect(overviewEntry(category)).toBeNull();
+  expect(paletteEntries(category)).toEqual([
+    expect.objectContaining({ href: "/ongoing-test/crosslink", label: "Crosslink" }),
+  ]);
+  expect(backOf("/ongoing-test/crosslink")).toEqual({ href: "/zcg", label: "ZCG" });
 });

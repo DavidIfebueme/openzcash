@@ -161,7 +161,7 @@ export function CrosslinkGuide() {
       <div className={styles.sectionHeading}><h3 id="payouts-heading">Incentive pool</h3><Source href={`${FORUM}/39`}>Program rules</Source></div>
       <section className={styles.paymentOverview} aria-labelledby="payouts-heading">
         <div className={styles.paymentProgress}>
-          <div className={styles.paymentProgressLabel}><span><strong>{reportedPaid}</strong> / 500 ZEC reported paid</span><span>{reportedPaid / 500 * 100}%</span></div>
+          <div className={styles.paymentProgressLabel}><span className={styles.paymentTotals}><strong>{reportedPaid}</strong><span>/ 500 <small>ZEC</small></span><small>reported paid</small></span><strong className={styles.paymentPercent}>{reportedPaid / 500 * 100}<small>%</small></strong></div>
           <div className={styles.paymentTrack} role="progressbar" aria-label="Reported payments from the program allocation" aria-valuemin={0} aria-valuemax={500} aria-valuenow={reportedPaid} aria-valuetext={`${reportedPaid} of 500 ZEC reported paid`}>
             {paidRounds.map((round) => <span key={round.round} style={{ width: `${round.total / 500 * 100}%` }} />)}
           </div>

@@ -41,6 +41,8 @@ export type AppDef = {
   pages: AppPage[];
   /** Reading order for inner pages and grouped child apps. */
   navigationOrder?: string[];
+  /** Grouping without a standalone overview; only its project pages are listed. */
+  navigationOnly?: boolean;
   /** Expanded in the sidebar by default (the visitor can still collapse it). */
   open?: boolean;
   /** Share of every block reward that funds the app, shown beside its name. */
@@ -155,7 +157,7 @@ export const APPS: AppDef[] = [
   { id: "zec-observatory", label: "ZEC Observatory", href: "/zec-observatory", sub: "Markets, DeFi liquidity & holdings", icon: "chart", pages: [] },
   { id: "legal", label: "Privacy & Policy", href: "/legal", sub: "Rights, regulation & public debate", icon: "balance", pages: [{ href: "/legal", label: "Updates" }] },
   { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
-  { id: "ongoing-test", label: "Ongoing Test", href: "/ongoing-test", sub: "Hands-on ecosystem tests and incentives", icon: "experiment", open: true, pages: [{ href: "/ongoing-test", label: "Crosslink", brandLogo: "/logos/shielded-labs.png" }] },
+  { id: "ongoing-test", label: "Ongoing Test", href: "/ongoing-test", sub: "Hands-on ecosystem tests and incentives", icon: "experiment", open: true, navigationOnly: true, pages: [{ href: "/ongoing-test/crosslink", label: "Crosslink", brandLogo: "/logos/shielded-labs.png" }] },
   { id: "private-chat", label: "Private Chat", href: "/private-chat", sub: "Private conversations via Nym · Experimental pilot", icon: "private-chat", pages: [] },
   { id: "lockbox", label: "Lockbox", href: "/lockbox", sub: "Live funding", logo: "/logos/marks/lockbox.png", icon: "shield", pages: [], hidden: true },
   { id: "arborist", parentId: "ecosystem", parentGroup: "pages", label: "Arborist Calls", href: "/arborist", sub: "Protocol call archive", logo: "/logos/arborist.png", icon: "sigma", pages: [] },
@@ -277,7 +279,7 @@ export function backOf(pathname: string): { href: string; label: string } {
   const place = placeOf(pathname);
   if (!place) return { href: "/zcg", label: "ZCG" };
   if (place.detail) return { href: place.detail.parent.href, label: place.detail.parent.label };
-  if (place.page) return { href: place.app.href, label: place.app.label };
+  if (place.page && !place.app.navigationOnly) return { href: place.app.href, label: place.app.label };
   const parent = parentAppOf(place.app);
   if (parent) return { href: parent.href, label: parent.label };
   return { href: "/zcg", label: "ZCG" };
@@ -290,14 +292,14 @@ export function backOf(pathname: string): { href: string; label: string } {
  * (unless one of the pages already is the landing page).
  */
 export function overviewEntry(app: AppDef): AppPage | null {
-  if (!app.pages.length || app.pages.some((p) => p.href === app.href)) return null;
+  if (app.navigationOnly || !app.pages.length || app.pages.some((p) => p.href === app.href)) return null;
   return { href: app.href, label: "Overview", mark: "/logos/glyphs/overview.png" };
 }
 
 export function paletteEntries(app: AppDef): { href: string; label: string }[] {
   const landingIsPage = app.pages.some((p) => p.href === app.href);
   return [
-    ...(landingIsPage ? [] : [{ href: app.href, label: app.pages.length ? "Overview" : app.label }]),
+    ...(landingIsPage || app.navigationOnly ? [] : [{ href: app.href, label: app.pages.length ? "Overview" : app.label }]),
     ...app.pages.filter((p) => !p.hidden || p.palette),
   ];
 }
@@ -308,7 +310,7 @@ export const DESIGN_GROUPS = APPS.map((app) => ({
   description: app.sub,
   admin: app.admin ?? false,
   routes: [
-    ...(app.pages.some((p) => p.href === app.href) ? [] : [[app.href, app.pages.length ? "Overview" : app.label] as [string, string]]),
+    ...(app.navigationOnly || app.pages.some((p) => p.href === app.href) ? [] : [[app.href, app.pages.length ? "Overview" : app.label] as [string, string]]),
     ...app.pages.map((p) => [p.href, p.label] as [string, string]),
   ],
 }));

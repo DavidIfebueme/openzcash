@@ -243,3 +243,9 @@
 .roundStatus { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; margin-top:14px; padding:10px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); color:var(--muted); font-size:12px; }
 .roundStatus b { color:var(--ink); font-weight:600; }
 .roundStatus .sourceLink { background:transparent; }
+
+.paymentTotals { display:flex; align-items:baseline; flex-wrap:wrap; gap:6px; font-size:28px; line-height:1.2; color:var(--ink); }
+.paymentTotals > strong { font-size:34px; line-height:1.1; font-weight:500; }
+.paymentTotals small { font-size:12px; font-weight:400; color:var(--muted); }
+.paymentProgressLabel .paymentPercent { font-size:28px; line-height:1.2; font-weight:500; white-space:nowrap; }
+.paymentPercent small { font-size:18px; }

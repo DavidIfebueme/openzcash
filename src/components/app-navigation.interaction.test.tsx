@@ -60,7 +60,7 @@ describe("Ongoing Test navigation", () => {
     const onVisit = vi.fn();
     const { container, getByRole, queryByRole } = render(<Navigation compact onVisit={onVisit} />);
     const crosslink = getByRole("link", { name: "Crosslink" });
-    expect(crosslink.getAttribute("href")).toBe("/ongoing-test");
+    expect(crosslink.getAttribute("href")).toBe("/ongoing-test/crosslink");
     expect(crosslink.querySelector("img")?.getAttribute("src")).toBe("/logos/shielded-labs.png");
     fireEvent.click(getByRole("button", { name: "Collapse Ongoing Test" }));
     expect(queryByRole("link", { name: "Crosslink" })).toBeNull();
