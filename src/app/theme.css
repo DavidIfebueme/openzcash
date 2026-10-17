@@ -2800,7 +2800,7 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 /* Ongoing Test is a compact disclosure, with its destination on a distinct row. */
 .rd-side-app[data-test-category] { margin-top:10px; padding-top:10px; border-top-color:var(--line-strong); }
 .rd-test-category-trigger { width:100%; min-height:38px; gap:9px; background:transparent; text-align:left; cursor:pointer; font-weight:600; }
-.rd-test-category-icon { width:23px; height:23px; flex-shrink:0; }
+.rd-test-category-icon { width:18px; height:18px; flex-shrink:0; }
 .rd-test-category-trigger > svg:last-child { margin-left:auto; color:var(--side-ink); transition:transform .15s; }
 .rd-test-category-trigger[aria-expanded=true] > svg:last-child { transform:rotate(90deg); }
 .rd-side-app[data-test-category] > .rd-side-pages { margin:3px 0 2px 22px; padding:0 0 0 10px; border-left:1px solid var(--line-strong); }
