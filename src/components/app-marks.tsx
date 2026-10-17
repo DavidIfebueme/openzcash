@@ -5,6 +5,7 @@
  * the sidebar and the ⌘K palette.
  */
 import type { ComponentType } from "react";
+import { OngoingTestIcon } from "./ongoing-test-icons";
 import { ZarvisMark } from "./zarvis/zarvis-mark";
 import { NetworkIcon } from "@/app/zcash-network/network-icons";
 import type { AppDef } from "@/lib/design-routes";
@@ -42,6 +43,7 @@ type IconType = ComponentType<{ className?: string }>;
 /** Line icons by key (apps without a logo) and by route (inner pages). */
 const ICON_BY_KEY: Record<string, IconType> = {
   "private-chat": IconPrivateChat,
+  experiment: (props) => <OngoingTestIcon name="experiment" {...props} />,
   network: (props) => <NetworkIcon name="network" {...props} />,
   zarvis: ZarvisMark,
   book: IconBook,

@@ -1,4 +1,5 @@
 "use client";
+import { OngoingTestIcon } from "./ongoing-test-icons";
 import Link from "next/link";
 import { type AppDef, type Place, childAppsOf, overviewEntry } from "@/lib/design-routes";
 import { AppMark, GLYPH, Glyph, PageMark } from "./app-marks";
@@ -12,11 +13,13 @@ type Props = {
   compact: boolean;
   onToggle: (id: string, fallbackOpen: boolean) => void;
   onOpen: (id: string) => void;
+  onVisit?: () => void;
 };
 
 /** The desktop sidebar and phone Apps drawer share one hierarchy. */
-export function AppNavigation({ apps, place, counts, openApps, compact, onToggle, onOpen }: Props) {
+export function AppNavigation({ apps, place, counts, openApps, compact, onToggle, onOpen, onVisit }: Props) {
   function renderApp(app: AppDef, nested = false) {
+    const isTestCategory = app.id === "ongoing-test";
     const isZcg = app.id === "zcg";
     const isPrivateChat = app.id === "private-chat";
     // The chat opens its own document, outside the portal's session and scripts.
@@ -48,9 +51,16 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
     const groupId = `${app.id}:organizations`;
     const groupOpen = openApps[groupId] ?? containsCurrentOrganization;
     return (
-      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined} data-separated={isPrivateChat || undefined}>
+      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined} data-test-category={isTestCategory || undefined} data-separated={app.id === "ongoing-test" || isPrivateChat || undefined}>
         <div className="rd-side-app-row">
-          <HeaderLink
+          {isTestCategory ? <button
+            type="button"
+            className="rd-side-item rd-test-category-trigger"
+            aria-expanded={open}
+            aria-controls={open ? `nav-${app.id}` : undefined}
+            aria-label={`${open ? "Collapse" : "Expand"} ${app.label}`}
+            onClick={() => onToggle(app.id, fallbackOpen)}
+          ><OngoingTestIcon name="experiment" className="rd-test-category-icon" /><span className="rd-side-label">{app.label}</span><Glyph d={GLYPH.chevron} size={12} /></button> : <HeaderLink
             href={isZcg ? "/zcg/participate" : app.href}
             rel={isPrivateChat ? "noreferrer" : undefined}
             className="rd-side-item"
@@ -74,8 +84,8 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
               </small>
             ) : null}
             {showCounts && counts[app.href] ? <small className="tnum">{counts[app.href]}</small> : null}
-          </HeaderLink>
-          {expandable ? (
+          </HeaderLink>}
+          {expandable && !isTestCategory ? (
             <button
               type="button"
               className="rd-side-toggle"
@@ -122,11 +132,18 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
               return <Link
                 key={page.href}
                 href={page.href}
+                onClick={(event) => {
+                  if (!event.defaultPrevented && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) onVisit?.();
+                }}
                 className="rd-side-item rd-side-page"
                 aria-current={place?.page?.href === page.href || place?.detail?.parent.href === page.href || (appActive && page.href === app.href) ? "page" : undefined}
               >
-                <PageMark mark={page.mark} href={page.href} />
+                {!page.brandLogo && <PageMark mark={page.mark} href={page.href} />}
                 <span className="rd-side-label">{page.label}</span>
+                {page.brandLogo ? <span className="rd-side-page-brand" aria-hidden="true">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={page.brandLogo} alt="" width={17} height={19} />
+                </span> : null}
                 {showCounts && counts[page.href] ? <small className="tnum">{counts[page.href]}</small> : null}
               </Link>;
             })}

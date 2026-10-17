@@ -255,6 +255,7 @@ export function AppShell({
             compact={compact}
             onToggle={toggleApp}
             onOpen={openApp}
+            onVisit={() => setNavOpen(false)}
           />
         </nav>
         <div className="rd-side-foot">

@@ -1,5 +1,7 @@
 # Redesign do OpenZcash — escopo, regras e estado
 
+Planejamento incremental: [roadmap de interface](../roadmap-ui.md) — padronização futura dos botões de links externos aprovada em 17/10/2026.
+
 Registro histórico: as rotas administrativas listadas neste plano e em
 `route-coverage.json` foram desativadas depois da revisão. Consulte o
 `README.md` da raiz para o modelo de segurança atual.

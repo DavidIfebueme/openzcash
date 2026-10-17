@@ -1,22 +1,23 @@
 // @vitest-environment jsdom
 import { useState } from "react";
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { APPS, placeOf } from "@/lib/design-routes";
 import { AppNavigation } from "./app-navigation";
 
 afterEach(cleanup);
 
-function Navigation({ compact }: { compact: boolean }) {
+function Navigation({ compact, onVisit }: { compact: boolean; onVisit?: () => void }) {
   const [openApps, setOpenApps] = useState<Record<string, boolean>>({});
   return (
-    <div onClickCapture={compact ? undefined : (event) => event.preventDefault()}>
+    <div onClick={(event) => event.preventDefault()} onClickCapture={compact ? undefined : (event) => event.preventDefault()}>
       <AppNavigation
         apps={APPS.filter((app) => !app.hidden)}
         place={placeOf("/zcash-network")}
         counts={{}}
         openApps={openApps}
         compact={compact}
+        onVisit={onVisit}
         onOpen={(id) => setOpenApps((current) => ({ ...current, [id]: true }))}
         onToggle={(id, fallbackOpen) => setOpenApps((current) => ({ ...current, [id]: !(current[id] ?? fallbackOpen) }))}
       />
@@ -50,5 +51,23 @@ describe("ZCG navigation", () => {
     expect(pages).not.toBeNull();
     expect(within(pages!).getByRole("link", { name: "Participate" })).toBeTruthy();
     expect(title?.getAttribute("aria-expanded")).toBe("true");
+  });
+});
+
+
+describe("Ongoing Test navigation", () => {
+  it("toggles the category without navigation and dismisses the drawer on a page selection", () => {
+    const onVisit = vi.fn();
+    const { container, getByRole, queryByRole } = render(<Navigation compact onVisit={onVisit} />);
+    const crosslink = getByRole("link", { name: "Crosslink" });
+    expect(crosslink.getAttribute("href")).toBe("/ongoing-test");
+    expect(crosslink.querySelector("img")?.getAttribute("src")).toBe("/logos/shielded-labs.png");
+    fireEvent.click(getByRole("button", { name: "Collapse Ongoing Test" }));
+    expect(queryByRole("link", { name: "Crosslink" })).toBeNull();
+    expect(onVisit).not.toHaveBeenCalled();
+    fireEvent.click(getByRole("button", { name: "Expand Ongoing Test" }));
+    fireEvent.click(getByRole("link", { name: "Crosslink" }));
+    expect(onVisit).toHaveBeenCalledOnce();
+    expect(container.querySelector("#nav-ongoing-test")).not.toBeNull();
   });
 });
