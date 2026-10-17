@@ -95,7 +95,7 @@
 .toolCard details p { margin:8px 0; }
 .toolType { display:block; font-size:11px; color:var(--muted); margin-top:8px; }
 .rewardGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:15px; }
-.rewardCard { border:1px solid var(--line); border-radius:13px; padding:20px; background:var(--surface); }
+.rewardCard { border:1px solid var(--line); border-radius:13px; padding:14px 16px; background:var(--surface); }
 .rewardCard > strong { display:block; font-size:49px; font-weight:400; line-height:1.25; letter-spacing:-.055em; margin:14px 0; }
 .rewardCard small { font-size:15px; color:var(--muted); letter-spacing:0; }
 .rewardCard p { font-size:11px; color:var(--muted); line-height:1.75; margin-bottom:14px; }
@@ -119,13 +119,13 @@
 .splitBar { height:5px; background:var(--line-strong); border-radius:4px; overflow:hidden; margin:23px 0 13px; }
 .splitBar > span { display:block; height:100%; background:#6c9160; }
 .breakdown { font-size:13px; font-variant-numeric:tabular-nums; }
-.breakdown > div { display:flex; justify-content:space-between; gap:15px; padding:6px 0; }
+.breakdown > div { display:flex; justify-content:space-between; gap:15px; padding:4px 0; }
 .breakdown dt { color:var(--muted); display:flex; align-items:center; gap:7px; }
 .breakdown i { display:inline-block; width:6px; height:6px; border-radius:50%; background:#6c9160; }
 .breakdown > div:last-child i { background:var(--line-strong); }
-.payoutCard details { margin-top:17px; padding-top:14px; border-top:1px solid var(--line); font-size:12px; line-height:1.8; }
+.payoutCard details { margin-top:10px; padding-top:9px; border-top:1px solid var(--line); font-size:12px; line-height:1.8; }
 .payoutCard details p { margin:10px 0; color:var(--muted); }
-.payoutCard > a { display:inline-block; font-size:10px; margin-top:16px; }
+.payoutCard > a { display:inline-block; font-size:10px; margin-top:10px; }
 .historyIntro { font-size:11px; color:var(--muted); line-height:1.8; margin:-8px 0 25px; max-width:570px; }
 .timeline { margin:0; padding:0; list-style:none; }
 .timeline > li { position:relative; display:grid; grid-template-columns:145px minmax(0,1fr); gap:27px; padding:0 0 24px; }
@@ -152,15 +152,15 @@
 .steps > li[data-expanded] { background:var(--surface2); }
 .check > span { background:var(--bg); border-color:var(--line-strong); font-size:11px; }
 .rewardCard { text-align:center; border-color:var(--line-strong); border-radius:12px; display:flex; flex-direction:column; align-items:center; }
-.rewardCard > .eyebrow { min-height:24px; display:grid; place-items:center; }
-.rewardCard > strong { margin:8px 0; font-size:44px; }
-.rewardCard p { font-size:13px; line-height:1.6; margin-bottom:12px; }
+.rewardCard > .eyebrow { min-height:18px; display:grid; place-items:center; }
+.rewardCard > strong { margin:4px 0; font-size:34px; }
+.rewardCard p { font-size:13px; line-height:1.5; margin-bottom:10px; }
 .rewardCard a { margin-top:auto; }
-.currentRound h4 { font-size:23px; margin:11px 0; }
-.payoutCard { border-color:var(--line-strong); border-radius:12px; padding:19px; }
+.currentRound h4 { font-size:20px; margin:8px 0; }
+.payoutCard { border-color:var(--line-strong); border-radius:12px; padding:14px 16px; }
 .payoutAmount,.reportDate { text-align:center; }
-.payoutAmount { margin-top:12px; }
-.splitBar { margin:18px 0 11px; }
+.payoutAmount { margin-top:5px; font-size:30px; line-height:1.2; }
+.splitBar { margin:12px 0 6px; }
 .filters button { border-radius:8px; font-size:13px; border-color:var(--line-strong); }
 .timeline > li { padding-bottom:18px; }
 .timeline summary { min-height:28px; }
@@ -189,9 +189,9 @@
 .footer .linkArrow { width:21px; height:21px; flex-basis:21px; }
 @media(max-width:540px) { .sectionHeading:has(> .externalLink) { flex-wrap:wrap; gap:12px; } .sectionHeading > .externalLink { max-width:100%; } .page .sourceLink { font-size:12px; } }
 @media(min-width:1400px) { .toolGrid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
-@media(max-width:1100px) {.guideGrid { grid-template-columns:minmax(0,1fr) 235px; gap:27px; }.toolGrid { grid-template-columns:repeat(2,minmax(0,1fr)); }.rewardCard { padding:20px; } }
-@media(max-width:760px) {.guideGrid { grid-template-columns:1fr; gap:30px; }.guideAside { display:grid; grid-template-columns:1fr; }.rewardCard > strong { font-size:38px; }.rewardCard { padding:18px; }.rewardGrid { gap:10px; }.rewardCard .eyebrow { font-size:8px; }.currentRound h4 { font-size:21px; }.rewardDetails { gap:25px; } }
-@media(max-width:540px) {.tabs { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }.tabs button { flex-direction:column; font-size:12px; gap:5px; min-height:64px; padding:9px 2px; line-height:1.2; white-space:normal; text-align:center; } .tabs button > .tabCount { position:absolute; left:calc(50% + 11px); top:7px; min-width:16px; height:16px; padding:0 3px; font-size:9px; }.tabBar { margin-top:12px; padding:0; }.panel { padding-top:22px; }.sectionHeading { gap:15px; }.sectionHeading h3 { font-size:23px; }.sectionHeading > a { font-size:11px; max-width:91px; line-height:1.6; }.stepButton { font-size:14px; padding-left:55px; }.stepBody { padding-left:55px; padding-right:21px; }.progressFoot { font-size:9px; }.toolGrid { grid-template-columns:1fr; }.filters { gap:6px; }.filters button { padding:7px 11px; font-size:12px; }.rewardGrid { grid-template-columns:1fr 1fr; gap:12px; }.rewardCard { padding:18px 15px; }.rewardCard > strong { font-size:39px; }.currentRound { grid-column:1/-1; }.currentRound h4 { margin:10px 0; font-size:23px; }.currentRound h4 br { display:none; }.currentRound h4 br::after { content:" "; }.rewardCard p { font-size:12px; }.rewardDetails { grid-template-columns:1fr; gap:22px; margin-bottom:28px; }.payoutGrid { grid-template-columns:1fr; }.archiveLabel { display:none; }.timeline > li { grid-template-columns:1fr; gap:7px; padding:0 0 23px 20px; }.timeline > li::before { left:3px; }.timeline > li::after { left:0; }.timeline details { padding:0; }.timeline summary { font-size:12px; gap:10px; }.timeline summary small { font-size:8px; }.footer { margin-top:27px; gap:10px 16px; }.footer > span { width:100%; } }
+@media(max-width:1100px) {.guideGrid { grid-template-columns:minmax(0,1fr) 235px; gap:27px; }.toolGrid { grid-template-columns:repeat(2,minmax(0,1fr)); }.rewardCard { padding:14px; } }
+@media(max-width:760px) {.guideGrid { grid-template-columns:1fr; gap:30px; }.guideAside { display:grid; grid-template-columns:1fr; }.rewardCard > strong { font-size:32px; }.rewardCard { padding:12px; }.rewardGrid { gap:10px; }.rewardCard .eyebrow { font-size:8px; }.currentRound h4 { font-size:19px; }.rewardDetails { gap:25px; } }
+@media(max-width:540px) {.tabs { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }.tabs button { flex-direction:column; font-size:12px; gap:5px; min-height:64px; padding:9px 2px; line-height:1.2; white-space:normal; text-align:center; } .tabs button > .tabCount { position:absolute; left:calc(50% + 11px); top:7px; min-width:16px; height:16px; padding:0 3px; font-size:9px; }.tabBar { margin-top:12px; padding:0; }.panel { padding-top:22px; }.sectionHeading { gap:15px; }.sectionHeading h3 { font-size:23px; }.sectionHeading > a { font-size:11px; max-width:91px; line-height:1.6; }.stepButton { font-size:14px; padding-left:55px; }.stepBody { padding-left:55px; padding-right:21px; }.progressFoot { font-size:9px; }.toolGrid { grid-template-columns:1fr; }.filters { gap:6px; }.filters button { padding:7px 11px; font-size:12px; }.rewardGrid { grid-template-columns:1fr 1fr; gap:12px; }.rewardCard { padding:12px 10px; }.rewardCard > strong { font-size:32px; }.currentRound { grid-column:1/-1; }.currentRound h4 { margin:6px 0; font-size:19px; }.rewardCard p { font-size:12px; }.rewardDetails { grid-template-columns:1fr; gap:22px; margin-bottom:28px; }.payoutGrid { grid-template-columns:1fr; }.archiveLabel { display:none; }.timeline > li { grid-template-columns:1fr; gap:7px; padding:0 0 23px 20px; }.timeline > li::before { left:3px; }.timeline > li::after { left:0; }.timeline details { padding:0; }.timeline summary { font-size:12px; gap:10px; }.timeline summary small { font-size:8px; }.footer { margin-top:27px; gap:10px 16px; }.footer > span { width:100%; } }
 .hero { isolation:isolate; position:relative; display:grid; grid-template-columns:1.1fr 1fr; overflow:hidden; background:#191919; color:#f7f7f7; border:1px solid #383838; border-radius:18px; }
 .hero::after { content:""; position:absolute; z-index:-1; inset:0; background:radial-gradient(ellipse at 85% 75%,#77777733,transparent 55%),linear-gradient(110deg,#111111,transparent); }
 .heroCopy { padding:18px 0 18px 26px; z-index:2; }
