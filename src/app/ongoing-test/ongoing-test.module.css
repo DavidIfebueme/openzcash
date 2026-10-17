@@ -107,24 +107,6 @@
 .rewardDetails p { color:var(--ink); font-size:13px; line-height:1.8; margin:8px 0; }
 .rewardDetails a { font-size:12px; color:var(--muted); }
 .payoutSection,.historySection { border-top:1px solid var(--line); padding-top:24px; margin-top:28px; }
-.payoutGrid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-.payoutCard { padding:23px; border:1px solid var(--line); border-radius:13px; }
-.payoutHeader { display:flex; align-items:center; justify-content:space-between; gap:20px; }
-.payoutHeader h4 { font-size:14px; font-weight:500; }
-.payoutHeader > span { background:#d6e9c8; color:#264620; padding:4px 9px; border-radius:5px; font-size:9px; }
-.payoutAmount { display:block; margin-top:20px; font-size:37px; letter-spacing:-.04em; font-weight:400; }
-.payoutAmount small { font-size:13px; letter-spacing:0; color:var(--muted); }
-.reportDate { font-size:12px; color:var(--muted); margin-top:3px; }
-.splitBar { height:5px; background:var(--line-strong); border-radius:4px; overflow:hidden; margin:23px 0 13px; }
-.splitBar > span { display:block; height:100%; background:#6c9160; }
-.breakdown { font-size:13px; font-variant-numeric:tabular-nums; }
-.breakdown > div { display:flex; justify-content:space-between; gap:15px; padding:4px 0; }
-.breakdown dt { color:var(--muted); display:flex; align-items:center; gap:7px; }
-.breakdown i { display:inline-block; width:6px; height:6px; border-radius:50%; background:#6c9160; }
-.breakdown > div:last-child i { background:var(--line-strong); }
-.payoutCard details { margin-top:10px; padding-top:9px; border-top:1px solid var(--line); font-size:12px; line-height:1.8; }
-.payoutCard details p { margin:10px 0; color:var(--muted); }
-.payoutCard > a { display:inline-block; font-size:10px; margin-top:10px; }
 .timeline { margin:0; padding:0; list-style:none; }
 .timeline > li { position:relative; display:grid; grid-template-columns:145px minmax(0,1fr); gap:27px; padding:0 0 24px; }
 .timeline > li::before { content:""; position:absolute; left:153px; top:10px; bottom:-10px; width:1px; background:var(--line); }
@@ -155,10 +137,6 @@
 .rewardCard p { font-size:13px; line-height:1.5; margin-bottom:10px; }
 .rewardCard a { margin-top:auto; }
 .currentRound h4 { font-size:20px; margin:8px 0; }
-.payoutCard { border-color:var(--line-strong); border-radius:12px; padding:14px 16px; }
-.payoutAmount,.reportDate { text-align:center; }
-.payoutAmount { margin-top:5px; font-size:30px; line-height:1.2; }
-.splitBar { margin:12px 0 6px; }
 .filters button { border-radius:8px; font-size:13px; border-color:var(--line-strong); }
 .timeline > li { padding-bottom:18px; }
 .timeline summary { min-height:28px; }
@@ -189,7 +167,7 @@
 @media(min-width:1400px) { .toolGrid { grid-template-columns:repeat(4,minmax(0,1fr)); } }
 @media(max-width:1100px) {.guideGrid { grid-template-columns:minmax(0,1fr) 235px; gap:27px; }.toolGrid { grid-template-columns:repeat(2,minmax(0,1fr)); }.rewardCard { padding:14px; } }
 @media(max-width:760px) {.guideGrid { grid-template-columns:1fr; gap:30px; }.guideAside { display:grid; grid-template-columns:1fr; }.rewardCard > strong { font-size:32px; }.rewardCard { padding:12px; }.rewardGrid { gap:10px; }.rewardCard .eyebrow { font-size:8px; }.currentRound h4 { font-size:19px; }.rewardDetails { gap:25px; } }
-@media(max-width:540px) {.tabs { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }.tabs button { flex-direction:column; font-size:12px; gap:5px; min-height:64px; padding:9px 2px; line-height:1.2; white-space:normal; text-align:center; } .tabs button > .tabCount { position:absolute; left:calc(50% + 11px); top:7px; min-width:16px; height:16px; padding:0 3px; font-size:9px; }.tabBar { margin-top:12px; padding:0; }.panel { padding-top:22px; }.sectionHeading { gap:15px; }.sectionHeading h3 { font-size:23px; }.sectionHeading > a { font-size:11px; max-width:91px; line-height:1.6; }.stepButton { font-size:14px; padding-left:55px; }.stepBody { padding-left:55px; padding-right:21px; }.progressFoot { font-size:9px; }.toolGrid { grid-template-columns:1fr; }.filters { gap:6px; }.filters button { padding:7px 11px; font-size:12px; }.rewardGrid { grid-template-columns:1fr 1fr; gap:12px; }.rewardCard { padding:12px 10px; }.rewardCard > strong { font-size:32px; }.currentRound { grid-column:1/-1; }.currentRound h4 { margin:6px 0; font-size:19px; }.rewardCard p { font-size:12px; }.rewardDetails { grid-template-columns:1fr; gap:22px; margin-bottom:28px; }.payoutGrid { grid-template-columns:1fr; }.timeline > li { grid-template-columns:1fr; gap:7px; padding:0 0 23px 20px; }.timeline > li::before { left:3px; }.timeline > li::after { left:0; }.timeline details { padding:0; }.timeline summary { font-size:12px; gap:10px; }.timeline summary small { font-size:8px; }.footer { margin-top:27px; gap:10px 16px; }.footer > span { width:100%; } }
+@media(max-width:540px) {.tabs { width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }.tabs button { flex-direction:column; font-size:12px; gap:5px; min-height:64px; padding:9px 2px; line-height:1.2; white-space:normal; text-align:center; } .tabs button > .tabCount { position:absolute; left:calc(50% + 11px); top:7px; min-width:16px; height:16px; padding:0 3px; font-size:9px; }.tabBar { margin-top:12px; padding:0; }.panel { padding-top:22px; }.sectionHeading { gap:15px; }.sectionHeading h3 { font-size:23px; }.sectionHeading > a { font-size:11px; max-width:91px; line-height:1.6; }.stepButton { font-size:14px; padding-left:55px; }.stepBody { padding-left:55px; padding-right:21px; }.progressFoot { font-size:9px; }.toolGrid { grid-template-columns:1fr; }.filters { gap:6px; }.filters button { padding:7px 11px; font-size:12px; }.rewardGrid { grid-template-columns:1fr 1fr; gap:12px; }.rewardCard { padding:12px 10px; }.rewardCard > strong { font-size:32px; }.currentRound { grid-column:1/-1; }.currentRound h4 { margin:6px 0; font-size:19px; }.rewardCard p { font-size:12px; }.rewardDetails { grid-template-columns:1fr; gap:22px; margin-bottom:28px; }.timeline > li { grid-template-columns:1fr; gap:7px; padding:0 0 23px 20px; }.timeline > li::before { left:3px; }.timeline > li::after { left:0; }.timeline details { padding:0; }.timeline summary { font-size:12px; gap:10px; }.timeline summary small { font-size:8px; }.footer { margin-top:27px; gap:10px 16px; }.footer > span { width:100%; } }
 .hero { isolation:isolate; position:relative; display:grid; grid-template-columns:1.1fr 1fr; overflow:hidden; background:#191919; color:#f7f7f7; border:1px solid #383838; border-radius:18px; }
 .hero::after { content:""; position:absolute; z-index:-1; inset:0; background:radial-gradient(ellipse at 85% 75%,#77777733,transparent 55%),linear-gradient(110deg,#111111,transparent); }
 .heroCopy { padding:18px 0 18px 26px; z-index:2; }
@@ -228,3 +206,40 @@
 @media(prefers-reduced-motion:reduce) { .page *, .page *::before, .page *::after { animation:none!important; transition:none!important; scroll-behavior:auto!important; } }
 
 .sectionHeading .guideEyebrow { margin:0; font-size:11px; font-weight:600; letter-spacing:.13em; text-transform:uppercase; color:var(--muted); }
+
+/* A compact payment rail preserves the allocation and each paid milestone. */
+.paymentProgress { margin-top:-4px; }
+.paymentProgressLabel { display:flex; align-items:center; justify-content:space-between; gap:12px; color:var(--muted); font-size:12px; font-variant-numeric:tabular-nums; }
+.paymentProgressLabel strong { color:var(--ink); font-weight:600; }
+.paymentTrack { display:flex; height:9px; margin-top:8px; overflow:hidden; border-radius:5px; background:var(--line); gap:2px; }
+.paymentTrack > span { flex-shrink:0; background:#63945b; }
+.paymentTrack > span + span { background:#8fb780; }
+.paymentLegend { display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; font-size:11px; color:var(--muted); }
+.paymentLegend > span { display:flex; align-items:center; gap:6px; }
+.paymentLegend i { width:7px; height:7px; border-radius:2px; background:#b7d4a9; }
+.paymentLegend > span:last-child i { background:#edcf8f; }
+.paidMilestones { display:grid; grid-template-columns:1fr 1fr; gap:24px; list-style:none; margin:0; padding:0; }
+.paidMilestones > li { min-width:0; padding:12px 0 0; }
+.milestoneHeader { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.milestoneHeader h4 { font-size:14px; font-weight:600; line-height:1.3; }
+.milestoneHeader > div > span { display:block; margin-top:3px; color:var(--muted); font-size:11px; }
+.milestoneHeader > strong { display:flex; align-items:center; gap:8px; font-size:18px; font-weight:500; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.milestoneHeader > strong > span { display:inline-flex; align-items:center; gap:3px; padding:3px 5px; border-radius:4px; font-size:10px; color:#264620; background:#d6e9c8; }
+.milestoneHeader svg { width:11px; height:11px; }
+.paymentSplit { display:flex; margin-top:9px; gap:2px; height:25px; border-radius:5px; overflow:hidden; }
+.paymentSplit > span { display:flex; align-items:center; justify-content:center; flex-basis:0; min-width:0; background:#b7d4a9; color:#203a1b; font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; }
+.paymentSplit > span + span { background:#edcf8f; color:#503808; }
+.paymentNotes { margin-top:6px; font-size:12px; color:var(--muted); }
+.paymentNotes summary { display:flex; justify-content:space-between; align-items:center; min-height:32px; list-style:none; cursor:pointer; }
+.paymentNotes summary::-webkit-details-marker { display:none; }
+.paymentNotes summary::after { content:"+"; font-size:17px; }
+.paymentNotes[open] summary::after { content:"−"; }
+.paymentNotes summary:hover { color:var(--ink); }
+.paymentNotes p { margin:8px 0; line-height:1.6; }
+.paymentNotes > div { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+@media(max-width:540px) { .paidMilestones { grid-template-columns:1fr; gap:4px; }.paidMilestones > li + li { border-top:1px solid var(--line); }.paymentLegend { gap:12px; }.milestoneHeader > strong { font-size:17px; } }
+
+.paymentOverview { padding:0; }
+.roundStatus { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; margin-top:14px; padding:10px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); color:var(--muted); font-size:12px; }
+.roundStatus b { color:var(--ink); font-weight:600; }
+.roundStatus .sourceLink { background:transparent; }

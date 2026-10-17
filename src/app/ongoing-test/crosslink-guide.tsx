@@ -158,24 +158,26 @@ export function CrosslinkGuide() {
     </div>
 
     <div role="tabpanel" id="crosslink-panel-2" aria-labelledby="crosslink-tab-2" hidden={tab !== "Incentives"} className={styles.panel}>
-      <div className={styles.sectionHeading}><h3>Incentive pool</h3><Source href={`${FORUM}/39`}>Program rules</Source></div>
-      <div className={styles.rewardGrid}>
-        <section className={styles.rewardCard}><span className={styles.eyebrow}>Program allocation</span><strong>500 <small>ZEC</small></strong><p>Announced total, not remaining funds.</p><Source href={`${FORUM}/1`}>Original announcement</Source></section>
-        <section className={styles.rewardCard}><span className={styles.eyebrow}>Reported paid · 2 rounds</span><strong>{reportedPaid} <small>ZEC</small></strong><p>Round 1 + Round 2 · 25 ZEC each.</p><a href="#payouts-heading">View paid rounds ↓</a></section>
-        <section className={`${styles.rewardCard} ${styles.currentRound}`}><span className={styles.eyebrow}>Round 3</span><h4>Awaiting reward details.</h4><p>Amount and claim dates unconfirmed in the reviewed sources.</p><Source href={`${FORUM}/101`}>Follow the round</Source></section>
-      </div>
-      <div className={styles.rewardDetails}><section><h4>Earned cTAZ counts.</h4><p>Mining and staking earnings determine the proportional reward. Simply holding faucet or transferred funds does not qualify.</p><Source href={`${FORUM}/39`}>Eligibility</Source></section><section><h4>Claims stay with Shielded Labs.</h4><p>Wait for the round’s private submission instructions. Previous claims used test-wallet viewing keys and a mainnet payout address. Never share a seed or spending key.</p><Source href={`${FORUM}/94`}>Previous claim process</Source></section></div>
-      <section className={styles.payoutSection} aria-labelledby="payouts-heading">
-        <div className={styles.sectionHeading}><h3 id="payouts-heading">Paid rounds</h3></div>
-        <div className={styles.payoutGrid}>{paidRounds.map((round) => <article className={styles.payoutCard} key={round.round}>
-          <div className={styles.payoutHeader}><h4>Round {round.round}</h4><span>Paid</span></div>
-          <strong className={styles.payoutAmount}>{round.total} <small>ZEC</small></strong><p className={styles.reportDate}>Reported {round.reported}</p>
-          <div className={styles.splitBar} aria-hidden="true"><span style={{ width: `${round.earned / round.total * 100}%` }} /></div>
-          <dl className={styles.breakdown}><div><dt><i />Mining & staking</dt><dd>{round.earned} ZEC</dd></div><div><dt><i />Discretionary</dt><dd>{round.discretionary} ZEC</dd></div></dl>
-          <details><summary>Distribution details</summary><p>{round.recipients} mining and staking recipients. {round.note}</p><p>Claims closed {round.claim}.</p><Source href={round.claimSource}>Claim announcement</Source></details>
-          <Source href={round.source}>Payout report</Source>
-        </article>)}</div>
+      <div className={styles.sectionHeading}><h3 id="payouts-heading">Incentive pool</h3><Source href={`${FORUM}/39`}>Program rules</Source></div>
+      <section className={styles.paymentOverview} aria-labelledby="payouts-heading">
+        <div className={styles.paymentProgress}>
+          <div className={styles.paymentProgressLabel}><span><strong>{reportedPaid}</strong> / 500 ZEC reported paid</span><span>{reportedPaid / 500 * 100}%</span></div>
+          <div className={styles.paymentTrack} role="progressbar" aria-label="Reported payments from the program allocation" aria-valuemin={0} aria-valuemax={500} aria-valuenow={reportedPaid} aria-valuetext={`${reportedPaid} of 500 ZEC reported paid`}>
+            {paidRounds.map((round) => <span key={round.round} style={{ width: `${round.total / 500 * 100}%` }} />)}
+          </div>
+        </div>
+        <div className={styles.paymentLegend}><span><i />Mining & staking</span><span><i />Discretionary</span></div>
+        <ol className={styles.paidMilestones}>{paidRounds.map((round) => <li key={round.round}>
+          <div className={styles.milestoneHeader}><div><h4>Round {round.round}</h4><span>Reported {round.reported}</span></div><strong>{round.total} ZEC <span><Icon name="check" />Paid</span></strong></div>
+          <div className={styles.paymentSplit}>
+            <span style={{ flexGrow: round.earned }} title={`Mining & staking: ${round.earned} ZEC`}><span className={styles.linkHint}>Mining & staking: </span>{round.earned}<span className={styles.linkHint}> ZEC</span></span>
+            <span style={{ flexGrow: round.discretionary }} title={`Discretionary: ${round.discretionary} ZEC`}><span className={styles.linkHint}>Discretionary: </span>{round.discretionary}<span className={styles.linkHint}> ZEC</span></span>
+          </div>
+          <details className={styles.paymentNotes}><summary>Details & sources</summary><p>{round.recipients} mining and staking recipients. {round.note}</p><p>Claims closed {round.claim}.</p><div><Source href={round.source}>Payout report</Source><Source href={round.claimSource}>Claim announcement</Source></div></details>
+        </li>)}</ol>
       </section>
+      <div className={styles.roundStatus}><span><b>Round 3</b> · Reward amount and claim dates pending.</span><Source href={`${FORUM}/101`}>Follow the round</Source></div>
+      <div className={styles.rewardDetails}><section><h4>Earned cTAZ counts.</h4><p>Mining and staking earnings determine the proportional reward. Simply holding faucet or transferred funds does not qualify.</p><Source href={`${FORUM}/39`}>Eligibility</Source></section><section><h4>Claims stay with Shielded Labs.</h4><p>Wait for the round’s private submission instructions. Previous claims used test-wallet viewing keys and a mainnet payout address. Never share a seed or spending key.</p><Source href={`${FORUM}/94`}>Previous claim process</Source></section></div>
       <section className={styles.historySection} aria-labelledby="history-heading">
         <div className={styles.sectionHeading}><h3 id="history-heading">Timeline</h3><Source href={FORUM}>Forum</Source></div>
         <ol className={styles.timeline}>{history.map((event) => <li key={event.title} data-kind={event.kind}><time>{event.date}</time><details><summary><span>{event.title}</span><small>{event.kind}</small></summary><p>{event.detail}</p><Source href={event.source}>Original source</Source></details></li>)}</ol>
