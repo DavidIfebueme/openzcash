@@ -4070,7 +4070,6 @@
 .oz-participate .participate-published h2 { font-size: 24px; overflow-wrap: anywhere; }
 .oz-participate .participate-published p { color: var(--dao-muted); font-size: 13px; line-height: 1.6; }
 .oz-participate .participate-published .dao-form-actions { justify-content: center; margin-top: 28px; }
-.oz-participate .participate-native-list { margin-bottom: 20px; }
 @media (max-width: 850px) {
   .oz-participate .participate-compose-grid { grid-template-columns: 1fr; }
   .oz-participate .participate-compose-aside { position: static; }

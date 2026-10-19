@@ -4,7 +4,7 @@ import { expect, it, vi } from "vitest";
 import { ProposalWorkspace } from "./proposal-workspace";
 import type { OfficialProposalSnapshot } from "@/lib/participate/official-proposals-model";
 import { ZCG_REVIEW_PROPOSALS } from "@/lib/participate/workspace/data/zcg-review-proposals";
-import { buildSourceProposal } from "@/lib/participate/workspace/archive/source-proposals";
+import { buildSourceProposal, buildSourceUpdate } from "@/lib/participate/workspace/archive/source-proposals";
 vi.mock("./community-workspace", () => ({ WorkspaceFrame: ({ children }: { children: ReactNode }) => <main>{children}</main> }));
 vi.mock("./proposal-economy", () => ({ ProposalEconomyProvider: ({ children }: { children: ReactNode }) => <>{children}</>, ProposalEconomyNotice: () => null, ProposalEngagement: ({ recordId }: {recordId: string}) => <button>Comments for {recordId}</button> }));
 vi.mock("./proposal-inline-details", () => ({ ProposalInlineDetails: ({recordId}: {recordId: string}) => <span>Preserved {recordId}</span> }));
@@ -151,4 +151,57 @@ it("shows a documented decision before archive import without offering nonexiste
   expect(html).not.toContain("Comments for zcg-github-447");
   expect(html).not.toContain("Preserved zcg-github-447");
   expect(html).not.toContain("proposal-read-zcg-github-447");
+});
+
+const issueUrl = (issue: number) => `https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/${issue}`;
+function cardHtml(html: string, recordId: string) {
+  const start = html.indexOf(`data-proposal-card="${recordId}"`);
+  const next = html.indexOf('data-proposal-card="', start + 1);
+  return start < 0 ? "" : html.slice(start, next < 0 ? undefined : next);
+}
+// GraphSense kept its curated record id when the October 16 GitHub update was captured as revision 2.
+function recaptureGraphSense(label: { name: string; color: string }) {
+  return buildSourceUpdate({ number: 424, html_url: issueUrl(424), title: "Grant Application - GraphSense Zcash Shielded Accounting Repair",
+    body: "### Requested Grant Amount (USD)\n\n$8,000", user: { login: "steven3002" }, state: "closed", state_reason: "completed",
+    created_at: "2026-09-14T14:23:35Z", updated_at: "2026-10-16T19:59:34Z", labels: [{ ...label, description: null }],
+  }, 424, "2026-10-16T20:33:00.000Z", { recordId: "zcg-graphsense-2026-09-28", revision: 1, manifestHash: "a".repeat(64) }, { events: [], comments: [] });
+}
+
+it("keeps the curated vote of a recaptured record and lists every decided card by decision date", async () => {
+  const update = await recaptureGraphSense({ name: "✔️ Grant Complete", color: "72243a" });
+  const original = JSON.stringify(update.capture);
+  const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+    initialRecordId="zcg-graphsense-2026-09-28"
+    board={{ ...board, proposals: [
+      { ...board.proposals[0], recordId: "zcg-graphsense-2026-09-28", title: update.capture.proposal.title, sourceCapture: update.capture },
+      { ...board.proposals[0], recordId: "zcg-ironwood-2026-09-28", title: "Ironwood" },
+    ] }}
+    initialOfficialProposals={{ ...snapshot, proposals: [
+      { ...snapshot.proposals[0], issueNumber: 424, url: issueUrl(424), title: "GraphSense", applicant: "@steven3002", submitted: "2026-09-14", outcome: "approved" },
+      { ...snapshot.proposals[0], issueNumber: 454, url: issueUrl(454), title: "0xramp", applicant: "@vinibarbosabr", submitted: "2026-09-29", outcome: "approved" },
+    ] }} />);
+  const graphsense = cardHtml(html, "zcg-graphsense-2026-09-28");
+  expect(graphsense).toContain('dateTime="2026-09-28">Decision Sep 28, 2026');
+  expect(graphsense).toContain('aria-label="Published committee verdict"');
+  expect(graphsense).toContain("4 approve · 1 reject");
+  expect(graphsense).toContain("zcash-community-grants-zcg-meeting-minutes-9-28-2026/57928/1");
+  expect(graphsense).toContain("Source checked Oct 16, 2026 · 20:33 UTC");
+  // Imported, pre-import and curated cards share one list ordered by decision date.
+  const order = ["zcg-github-454", "zcg-graphsense-2026-09-28", "zcg-ironwood-2026-09-28"].map(id => html.indexOf(`data-proposal-card="${id}"`));
+  expect(order.every(index => index >= 0)).toBe(true);
+  expect(order).toEqual([...order].sort((a, b) => a - b));
+  expect(html.match(/class="dao-proposal-list/g)).toHaveLength(1);
+  expect(JSON.stringify(update.capture)).toBe(original);
+});
+
+it("drops a curated vote once the recaptured GitHub outcome no longer matches it", async () => {
+  const update = await recaptureGraphSense({ name: "❌ Grant Cancelled Before Completion", color: "b60205" });
+  const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
+    initialRecordId="zcg-graphsense-2026-09-28" initialOfficialProposals={null}
+    board={{ ...board, proposals: [{ ...board.proposals[0], recordId: "zcg-graphsense-2026-09-28", title: update.capture.proposal.title, sourceCapture: update.capture }] }} />);
+  const graphsense = cardHtml(html, "zcg-graphsense-2026-09-28");
+  expect(html).toContain('aria-pressed="true">Withdrawn</button>');
+  expect(graphsense).toContain("GraphSense Zcash Shielded Accounting Repair");
+  expect(graphsense).not.toContain("Published committee verdict");
+  expect(graphsense).not.toContain("Decision Sep 28, 2026");
 });
