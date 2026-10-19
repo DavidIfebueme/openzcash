@@ -36,9 +36,9 @@ function proposalFilter(proposal?: ProposalParticipation) {
   return proposal?.sourceCapture?.proposal.outcome ?? (proposal?.abandonment ? "abandoned" : "under_review");
 }
 
-/** A recaptured curated record keeps its published vote; callers still drop one whose outcome changed. */
-function committeeDecision(recordId: string, sourceUrl: string | null | undefined) {
-  return publishedDecisionForIssue(sourceUrl) ?? ZCG_PROPOSAL_EXAMPLES.find(example => example.id === recordId) ?? null;
+/** A recaptured curated record keeps its published vote only while its own GitHub capture agrees; the official list can lag. */
+function committeeDecision(proposal: ProposalParticipation, sourceUrl: string | null | undefined) {
+  return publishedDecisionForIssue(sourceUrl) ?? ZCG_PROPOSAL_EXAMPLES.find(example => example.id === proposal.recordId && example.outcome === proposalFilter(proposal)) ?? null;
 }
 
 export function ProposalWorkspace({ community, communities, viewer, board, initialProfile, initialCreditSummary, embedded = false, drafts = [], draftsUnavailable = false, initialRecordId, initialCommentId, initialBudgets = null, initialOfficialProposals = null }: Omit<WorkspaceFrameProps, "children"> & { board: ProposalParticipationBoard; drafts?: SubmissionDraft[]; draftsUnavailable?: boolean; initialRecordId?: string; initialCommentId?: string; initialBudgets?: ApprovedBudgetSnapshot | null; initialOfficialProposals?: OfficialProposalSnapshot | null }) {
@@ -117,7 +117,7 @@ export function ProposalWorkspace({ community, communities, viewer, board, initi
       const source = captured?.source ?? zcgSourceMetadata(proposal.recordId);
       const issue = source ? officialIssueNumber(source.url) : null;
       const listing = issue ? officialByIssue.get(issue) : undefined;
-      const published = committeeDecision(proposal.recordId, source?.url);
+      const published = committeeDecision(proposal, source?.url);
       const decision = published?.outcome === outcome ? published : undefined;
       const submittedAt = captured?.proposal.submittedAt ?? proposal.application?.submittedAt;
       const requestedUsd = proposal.application ? Number(proposal.application.requestedAmountUsd) : captured && outcome !== "approved" ? proposal.sourceRequestedUsd ?? captured.proposal.requestedUsd : null;

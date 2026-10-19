@@ -194,13 +194,17 @@ it("keeps the curated vote of a recaptured record and lists every decided card b
   expect(JSON.stringify(update.capture)).toBe(original);
 });
 
-it("drops a curated vote once the recaptured GitHub outcome no longer matches it", async () => {
+it.each([
+  ["without the official list", null, "Withdrawn"],
+  ["while the official list still shows it approved", "approved", "Approved"],
+] as const)("drops a curated vote once the recaptured GitHub outcome no longer matches it (%s)", async (_case, listed, tab) => {
   const update = await recaptureGraphSense({ name: "❌ Grant Cancelled Before Completion", color: "b60205" });
+  const official = listed ? { ...snapshot, proposals: [{ ...snapshot.proposals[0], issueNumber: 424, url: issueUrl(424), title: "GraphSense", applicant: "@steven3002", submitted: "2026-09-14", outcome: listed }] } : null;
   const html = renderToStaticMarkup(<ProposalWorkspace community={community} communities={[community]} viewer={null}
-    initialRecordId="zcg-graphsense-2026-09-28" initialOfficialProposals={null}
+    initialRecordId="zcg-graphsense-2026-09-28" initialOfficialProposals={official}
     board={{ ...board, proposals: [{ ...board.proposals[0], recordId: "zcg-graphsense-2026-09-28", title: update.capture.proposal.title, sourceCapture: update.capture }] }} />);
   const graphsense = cardHtml(html, "zcg-graphsense-2026-09-28");
-  expect(html).toContain('aria-pressed="true">Withdrawn</button>');
+  expect(html).toContain(`aria-pressed="true">${tab}</button>`);
   expect(graphsense).toContain("GraphSense Zcash Shielded Accounting Repair");
   expect(graphsense).not.toContain("Published committee verdict");
   expect(graphsense).not.toContain("Decision Sep 28, 2026");
