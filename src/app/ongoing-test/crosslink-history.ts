@@ -5,7 +5,7 @@ export const paidRounds = [
 ] as const;
 export const reportedPaid = paidRounds.reduce((total, round) => total + round.total, 0);
 export const history = [
-  { date: "2 Apr 2026", title: "The incentive program opens", detail: "500 ZEC allocated to the program; 25 ZEC earmarked for the first season. Rewards are based on cTAZ earned through mining and staking, excluding faucet balances and the funding wallet.", source: `${forum}/1`, kind: "Program" },
+  { date: "2 Apr 2026", title: "The incentive program opens", allocatedZec: 500, detail: "500 ZEC allocated to the program; 25 ZEC earmarked for the first season. Rewards are based on cTAZ earned through mining and staking, excluding faucet balances and the funding wallet.", source: `${forum}/1`, kind: "Program" },
   { date: "15 Apr 2026", title: "Feature net launches", detail: "The first public network and desktop release open community testing.", source: `${forum}/19`, kind: "Network" },
   { date: "23–27 Apr 2026", title: "Early network upgrades", detail: "The v3 upgrade includes restoring the wallet seed, followed by v4. These instructions belong to the early network, not the current v15 guide.", source: `${forum}/31`, kind: "Network" },
   { date: "12 May 2026", title: "Finality stalls", detail: "Participants report stalled BFT finality. Chain divergence and recovery become a focus of testing and community diagnostics.", source: `${forum}/38`, kind: "Network" },

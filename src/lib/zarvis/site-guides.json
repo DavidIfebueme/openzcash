@@ -1,0 +1,50 @@
+[
+  {
+    "id": "narratives-guide",
+    "route": "/narratives",
+    "title": "Zcash Pitches & Narratives · using the library",
+    "text": "Original OpenZcash educational copy in English, Brazilian Portuguese and Spanish. Choose Pitches for examples or Narratives for the underlying ideas. Each pitch has a one-sentence, approximately 30-second and approximately 60-second version. Search the current language and filter by audience and theme. Prepare a pitch selects an existing reviewed example; it does not generate a new AI response. Copy text copies the selected version; Copy link opens that example with its language and length. Expand Make it your own for context and limitations. The library has no Sources tab or external reference links."
+  },
+  {
+    "id": "narratives-print",
+    "route": "/narratives",
+    "title": "Zcash Pitches & Narratives · select and print / imprimir / impresión",
+    "text": "In Pitches, check Select for printing on a card. Selected cards gain a gold outline and a Selected for printing label. Selecting does not open printing. After selecting at least one card, click the yellow Print selected button with the selection count in the results toolbar. It calls the browser print dialog, where Save as PDF may be available. Printing uses the selected pitches with the current language and length, including previously selected pitches that later become hidden when filters change. A hidden card cannot be selected until filters make it visible again. Clear selection removes the selections. Selection is held in page memory and is not saved in a copied link or across reloads. If an embedded browser does not show its print dialog, open the same page in a browser that supports printing and select the cards again."
+  },
+  {
+    "id": "narratives-guide-pt",
+    "route": "/narratives?lang=pt-BR",
+    "title": "Zcash Pitches & Narratives · idiomas, filtros, copiar e imprimir",
+    "text": "A biblioteca tem textos originais em inglês, português brasileiro e espanhol. Pitches reúne exemplos de uma frase, cerca de 30 segundos ou cerca de 60 segundos. Narrativas explica a ideia, os fundamentos e os limites. A busca usa o idioma selecionado; os filtros selecionam público e tema. Preparar um pitch escolhe um exemplo existente. Copiar texto copia a versão atual; Copiar link abre esse exemplo no idioma e extensão escolhidos. Para imprimir, marque Selecionar para impressão; o cartão ganha contorno dourado. Depois clique no botão amarelo Imprimir selecionados. Marcar não abre a impressão. O navegador abre seu diálogo; salvar como PDF depende dele. Selecione um cartão enquanto ele está visível. Se um filtro depois esconder esse cartão, ele continua selecionado para impressão. Para selecionar um cartão oculto, primeiro ajuste os filtros para mostrá-lo. A seleção não fica no link e se perde ao recarregar. Não há aba Sources ou links externos de referências. Se um navegador embutido não abrir o diálogo, abra a página em um navegador com suporte à impressão e selecione os cartões novamente."
+  },
+  {
+    "id": "narratives-guide-es",
+    "route": "/narratives?lang=es",
+    "title": "Zcash Pitches & Narratives · idiomas, filtros, copiar e imprimir",
+    "text": "La biblioteca ofrece textos originales en inglés, portugués brasileño y español. Pitches reúne ejemplos de una frase, unos 30 segundos o unos 60 segundos. Narrativas explica la idea, los fundamentos y sus límites. La búsqueda usa el idioma elegido; los filtros seleccionan público y tema. Preparar un pitch elige un ejemplo existente. Copiar texto copia la versión actual; Copiar enlace abre ese ejemplo con su idioma y duración. Para imprimir, marca Seleccionar para imprimir; la tarjeta recibe un borde dorado. Después pulsa el botón amarillo Imprimir seleccionados. Marcar no abre la impresión. El navegador muestra su diálogo y puede permitir guardar como PDF. Selecciona una tarjeta mientras está visible. Si un filtro después la oculta, sigue seleccionada para imprimir. Para seleccionar una tarjeta oculta, primero ajusta los filtros para mostrarla. La selección no se guarda en el enlace y se pierde al recargar. No hay pestaña Sources ni enlaces externos de referencias. Si un navegador integrado no abre el diálogo, abre la página en un navegador con soporte de impresión y selecciona las tarjetas de nuevo."
+  },
+  {
+    "id": "crosslink-guide",
+    "route": "/ongoing-test/crosslink",
+    "title": "Crosslink · Ongoing Test · testing, cTAZ and incentives",
+    "text": "The Crosslink guide has Participate, Community tools and Incentives tabs. Participate offers Test, Build and Operate paths. Test uses a separate test wallet and cTAZ only: install and privately back up, sync, compare a block height AND hash on the same network, get test funds, choose a finalizer and stake, retarget a bond, then unbond and withdraw in allowed windows. Check advancing finalized height too. Record build, OS, time, transaction IDs and expected versus actual behavior; never include keys or seeds. Listed community issues are not assignments or promised funding. Incentive allocations, earned rewards, claims and reported payouts are different states. Curated release and round notes are dated snapshots; confirm current compatibility and claim windows in the linked program sources. Test cTAZ is not mainnet ZEC."
+  },
+  {
+    "id": "participate-guide",
+    "route": "/zcg/participate",
+    "title": "ZCG Participate · community proposals and demo Zcred",
+    "text": "Participate lets visitors explore proposals and discuss ideas with a verifiable history. Participation uses free demo Zcred. Demo participation, community feedback and an official committee decision are separate. A committee verdict does not establish payment or delivered work. Zarvis reads public records only; it cannot see private drafts or committee workspace records, post comments, submit applications, spend credits or vote on the visitor's behalf. Public applications, decisions and payment records must be checked with their respective readers and dates."
+  },
+  {
+    "id": "private-chat-guide",
+    "route": "/private-chat",
+    "title": "Private Chat · Nym experimental pilot",
+    "text": "OpenZcash links to an experimental Private Chat pilot using Nym. The page hosts an isolated chat service inside the site. This is a separate service from Zarvis. Zarvis has no access to its rooms, messages or identities. A pilot label does not establish a security audit, universal anonymity, uptime or suitability for a particular threat model. Consult the service's own current interface for its available features."
+  },
+  {
+    "id": "zarvis-guide",
+    "route": "/zarvis",
+    "title": "Zarvis · knowledge, tests, system and capabilities",
+    "text": "Zarvis answers questions about Zcash and OpenZcash using reviewed references, indexed public pages and read-only tools. Static documentation describes workflows; live tools return data with freshness and coverage. It does not read the whole repository, internal test reports, private committee workspaces, deployment dashboards or wallets. A source revision, editorial review date or local preview does not prove tests passed, a PR merged or a production release succeeded. For build, test and publication status it needs current evidence for that exact version; without that evidence the status is unverified. It can draft original pitches adapted to an audience, occasion, channel, language and length, grounded in the library; a draft is not a new verified fact. Reloading clears chat memory. Model answers send recent context and retrieved public records to the configured provider. Availability and limits are shown on /zarvis/about."
+  }
+]

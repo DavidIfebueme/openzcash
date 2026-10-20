@@ -7,9 +7,10 @@ import { requestedZips } from "./zip-catalog";
 import type { ZipCorpus } from "./zip-source";
 import { KNOWLEDGE, terms } from "./sources";
 import { isHistoricalQuestion } from "./research-scope";
+import { narrativeIntent, narrativeSearchTerms } from "./narrative-intent";
 
 export type ExternalKind = "official blog" | "community wiki" | "forum topic";
-export type KnowledgeDocument = { id: string; title: string; url: string; text: string; section?: string; reviewedOn?: string; retrievedAt?: string; sourceUpdatedOn?: string | null; publishedOn?: string | null; site?: string; snapshotNote?: string; kind: "reference" | "site documentation" | "navigation" | ExternalKind };
+export type KnowledgeDocument = { locale?: string; pitchLength?: string; id: string; title: string; url: string; text: string; section?: string; reviewedOn?: string; retrievedAt?: string; sourceUpdatedOn?: string | null; publishedOn?: string | null; site?: string; snapshotNote?: string; kind: "reference" | "site documentation" | "navigation" | ExternalKind };
 /** One record of external-content.json: a blog post, a ZecHub wiki page or a forum topic's first post, written by scripts/sync-zarvis-sources.py. */
 export type ExternalSource = { id: string; kind: ExternalKind; site: string; title: string; url: string; publishedOn: string | null; retrievedAt: string; sha256: string; author: string | null; source: string | null; marker?: string | null; text: string };
 export type ExternalCorpus = { version: number; retrievedAt: string; sources: ExternalSource[] };
@@ -46,7 +47,7 @@ const concepts: Array<[string, RegExp, string[]]> = [
   ["issuance", /halving|supply|oferta|emissao|issuance|cap.*coins|21.*million|21.*milh|block.*spacing/, ["issuance", "supply", "halving"]],
   // Keep PT/ES funding inflections and compounds, but exclude English financial/financially.
   ["funding", /dev.?fund|fundo.*desenvolvimento|subsid|funding.*split|alocacao|miners.*25|mineradores.*25|\bbanca\b|financia(?!l)|quem paga.*desenvolv|who (?:pays for|funds).*development|development fund/, ["funding", "allocation", "subsidy"]],
-  ["ledger", /milestone|marcos|pagamento|pagou|paid|budget|orcamento|orcad|liquidacao|settlement|methodolog|metodolog|\bimport\b|imported|importad/, ["ledger", "methodology", "paid"]],
+  ["ledger", /milestone|marcos|pagamento|pagou|\bpayments?\b|paid|budget|orcamento|orcad|liquidacao|settlement|methodolog|metodolog|\bimport\b|imported|importad/, ["ledger", "methodology", "paid"]],
   ["calculator", /coverage|cobertura|runway|simul|cenario|scenario|\bmeta\b|ownership|participacao|calculad|calculator|cypherpunk|cipherpunk|20[x×]|quanto.*anos|how many years/, ["calculator", "treasury", "scenario"]],
   ["governance", /governan|governanc|ativad|activated|consensus|consenso|votacao|poll|enquete/, ["governance", "activation", "decision"]],
   ["ecosystem", /carteira|wallet|zingo|zashi|zodl|zebra|zaino|ecossistema|ecosystem/, ["ecosystem", "wallet"]],
@@ -82,6 +83,8 @@ function referenceChunks(source: ReferenceSource, kind: KnowledgeDocument["kind"
   // A selected paragraph must retain document-wide key authority assumptions.
   const scope = source.id === "zip-0310"
     ? " Scope: every ZIP 310 example assumes Ian holds Alice's full Sapling viewing key (FVK), even when a step mentions its derived IVK. An incoming viewing key alone cannot derive nullifiers or detect later spends. Outgoing recovery uses the matching OVK and does not require possession of the full FVK; do not conflate that with spend detection."
+    : source.id === "zip-0224"
+      ? " Scope: ZIP 224 specifies Orchard using Halo 2, but explicitly does not use Halo 2 recursive proofs or propose a recursive protocol. A single proof covers the Actions in one bundle; this is not network-wide aggregation. Future scalability motivation is not deployed capability."
     : source.id === "zip-0317"
       ? " Scope: conventional fee is wallet policy, not a consensus minimum. For Sapling, logical actions use max(spends, outputs). Each revision has its own status. This repository snapshot is not independent proof of which revision is active on a live network; avoid volunteering an active-revision claim for a timeless fee calculation."
       : "";
@@ -171,10 +174,14 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
   const { normalized, frequency, averageLength, count } = searchIndex;
   const normalizedQuery = query.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
   const historical = isHistoricalQuestion(query);
+  const narrative = narrativeIntent(query);
   const matchingConcepts = concepts.filter(([, pattern]) => pattern.test(normalizedQuery));
-  const tokens = [...new Set([...searchTerms(query), ...matchingConcepts.flatMap(([, , words]) => words)])];
+  const tokens = [...new Set([...searchTerms(query), ...(narrative ? narrativeSearchTerms(query) : []), ...matchingConcepts.flatMap(([, , words]) => words)])];
   const zips = requestedZips(query);
   const blossomSpacing = /\bblossom\b/.test(normalizedQuery) && /block|bloco|spacing|intervalo|seconds|segundos/.test(normalizedQuery);
+  const siteFocus = /\bcrosslink\b/.test(normalizedQuery) ? "/ongoing-test/crosslink"
+    : /\bzcash network\b/.test(normalizedQuery) && /\b(?:dashboard|page|painel|pagina)\b/.test(normalizedQuery) ? "/zcash-network"
+    : null;
   const monthly = /\b(?:monthly|mensais|mensal)\b/.test(normalizedQuery);
   // The wallet catalog and community directory are indexed per record; a question naming them should reach those records before generic ZIP text.
   const directory = /\b(?:wallets?|carteiras?)\b/.test(normalizedQuery) ? "https://openzcash.org/wallets/find" : /\b(?:communit(?:y|ies)|comunidades?|embaixador\w*|ambassadors?)\b/.test(normalizedQuery) ? "https://openzcash.org/communities" : null;
@@ -204,6 +211,8 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
       if (blossomSpacing && doc.url.endsWith("zip-0208")) score += 25;
       // The fee question has one current answer: ZIP 317 superseded the older fee ZIPs that share its words.
       if (fees && doc.url.endsWith("zip-0317")) score += 25;
+      if (/\b(?:orchard|halo ?2)\b/.test(normalizedQuery) && doc.url.endsWith("zip-0224")) score += 30;
+      if (matchingConcepts.some(([id]) => id === "viewing-keys") && (!/\borchard\b/.test(normalizedQuery) || /\bsapling\b/.test(normalizedQuery)) && doc.url.endsWith("zip-0310")) score += 25;
       if (monthly && doc.url.startsWith("https://openzcash.org/monthly")) score *= 3;
       if (directory && doc.url === directory && doc.kind === "site documentation") score *= 3;
       if (nudged) score *= 2;
@@ -222,6 +231,14 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
       }
       if (doc.id.startsWith("reference:zip-") || doc.id.startsWith("reference:draft-")) score *= 0.12;
     }
+    if (siteFocus && doc.url === `https://openzcash.org${siteFocus}` && doc.kind === "site documentation") score *= doc.id.startsWith("guide:") ? 8 : 3;
+    if (doc.url.startsWith("https://openzcash.org/narratives")) {
+      // Editorial examples should win communication requests, without displacing protocol evidence in technical questions.
+      score *= narrative ? 5 : 0.2;
+      if (narrative?.usage) score *= doc.id.startsWith("guide:narratives") ? 10 : 0.1;
+      if (narrative && doc.locale) score *= doc.locale === narrative.locale ? 3 : 0.15;
+      if (narrative?.length && doc.pitchLength) score *= doc.pitchLength === narrative.length ? 2 : 0.3;
+    }
     if (doc.kind === "navigation") score *= 0.35;
     return { doc, i, score };
   }).filter((x) => x.score > 0).sort((a, b) => b.score - a.score || a.i - b.i);
@@ -233,10 +250,12 @@ export function searchKnowledge(query: string, limit = 4, budget = 5000, corpus:
   }
   for (const { doc } of scored) {
     if (selected.length >= limit) break;
-    if ((perPage.get(doc.url) ?? 0) >= 2) continue;
+    const pitch = doc.id.startsWith("narratives:pitch:");
+    const key = pitch ? doc.id.split(":").slice(0, 3).join(":") : doc.url;
+    if ((perPage.get(key) ?? 0) >= (pitch ? 1 : 2)) continue;
     const size = JSON.stringify(doc).length + (selected.length ? 1 : 0);
     if (used + size > budget) continue;
-    selected.push(doc); used += size; perPage.set(doc.url, (perPage.get(doc.url) ?? 0) + 1);
+    selected.push(doc); used += size; perPage.set(key, (perPage.get(key) ?? 0) + 1);
     if (selected.length >= limit) break;
   }
   return selected;

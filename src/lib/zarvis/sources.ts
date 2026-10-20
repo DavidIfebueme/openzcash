@@ -146,4 +146,5 @@ export const STARTERS = [
   { label: "Follow a project", question: "Show project history for Zaino." },
   { label: "What changed on-chain?", question: "Compare monthly activity for last month." },
   { label: "Check the shielded pools", question: "How much ZEC is in shielded pools?" },
+  { label: "Craft a Zcash pitch", question: "Write a 30-second Zcash pitch for someone new to crypto. Give me a natural opening and one practical next step." },
 ];

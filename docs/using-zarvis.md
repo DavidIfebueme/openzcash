@@ -3,7 +3,7 @@
 Zarvis is the guide on OpenZcash: it answers questions about Zcash and about the
 funding data this site publishes, in the language of the question. It is free to
 use and capacity-limited; OpenZcash pays the model. This file describes the
-deployed interface. Limits, retention and the incident log it references live at
+interface in this checkout. Limits, retention and the incident log it references live at
 <https://openzcash.org/zarvis/about>, which is generated from the deployed
 configuration and is the authoritative version.
 
@@ -19,7 +19,7 @@ configuration and is the authoritative version.
   There is no keyword syntax to learn.
 - The pills under the composer are one-tap starting points covering the common
   paths: how shielded transactions work, the latest treasury balances, the Dev
-  Fund split, treasury scenarios and a project history lookup.
+  Fund split, treasury scenarios, a project history lookup and a Zcash pitch.
 - The selector next to the composer chooses the depth. Quick answers are
   written within 55 seconds; Deep analysis within 110.
 - Follow-ups work in context: "and in 2025?", "and the Lockbox?", "what is its
@@ -46,6 +46,32 @@ protocol constants. Unsupported figures may be restated once, when time permits;
 those still unsupported are withheld with a notice. Other answers and currencies
 are not fully covered, and a matching figure can still be out of context. Open
 the sources.
+
+## Pitches, narratives and site workflows
+
+Ask for a draft with an audience, occasion, language and format, for example:
+"Write a 30-second Zcash opening for a small business owner" or
+"Crie um pitch de 60 segundos para uma ONG". Follow-ups such as
+"Agora adapte para espanhol e reduza a uma frase" keep the current brief.
+A new subject ends that writing brief.
+
+Zarvis uses the same original EN/PT-BR/ES catalog as `/narratives`, including
+its factual qualifications. It can write fresh copy for conversations,
+presentations, panels, interviews and social posts. The library itself remains
+a collection of reviewed examples. Its print selection is separate from chat.
+
+For timed pitches, the app measures the delivered text against an upper bound
+of 80 words for 30 seconds and 150 for 60 seconds. It checks one-sentence requests
+too. An overlong response gets at most one bounded rewrite; if it still fails,
+the app reports that limitation instead of claiming it fits. An explicit word
+count overrides these timing defaults. Speaking time still varies by speaker.
+The existing source details retain the library passages used without adding
+reference lists to the reusable pitch.
+
+Zarvis also has reviewed instructions for printing, Crosslink tests and
+incentives, demo Zcred participation and the separate Private Chat service.
+It reads public information; it cannot inspect internal test runs, deployment
+status, private messages or wallets. A local review date proves none of those.
 
 ## Sharing an answer
 

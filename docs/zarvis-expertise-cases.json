@@ -1,0 +1,43 @@
+[
+  {
+    "id": "business-pitch-en",
+    "question": "Write a 30-second Zcash pitch for a small business owner who worries about publishing customer payment details. Use plain English, give the pitch itself, and do not promise perfect anonymity.",
+    "review": "Usable English business pitch, about 55–80 spoken words, no universal-anonymity claim, internal supporting source."
+  },
+  {
+    "id": "donation-pitch-pt",
+    "question": "Crie um pitch de 60 segundos, em português, para apresentar a Zcash a uma ONG que recebe doações. Público leigo, tom humano, sem promessa de valorização. Entregue um texto pronto para falar.",
+    "review": "Original Portuguese NGO pitch, about 110–150 spoken words; ordinary bank/card donations are not described as public blockchains; no returns promise."
+  },
+  {
+    "id": "rewrite-es",
+    "question": "Agora adapte para espanhol e reduza a uma única frase para abrir uma conversa com um doador.",
+    "follows": "donation-pitch-pt",
+    "review": "Exactly one concise Spanish sentence, same donor audience, no heading/notes/second version; Spanish provenance; relevant sources."
+  },
+  {
+    "id": "protocol-false-premises",
+    "question": "Check two claims against the actual Zcash protocol references: (1) Orchard already recursively aggregates every transaction proof; (2) a Sapling incoming viewing key can detect when a received note is spent. Are these claims correct? Explain the exact limits briefly.",
+    "review": "Reject both claims. Cite ZIP 224 for recursion capability vs actual Orchard design and ZIP 310 for IVK/FVK nullifier scope."
+  },
+  {
+    "id": "evidence-boundaries",
+    "question": "A page says editorially reviewed today. Can I say that OpenZcash passed all tests, the new page was deployed, and shielded Zcash makes the user impossible to trace? Correct each claim in plain English. Do not assume access to internal systems.",
+    "review": "Review is not test/merge/deployment evidence. No claimed access to CI. Reject untraceability and retain relevant evidence."
+  },
+  {
+    "id": "print-workflow",
+    "question": "Na página Zcash Pitches & Narratives, marquei Selecionar para impressão e nada abriu. O que faço?",
+    "review": "Explain selection first, gold Print selected button second; browser print dialog; selected language/length; no obsolete Sources tab."
+  },
+  {
+    "id": "crosslink-incentives",
+    "question": "No Crosslink, quanto foi reportado como pago nas rodadas 1 e 2? Isso é o mesmo que o total alocado ao programa? Posso usar ZEC real nos testes?",
+    "review": "Read crosslink tool. Preserve reporting dates; distinguish 50 ZEC reported paid from 500 allocated, test cTAZ from mainnet ZEC; no current claim-window guarantee."
+  },
+  {
+    "id": "bitcoin-panel",
+    "question": "Write a 60-second Zcash opening for a skeptical Bitcoin audience at a conference. Be fair to Bitcoin, explain the practical privacy difference, and avoid price predictions.",
+    "review": "Original 110–150-word opening, fair comparison, ZEC distinct from BTC, bounded privacy claims, no fabricated adoption/endorsements or investment recommendation."
+  }
+]

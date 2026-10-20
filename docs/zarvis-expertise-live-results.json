@@ -1,0 +1,384 @@
+{
+  "auditDate": "2026-10-20",
+  "provider": "anthropic",
+  "model": "claude-sonnet-5-5",
+  "environment": "isolated loopback preview; normal API safeguards",
+  "applicationSourceSha256": "ee3dfc1db1a331123c8d50fa5145c1f55f0a5619e9bb8a2f6790dcd3587e2252",
+  "fingerprintedFiles": [
+    "src/app/ongoing-test/crosslink-history.ts",
+    "src/lib/zarvis/data.ts",
+    "src/lib/zarvis/engine.ts",
+    "src/lib/zarvis/grounding.ts",
+    "src/lib/zarvis/knowledge.ts",
+    "src/lib/zarvis/language.ts",
+    "src/lib/zarvis/local.ts",
+    "src/lib/zarvis/narrative-intent.ts",
+    "src/lib/zarvis/prompt.ts",
+    "src/lib/zarvis/public-content.json",
+    "src/lib/zarvis/session.ts",
+    "src/lib/zarvis/site-guides.json"
+  ],
+  "interpretation": "The eight-case batch completed, but two drafting cases failed semantically. Both affected cases were retested after a lower word target. These are small observed samples, not a reliability percentage or a world ranking.",
+  "runs": [
+    {
+      "at": "2026-10-20T14:28:24.225681+00:00",
+      "origin": "http://127.0.0.1:4237",
+      "semanticReview": "Manually reviewed",
+      "results": [
+        {
+          "id": "business-pitch-en",
+          "question": "Write a 30-second Zcash pitch for a small business owner who worries about publishing customer payment details. Use plain English, give the pitch itself, and do not promise perfect anonymity.",
+          "review": "Usable English business pitch, about 55–80 spoken words, no universal-anonymity claim, internal supporting source.",
+          "completed": true,
+          "answer": "When a customer pays you, that payment shouldn't become a public record. On many blockchains, anyone can look up who paid, who received and how much. Zcash shielded payments let the network verify the transfer without publishing the sender, recipient or amount. You still keep the records you need for your own books. Choose a wallet that supports shielded payments, then send yourself a small test payment.",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · A payment is not a customer directory · 30s",
+              "url": "https://openzcash.org/narratives?lang=en&length=30s&view=pitches#pitch-private-business"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Start with less to disclose · 30s",
+              "url": "https://openzcash.org/narratives?lang=en&length=30s&view=pitches#pitch-privacy-is-a-design-choice"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Give the payment an envelope · 30s",
+              "url": "https://openzcash.org/narratives?lang=en&length=30s&view=pitches#pitch-sealed-envelope"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Your money can move with discretion · 30s",
+              "url": "https://openzcash.org/narratives?lang=en&length=30s&view=pitches#pitch-privacy-in-one-line"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "en"
+          },
+          "seconds": 10.89,
+          "semanticResult": "pass",
+          "manualReview": "Usable English business copy within the 30-second cap, with four internal supporting examples. Public-ledger wording should continue to distinguish addresses from identified people."
+        },
+        {
+          "id": "donation-pitch-pt",
+          "question": "Crie um pitch de 60 segundos, em português, para apresentar a Zcash a uma ONG que recebe doações. Público leigo, tom humano, sem promessa de valorização. Entregue um texto pronto para falar.",
+          "review": "Original Portuguese NGO pitch, about 110–150 spoken words; ordinary bank/card donations are not described as public blockchains; no returns promise.",
+          "completed": true,
+          "answer": "Não consegui preparar um texto dentro da extensão solicitada. Consulte os exemplos mais curtos da biblioteca. [Zcash Pitches & Narratives](https://openzcash.org/narratives)",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · library size / quantos / cuántos",
+              "url": "https://openzcash.org/narratives"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Verifique as regras, sem um dossiê público · 60s",
+              "url": "https://openzcash.org/narratives?lang=pt-BR&length=60s&view=pitches#pitch-verify-without-exposing"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Prestação de contas pode ter público definido · 60s",
+              "url": "https://openzcash.org/narratives?lang=pt-BR&length=60s&view=pitches#pitch-records-without-publication"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Compartilhe acesso com intenção · 60s",
+              "url": "https://openzcash.org/narratives?lang=pt-BR&length=60s&view=pitches#pitch-selective-disclosure"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "pt"
+          },
+          "seconds": 9.97,
+          "semanticResult": "needs-work",
+          "manualReview": "Failed to deliver the requested draft: the bounded length check returned an honest fallback. Retested after adding a concrete lower target."
+        },
+        {
+          "id": "rewrite-es",
+          "question": "Agora adapte para espanhol e reduza a uma única frase para abrir uma conversa com um doador.",
+          "review": "Exactly one concise Spanish sentence, same donor audience, no heading/notes/second version; Spanish provenance; relevant sources.",
+          "completed": true,
+          "answer": "Con Zcash, una organización puede recibir donaciones sin convertir los datos financieros de cada donante en información pública, y, si lo necesita, compartir un registro solo con quien deba verlo.",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · No conviertas cada pago en un dato público · sentence",
+              "url": "https://openzcash.org/narratives?lang=es&length=sentence&view=pitches#pitch-less-data-to-profile"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · La rendición de cuentas puede tener un público definido · sentence",
+              "url": "https://openzcash.org/narratives?lang=es&length=sentence&view=pitches#pitch-records-without-publication"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Tu dinero puede moverse con discreción · sentence",
+              "url": "https://openzcash.org/narratives?lang=es&length=sentence&view=pitches#pitch-privacy-in-one-line"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Verifica las reglas, sin un expediente público · sentence",
+              "url": "https://openzcash.org/narratives?lang=es&length=sentence&view=pitches#pitch-verify-without-exposing"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "es"
+          },
+          "seconds": 2.13,
+          "semanticResult": "pass",
+          "manualReview": "One concise Spanish sentence, donor context retained, Spanish provenance and supporting Spanish examples. This followed the failed Portuguese draft but retained its user brief."
+        },
+        {
+          "id": "protocol-false-premises",
+          "question": "Check two claims against the actual Zcash protocol references: (1) Orchard already recursively aggregates every transaction proof; (2) a Sapling incoming viewing key can detect when a received note is spent. Are these claims correct? Explain the exact limits briefly.",
+          "review": "Reject both claims. Cite ZIP 224 for recursion capability vs actual Orchard design and ZIP 310 for IVK/FVK nullifier scope.",
+          "completed": true,
+          "answer": "Both claims are incorrect, going by the local ZIP snapshots.\n\n**1. \"Orchard already recursively aggregates every transaction proof\": incorrect.**\n- Orchard uses a single circuit for both spends and outputs. An \"action\" contains one possibly dummy note being spent and one possibly dummy note being created.\n- An Orchard transaction contains a bundle of actions, and one Halo 2 proof covers all the actions in that bundle.\n- The aggregation is therefore per transaction bundle. It is not network-wide.\n- The snapshot note says ZIP 224 uses Halo 2 but does not use Halo 2 recursive proofs or propose a recursive protocol. Any scalability benefit from recursion is future motivation, not deployed capability.\n- A \"Final\" ZIP status is also not independent proof of what is live on the network.\n\n**2. \"A Sapling incoming viewing key (IVK) can detect when a received note is spent\": incorrect.**\n- With an IVK alone, you can see received notes, including their amounts, the receiving addresses and the memos. You cannot derive the nullifiers, so you cannot detect later spends. (A nullifier is the value published when a note is spent.)\n- ZIP 310's examples assume the holder has the *full* viewing key (FVK). Only with the FVK can the holder learn the nullifier needed to detect the note being spent once the transaction is mined.\n- Sapling differs from Sprout here. You do not learn this information for Sprout viewing keys.\n- Recovering *outgoing* payment details is a separate capability. It needs the matching outgoing viewing key (OVK), not the FVK.\n- Neither key grants spending authority. A memo might claim a sender identity, but the memo contents are unverified unless they include explicit sender authentication.\n\nZIP 310 is still marked Draft in this snapshot.",
+          "sources": [
+            {
+              "title": "ZIP 310: Security Properties of Sapling Viewing Keys",
+              "url": "https://zips.z.cash/zip-0310",
+              "retrievedAt": "2026-10-08T03:13:42.940Z"
+            },
+            {
+              "title": "ZIP 224: Orchard Shielded Protocol",
+              "url": "https://zips.z.cash/zip-0224",
+              "retrievedAt": "2026-10-08T03:13:42.940Z"
+            },
+            {
+              "title": "ceremony · people · Hal Finney",
+              "url": "https://openzcash.org/ceremony/people"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "en"
+          },
+          "seconds": 5.12,
+          "semanticResult": "pass",
+          "manualReview": "Correct rejection of both premises with ZIP 224 and ZIP 310 available. Snapshot scope is retained; the extra ceremony source is incidental."
+        },
+        {
+          "id": "evidence-boundaries",
+          "question": "A page says editorially reviewed today. Can I say that OpenZcash passed all tests, the new page was deployed, and shielded Zcash makes the user impossible to trace? Correct each claim in plain English. Do not assume access to internal systems.",
+          "review": "Review is not test/merge/deployment evidence. No claimed access to CI. Reject untraceability and retain relevant evidence.",
+          "completed": true,
+          "answer": "No to all three. Here is what the evidence supports for each claim.\n\n**1. \"OpenZcash passed all tests.\"** You can't say this. A source revision, editorial review date or local preview does not prove tests passed, a PR merged or a production release succeeded. Claiming a pass would need current evidence for that exact version, such as a CI report. Without it, the test status is unverified. I have no access to internal test reports.\n\n**2. \"The new page was deployed.\"** You can't say this either. \"Editorially reviewed today\" only means someone read the content. Zarvis doesn't read deployment dashboards, and a review date doesn't show that a production release succeeded. Check the live URL or the deployment record before you say it's live.\n\n**3. \"Shielded Zcash makes the user impossible to trace.\"** This overstates the case. Shielded transfers use zero-knowledge proofs to validate encrypted transaction data, but privacy depends on which receivers and pools are used, the wallet, and the surrounding activity. Transparent activity is public. Network metadata and exchanges can reveal information outside the chain. A safer wording is: \"Shielded transactions encrypt transaction details on-chain, but real-world privacy depends on how you use them.\"\n\n**Safe summary:** \"This page was editorially reviewed on 20 October 2026. Test and deployment status are unconfirmed.\"",
+          "sources": [
+            {
+              "title": "Disabling Addition of New Value to the Transparent Chain Value Pool",
+              "url": "https://zips.z.cash/draft-arya-dairaemma-disable-addition-of-transparent-chain-value",
+              "retrievedAt": "2026-10-08T03:13:42.940Z"
+            },
+            {
+              "title": "ZIP 215: Explicitly Defining and Modifying Ed25519 Validation Rules",
+              "url": "https://zips.z.cash/zip-0215",
+              "retrievedAt": "2026-10-08T03:13:42.940Z"
+            },
+            {
+              "title": "Zarvis · knowledge, tests, system and capabilities",
+              "url": "https://openzcash.org/zarvis"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "en"
+          },
+          "seconds": 4.96,
+          "semanticResult": "pass",
+          "manualReview": "Correctly distinguishes editorial review, test results, deployment and privacy limits. No claimed access to private systems. Source drawer includes the Zarvis capability guide; ZIP context is broader than necessary."
+        },
+        {
+          "id": "print-workflow",
+          "question": "Na página Zcash Pitches & Narratives, marquei Selecionar para impressão e nada abriu. O que faço?",
+          "review": "Explain selection first, gold Print selected button second; browser print dialog; selected language/length; no obsolete Sources tab.",
+          "completed": true,
+          "answer": "Isso é o esperado: marcar **Selecionar para impressão** só seleciona o cartão, que ganha contorno dourado. Não abre a impressão.\n\nPara imprimir:\n1. Marque os cartões que você quer. Faça isso enquanto eles estão visíveis.\n2. Clique no botão amarelo **Imprimir selecionados**. Só então o navegador abre o diálogo de impressão. Se o navegador permitir, você pode salvar como PDF nesse diálogo.\n\nSe você usa um navegador embutido (por exemplo, dentro de um aplicativo) e o diálogo não abre, abra a página em um navegador completo com suporte à impressão. Depois selecione os cartões de novo, porque a seleção não fica no link e se perde ao recarregar.\n\nSe um filtro esconder um cartão já marcado, ele continua selecionado. Para marcar um cartão oculto, ajuste os filtros até mostrá-lo.\n\nFonte: [guia da biblioteca (pt-BR)](https://openzcash.org/narratives?lang=pt-BR).",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · idiomas, filtros, copiar e imprimir",
+              "url": "https://openzcash.org/narratives?lang=pt-BR"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · library size / quantos / cuántos",
+              "url": "https://openzcash.org/narratives"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · idiomas, filtros, copiar e imprimir",
+              "url": "https://openzcash.org/narratives?lang=es"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "pt"
+          },
+          "seconds": 3.5,
+          "semanticResult": "pass",
+          "manualReview": "Correct selection-then-print flow, visible/hidden selection distinction, persistence and embedded-browser fallback."
+        },
+        {
+          "id": "crosslink-incentives",
+          "question": "No Crosslink, quanto foi reportado como pago nas rodadas 1 e 2? Isso é o mesmo que o total alocado ao programa? Posso usar ZEC real nos testes?",
+          "review": "Read crosslink tool. Preserve reporting dates; distinguish 50 ZEC reported paid from 500 allocated, test cTAZ from mainnet ZEC; no current claim-window guarantee.",
+          "completed": true,
+          "answer": "**Pago nas rodadas 1 e 2:** o total reportado é de **50 ZEC**, sendo 25 ZEC em cada rodada. A rodada 1 foi reportada em 27 jun 2026, com 11,2 ZEC de recompensas ganhas e 13,8 ZEC discricionários. A rodada 2 foi reportada em 15 out 2026, com 19,954 ZEC ganhos e 5,046 ZEC discricionários. Esses dados são relatos curados do programa e não uma verificação independente dos pagamentos.\n\n**Isso é o mesmo que o total alocado?** Não. O programa foi aberto em 2 abr 2026 com **500 ZEC alocados**, dos quais 25 ZEC foram reservados para a primeira temporada. Alocação, recompensa ganha, direito a reivindicar e pagamento reportado são estados diferentes. Eu não calculei nem apresento um valor para a diferença entre alocado e pago. Os dados disponíveis também não mostram o que acontece com o restante da alocação.\n\n**Posso usar ZEC real nos testes?** Não. Os testes usam uma carteira de teste separada e **cTAZ**, que é dinheiro da rede de teste e não é ZEC da mainnet. Nunca inclua chaves ou seeds em relatórios. As recompensas reportadas foram expressas em ZEC, mas isso não torna o cTAZ ZEC real.",
+          "sources": [
+            {
+              "title": "ongoing test · crosslink",
+              "url": "https://openzcash.org/ongoing-test/crosslink"
+            },
+            {
+              "title": "monthly",
+              "url": "https://openzcash.org/monthly"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "pt"
+          },
+          "seconds": 9.32,
+          "semanticResult": "pass",
+          "manualReview": "Correct dated 25+25 ZEC paid reports, 500 ZEC allocation and test cTAZ distinction, with numeric guard enabled. Does not infer a remaining spendable balance. An incidental Monthly source is shown."
+        },
+        {
+          "id": "bitcoin-panel",
+          "question": "Write a 60-second Zcash opening for a skeptical Bitcoin audience at a conference. Be fair to Bitcoin, explain the practical privacy difference, and avoid price predictions.",
+          "review": "Original 110–150-word opening, fair comparison, ZEC distinct from BTC, bounded privacy claims, no fabricated adoption/endorsements or investment recommendation.",
+          "completed": true,
+          "answer": "I could not produce a draft within the requested length. Please try the shorter examples in the library. [Zcash Pitches & Narratives](https://openzcash.org/narratives)",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · Everyday privacy needs no special occasion · 60s",
+              "url": "https://openzcash.org/narratives?lang=en&length=60s&view=pitches#pitch-curtains-for-financial-life"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Accountability can have an audience · 60s",
+              "url": "https://openzcash.org/narratives?lang=en&length=60s&view=pitches#pitch-records-without-publication"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Two questions worth keeping separate · 60s",
+              "url": "https://openzcash.org/narratives?lang=en&length=60s&view=pitches#pitch-scarcity-with-context"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · A few words. A useful beginning.",
+              "url": "https://openzcash.org/narratives?lang=en&view=narratives#narrative-taglines"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "en"
+          },
+          "seconds": 7.93,
+          "semanticResult": "needs-work",
+          "manualReview": "Failed to deliver an opening: length remained over budget after its bounded repair. Retested with a lower drafting target."
+        }
+      ],
+      "label": "Eight-case batch before final word-target refinement"
+    },
+    {
+      "at": "2026-10-20T14:30:07.227996+00:00",
+      "origin": "http://127.0.0.1:4237",
+      "semanticReview": "Manually reviewed",
+      "results": [
+        {
+          "id": "donation-pitch-pt",
+          "question": "Crie um pitch de 60 segundos, em português, para apresentar a Zcash a uma ONG que recebe doações. Público leigo, tom humano, sem promessa de valorização. Entregue um texto pronto para falar.",
+          "review": "Original Portuguese NGO pitch, about 110–150 spoken words; ordinary bank/card donations are not described as public blockchains; no returns promise.",
+          "completed": true,
+          "answer": "Imagine uma pessoa que quer apoiar a sua causa, mas prefere não expor quanto doou. A Zcash é uma moeda digital, a ZEC, que permite pagamentos protegidos. Com provas de conhecimento zero, a rede confirma que o pagamento é válido sem publicar os dados privados de quem paga e de quem recebe.\n\nPara uma ONG, isso pode dar mais discrição a quem doa, com prestação de contas: chaves de visualização deixam alguém revisar registros sem poder gastar. Mas a Zcash não promete valorização nem invisibilidade total. O primeiro passo é testar uma doação pequena, com uma carteira que aceite endereços protegidos.",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · Verifique as regras, sem um dossiê público · 60s",
+              "url": "https://openzcash.org/narratives?lang=pt-BR&length=60s&view=pitches#pitch-verify-without-exposing"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Prestação de contas pode ter público definido · 60s",
+              "url": "https://openzcash.org/narratives?lang=pt-BR&length=60s&view=pitches#pitch-records-without-publication"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Compartilhe acesso com intenção · 60s",
+              "url": "https://openzcash.org/narratives?lang=pt-BR&length=60s&view=pitches#pitch-selective-disclosure"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · library size / quantos / cuántos",
+              "url": "https://openzcash.org/narratives"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "pt"
+          },
+          "seconds": 9.26,
+          "semanticResult": "pass",
+          "manualReview": "Usable original Portuguese NGO copy within the length cap, with qualified privacy and disclosure, no price promise. Shorter than the preferred 110–150-word range; timing remains approximate."
+        },
+        {
+          "id": "bitcoin-panel",
+          "question": "Write a 60-second Zcash opening for a skeptical Bitcoin audience at a conference. Be fair to Bitcoin, explain the practical privacy difference, and avoid price predictions.",
+          "review": "Original 110–150-word opening, fair comparison, ZEC distinct from BTC, bounded privacy claims, no fabricated adoption/endorsements or investment recommendation.",
+          "completed": true,
+          "answer": "Bitcoin proved something remarkable: strangers can agree on money without a bank in the middle. Nobody here needs convincing of that.\n\nBitcoin's ledger is public by design. Addresses and amounts are visible to everyone. That doesn't name you, but it can be linked to you over time. Bitcoin users manage this with careful habits and tools, and those efforts deserve respect.\n\nZcash is a separate network with its own coin, ZEC. It takes a different approach. A fully shielded payment keeps the sender, recipient and amount off the public ledger, and the network can still verify it. Its supply is capped at 21 million ZEC. Scarcity and privacy are two separate properties.\n\nShielding isn't invisibility. It doesn't hide your device or your connection. Don't take my word for it. Read how shielded transactions work, then judge for yourself.",
+          "sources": [
+            {
+              "title": "Zcash Pitches & Narratives · Everyday privacy needs no special occasion · 60s",
+              "url": "https://openzcash.org/narratives?lang=en&length=60s&view=pitches#pitch-curtains-for-financial-life"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Accountability can have an audience · 60s",
+              "url": "https://openzcash.org/narratives?lang=en&length=60s&view=pitches#pitch-records-without-publication"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · Two questions worth keeping separate · 60s",
+              "url": "https://openzcash.org/narratives?lang=en&length=60s&view=pitches#pitch-scarcity-with-context"
+            },
+            {
+              "title": "Zcash Pitches & Narratives · A few words. A useful beginning.",
+              "url": "https://openzcash.org/narratives?lang=en&view=narratives#narrative-taglines"
+            }
+          ],
+          "provenance": {
+            "route": "model",
+            "model": "claude-sonnet-5-5",
+            "webSearch": false,
+            "groundingFallback": false,
+            "withheldFigures": 0,
+            "language": "en"
+          },
+          "seconds": 4.77,
+          "semanticResult": "pass",
+          "manualReview": "Usable opening within the 60-second cap. Fair treatment of Bitcoin practices, ZEC distinct from BTC, qualified privacy and no price predictions."
+        }
+      ],
+      "label": "Affected cases after explicit lower word targets"
+    }
+  ]
+}

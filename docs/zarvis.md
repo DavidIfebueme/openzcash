@@ -154,7 +154,7 @@ Official references read on 2026-10-07: [Messages API](https://platform.claude.c
 - Curated, dated background: privacy, Unified Addresses, viewing keys, issuance/halvings, funding rules, ledger interpretation, treasury scenarios, governance and ecosystem navigation (`src/lib/zarvis/sources.ts`). This is a reviewed starting library, not a claim of exhaustive or automatically current knowledge.
 - Live read-only tools: a dedicated ZEC/USD quote at `/api/zec-price` (from the shared price oracle, with provider time, retrieval time and stale flag), plus public treasury, markets, grants, recipients, disbursements, ZCG grant applications and decisions, coinholder, ZecHub, ecosystem, wallets, communities, Arborist calls, chain and supply readings, historical daily closes, news, funding history, site documentation, meetings, elections, published totals, payment schedules, Maya transfers, governance records and monthly reading sets (see the data-coverage table below). The tool calls explicit public readers; the model cannot supply URLs, database queries or private routes. Records are bounded and truncation is labeled. Reporting dates and stale flags remain attached.
 - Provider web search can consult a fixed list of Zcash reference/community domains for long-tail and current external information. Community content remains untrusted evidence, not official consensus. ZIPs use the complete internal official-source catalog and a dedicated lookup tool. Missing or stale information can use official external sources. ZCG grant applications are never treated as protocol ZIPs. Disable search with `ZARVIS_WEB_SEARCH=false` if desired; the assistant must disclose missing current evidence.
-- Returned citations are rendered as safe Markdown links. The source drawer includes consulted live sources even if the model omits an inline link, plus explicitly cited curated background. Bare-URL citations also retain their source entry. AI citations are not independent verification; users can inspect the evidence.
+- Returned citations are rendered as safe Markdown links. The source drawer includes consulted live sources and public site-documentation records supplied to the model even if it omits an inline link, plus explicitly cited curated background. Static site records do not receive an invented freshness timestamp. Bare-URL citations also retain their source entry. AI citations are not independent verification; users can inspect the evidence.
 - Review curated notes after protocol upgrades, source changes or new treasury methodology. Do not ingest the private repository, keys, private wallet scans, admin routes or confidential material.
 
 ## Data coverage (2026-09-28)
@@ -381,3 +381,36 @@ curl --fail-with-body -H "Authorization: Bearer $CRON_SECRET" https://openzcash.
 | `ZARVIS_AGGREGATE_METRICS` | Existing; prints the process counters once a minute. |
 
 Verification: `npx vitest run`, `npx tsc --noEmit`, `npx eslint src/lib/zarvis src/app/api/zarvis src/components/zarvis`.
+
+
+## Expertise and narrative audit — October 20, 2026
+
+See [the expertise audit](zarvis-expertise-audit.md) for retrieval gaps,
+real-provider failures, corrections and measured validation. The public index
+now includes every visible public navigation destination and projects the
+original narrative catalog into locale/length-specific evidence. The build
+reads explicit allowlisted files only. Update the catalogs and
+`src/lib/zarvis/site-guides.json`, run `npm run knowledge:build`, and commit the
+generated `public-content.json` with the source change; `knowledge:check` catches
+drift. The metadata is a source revision, not a test or publication certificate.
+
+`lookup_openzcash(topic: "crosslink")` reads the same `crosslink-history.ts`
+records as the public page: launch allocation, reported paid rounds and recent
+program history. It preserves dates and distinguishes mining/staking recipient
+counts from overlapping discretionary groups. Currency fields carry explicit ZEC units and participate in the existing numeric guard. It does not verify payments
+independently or establish a currently open claim window.
+
+Writing briefs bypass automatic dataset prefetch, so "avoid price predictions"
+does not fetch a quote. Model-requested read-only tools remain available for
+facts the draft needs. Trusted writing instructions are separate from retrieved
+evidence and visitor messages. Length repairs share the request deadline,
+perform no tools/searches, count provider usage, and run before the financial
+check. The final length check never starts another repair cycle. Library usage
+requests receive separate, concise workflow guidance.
+
+The new `scripts/eval-zarvis-expertise.py --confirm-paid` runner is opt-in and
+loopback-only. It sends synthetic questions through the normal HTTP endpoint,
+stops on a refusal/error, and does not load credentials or override quotas.
+A completed response is not a semantic pass: inspect every answer against
+`docs/zarvis-expertise-cases.json`. Run `npm run eval:zarvis` for deterministic
+retrieval/behavior checks. Paid conversations are not part of CI.

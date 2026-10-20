@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { scenarioAssumptionsSchema } from "./scenario-input";
 import type { ChatMessage } from "./types";
-import { normalizeQuestion } from "./language";
+import { normalizeQuestion, requestedOutputLanguage } from "./language";
 
 export const sessionSchema = z.object({
   language: z.enum(["en", "pt", "es", "fr"]).optional(),
@@ -17,8 +17,8 @@ export function sessionPreferences(previous: ZarvisSession = {}, messages: ChatM
   for (const message of messages) {
     if (message.role !== "user") continue;
     const q = normalizeQuestion(message.content).replace(/^(?:please |por favor )/, "").replace(/(?: please| por favor)$/, "");
-    const language = q.match(/^(?:please )?(?:answer|reply|respond|responda|responde|respondeme|contesta|contestame)(?: to me|me)? (?:in|em|en) (english|ingles|portuguese|portugues|spanish|espanhol|espanol|french|frances)[.!]?$/);
-    if (language) result.language = ({ english: "en", ingles: "en", portuguese: "pt", portugues: "pt", spanish: "es", espanhol: "es", espanol: "es", french: "fr", frances: "fr" } as const)[language[1] as "english"];
+    const language = requestedOutputLanguage(q);
+    if (language) result.language = language;
     if (/^(?:use|usar|usa|mostre em|muestra en|show amounts in) (usd|dollars|dolares)[.!]?$/.test(q)) result.currency = "USD";
     if (/^(?:use|usar|usa|mostre em|muestra en|show amounts in) (brl|reais|reales)[.!]?$/.test(q)) result.currency = "BRL";
     if (/^(?:use|usar|usa|mostre em|muestra en|show amounts in) (eur|euros)[.!]?$/.test(q)) result.currency = "EUR";

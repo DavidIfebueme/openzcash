@@ -152,3 +152,11 @@ it("keeps the person in short requests for more depth", () => {
   const query = retrievalQuestion([user("Quem é Zooko?"), answer("Zooko ajudou a criar o Zcash."), user("Conte mais.")]);
   expect(query).toContain("Zooko"); expect(query).toContain("Conte mais");
 });
+
+
+it("does not prefetch price data from a writing brief that excludes price predictions", async () => {
+  const result = await prepareLocal([user("Write a 60-second Zcash opening for a skeptical Bitcoin audience at a conference. Be fair to Bitcoin, explain the practical privacy difference, and avoid price predictions.")], signal());
+  expect(result.direct).toBeUndefined();
+  expect(result.documents.some(doc => doc.id.startsWith("narratives:") && doc.pitchLength === "60s")).toBe(true);
+  expect(mocks.lookup).not.toHaveBeenCalled();
+});

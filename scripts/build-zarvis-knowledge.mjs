@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import ts from "typescript";
+import { narrativeDocuments } from "./zarvis-narratives.mjs";
 import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // Explicit allowlist: never scan private routes, env files, admin modules or the repository broadly.
@@ -16,6 +17,8 @@ export const routes = [
   "/monthly", "/lockbox", "/zf", "/zodl", "/shielded-labs", "/zakura", "/tachyon",
   "/zechub", "/arborist", "/communities", "/ceremony", "/ceremony/people", "/ceremony/road",
   "/ceremony/record", "/ceremony/ten-years", "/ceremony/watch",
+  "/narratives", "/ongoing-test/crosslink", "/zcash-network", "/legal",
+  "/zcg/participate", "/zcg/copilot", "/zechub/copilot", "/zcg/coinholder/copilot", "/ecosystem/history",
 ];
 const references = [
   ["src/lib/ceremony/story.ts", "/ceremony/road"],
@@ -26,6 +29,9 @@ const references = [
   ["src/lib/monthly/reading-sets.json", "/monthly"],
   ["src/app/wallets/catalog-data.ts", "/wallets/find"],
   ["src/lib/communities/data.ts", "/communities"],
+  ["src/app/ongoing-test/crosslink-guide.tsx", "/ongoing-test/crosslink"],
+  ["src/app/ongoing-test/community-tools.ts", "/ongoing-test/crosslink"],
+  ["src/components/legal/page.tsx", "/legal"],
 ];
 const textFields = new Set(["title", "subtitle", "description", "what", "label", "name", "detail", "text", "note", "body", "summary", "contents", "licence", "role", "outcome", "decidedBy", "status", "date", "evidenceCutoff", "reviewedAt", "era", "who", "knownAs", "public", "year", "by", "caption", "claim", "fact", "papers", "item", "lede", "maker", "shielded", "tag", "country", "region", "language", "about", "recipient"]);
 const decode = (s) => s.replace(/&apos;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/\s+/g, " ").trim();
@@ -108,7 +114,18 @@ export function compile() {
       flush();
     }
   }
-  return {version:1,sourceRevision:hash.digest("hex").slice(0,16),sourceFiles:files.length,documents:docs};
+  // JSON catalogs need an explicit projection: generic string extraction loses their locale/length structure.
+  const extraFiles = ["src/lib/narratives/pitches.json", "src/lib/narratives/narratives.json", "src/lib/zarvis/site-guides.json"];
+  const [pitches, narratives, guides] = extraFiles.map(file => {
+    const source = fs.readFileSync(path.join(root, file), "utf8");
+    hash.update(file).update(source);
+    return JSON.parse(source);
+  });
+  docs.push(...narrativeDocuments(pitches, narratives));
+  docs.push({ id: "guide:narratives-counts", url: "https://openzcash.org/narratives", title: "Zcash Pitches & Narratives · library size / quantos / cuántos",
+    text: `The library contains ${pitches.length} original pitches and ${narratives.length} narrative themes. Every pitch has English, Brazilian Portuguese and Spanish text in three lengths: one sentence, approximately 30 seconds and approximately 60 seconds. Counts refer to examples, not separate translations. A biblioteca tem ${pitches.length} pitches e ${narratives.length} narrativas. La biblioteca tiene ${pitches.length} pitches y ${narratives.length} narrativas.` });
+  for (const { id, route, title, text } of guides) docs.push({ id: `guide:${id}`, title, text, url: `https://openzcash.org${route}` });
+  return {version:1,sourceRevision:hash.digest("hex").slice(0,16),sourceFiles:files.length + extraFiles.length,documents:docs};
 }
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const target=path.join(root,"src/lib/zarvis/public-content.json");

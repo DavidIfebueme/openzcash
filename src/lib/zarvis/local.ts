@@ -4,6 +4,7 @@ import { projectActivityMonth, lookupProjectActivity, projectActivityAnswer } fr
 import { lookupPublicData, lookupSchema } from "./data";
 import { queryLedger, ledgerQuerySchema, type LedgerSummary } from "./ledger";
 import { searchKnowledge } from "./knowledge";
+import { narrativeContext, narrativeIntent } from "./narrative-intent";
 import { getZipCorpus } from "./zips";
 import { isZipQuestion, zipCatalogEvidence, latestZipAnswer, requestedZips } from "./zip-catalog";
 import { boundedRead } from "./timeout";
@@ -25,6 +26,8 @@ export type LocalPlan = { query: string; documents: ReturnType<typeof searchKnow
 /** Retrieve for the latest topic; short replies can refer to the preceding answer/offer. */
 export function retrievalQuestion(messages: ChatMessage[]): string {
   const latest = messages.at(-1)?.content ?? "";
+  const brief = narrativeContext(messages);
+  if (brief) return brief;
   if (latest.length <= 70 && /^(?:yes|sim|ok|sure|please|continue|tell me more|conte mais|fale mais|aprofunde|pode|isso|e\b|and\b|what about\b|how about\b|explain(?: (?:that|it|more))?$|explique(?: (?:isso|mais))?$|por que\b|why\b)/i.test(latest.trim())) {
     return `${messages.slice(-3, -1).map((m) => m.content.slice(0, 900)).join("\n")}\n${latest}`;
   }
@@ -92,6 +95,7 @@ export function relevantTopics(query: string): Array<typeof lookupSchema._output
   // A payment total needs the complete ledger tool, not large ecosystem/grant excerpts.
   if (/\b(?:paid|payments|pagou|pagos?|pagamentos|gastos|gastou)\b/.test(q) && /\b(?:grants?|zcg)\b/.test(q) && !/\b(?:treasury|tesouro|balance|saldo)\b/.test(q)) return [];
   const matches: Array<[RegExp, typeof lookupSchema._output.topic]> = [
+    [/\bcrosslink\b/, "crosslink"],
     [/\b(?:price|preco|cotacao|quanto (?:vale|valia|custa|custava|era|estava|esta) (?:o |um |1 )?zec|how much (?:is|was|does) (?:a |one |1 )?zec)\b/, "price"],
     [/\b(?:hashrate|solrate|difficulty|dificuldade)\b.*\b(?:current|today|now|atual|hoje|agora)\b|\b(?:current|today|now|atual|hoje|agora)\b.*\b(?:hashrate|solrate|difficulty|dificuldade)\b/, "mining"],
     [/\b(?:treasur\w*|tesour\w*|balances?|saldos?|holdings?|lockbox)\b/, "treasuries"],
@@ -189,7 +193,11 @@ export async function prepareLocal(messages: ChatMessage[], signal: AbortSignal,
     return { query, documents, evidence: [result], direct: treasuryAnswer(result.content, intent.fund, lang), external: false };
   }
   const scenarioQuestion = /(?:simul|scenario|cenario|\b[0-9]+\s*[x×]\b)/i.test(query) && /treasur|tesour|cypherpunk|cipherpunk|lockbox|zcg/i.test(query);
-  const topics = scenarioQuestion ? [] : intent?.type === "price" ? ["price" as const] : relevantTopics(query);
+  const communication = narrativeIntent(query);
+  // A writing brief can mention "avoid price predictions" or "conference panel".
+  // Do not prefetch unrelated datasets; the model can still call tools for facts it needs.
+  const writingBrief = communication && !communication.usage;
+  const topics = scenarioQuestion || writingBrief ? [] : intent?.type === "price" ? ["price" as const] : relevantTopics(query);
   const evidence = await Promise.all(topics.map((topic) => lookupPublicData({ topic, query: QUERY_TOPICS.has(topic) ? normalizeQuestion(query).slice(0, 120) : "" }, signal)));
   if (zip) evidence.push(zipCatalogEvidence(query, zip.corpus, zip.stale));
   signal.throwIfAborted();

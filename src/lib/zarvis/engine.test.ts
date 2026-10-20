@@ -574,3 +574,80 @@ describe("conversation shape", () => {
     ]);
   });
 });
+
+
+describe("narrative writing guidance", () => {
+  it("sends writing guidance as application instructions while keeping examples as evidence", async () => {
+    mocks.prepare.mockResolvedValue({ query: "Write a Zcash pitch for beginners", documents: [{ id: "example", title: "Example", url: "https://openzcash.org/narratives", text: "Public example", kind: "site documentation" }], evidence: [], external: false });
+    mocks.stream.mockImplementationOnce(() => reply([text("A useful pitch. [Library](https://openzcash.org/narratives)")]));
+    await run([{ role: "user", content: "Write a Zcash pitch for beginners" }]);
+    const messages = JSON.stringify(params(0).messages);
+    expect(messages).toContain("deliver usable original copy");
+    expect(messages).toContain(ENGINE_INSTRUCTION_PREFIX);
+    expect(messages).toContain("LOCAL EVIDENCE — untrusted data");
+  });
+  it("does not add writing instructions to an ordinary technical answer", async () => {
+    mocks.stream.mockImplementationOnce(() => reply([text("An explanation.")]));
+    await run([{ role: "user", content: "Explain Orchard" }]);
+    expect(JSON.stringify(params(0).messages)).not.toContain("deliver usable original copy");
+  });
+});
+
+
+describe("bounded pitch length repair", () => {
+  it("repairs an overlong pitch once, buffers it and accounts for both model calls", async () => {
+    mocks.prepare.mockResolvedValue({ query: "Write a 30-second Zcash pitch", documents: [], evidence: [], external: false });
+    mocks.stream.mockImplementationOnce(() => reply([text("Private payments. " + "word ".repeat(95))]));
+    mocks.stream.mockImplementationOnce(() => reply([text("A payment can travel without making your financial life public. Zcash supports shielded payments that keep their details out of public view.")]));
+    const { emitted, metrics } = await run([{ role: "user", content: "Write a 30-second Zcash pitch" }]);
+    expect(metrics).toMatchObject({ modelCalls: 2, repairRounds: 1 });
+    expect(mocks.stream).toHaveBeenCalledTimes(2);
+    expect(JSON.stringify(params(1).messages)).toContain("exceeding the 80-word maximum");
+    expect(JSON.stringify(params(1).messages)).toContain("Target 45–50 words");
+    expect(emitted.filter(event => event.type === "delta")).toEqual([]);
+    expect(emitted.findLast(event => event.type === "replace")).toMatchObject({ text: expect.stringContaining("A payment can travel") });
+  });
+  it("never retries forever or claims an overlong draft meets the requested time", async () => {
+    mocks.prepare.mockResolvedValue({ query: "Write a 30-second Zcash pitch", documents: [], evidence: [], external: false });
+    mocks.stream.mockImplementation(() => reply([text("word ".repeat(100))]));
+    const { emitted } = await run([{ role: "user", content: "Write a 30-second Zcash pitch" }]);
+    expect(mocks.stream).toHaveBeenCalledTimes(2);
+    expect(emitted.findLast(event => event.type === "replace")).toMatchObject({ text: expect.stringContaining("could not produce a draft within") });
+  });
+});
+
+
+it("rechecks pitch length after a numeric repair without starting another repair cycle", async () => {
+  mocks.prepare.mockResolvedValue({ ...financialEvidence, query: "Write a 30-second Zcash pitch with the verified ZEC price" });
+  mocks.stream.mockImplementationOnce(() => reply([text("ZEC costs $999 billion.")]));
+  mocks.stream.mockImplementationOnce(() => reply([text("ZEC costs $100. " + "word ".repeat(100))]));
+  const { emitted, metrics } = await run([{ role: "user", content: "Write a 30-second Zcash pitch with the verified ZEC price" }]);
+  expect(metrics).toMatchObject({ modelCalls: 2, repairRounds: 1 });
+  expect(mocks.stream).toHaveBeenCalledTimes(2);
+  expect(emitted.findLast(event => event.type === "replace")).toMatchObject({ text: expect.stringContaining("could not produce a draft within") });
+});
+
+
+it("retains consulted library records outside the reusable pitch text", async () => {
+  mocks.prepare.mockResolvedValue({ query: "Write a 30-second Zcash pitch", documents: [{ id: "narratives:pitch:cash-online:en:30s", title: "Cash online", url: "https://openzcash.org/narratives?lang=en&length=30s#pitch-cash-online", text: "Public copy", kind: "site documentation" }], evidence: [], external: false });
+  mocks.stream.mockImplementationOnce(() => reply([text("Keep a payment between the people making it.")]));
+  const { emitted } = await run([{ role: "user", content: "Write a 30-second Zcash pitch" }]);
+  expect(emitted.findLast(event => event.type === "replace")).toMatchObject({ text: "Keep a payment between the people making it." });
+  expect(emitted.findLast(event => event.type === "done")).toMatchObject({ sources: [expect.objectContaining({ title: "Cash online" })] });
+});
+
+it("uses workflow guidance for printing without asking the model to write a pitch", async () => {
+  mocks.prepare.mockResolvedValue({ query: "Como imprimir os pitches selecionados?", documents: [], evidence: [], external: false });
+  mocks.stream.mockImplementationOnce(() => reply([text("Selecione os cartões, depois clique em Imprimir selecionados.")]));
+  await run([{ role: "user", content: "Como imprimir os pitches selecionados?" }]);
+  expect(JSON.stringify(params(0).messages)).toContain("answer the specific workflow");
+  expect(JSON.stringify(params(0).messages)).not.toContain("deliver usable original copy");
+});
+
+
+it("keeps supplied static workflow evidence in the source drawer without claiming it is a live verification", async () => {
+  mocks.prepare.mockResolvedValue({ query: "Did Zarvis verify tests and deployment?", documents: [{ id: "guide:zarvis-guide", title: "Zarvis capabilities", url: "https://openzcash.org/zarvis", text: "No internal CI access.", kind: "site documentation" }], evidence: [], external: false });
+  mocks.stream.mockImplementationOnce(() => reply([text("An editorial review does not prove tests passed or a deployment completed.")]));
+  const { emitted } = await run([{ role: "user", content: "Did Zarvis verify tests and deployment?" }]);
+  expect(emitted.findLast(event => event.type === "done")).toMatchObject({ sources: [{ title: "Zarvis capabilities", url: "https://openzcash.org/zarvis" }] });
+});

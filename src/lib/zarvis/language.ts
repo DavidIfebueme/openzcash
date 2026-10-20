@@ -19,7 +19,7 @@ export const normalizeQuestion = (s: string) => s.normalize("NFD").replace(/\p{M
 /** Function words weigh 2 and the few domain nouns the direct templates accept weigh 1, so "Como funciona a viewing key?" is Portuguese. A word may count for several languages: everyday Portuguese that is also Spanish (se, vale, pago, use, usar, sobre, por, dólares) is in both lists so a tie falls to Portuguese, except "se" and "usa", which open the Spanish preferences "sé breve" and "usa dólares" and therefore count only 1 for Portuguese: enough for "Como se usa uma viewing key?" (6–6) and "Ela usa dólares?" (4–3), not enough to flip "Sé breve" or "Usa dólares" (2–3). */
 const FUNCTION_WORD = 2, DOMAIN_NOUN = 1;
 const words = {
-  en: ["what whats how the is are does do did and or in of for to an it its my this that these those where which who when with about much many can could should will was were has have had not no yes hi hello thanks thank explain today now on at by from as into up out over use", "a price latest current treasury balance balances holdings paid grants viewing key keys"],
+  en: ["what whats how the is are does do did and or in of for to an it its my this that these those where which who when with about much many can could should will was were has have had not no yes hi hello thanks thank explain today now on at by from as into up out over use write draft rewrite shorten adapt craft prepare create give", "a price latest current treasury balance balances holdings paid grants viewing key keys"],
   pt: ["como onde quais qual quanto quantos quanta quantas sao esta estao foi tem ha dizem mostram que de do da dos das um uma o a os as para com nao e em no na nos nas ao aos por mais sim ola oi obrigado obrigada valeu explique pagou pagaram custa hoje agora ultimo ultima atual atuais quando ela ele pode meus minha meu isso esse essa vale pago use usar sobre", "saldo saldos dados preco cotacao tesouro tesouraria carteiras chave chaves cenario cenarios vezes limitacoes breve respostas dolares se usa"],
   es: ["como donde cuales cual cuanto cuantos cuanta cuantas es son esta estan fue tiene tienen hay dicen muestran que de del al a un una el los las la para con no y en si hola buenas gracias muchas explica explicame dime cuesta vale hoy ahora ultimo ultima actual actuales cuando puede puedes podrias mis mi eso ese esa responde contesta usa llamada reunion pagado pago gastado desembolsado se significa quiere decir hablame cuentame sobre por", "saldo saldos datos precio cotizacion tesoreria carteras billetera billeteras clave claves escenario escenarios subvenciones subvencion propuesta propuestas dolares espanol breve respuestas"],
   fr: ["comment ou quel quelle quels quelles combien est sont sera disent montrent que de du des un une le les la pour avec pas ne et en dans sur oui bonjour merci coute aujourd'hui maintenant dernier derniere actuel actuelle quand peut mes mon ma cela ce cette", "solde donnees prix cours tresorerie portefeuille cle cles scenario"],
@@ -40,6 +40,15 @@ export function questionLanguage(question: string): AnswerLanguage | undefined {
   if (tied.includes("en")) return tied.length === 1 ? "en" : undefined;
   if (tied.includes("pt") && tied.includes("es") && SPANISH_MARK.test(question)) return "es";
   return tied.includes("pt") ? "pt" : tied.includes("es") ? "es" : "other";
+}
+
+/** Explicit output-language requests inside a writing/translation command, not a passing mention of a language. */
+export function requestedOutputLanguage(question: string): "en" | "pt" | "es" | "fr" | undefined {
+  const q = normalizeQuestion(question);
+  if (!/^(?:(?:please|por favor) )?(?:(?:now|agora|ahora) )?(?:answer|reply|respond|responda|responde|respondeme|contesta|contestame|write|draft|prepare|create|craft|give me|faca|faz|haz|haga|quero|quiero|rewrite|adapt|translate|crie|escreva|redija|reescreva|adapte|traduza|escribe|redacta|reescribe|adapta|traduce)\b/.test(q)) return;
+  const match = [...q.matchAll(/\b(?:in|em|en|to|para(?: o)?) (english|ingles|portuguese|portugues|spanish|espanhol|espanol|french|frances)\b/g)].at(-1);
+  if (!match) return;
+  return ({ english: "en", ingles: "en", portuguese: "pt", portugues: "pt", spanish: "es", espanhol: "es", espanol: "es", french: "fr", frances: "fr" } as const)[match[1] as "english"];
 }
 
 /** An explicit stored preference wins; otherwise the latest decisive user turn, so short follow-ups keep the language of the question they continue. */

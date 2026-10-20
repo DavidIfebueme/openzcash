@@ -5,7 +5,7 @@ import { compile, publicText, publicSections, routes } from "./build-zarvis-know
 test("only explicitly allowed public pages are compiled", () => {
   for (const route of routes) assert.doesNotMatch(route, /\/(?:admin|viewing-keys|invites|login|projects)(?:\/|$)/);
   const index = compile();
-  assert.equal(index.sourceFiles, 56);
+  assert.equal(index.sourceFiles, 71);
   assert.ok(index.documents.length > 40);
   assert.deepEqual(index, JSON.parse(fs.readFileSync(new URL("../src/lib/zarvis/public-content.json", import.meta.url), "utf8")));
 });
@@ -61,4 +61,16 @@ test("mixed reference layouts preserve archives and their names alongside dated 
   const mixed = publicSections('const x = [{title:"Recognized",text:"Body"},{caption:"Public remainder",password:"secret-sentinel"}];', "reference.ts");
   assert.ok(mixed.some(d => d.text.includes("Public remainder")));
   assert.doesNotMatch(JSON.stringify(mixed), /secret-sentinel/);
+});
+
+
+test("narrative projection excludes private extras and historical source attribution", async () => {
+  const { narrativeDocuments } = await import("./zarvis-narratives.mjs");
+  const localized = { en: "Public example", "pt-BR": "Exemplo público", es: "Ejemplo público" };
+  const family = { id: "cash", title: localized, idea: localized, context: localized, fact: localized, limit: localized, secret: "secret-sentinel" };
+  const pitch = { id: "example", theme: "cash", title: localized, context: localized, approach: localized, audiences: ["beginners"], translations: Object.fromEntries(Object.entries(localized).map(([locale, text]) => [locale, { sentence: text, "30s": text, "60s": text }])), apiKey: "secret-sentinel", source: "historical-source-sentinel" };
+  const docs = narrativeDocuments([pitch], [family]);
+  assert.equal(docs.length, 12);
+  assert.doesNotMatch(JSON.stringify(docs), /secret-sentinel|historical-source-sentinel/);
+  assert.throws(() => narrativeDocuments([{ ...pitch, translations: {} }], [family]));
 });

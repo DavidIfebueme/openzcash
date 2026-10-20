@@ -29,7 +29,7 @@
     "test:knowledge": "node --test scripts/build-zarvis-knowledge.test.mjs",
     "knowledge:sync": "npm run knowledge:sync:zips && python3 scripts/sync-zarvis-references.py && python3 scripts/sync-zarvis-sources.py",
     "knowledge:sync:sources": "python3 scripts/sync-zarvis-sources.py",
-    "eval:zarvis": "vitest run src/lib/zarvis/evaluation.test.ts",
+    "eval:zarvis": "vitest run src/lib/zarvis/evaluation.test.ts src/lib/zarvis/narratives.test.ts",
     "zarvis:review": "bash scripts/zarvis-review.sh",
     "knowledge:sync:zips": "node --import tsx scripts/sync-zarvis-zips.ts",
     "errors:build": "tsx scripts/build-error-fallback.tsx",
