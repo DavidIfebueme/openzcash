@@ -36,14 +36,14 @@ function CopyButton({ text, locale, link = false }: { text: string; locale: Loca
 
 function PitchCard({ pitch, locale, length, selected, onSelect, compact = false }: { pitch: Pitch; locale: Locale; length: PitchLength; selected?: boolean; onSelect?: () => void; compact?: boolean }) {
   const family = narratives.find(n => n.id === pitch.theme)!;
-  return <article id={compact ? undefined : `pitch-${pitch.id}`} className={styles.card}>
+  return <article id={compact ? undefined : `pitch-${pitch.id}`} className={styles.card} data-selected={selected || undefined}>
     <div className={styles.cardMeta}><span className={styles.cardIndex}>{String(pitches.indexOf(pitch) + 1).padStart(2, '0')}</span><span>{pitch.audiences.map(a => audiences[a][locale]).join(' · ')}</span><span className={styles.cardLength}>{lengthLabels[length][locale]}</span></div>
     <h3><Link href={contentHref(pitch.id, locale, length)}>{pitch.title[locale]}</Link></h3>
     <p className={styles.pitchText}>{pitch.translations[locale][length]}</p>
     <div className={styles.actions}>
       <CopyButton key={`${pitch.id}-${locale}-${length}`} text={pitch.translations[locale][length]} locale={locale} />
       <CopyButton key={`link-${pitch.id}-${locale}-${length}`} text={contentHref(pitch.id, locale, length)} locale={locale} link />
-      {onSelect && <label className={styles.check}><input type="checkbox" checked={selected} onChange={onSelect} />{message(locale, 'Print', 'Imprimir')}</label>}
+      {onSelect && <label className={styles.check}><input type="checkbox" checked={selected} onChange={onSelect} aria-label={`${message(locale, 'Select for printing', 'Selecionar para impressão')}: ${pitch.title[locale]}`} /><span>{selected ? message(locale, 'Selected for printing', 'Selecionado para impressão') : message(locale, 'Select for printing', 'Selecionar para impressão')}</span></label>}
     </div>
     <details className={styles.details}>
       <summary>{message(locale, 'Make it your own', 'Leve para sua conversa')}</summary>
@@ -124,7 +124,7 @@ export function NarrativesLibrary() {
         </aside>
         <div className={styles.results}>
         <PreparePitch key={locale} locale={locale} length={length} />
-        <div className={styles.resultBar}><span className={styles.resultCount} role="status">{results.length} {results.length === 1 ? message(locale, 'pitch found', 'pitch encontrado') : message(locale, 'pitches found', 'pitches encontrados')}</span><div className={styles.actions}>{(query || audience || theme) && <button onClick={() => update({ q: '', audience: '', theme: '' })}>{message(locale, 'Clear filters', 'Limpar filtros')}</button>}{selected.length > 0 && <button onClick={() => window.print()}>{message(locale, 'Print selected', 'Imprimir selecionados')} ({selected.length})</button>}{selected.length > 0 && <button onClick={() => setSelected([])}>{message(locale, 'Clear selection', 'Limpar seleção')}</button>}</div></div>
+        <div className={styles.resultBar} data-selection={selected.length > 0 || undefined}><span className={styles.resultCount} role="status">{results.length} {results.length === 1 ? message(locale, 'pitch found', 'pitch encontrado') : message(locale, 'pitches found', 'pitches encontrados')}</span><div className={styles.actions}>{(query || audience || theme) && <button onClick={() => update({ q: '', audience: '', theme: '' })}>{message(locale, 'Clear filters', 'Limpar filtros')}</button>}{selected.length > 0 && <button className={styles.printButton} onClick={() => window.print()}>{message(locale, 'Print selected', 'Imprimir selecionados')} ({selected.length})</button>}{selected.length > 0 && <button onClick={() => setSelected([])}>{message(locale, 'Clear selection', 'Limpar seleção')}</button>}</div></div>
         <div className={styles.grid}>{results.map(pitch => <PitchCard key={pitch.id} pitch={pitch} locale={locale} length={length} selected={selected.includes(pitch.id)} onSelect={() => setSelected(current => current.includes(pitch.id) ? current.filter(id => id !== pitch.id) : [...current, pitch.id])} />)}</div>
         {!results.length && <div className={styles.empty}><h3>{message(locale, 'No pitches match this combination.', 'Nenhum pitch nesta combinação.')}</h3><p>{message(locale, 'Try another theme or remove a filter.', 'Experimente outro tema ou remova um filtro.')}</p><button onClick={() => update({ q: '', audience: '', theme: '' })}>{message(locale, 'Show all pitches', 'Ver todos os pitches')}</button></div>}
         <p className={styles.footnote}>{message(locale, 'Speaking times are approximate. All three lengths have been reviewed; read aloud and adapt to your pace.', 'Tempos de fala são aproximados. As três extensões foram revisadas; leia em voz alta e adapte ao seu ritmo.')}</p>

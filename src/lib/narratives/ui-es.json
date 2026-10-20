@@ -5,7 +5,6 @@
   "Copied to clipboard.": "Copiado al portapapeles.",
   "Clipboard unavailable. Select and copy manually:": "El portapapeles no está disponible. Selecciona y copia manualmente:",
   "Text to copy": "Texto para copiar",
-  "Print": "Imprimir",
   "When to use": "Cuándo usarlo",
   "Prepare your pitch": "Prepara tu pitch",
   "Audience": "Público",
@@ -58,5 +57,7 @@
   "Your voice": "Tu voz",
   "Use these starting points to explain the idea in words that feel natural to you.": "Usa estos puntos de partida para explicar la idea con palabras que te resulten naturales.",
   "Written for OpenZcash to make conversations about private digital money clearer, more useful and more human.": "Textos escritos para OpenZcash para que las conversaciones sobre dinero digital privado sean más claras, útiles y humanas.",
-  "OpenZcash · Ideas worth explaining. Privacy worth understanding.": "OpenZcash · Ideas que vale la pena explicar. Privacidad que vale la pena entender."
+  "OpenZcash · Ideas worth explaining. Privacy worth understanding.": "OpenZcash · Ideas que vale la pena explicar. Privacidad que vale la pena entender.",
+  "Select for printing": "Seleccionar para imprimir",
+  "Selected for printing": "Seleccionado para imprimir"
 }

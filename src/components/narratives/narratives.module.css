@@ -71,10 +71,16 @@
 .libraryHeading h2 { font-size: 24px; letter-spacing: -.03em; font-weight: 600; }
 .libraryHeading + p { max-width: 760px; color: var(--text-muted); font-size: 14px; }
 .resultBar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; margin: 0 0 2px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+.resultBar[data-selection] { position: sticky; top: 76px; z-index: 5; padding: 10px 12px; margin: 12px 0 18px; background: var(--surface-1); border: 1px solid var(--border-strong); border-radius: 10px; box-shadow: 0 6px 18px -10px #0003; }
+.page .printButton { background: var(--gold); color: #1c1917; border-color: var(--gold); font-weight: 650; min-height: 40px; padding: 9px 16px; }
+.page .printButton:hover { background: color-mix(in srgb, var(--gold), white 14%); border-color: var(--gold); }
 .resultCount { font-weight: 500; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
 .card { position: relative; border: 1px solid var(--border); border-radius: 12px; background: var(--surface-1); padding: 24px; scroll-margin-top: 92px; overflow-wrap: anywhere; transition: border-color .2s, box-shadow .2s; }
 .card:hover { border-color: var(--border-strong); box-shadow: 0 4px 18px -12px #76542c55; }
+.results:has(.resultBar[data-selection]) .card { scroll-margin-top: 168px; }
+.card[data-selected] { border-color: var(--gold); box-shadow: 0 0 0 2px color-mix(in srgb, var(--gold) 45%, transparent), 0 0 22px -8px color-mix(in srgb, var(--gold) 55%, transparent); }
+.card[data-selected] .check { color: var(--accent-fg); font-weight: 600; }
 .card:target, .narrative:target { outline: 2px solid var(--accent); outline-offset: 4px; }
 .cardMeta { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; color: var(--text-muted); font-size: 10px; }
 .cardIndex { display: grid; place-items: center; width: 27px; height: 27px; background: var(--surface-2); color: var(--accent-fg); border-radius: 6px; font-size: 10px; font-variant-numeric: tabular-nums; }
@@ -169,6 +175,7 @@
   .tabs { margin-bottom: 22px; }
 }
 @container (max-width: 560px) {
+  .resultBar[data-selection] { top: 64px; gap: 8px; }
   .masthead > header { gap: 18px; align-items: start; margin-bottom: 22px; }
   .masthead h1 { font-size: 24px; max-width: 290px; line-height: 1.2; }
   .masthead p { font-size: 13px; }
@@ -182,6 +189,7 @@
   .featured > .copy { margin-left: 0; }
   .tabs { gap: 24px; margin-top: 16px; }
   .page .tabs button { gap: 7px; font-size: 12px; }
+  .grid, .definitions { grid-template-columns: 1fr; }
   .card { padding: 22px; }
   .cardLength { display: inline; }
   .check { margin-left: auto; }
