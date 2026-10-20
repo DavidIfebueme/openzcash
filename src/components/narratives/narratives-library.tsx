@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { PageHeader } from '@/components/ui';
-import { audiences, contentHref, filterPitches, lengthLabels, lengths, locales, narratives, pitches, readState, reviewedAt, sources, cellUrl, type Locale, type Pitch, type PitchLength, type View } from '@/lib/narratives/catalog';
+import { audiences, contentHref, filterPitches, lengthLabels, lengths, locales, narratives, pitches, readState, reviewedAt, type Locale, type Pitch, type PitchLength, type View } from '@/lib/narratives/catalog';
 import styles from './narratives.module.css';
 import { message } from '@/lib/narratives/i18n';
 
@@ -34,34 +34,6 @@ function CopyButton({ text, locale, link = false }: { text: string; locale: Loca
   </span>;
 }
 
-function SourceLinks({ pitch, locale }: { pitch: Pitch; locale: Locale }) {
-  const family = narratives.find(n => n.id === pitch.theme)!;
-  return <div className={styles.provenance}>
-    <p><strong>{message(locale, 'Editorial adaptation', 'Adaptação editorial')}</strong> · {message(locale, 'Community contributions', 'Contribuições da comunidade')} {pitch.sourceCells.map(cell => <a key={cell} href={cellUrl(cell)} target="_blank" rel="noopener noreferrer">{cell} ↗</a>)}</p>
-    <p>{pitch.author ? `${message(locale, 'Attribution in source', 'Autoria indicada na fonte')}: ${pitch.author}` : message(locale, 'No author specified in the contributions used.', 'Autoria não indicada nas contribuições utilizadas.')}</p>
-    <p>{message(locale, 'Factual basis', 'Base factual')}: {family.sources.map(id => { const source = sources.find(s => s.id === id)!; return <a key={id} href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a>; })}</p>
-  </div>;
-}
-
-function InlineReferences({ pitch, locale }: { pitch: Pitch; locale: Locale }) {
-  const family = narratives.find(n => n.id === pitch.theme)!;
-  const labels: Record<string, string> = {
-    use: message(locale, 'Payment guide', 'Guia de pagamentos'),
-    shielded: message(locale, 'Shielded payments', 'Pagamentos shielded'),
-    privacy: message(locale, 'Privacy guide', 'Guia de privacidade'),
-    proofs: message(locale, 'Zero-knowledge proofs', 'Provas de conhecimento zero'),
-    protocol: message(locale, 'Protocol', 'Protocolo'),
-    supply: message(locale, 'Supply rules', 'Regras de emissão'),
-    keys: message(locale, 'Viewing keys', 'Chaves de visualização'),
-    learn: message(locale, 'Learn Zcash', 'Aprenda sobre Zcash'),
-  };
-  return <div className={styles.inlineReferences} aria-label={message(locale, 'References for this example', 'Referências deste exemplo')}>
-    <span>{message(locale, 'References', 'Referências')}</span>
-    {family.sources.map(id => { const source = sources.find(s => s.id === id)!; return <a key={id} href={source.url} title={source.title} target="_blank" rel="noopener noreferrer">{labels[id] ?? source.title} ↗</a>; })}
-    <span className={styles.communityReferences}>{message(locale, 'Community', 'Comunidade')} {pitch.sourceCells.map(cell => <a key={cell} href={cellUrl(cell)} target="_blank" rel="noopener noreferrer">{cell} ↗</a>)}</span>
-  </div>;
-}
-
 function PitchCard({ pitch, locale, length, selected, onSelect, compact = false }: { pitch: Pitch; locale: Locale; length: PitchLength; selected?: boolean; onSelect?: () => void; compact?: boolean }) {
   const family = narratives.find(n => n.id === pitch.theme)!;
   return <article id={compact ? undefined : `pitch-${pitch.id}`} className={styles.card}>
@@ -74,14 +46,12 @@ function PitchCard({ pitch, locale, length, selected, onSelect, compact = false 
       {onSelect && <label className={styles.check}><input type="checkbox" checked={selected} onChange={onSelect} />{message(locale, 'Print', 'Imprimir')}</label>}
     </div>
     <details className={styles.details}>
-      <summary>{message(locale, 'Context & limits', 'Contexto e cuidados')}</summary>
+      <summary>{message(locale, 'Make it your own', 'Leve para sua conversa')}</summary>
       <p><strong>{message(locale, 'When to use', 'Quando usar')}.</strong> {pitch.context[locale]}</p>
-      <p><strong>{message(locale, 'Approach', 'Abordagem')}.</strong> {pitch.approach[locale]}</p>
-      <p><strong>{message(locale, 'Limits', 'Limites')}.</strong> {family.limit[locale]}</p>
-      <SourceLinks pitch={pitch} locale={locale} />
+      <p><strong>{message(locale, 'Core idea', 'Ideia central')}.</strong> {pitch.approach[locale]}</p>
+      <p><strong>{message(locale, 'Keep in mind', 'Vale lembrar')}.</strong> {family.limit[locale]}</p>
       <Link href={contentHref(family.id, locale, length, 'narratives')}>{family.title[locale]} →</Link>
     </details>
-    <InlineReferences pitch={pitch} locale={locale} />
   </article>;
 }
 
@@ -95,8 +65,8 @@ function PreparePitch({ locale, length }: { locale: Locale; length: PitchLength 
   const matches = filterPitches({ locale: language, audience, theme });
   const result = matches.find(p => p.id === exampleId) ?? matches[0];
   return <details className={styles.prepare}>
-    <summary>{message(locale, 'Prepare your pitch', 'Prepare seu pitch')} <span>{message(locale, 'A reviewed version for your audience', 'Uma versão revisada para o seu público')}</span></summary>
-    <p>{message(locale, 'Choose from the available combinations. The result is a reviewed editorial text, ready for you to adapt.', 'Escolha entre as combinações disponíveis. O resultado é um texto editorial revisado, pronto para você adaptar.')}</p>
+    <summary>{message(locale, 'Prepare your pitch', 'Prepare seu pitch')} <span>{message(locale, 'Find the right words for your audience', 'Encontre as palavras para seu público')}</span></summary>
+    <p>{message(locale, 'Choose who you are speaking to and how much time you have. Start with an example, then bring your own voice.', 'Escolha com quem vai falar e quanto tempo você tem. Comece com um exemplo e acrescente sua voz.')}</p>
     <div className={styles.filters}>
       <label>{message(locale, 'Audience', 'Público')}<select value={audience} onChange={e => { setAudience(e.target.value); if (!pitches.some(p => p.theme === theme && p.audiences.some(a => a === e.target.value))) setTheme(pitches.find(p => p.audiences.some(a => a === e.target.value))!.theme); }}>{Object.entries(audiences).map(([id, label]) => <option key={id} value={id}>{label[locale]}</option>)}</select></label>
       <label>{message(locale, 'Available theme', 'Tema disponível')}<select value={theme} onChange={e => setTheme(e.target.value)}>{available.map(n => <option key={n.id} value={n.id}>{n.title[locale]}</option>)}</select></label>
@@ -162,37 +132,59 @@ export function NarrativesLibrary() {
         </div>
       </section>}
       {view === 'narratives' && <section aria-label={message(locale, 'Educational narratives', 'Narrativas educativas')}>
-        <div className={styles.libraryHeading}><h2>{message(locale, 'Eight ways into the conversation', 'Oito maneiras de começar')}</h2></div>
-        <p>{message(locale, 'There is no universal approach. Choose the idea that helps your audience and make its limits clear.', 'Não há uma abordagem universal. Escolha a ideia que ajuda seu público e deixe seus limites claros.')}</p>
-        <div className={styles.narrativeList}>{narratives.map((n, index) => { const example = pitches.find(p => p.id === n.examplePitch)!; return <article className={styles.narrative} key={n.id} id={`narrative-${n.id}`}>
-          <span className={styles.number}>{String(index + 1).padStart(2, '0')}</span>
-          <div><h3><Link href={contentHref(n.id, locale, length, 'narratives')}>{n.title[locale]}</Link></h3><p className={styles.idea}>{n.idea[locale]}</p><p><strong>{message(locale, 'Context', 'Contexto')}.</strong> {n.context[locale]}</p>
-            <blockquote>{example.translations[locale].sentence}</blockquote>
-            <details className={styles.details}><summary>{message(locale, 'Expanded example', 'Exemplo expandido')}</summary><p>{example.translations[locale]['60s']}</p><SourceLinks pitch={example} locale={locale} /></details>
-            <p><strong>{message(locale, 'Factual basis', 'Base factual')}.</strong> {n.fact[locale]}</p>
-            <p className={styles.limit}><strong>{message(locale, 'Limits of the analogy', 'Limites da analogia')}.</strong> {n.limit[locale]}</p>
-            <InlineReferences pitch={example} locale={locale} />
-            {pitches.some(p => p.theme === n.id && p.id !== example.id) && <div className={styles.relatedExamples}><span>{message(locale, 'More examples', 'Mais exemplos')}</span><div>{pitches.filter(p => p.theme === n.id && p.id !== example.id).map(p => <article key={p.id}><Link href={contentHref(p.id, locale, length)}>{p.title[locale]} →</Link><p>{p.translations[locale].sentence}</p></article>)}</div></div>}
-            <div className={styles.actions}><Link href={n.next.href.startsWith('/narratives') ? `/narratives?lang=${locale}&length=60s&view=pitches` : n.next.href} target={n.next.href.startsWith('https://') ? '_blank' : undefined} rel={n.next.href.startsWith('https://') ? 'noopener noreferrer' : undefined}>{n.next.label[locale]} {n.next.href.startsWith('https://') ? '↗' : '→'}</Link><CopyButton locale={locale} link text={contentHref(n.id, locale, length, 'narratives')} /></div>
-          </div>
-        </article>; })}</div>
+        <div className={styles.libraryHeading}><h2>{message(locale, 'A reason to care. A way to explain.', 'Um motivo para se importar. Um jeito de explicar.')}</h2></div>
+        <p>{message(locale, 'Start with what matters to the person in front of you. These eight perspectives connect Zcash to everyday life.', 'Comece pelo que importa para quem está à sua frente. Estas oito perspectivas conectam Zcash à vida cotidiana.')}</p>
+        <nav className={styles.narrativeIndex} aria-label={message(locale, 'Explore the ideas', 'Explore as ideias')}>
+          {narratives.map((n, index) => <a key={n.id} href={`#narrative-${n.id}`}><span>{String(index + 1).padStart(2, '0')}</span>{n.title[locale]}</a>)}
+        </nav>
+        <div className={styles.narrativeList}>{narratives.map((n, index) => {
+          const example = pitches.find(p => p.id === n.examplePitch)!;
+          return <article className={styles.narrative} key={n.id} id={`narrative-${n.id}`}>
+            <header className={styles.narrativeHeader}>
+              <span className={styles.number}>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{n.title[locale]}</h3>
+              <p className={styles.idea}>{n.idea[locale]}</p>
+              <p className={styles.narrativeAudience}>{n.context[locale]}</p>
+            </header>
+            <div className={styles.narrativeBody}>
+              <div className={styles.opening}>
+                <span className={styles.eyebrow}>{message(locale, 'Try this opening', 'Comece por aqui')}</span>
+                <p>{example.translations[locale].sentence}</p>
+                <CopyButton key={`${n.id}-${locale}`} text={example.translations[locale].sentence} locale={locale} />
+              </div>
+              <details className={styles.conversation}>
+                <summary>{message(locale, 'Build on the idea', 'Desenvolva a ideia')}<span aria-hidden="true">+</span></summary>
+                {example.translations[locale]['60s'].split('\n\n').map((paragraph, i) => <p key={i}>{paragraph}</p>)}
+                <CopyButton key={`long-${n.id}-${locale}`} text={example.translations[locale]['60s']} locale={locale} />
+              </details>
+              <div className={styles.narrativeNotes}>
+                <div><h4>{message(locale, 'How it works', 'Como funciona')}</h4><p>{n.fact[locale]}</p></div>
+                <div><h4>{message(locale, 'Keep in mind', 'Vale lembrar')}</h4><p>{n.limit[locale]}</p></div>
+              </div>
+              {pitches.some(p => p.theme === n.id && p.id !== example.id) && <div className={styles.relatedExamples}><h4>{message(locale, 'Another way in', 'Outras formas de começar')}</h4><div>{pitches.filter(p => p.theme === n.id && p.id !== example.id).map(p => <Link key={p.id} href={contentHref(p.id, locale, length)}>{p.title[locale]}<LibraryIcon kind="arrow" /></Link>)}</div></div>}
+              <div className={styles.narrativeActions}>
+                <Link href={n.next.href.startsWith('/narratives') ? `/narratives?lang=${locale}&length=sentence&view=pitches` : n.next.href}>{n.next.label[locale]} <LibraryIcon kind="arrow" /></Link>
+                <CopyButton locale={locale} link text={contentHref(n.id, locale, length, 'narratives')} />
+              </div>
+            </div>
+          </article>;
+        })}</div>
       </section>}
       <details className={styles.glossary}><summary><LibraryIcon />{message(locale, 'About this library', 'Sobre esta biblioteca')}</summary>
       <dl className={styles.definitions}>
         <div><dt>Pitch</dt><dd>{message(locale, 'A short introduction that opens a conversation.', 'Uma apresentação curta que abre uma conversa.')}</dd></div>
         <div><dt>{message(locale, 'Narrative', 'Narrativa')}</dt><dd>{message(locale, 'The broader idea that gives the technology meaning.', 'A ideia mais ampla que dá significado à tecnologia.')}</dd></div>
-        <div><dt>{message(locale, 'Evidence', 'Evidência')}</dt><dd>{message(locale, 'The mechanism or record that supports a claim.', 'O funcionamento ou registro que sustenta uma afirmação.')}</dd></div>
+        <div><dt>{message(locale, 'Your voice', 'Sua voz')}</dt><dd>{message(locale, 'Use these starting points to explain the idea in words that feel natural to you.', 'Use estes pontos de partida para explicar a ideia com palavras que soem naturais para você.')}</dd></div>
       </dl>
-      <p>{message(locale, 'Every pitch on this page is adapted and translated; these are not verbatim quotations.', 'Todos os pitches desta página foram adaptados e traduzidos; não são citações literais.')}</p>
+      <p>{message(locale, 'Written for OpenZcash to make conversations about private digital money clearer, more useful and more human.', 'Textos escritos para o OpenZcash para tornar conversas sobre dinheiro digital privado mais claras, úteis e humanas.')}</p>
       <p>{message(locale, 'Scenarios are illustrative examples, not reports of real transactions.', 'As situações são exemplos ilustrativos, não relatos de transações reais.')}</p>
-      <a href={sources.find(s => s.id === 'document')!.url} target="_blank" rel="noopener noreferrer">{sources.find(s => s.id === 'document')!.title} ↗</a>
       </details>
-      <footer className={styles.footer}>{message(locale, 'Editorial selection and adaptations · reviewed October 20, 2026 · share with context.', 'Seleção e adaptações editoriais · revisão de 20/10/2026 · compartilhe com contexto.')}</footer>
+      <footer className={styles.footer}>{message(locale, 'OpenZcash · Ideas worth explaining. Privacy worth understanding.', 'OpenZcash · Ideias que vale explicar. Privacidade que vale entender.')}</footer>
     </div>
     <section className={styles.print} aria-label={message(locale, 'Pitches selected for printing', 'Pitches selecionados para impressão')}>
       <h1>Zcash Pitches & Narratives</h1><p>OpenZcash · {reviewedAt} · {locale}</p>
       {!selected.length && <p>{message(locale, 'Select pitches in the library before printing.', 'Selecione pitches na biblioteca antes de imprimir.')}</p>}
-      {pitches.filter(p => selected.includes(p.id)).map(p => <article key={p.id}><h2>{p.title[locale]}</h2><p>{p.translations[locale][length]}</p><p>{narratives.find(n => n.id === p.theme)!.limit[locale]}</p><SourceLinks pitch={p} locale={locale} /><p>https://openzcash.org{contentHref(p.id, locale, length)}</p></article>)}
+      {pitches.filter(p => selected.includes(p.id)).map(p => <article key={p.id}><h2>{p.title[locale]}</h2><p>{p.translations[locale][length]}</p><p>{narratives.find(n => n.id === p.theme)!.limit[locale]}</p><p>https://openzcash.org{contentHref(p.id, locale, length)}</p></article>)}
     </section>
   </div>;
 }

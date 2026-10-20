@@ -4,7 +4,7 @@ import { pageMetadata } from '@/lib/seo/page-metadata';
 import { NarrativesLibrary } from '@/components/narratives/narratives-library';
 
 export const metadata: Metadata = {
-  ...pageMetadata({ title: 'Zcash Pitches & Narratives · OpenZcash', description: '20 community pitches, eight narratives and inline references in English, Portuguese and Spanish.', path: '/narratives' }),
+  ...pageMetadata({ title: 'Zcash Pitches & Narratives · OpenZcash', description: '20 original OpenZcash pitches and eight ways to explain private digital money in English, Portuguese and Spanish.', path: '/narratives' }),
   alternates: { canonical: '/narratives', languages: { en: '/narratives?lang=en', 'pt-BR': '/narratives?lang=pt-BR', es: '/narratives?lang=es' } },
 };
 

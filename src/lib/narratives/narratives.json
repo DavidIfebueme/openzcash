@@ -1,0 +1,298 @@
+[
+  {
+    "id": "cash",
+    "title": {
+      "en": "Everyday money. Personal space.",
+      "pt-BR": "Dinheiro do dia a dia. Espaço pessoal.",
+      "es": "Dinero cotidiano. Espacio personal."
+    },
+    "idea": {
+      "en": "The payment can travel. Your personal life does not have to travel with it.",
+      "pt-BR": "O pagamento pode circular. Sua vida pessoal não precisa ir junto.",
+      "es": "El pago puede viajar. Tu vida personal no tiene que ir con él."
+    },
+    "context": {
+      "en": "For everyday payments, shared expenses and first conversations about Zcash.",
+      "pt-BR": "Para pagamentos cotidianos, despesas compartilhadas e primeiras conversas sobre Zcash.",
+      "es": "Para pagos cotidianos, gastos compartidos y primeras conversaciones sobre Zcash."
+    },
+    "fact": {
+      "en": "A fully shielded transfer keeps the sender, recipient and amount off the public record. The network still checks that the payment follows its rules.",
+      "pt-BR": "Uma transferência totalmente protegida mantém remetente, destinatário e valor fora do registro público. A rede continua verificando se o pagamento segue suas regras.",
+      "es": "Una transferencia completamente blindada mantiene al remitente, al destinatario y al importe fuera del registro público. La red sigue comprobando que el pago cumpla sus reglas."
+    },
+    "limit": {
+      "en": "Choose a wallet and payment flow that support shielding. Transparent transfers expose different information, and every transfer still needs fees and confirmation.",
+      "pt-BR": "Escolha uma carteira e um fluxo de pagamento com suporte à proteção. Transferências transparentes expõem outras informações, e toda transferência ainda exige taxas e confirmação.",
+      "es": "Elige una cartera y un flujo de pago compatibles con el blindaje. Las transferencias transparentes exponen otra información, y cada transferencia requiere comisiones y confirmación."
+    },
+    "examplePitch": "cash-online",
+    "next": {
+      "href": "/wallets/find",
+      "label": {
+        "en": "Find your wallet",
+        "pt-BR": "Encontre sua carteira",
+        "es": "Encuentra tu cartera"
+      }
+    }
+  },
+  {
+    "id": "bitcoin",
+    "title": {
+      "en": "Open money, less exposure",
+      "pt-BR": "Dinheiro aberto, menos exposição",
+      "es": "Dinero abierto, menos exposición"
+    },
+    "idea": {
+      "en": "A public network can move money without making every payment a public story.",
+      "pt-BR": "Uma rede pública pode movimentar dinheiro sem transformar cada pagamento em uma história pública.",
+      "es": "Una red pública puede mover dinero sin convertir cada pago en una historia pública."
+    },
+    "context": {
+      "en": "For people familiar with Bitcoin, public ledgers and monetary scarcity.",
+      "pt-BR": "Para quem conhece Bitcoin, registros públicos e escassez monetária.",
+      "es": "Para quienes conocen Bitcoin, los registros públicos y la escasez monetaria."
+    },
+    "fact": {
+      "en": "Zcash is an independent network with its own asset, ZEC. Its monetary rules set a limit of 21 million ZEC, while shielded transfers add confidentiality to payments.",
+      "pt-BR": "Zcash é uma rede independente com seu próprio ativo, ZEC. Suas regras monetárias estabelecem um limite de 21 milhões de ZEC, enquanto transferências protegidas acrescentam confidencialidade aos pagamentos.",
+      "es": "Zcash es una red independiente con su propio activo, ZEC. Sus reglas monetarias fijan un límite de 21 millones de ZEC, mientras las transferencias blindadas aportan confidencialidad a los pagos."
+    },
+    "limit": {
+      "en": "ZEC is not BTC, and shielding is a separate property from scarcity. A fixed supply limit does not guarantee demand, purchasing power or returns.",
+      "pt-BR": "ZEC não é BTC, e proteção é uma propriedade diferente de escassez. Um limite de oferta não garante demanda, poder de compra nem retorno.",
+      "es": "ZEC no es BTC, y el blindaje es una propiedad distinta de la escasez. Un límite de oferta no garantiza demanda, poder adquisitivo ni rentabilidad."
+    },
+    "examplePitch": "bitcoin-with-privacy",
+    "next": {
+      "href": "/zcash-network",
+      "label": {
+        "en": "Explore the network",
+        "pt-BR": "Explore a rede",
+        "es": "Explora la red"
+      }
+    }
+  },
+  {
+    "id": "cryptography",
+    "title": {
+      "en": "Proof without a public receipt",
+      "pt-BR": "Prova sem recibo público",
+      "es": "Prueba sin recibo público"
+    },
+    "idea": {
+      "en": "Let the network verify the payment. Keep the personal details with the people involved.",
+      "pt-BR": "Deixe a rede verificar o pagamento. Mantenha os detalhes pessoais com quem participa dele.",
+      "es": "Deja que la red verifique el pago. Mantén los detalles personales entre quienes participan."
+    },
+    "context": {
+      "en": "For developers, curious builders and anyone asking how private payments work.",
+      "pt-BR": "Para desenvolvedores, pessoas que criam produtos e quem quer entender pagamentos privados.",
+      "es": "Para desarrolladores, creadores de productos y quienes quieren entender los pagos privados."
+    },
+    "fact": {
+      "en": "Zero-knowledge proofs let Zcash demonstrate that a shielded payment meets protocol requirements without revealing its private inputs. Signatures and other checks also help enforce the rules.",
+      "pt-BR": "Provas de conhecimento zero permitem que o Zcash demonstre que um pagamento protegido atende aos requisitos do protocolo sem revelar suas entradas privadas. Assinaturas e outras verificações também ajudam a aplicar as regras.",
+      "es": "Las pruebas de conocimiento cero permiten que Zcash demuestre que un pago blindado cumple los requisitos del protocolo sin revelar sus entradas privadas. Las firmas y otras comprobaciones también ayudan a aplicar las reglas."
+    },
+    "limit": {
+      "en": "A valid payment does not establish who a person is or whether a device is secure. Payment privacy and the security of the surrounding application both matter.",
+      "pt-BR": "Um pagamento válido não comprova a identidade de uma pessoa nem a segurança de um dispositivo. A privacidade do pagamento e a segurança do aplicativo importam.",
+      "es": "Un pago válido no acredita la identidad de una persona ni la seguridad de un dispositivo. Importan tanto la privacidad del pago como la seguridad de la aplicación."
+    },
+    "examplePitch": "verify-without-exposing",
+    "next": {
+      "href": "/development",
+      "label": {
+        "en": "Explore development",
+        "pt-BR": "Explore o desenvolvimento",
+        "es": "Explora el desarrollo"
+      }
+    }
+  },
+  {
+    "id": "freedom",
+    "title": {
+      "en": "More room to choose",
+      "pt-BR": "Mais espaço para escolher",
+      "es": "Más espacio para elegir"
+    },
+    "idea": {
+      "en": "A contribution can speak for what you believe in without publishing your financial life.",
+      "pt-BR": "Uma contribuição pode expressar o que você valoriza sem publicar sua vida financeira.",
+      "es": "Una contribución puede expresar lo que valoras sin publicar tu vida financiera."
+    },
+    "context": {
+      "en": "For community support, independent work and conversations about personal autonomy.",
+      "pt-BR": "Para apoio comunitário, trabalho independente e conversas sobre autonomia pessoal.",
+      "es": "Para el apoyo comunitario, el trabajo independiente y las conversaciones sobre autonomía personal."
+    },
+    "fact": {
+      "en": "Shielded payments reduce what a public blockchain reveals about a transfer. With self-custody, the person holding the spending keys controls access to the funds.",
+      "pt-BR": "Pagamentos protegidos reduzem o que uma blockchain pública revela sobre uma transferência. Na autocustódia, quem guarda as chaves de gasto controla o acesso aos fundos.",
+      "es": "Los pagos blindados reducen lo que una blockchain pública revela sobre una transferencia. Con autocustodia, quien guarda las claves de gasto controla el acceso a los fondos."
+    },
+    "limit": {
+      "en": "Privacy on the blockchain is one part of the picture. Account records, messages and information shared with a recipient can still connect a payment to a person.",
+      "pt-BR": "A privacidade na blockchain é parte da história. Registros de contas, mensagens e informações compartilhadas com o destinatário ainda podem ligar um pagamento a uma pessoa.",
+      "es": "La privacidad en la blockchain es parte de la historia. Los registros de cuentas, los mensajes y la información compartida con el destinatario aún pueden vincular un pago a una persona."
+    },
+    "examplePitch": "donate-with-dignity",
+    "next": {
+      "href": "/communities",
+      "label": {
+        "en": "Meet the community",
+        "pt-BR": "Conheça a comunidade",
+        "es": "Conoce la comunidad"
+      }
+    }
+  },
+  {
+    "id": "disclosure",
+    "title": {
+      "en": "Privacy with a place for trust",
+      "pt-BR": "Privacidade com espaço para confiança",
+      "es": "Privacidad con espacio para la confianza"
+    },
+    "idea": {
+      "en": "Keeping a record and publishing it to the world are two different decisions.",
+      "pt-BR": "Guardar um registro e publicá-lo para o mundo são duas decisões diferentes.",
+      "es": "Guardar un registro y publicarlo para todo el mundo son dos decisiones distintas."
+    },
+    "context": {
+      "en": "For teams, organizations and people who need to share financial information responsibly.",
+      "pt-BR": "Para equipes, organizações e pessoas que precisam compartilhar informações financeiras com responsabilidade.",
+      "es": "Para equipos, organizaciones y personas que necesitan compartir información financiera con responsabilidad."
+    },
+    "fact": {
+      "en": "Zcash viewing keys can provide access to transaction information without permission to spend. The information visible depends on the key type, shielded pool and software support.",
+      "pt-BR": "Chaves de visualização do Zcash podem dar acesso a informações de transações sem permissão para gastar. O que fica visível depende do tipo de chave, do pool protegido e do suporte do software.",
+      "es": "Las claves de visualización de Zcash pueden dar acceso a información de transacciones sin permiso para gastar. Lo visible depende del tipo de clave, del pool blindado y del soporte del software."
+    },
+    "limit": {
+      "en": "Check the scope before sharing. A key can expose a wider history and future activity, and information already seen cannot be taken back. Access alone does not meet every reporting obligation.",
+      "pt-BR": "Confira o alcance antes de compartilhar. Uma chave pode expor um histórico amplo e atividades futuras, e informações já vistas não podem ser recolhidas. O acesso, sozinho, não resolve todas as obrigações de prestação de contas.",
+      "es": "Comprueba el alcance antes de compartir. Una clave puede exponer un historial amplio y actividad futura, y lo que ya se ha visto no se puede retirar. El acceso por sí solo no resuelve todas las obligaciones de información."
+    },
+    "examplePitch": "selective-disclosure",
+    "next": {
+      "href": "/wallets/find",
+      "label": {
+        "en": "Compare wallet features",
+        "pt-BR": "Compare recursos de carteiras",
+        "es": "Compara funciones de las carteras"
+      }
+    }
+  },
+  {
+    "id": "metaphors",
+    "title": {
+      "en": "A familiar way to understand privacy",
+      "pt-BR": "Um jeito familiar de entender privacidade",
+      "es": "Una forma familiar de entender la privacidad"
+    },
+    "idea": {
+      "en": "We already make room for private conversations. Payments deserve that consideration too.",
+      "pt-BR": "Já reservamos espaço para conversas privadas. Pagamentos também merecem esse cuidado.",
+      "es": "Ya dejamos espacio para conversaciones privadas. Los pagos también merecen ese cuidado."
+    },
+    "context": {
+      "en": "For a first introduction that begins with ordinary life instead of technical vocabulary.",
+      "pt-BR": "Para uma primeira apresentação que começa na vida cotidiana, sem vocabulário técnico.",
+      "es": "Para una primera presentación que empieza en la vida cotidiana, sin vocabulario técnico."
+    },
+    "fact": {
+      "en": "An envelope or a closed curtain illustrates a boundary around information. In Zcash, cryptography provides a boundary around the details of fully shielded payments.",
+      "pt-BR": "Um envelope ou uma cortina fechada representa um limite ao acesso à informação. No Zcash, a criptografia cria um limite ao acesso aos detalhes de pagamentos totalmente protegidos.",
+      "es": "Un sobre o una cortina cerrada representa un límite al acceso a la información. En Zcash, la criptografía crea un límite alrededor de los detalles de los pagos completamente blindados."
+    },
+    "limit": {
+      "en": "The comparison explains confidentiality, not invisibility. A shielded transfer remains a blockchain transaction; it does not hide everything about the device or connection used to send it.",
+      "pt-BR": "A comparação explica confidencialidade, não invisibilidade. Uma transferência protegida continua sendo uma transação na blockchain; ela não esconde tudo sobre o dispositivo ou a conexão usados.",
+      "es": "La comparación explica confidencialidad, no invisibilidad. Una transferencia blindada sigue siendo una transacción en la blockchain; no oculta todo sobre el dispositivo o la conexión utilizados."
+    },
+    "examplePitch": "sealed-envelope",
+    "next": {
+      "href": "/wallets/find",
+      "label": {
+        "en": "Try a wallet",
+        "pt-BR": "Explore uma carteira",
+        "es": "Explora una cartera"
+      }
+    }
+  },
+  {
+    "id": "taglines",
+    "title": {
+      "en": "A few words. A useful beginning.",
+      "pt-BR": "Poucas palavras. Um bom começo.",
+      "es": "Pocas palabras. Un buen comienzo."
+    },
+    "idea": {
+      "en": "Start with a reason to care. Leave room for the next question.",
+      "pt-BR": "Comece com um motivo para se importar. Deixe espaço para a próxima pergunta.",
+      "es": "Empieza con un motivo para interesarse. Deja espacio para la siguiente pregunta."
+    },
+    "context": {
+      "en": "For event introductions, short posts and the first line of a presentation.",
+      "pt-BR": "Para apresentações em eventos, publicações curtas e a primeira frase de uma conversa.",
+      "es": "Para presentaciones en eventos, publicaciones breves y la primera frase de una conversación."
+    },
+    "fact": {
+      "en": "The central idea is simple: Zcash offers digital payments with the option to protect their details. A good opening gives someone a reason to explore how shielding works.",
+      "pt-BR": "A ideia central é simples: Zcash oferece pagamentos digitais com a opção de proteger seus detalhes. Uma boa abertura dá um motivo para entender como essa proteção funciona.",
+      "es": "La idea central es sencilla: Zcash ofrece pagos digitales con la opción de proteger sus detalles. Una buena apertura da un motivo para entender cómo funciona el blindaje."
+    },
+    "limit": {
+      "en": "Keep the promise specific to shielded payments. Avoid absolute claims about anonymity, speed or returns; a short explanation should still be an accurate one.",
+      "pt-BR": "Mantenha a promessa ligada aos pagamentos protegidos. Evite afirmações absolutas sobre anonimato, velocidade ou retorno; uma explicação curta ainda precisa ser precisa.",
+      "es": "Mantén la promesa ligada a los pagos blindados. Evita afirmaciones absolutas sobre anonimato, velocidad o rentabilidad; una explicación breve también debe ser precisa."
+    },
+    "examplePitch": "privacy-in-one-line",
+    "next": {
+      "href": "/narratives",
+      "label": {
+        "en": "Find your opening",
+        "pt-BR": "Encontre sua primeira frase",
+        "es": "Encuentra tu primera frase"
+      }
+    }
+  },
+  {
+    "id": "surveillance",
+    "title": {
+      "en": "Leave less of your life in public",
+      "pt-BR": "Deixe menos da sua vida em público",
+      "es": "Deja menos de tu vida en público"
+    },
+    "idea": {
+      "en": "The best place to protect a payment detail is before it becomes public data.",
+      "pt-BR": "O melhor momento para proteger um detalhe financeiro é antes que ele vire um dado público.",
+      "es": "El mejor momento para proteger un detalle financiero es antes de que se convierta en un dato público."
+    },
+    "context": {
+      "en": "For conversations about data collection, financial profiling and privacy over time.",
+      "pt-BR": "Para conversas sobre coleta de dados, perfis financeiros e privacidade ao longo do tempo.",
+      "es": "Para conversaciones sobre recopilación de datos, perfiles financieros y privacidad a lo largo del tiempo."
+    },
+    "fact": {
+      "en": "Public transaction details can be stored, analyzed and combined with other information. Shielded payments reduce the sensitive payment data available from the blockchain in the first place.",
+      "pt-BR": "Detalhes públicos de transações podem ser armazenados, analisados e combinados com outras informações. Pagamentos protegidos reduzem, desde o início, os dados financeiros sensíveis disponíveis na blockchain.",
+      "es": "Los detalles públicos de transacciones pueden almacenarse, analizarse y combinarse con otra información. Los pagos blindados reducen desde el principio los datos financieros sensibles disponibles en la blockchain."
+    },
+    "limit": {
+      "en": "Shielding cannot erase a previous disclosure. Wallet services, counterparties and network activity may reveal information beyond what appears on the blockchain.",
+      "pt-BR": "A proteção não apaga uma divulgação anterior. Serviços de carteira, contrapartes e atividades de rede podem revelar informações além das que aparecem na blockchain.",
+      "es": "El blindaje no borra una divulgación anterior. Los servicios de cartera, las contrapartes y la actividad de red pueden revelar información más allá de lo que aparece en la blockchain."
+    },
+    "examplePitch": "less-data-to-profile",
+    "next": {
+      "href": "/wallets/find",
+      "label": {
+        "en": "Choose a wallet",
+        "pt-BR": "Escolha uma carteira",
+        "es": "Elige una cartera"
+      }
+    }
+  }
+]

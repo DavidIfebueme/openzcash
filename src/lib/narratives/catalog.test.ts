@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { audiences, contentHref, filterPitches, lengths, locales, narratives, pitches, readState, sources } from './catalog';
+import { audiences, contentHref, filterPitches, lengths, locales, narratives, pitches, readState } from './catalog';
 import { searchNarratives } from './search';
 import { APPS, placeOf } from '../design-routes';
 import { buildPalette, paletteRows } from '../palette';
@@ -9,14 +9,13 @@ import spanishCatalog from './es.json';
 import spanishUi from './ui-es.json';
 
 describe('educational narrative catalog', () => {
-  it('has complete reviewed translations, references and unique stable IDs', () => {
+  it('has complete reviewed translations and unique stable IDs', () => {
     expect(pitches).toHaveLength(20);
     expect(narratives).toHaveLength(8);
     expect(new Set(pitches.map(p => p.id)).size).toBe(pitches.length);
     for (const p of pitches) {
       expect(p.reviewStatus).toBe('reviewed');
-      expect(p.kind).toBe('editorial-adaptation');
-      expect(p.sourceCells.length).toBeGreaterThan(0);
+      expect(p.kind).toBe('openzcash-editorial');
       expect(narratives.some(n => n.id === p.theme)).toBe(true);
       for (const lang of locales) {
         expect(p.title[lang].length).toBeGreaterThan(0);
@@ -26,7 +25,8 @@ describe('educational narrative catalog', () => {
     }
     for (const n of narratives) {
       expect(pitches.some(p => p.id === n.examplePitch)).toBe(true);
-      for (const id of n.sources) expect(sources.some(s => s.id === id)).toBe(true);
+      expect(n.next.href.startsWith('/')).toBe(true);
+      for (const lang of locales) for (const field of [n.title, n.idea, n.context, n.fact, n.limit]) expect(field[lang].length).toBeGreaterThan(0);
     }
   });
   it('includes every catalog and interface message in Spanish', () => {
@@ -38,7 +38,7 @@ describe('educational narrative catalog', () => {
     for (const key of uiKeys) expect(Object.hasOwn(spanishUi, key), key).toBe(true);
   });
   it('combines text, audience and theme filters, tolerates accents and returns genuine empty results', () => {
-    expect(filterPitches({ locale: 'pt-BR', query: 'doacao', theme: 'freedom', audience: 'organizations' }).map(p => p.id)).toEqual(['donate-with-dignity', 'support-independent-work']);
+    expect(filterPitches({ locale: 'pt-BR', query: 'doacao', theme: 'freedom', audience: 'organizations' }).map(p => p.id)).toEqual(['donate-with-dignity']);
     expect(filterPitches({ locale: 'en', query: 'zero-knowledge', audience: 'developers' }).length).toBeGreaterThan(0);
     expect(filterPitches({ locale: 'en', theme: 'disclosure', audience: 'bitcoin' })).toEqual([]);
     expect(filterPitches({ locale: 'en', query: 'no-such-pitch' })).toEqual([]);
@@ -60,7 +60,7 @@ describe('educational narrative catalog', () => {
     expect(searchSite('zero-knowledge').some(r => r.href.includes('lang=en'))).toBe(true);
     expect(searchSite('conhecimento zero').some(r => r.href.includes('lang=pt-BR'))).toBe(true);
     expect(searchSite('conocimiento cero').some(r => r.href.includes('lang=es'))).toBe(true);
-    expect(searchSite('selective disclosure').some(r => r.href.includes('#narrative-disclosure'))).toBe(true);
+    expect(searchSite('viewing keys').some(r => r.href.includes('#narrative-disclosure'))).toBe(true);
   });
   it('places Narratives before Monthly in the shared navigation and resolves its breadcrumb', () => {
     const index = APPS.findIndex(app => app.id === 'narratives');
