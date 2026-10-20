@@ -20,6 +20,7 @@ import {
   type PaletteRow,
   type PaletteStep,
 } from "@/lib/palette";
+import type { searchNarratives as NarrativeSearch } from "@/lib/narratives/search";
 import styles from "./command-palette.module.css";
 
 const STEP_KEYS: readonly string[] = ["ArrowDown", "ArrowUp", "Home", "End"];
@@ -60,10 +61,20 @@ export function CommandPalette({
   const listId = `${uid}-list`;
   const optionId = (index: number) => `${uid}-option-${index}`;
 
+  const [searchNarratives, setSearchNarratives] = useState<typeof NarrativeSearch | null>(null);
+  useEffect(() => {
+    if (!open || searchNarratives) return;
+    let active = true;
+    import('@/lib/narratives/search').then(module => {
+      if (active) setSearchNarratives(() => module.searchNarratives);
+    }).catch(() => { /* Page search remains available if the optional catalog fails to load. */ });
+    return () => { active = false; };
+  }, [open, searchNarratives]);
+
   const canAsk = chat !== null;
   const { groups, noMatch } = useMemo(
-    () => buildPalette(apps, query, canAsk),
-    [apps, query, canAsk],
+    () => buildPalette(apps, query, canAsk, searchNarratives?.(query) ?? []),
+    [apps, query, canAsk, searchNarratives],
   );
   const rows = paletteRows(groups);
   const current = Math.min(active, Math.max(rows.length - 1, 0));

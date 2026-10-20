@@ -23,6 +23,13 @@ function svg(path: ReactNode) {
   };
 }
 
+export const IconMegaphone = svg(
+  <>
+    <path d="M4 8h5l10-4v16L9 16H4a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2Z" />
+    <path d="M9 8v8m-4 0 2 5h4l-2-5m13-6v4" />
+  </>,
+);
+
 export const IconBook = svg(
   <>
     <path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1Z" />

@@ -59,6 +59,8 @@ describe("Ongoing Test navigation", () => {
   it("toggles the category without navigation and dismisses the drawer on a page selection", () => {
     const onVisit = vi.fn();
     const { container, getByRole, queryByRole } = render(<Navigation compact onVisit={onVisit} />);
+    expect(queryByRole("link", { name: "Crosslink" })).toBeNull();
+    fireEvent.click(getByRole("button", { name: "Expand Ongoing Test" }));
     const crosslink = getByRole("link", { name: "Crosslink" });
     expect(crosslink.getAttribute("href")).toBe("/ongoing-test/crosslink");
     expect(crosslink.querySelector("img")?.getAttribute("src")).toBe("/logos/shielded-labs.png");

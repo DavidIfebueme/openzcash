@@ -159,6 +159,7 @@ export function buildPalette(
   apps: AppDef[],
   query: string,
   canAsk: boolean,
+  additionalGroups: PaletteGroup[] = [],
 ): Palette {
   const question = query.trim();
   const tokens = foldText(question).split(/\s+/).filter(Boolean);
@@ -211,8 +212,8 @@ export function buildPalette(
       : [];
 
   return {
-    groups: [...pageGroups, ...askGroup],
-    noMatch: question !== "" && pageGroups.length === 0,
+    groups: [...pageGroups, ...additionalGroups, ...askGroup],
+    noMatch: question !== "" && pageGroups.length === 0 && additionalGroups.length === 0,
   };
 }
 
