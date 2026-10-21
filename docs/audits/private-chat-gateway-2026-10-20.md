@@ -31,3 +31,4 @@ The deployment must update both public gateway variables together and rebuild th
 - Served CSP contains only the replacement gateway origin, with the old WSS origin removed. No-store, no-referrer and the sanitized gateway error are present in served responses/assets.
 - Production dependency audit (`npm audit --omit=dev`) reported zero vulnerabilities. Build-time development dependency notices are not included in that claim.
 - No real user chats, invitations or keys were accessed or recorded.
+- Portal icon correction: PR #189 merged as `c8401a7fd0d4898e089013d46d4222ac629bb4e1`; Railway deployment `a4f4b42e-0fe9-4547-8346-155e47b389ab` reached SUCCESS. All seven corrected SVGs were confirmed in the public entry HTML, along with its `connect-src 'none'` policy and absence of the portal client runtime.
