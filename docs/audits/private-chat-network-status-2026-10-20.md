@@ -26,4 +26,10 @@ Missing sources, malformed payloads, incomplete pagination, stale epochs, servic
 - Real sources rendered in the local preview. Desktop light/dark and 390×844 mobile were inspected, including keyboard disclosure, compact layout and no horizontal overflow. No browser console errors were observed.
 - Public status and successful HTTP responses are not proof of a real peer exchange. This change does not claim new physical-device or cross-network certification.
 
-Publication and served-route checks are recorded after deployment.
+## Publication and served verification
+
+- Final deployed source: `712f04b342fbbc6d8e0b2c6a13c425b33d32ad15`; Railway deployment `b02644bd-a6fb-4355-bf00-a77cc87065b5` reached SUCCESS. Its production build validated the final source. The portal and Nym directory services were not redeployed.
+- The public dashboard rendered inside `https://openzcash.org/private-chat`, retaining the existing sidebar and isolated chat frame. A synthetic session reached **Connected via Nym**, and its network panel refreshed automatically (21:53, 21:55 and 21:57 São Paulo). The gateway count changed from 627 to 626 without a page reload.
+- Final live status response: HTTP 200, `Cache-Control: no-store`, `Referrer-Policy: no-referrer`, `Cross-Origin-Resource-Policy: same-origin`, and `Content-Security-Policy: default-src 'none'; frame-ancestors 'none'`. These are explicitly enforced in the proxy so the portal's global defaults cannot override route headers. The focused route/proxy regression suite passed 31 tests after that adjustment.
+- Extra query parameters returned 400; the direct `/api/private-chat/presence` route remained 404.
+- Public desktop and 390px mobile views were inspected with no horizontal overflow and no observed console errors. Captures are stored outside the repository in the thread's visualization directory. The synthetic connection was disconnected and viewport overrides cleared after verification.
