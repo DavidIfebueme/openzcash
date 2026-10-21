@@ -1,3 +1,4 @@
+import navigationArtwork from "./navigation-icons.generated.json";
 import { APPS, childAppsOf, overviewEntry, type AppDef, type AppPage } from "./design-routes";
 
 const escape = (value: string) => value.replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]!);
@@ -10,10 +11,7 @@ export const entryTheme = svg('<path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5 8.5 8.5
 function mark(app: AppDef): string {
   if (app.logo) return `<img class="mark${app.logo.includes('/logos/marks/') ? ' glyph' : ''}" src="${escape(app.logo)}" width="20" height="20" alt="">`;
   if (app.icon === "zarvis") return '<svg class="mark" viewBox="17 620 122 133" aria-hidden="true"><image href="/zarvis/ironwood-reference.png" width="1212" height="1297"/></svg>';
-  if (app.icon === "private-chat") return svg('<path d="M6 3.5h12a3 3 0 0 1 3 3v9a3 3 0 0 1-3 3H8L3 22V6.5a3 3 0 0 1 3-3Z"/><rect x="9" y="10" width="6" height="5.5" rx="1"/><path d="M10 10V8a2 2 0 0 1 4 0v2M12 12.5v.5"/>');
-  if (app.icon === "balance") return svg('<path d="M12 3v18M5 7h14M7 7l-3 6a3 3 0 0 0 6 0L7 7Zm10 0-3 6a3 3 0 0 0 6 0l-3-6Z"/>');
-  if (app.icon === "chart") return svg('<path d="M3 3v18h18"/><rect x="6.5" y="12" width="3" height="6" rx=".5"/><rect x="11.5" y="8" width="3" height="10" rx=".5"/><rect x="16.5" y="5" width="3" height="13" rx=".5"/>');
-  return svg('<path d="m10 10-4-4m8 4 4-4m-8 8-4 4m8-4 4 4"/><circle cx="12" cy="12" r="3"/><circle cx="4.5" cy="4.5" r="2.2"/><circle cx="19.5" cy="4.5" r="2.2"/><circle cx="4.5" cy="19.5" r="2.2"/><circle cx="19.5" cy="19.5" r="2.2"/>');
+  return (navigationArtwork as Record<string, string>)[app.icon] ?? navigationArtwork.grid;
 }
 
 function pageLink(page: AppPage): string {

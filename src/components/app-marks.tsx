@@ -5,66 +5,33 @@
  * the sidebar and the ⌘K palette.
  */
 import type { ComponentType } from "react";
-import { OngoingTestIcon } from "./ongoing-test-icons";
+import { NavigationIcon } from "./navigation-icon";
 import { ZarvisMark } from "./zarvis/zarvis-mark";
-import { NetworkIcon } from "@/app/zcash-network/network-icons";
 import type { AppDef } from "@/lib/design-routes";
 import {
   IconArrowUp,
   IconBalance,
   IconBook,
   IconChart,
-  IconCalculator,
   IconCheck,
   IconCoins,
   IconDashboard,
-  IconEcosystem,
-  IconGlobe,
   IconGrant,
-  IconGrid,
   IconKey,
   IconList,
   IconMail,
-  IconMegaphone,
   IconNews,
   IconPencil,
-  IconPrivateChat,
   IconReceipt,
   IconShield,
-  IconSigma,
-  IconSwap,
   IconTerminal,
   IconUsers,
   IconVote,
-  IconWallet,
 } from "./icons";
 
 type IconType = ComponentType<{ className?: string }>;
 
 /** Line icons by key (apps without a logo) and by route (inner pages). */
-const ICON_BY_KEY: Record<string, IconType> = {
-  "private-chat": IconPrivateChat,
-  experiment: (props) => <OngoingTestIcon name="experiment" {...props} />,
-  network: (props) => <NetworkIcon name="network" {...props} />,
-  zarvis: ZarvisMark,
-  book: IconBook,
-  narratives: IconMegaphone,
-  calculator: IconCalculator,
-  news: IconNews,
-  shield: IconShield,
-  grant: IconGrant,
-  balance: IconBalance,
-  wallet: IconWallet,
-  swap: IconSwap,
-  chart: IconChart,
-  terminal: IconTerminal,
-  globe: IconGlobe,
-  ecosystem: IconEcosystem,
-  sigma: IconSigma,
-  users: IconUsers,
-  grid: IconGrid,
-  key: IconKey,
-};
 const PAGE_ICON: Record<string, IconType> = {
   "/legal": IconNews,
   "/legal/pgp": IconBook,
@@ -137,8 +104,9 @@ export function AppMark({ app, size = 18 }: { app: AppDef; size?: number }) {
       />
     );
   }
-  const Icon = ICON_BY_KEY[app.icon] ?? IconGrid;
-  return <Icon className="rd-side-icon" />;
+  return app.icon === "zarvis"
+    ? <ZarvisMark className="rd-side-icon" />
+    : <NavigationIcon name={app.icon} className="rd-side-icon" />;
 }
 
 export function PageMark({ mark, href }: { mark?: string; href: string }) {

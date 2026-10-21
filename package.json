@@ -6,9 +6,9 @@
     "node": ">=20.9.0"
   },
   "scripts": {
-    "predev": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs",
+    "predev": "node --import tsx scripts/generate-navigation-icons.tsx && node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs",
     "dev": "next dev",
-    "prebuild": "node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs && npm run errors:check && npm run check:proposal-cards && npm run wallets:check",
+    "prebuild": "node --import tsx scripts/generate-navigation-icons.tsx && node scripts/publish-copilot.mjs && node scripts/build-zarvis-knowledge.mjs && npm run errors:check && npm run check:proposal-cards && npm run wallets:check",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
