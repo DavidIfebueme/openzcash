@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { chatCsp } from "@/lib/private-chat/csp";
 import { chatEnabled, pilotDeployment } from "@/lib/private-chat/deployment";
+import { NETWORK_STATUS_PATH } from "@/lib/private-chat/network-health";
 
 /** The former admin, onboarding and viewing-key HTTP surface is retired. */
 const RETIRED_PATHS = [
@@ -61,6 +62,7 @@ export function proxy(req: NextRequest) {
 
   const chatNamespace = pathname === "/private-chat" || pathname.startsWith("/private-chat/");
   const chatPath = pathname === "/private-chat";
+  const chatStatus = pathname === NETWORK_STATUS_PATH;
   const pilot = pilotDeployment();
   // Railway probes use a dedicated Host. This exception exposes only readiness,
   // never chat content or other routes, and does not relax the canonical origin.
@@ -68,13 +70,13 @@ export function proxy(req: NextRequest) {
       (matchesPilotOrigin(req, pilot.origin) || req.headers.get("host") === "healthcheck.railway.app")) {
     return NextResponse.json({ ready: true }, { headers: { "Cache-Control": "no-store" } });
   }
-  if (chatNamespace && (!chatPath || !chatEnabled() ||
+  if ((chatNamespace || chatStatus) && ((!chatPath && !chatStatus) || !chatEnabled() ||
       (process.env.NODE_ENV === "production" && !matchesPilotOrigin(req, pilot?.origin)))) {
     return new NextResponse("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });
   }
   if ((pilot || process.env.PRIVATE_CHAT_ISOLATED === "true") &&
       (!pilot || !matchesPilotOrigin(req, pilot.origin) ||
-       !(chatPath || pathname.startsWith("/_next/") ||
+       !(chatPath || chatStatus || pathname.startsWith("/_next/") ||
          pathname.startsWith("/private-chat-nym/") || pathname.startsWith("/logos/") ||
          pathname.startsWith("/icons/") || ["/favicon.ico", "/zcash-emblem.png", "/icon.png"].includes(pathname)))) {
     return new NextResponse("Not Found", { status: 404, headers: { "Cache-Control": "no-store" } });

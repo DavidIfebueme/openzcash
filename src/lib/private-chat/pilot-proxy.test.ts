@@ -32,10 +32,16 @@ describe("isolated pilot boundary", () => {
   it("keeps unrelated pages/APIs out of the isolated chat origin", () => {
     pilot();
     vi.stubEnv("PRIVATE_CHAT_ISOLATED", "");
-    for (const path of ["/", "/zcg", "/private-chat/missing", "/api/zarvis/chat", "/api/private-chat/presence", "/participate"])
+    for (const path of ["/", "/zcg", "/private-chat/missing", "/api/zarvis/chat", "/api/private-chat/presence", "/api/private-chat/network-status/other", "/participate"])
       expect(proxy(new NextRequest("https://chat.example"+path)).status).toBe(404);
-    for (const path of ["/private-chat","/private-chat-nym/worker.js","/logos/nym.svg"])
+    for (const path of ["/private-chat","/private-chat-nym/worker.js","/logos/nym.svg", "/api/private-chat/network-status"])
       expect(proxy(new NextRequest("https://chat.example"+path)).status).toBe(200);
+  });
+  it("keeps network status on the canonical chat origin and disabled outside the chat", () => {
+    pilot();
+    expect(proxy(new NextRequest("https://openzcash.org/api/private-chat/network-status")).status).toBe(404);
+    vi.stubEnv("PRIVATE_CHAT_DEPLOYMENT", "");
+    expect(proxy(new NextRequest("https://chat.example/api/private-chat/network-status")).status).toBe(404);
   });
   it("accepts the public Host behind a local server and ignores forged forwarding hosts", () => {
     pilot();

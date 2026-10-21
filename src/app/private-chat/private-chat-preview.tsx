@@ -28,6 +28,7 @@ import { roomUrl } from "@/lib/private-chat/discovery-room";
 import { normalizeAlias } from "@/lib/private-chat/session";
 import { ChatComposer } from "./chat-composer";
 import { ChatHelp } from "./chat-help";
+import { ChatNetworkStatus } from "./chat-network-status";
 import { ChatConfirm } from "@/components/private-chat-confirm";
 import { useChatSession } from "@/components/private-chat-session";
 import {
@@ -540,6 +541,7 @@ export function PrivateChatPreview({
               </span>
             </button>
           </section>
+          <ChatNetworkStatus />
           {state.keyReady && <nav
             className={styles.viewControls}
             role="tablist"
