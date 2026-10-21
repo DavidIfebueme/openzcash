@@ -102,7 +102,7 @@ for open discovery.
 
 ## Local development
 
-Requires Node 20.9+ and Postgres.
+Requires Node 20.9+ and Postgres. Production runs the exact Node version pinned in `package.json` `engines.node`.
 
 Create `.env.local` with the connection string for your local development database:
 

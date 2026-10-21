@@ -1,7 +1,14 @@
 # Railway deploy config for the Zcash Back Office (ZBO).
 #
-# Pure Next.js app (Nixpacks builds it: npm install -> npm run build -> npm run
-# start). Public data comes from external sources and the database.
+# Pure Next.js app (Railpack builds it: npm install -> npm run build -> the
+# start command below). Public data comes from external sources and the
+# database.
+#
+# Node runtime: Railpack installs the exact version in package.json
+# engines.node, so bumping that field is how the runtime gets security fixes.
+# Nixpacks could only choose a Node major from the nixpkgs snapshot it pins
+# (24.x resolved to 24.10.0), so no patch release ever reached production.
+# A RAILPACK_NODE_VERSION service variable would override engines.node.
 #
 # Scheduling: no external cron. src/instrumentation.ts starts an in-process
 # timer in this always-on service: the ZCG/ZecHub refresh every 6h (first run
@@ -9,7 +16,7 @@
 # hourly. GET /api/cron/refresh (Bearer $CRON_SECRET) remains a manual trigger.
 
 [build]
-builder = "NIXPACKS"
+builder = "RAILPACK"
 
 [deploy]
 # Apply DB migrations on boot (prod-deps only, best-effort), then start.
