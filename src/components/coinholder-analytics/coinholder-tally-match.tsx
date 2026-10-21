@@ -181,7 +181,7 @@ export function CoinholderTallyMatchChart({ proposals, activity, selectedBallot,
         </ol>
       </div>
       <p className="coin-match-caption">
-        About the same ZEC voted on every proposal: {range ? `${formatInsightUnits(range.min)}–${formatInsightUnits(range.max)} ZEC` : "unavailable"}{casts.length ? `, from ${counts.format(Math.min(...casts))} to ${counts.format(Math.max(...casts))} casts each` : ""}. A pair’s distance is half the sum of its four option differences; with totals this close, that is about the least ZEC that would have to change option to turn one tally into the other. Groups chain pairs within {LIMIT} of the vote. These are patterns in public totals; they do not identify holders.
+        About the same ZEC voted on every proposal: {range ? `${formatInsightUnits(range.min)}–${formatInsightUnits(range.max)} ZEC` : "unavailable"}{casts.length ? `, from ${counts.format(Math.min(...casts))} to ${counts.format(Math.max(...casts))} casts each` : ""}. A pair’s distance is half the sum of its four option differences; with totals this close, that is about the least ZEC that would have to change option to turn one tally into the other, a lower bound rather than evidence that holders agreed. Groups chain pairs within {LIMIT} of the vote. These are patterns in public totals; they do not identify holders.
       </p>
       <details className="coin-chart-data"><summary>Chart data</summary><div className="coin-data-scroll" tabIndex={0} role="region" aria-label="Scrollable matching-tally data"><table>
         <caption>Nearest final tally for each proposal. ZEC apart is half the sum of the four option differences between the two tallies.</caption>

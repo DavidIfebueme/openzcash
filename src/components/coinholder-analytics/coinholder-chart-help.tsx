@@ -42,7 +42,7 @@ const guides: Record<Chart, { title: string; paragraphs: [string, string] }> = {
   matching: {
     title: "Matching tallies",
     paragraphs: [
-      "Each cell compares the final tallies of two proposals, in the same group order on both axes. A pair’s distance is half the sum of its four option differences, shown as a share of the smaller vote; darker cells are closer. Because about the same ZEC voted on every proposal, a small distance means most of that ZEC chose the same option on both. Groups chain proposals within 2% of the vote; this describes public totals and does not identify holders.",
+      "Each cell compares the final tallies of two proposals, in the same group order on both axes. A pair’s distance is half the sum of its four option differences, shown as a share of the smaller vote; darker cells are closer. It is the least ZEC that would have to move between options to reconcile the two tallies: a lower bound on the ZEC that voted differently, not evidence that holders agreed, because switches in opposite directions cancel out in the totals. Groups chain proposals within 2% of the vote; this describes public totals and does not identify holders.",
       "Hover, tap or focus the matrix and use the arrow keys to compare pairs, Enter to select or clear the row’s proposal and Escape to clear. Select a ballot number to filter every chart."
     ]
   },

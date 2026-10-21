@@ -25,6 +25,7 @@ describe("Coinholder tally-pattern insights", () => {
     expect(html).toContain("Rejected · ~182K ZEC chose lower amount");
     expect(html).toContain("About the same ZEC voted on every proposal: 2,179,029.875–2,181,452.875 ZEC, from 877 to 888 casts each.");
     expect(html).toContain("Groups chain pairs within 2% of the vote.");
+    expect(html).toContain("a lower bound rather than evidence that holders agreed.");
     expect(html).toContain("<td>#32 Ironwood external audit reimbursement</td><td>A</td><td>#33</td><td>1,580.25</td><td>0.07%</td>");
     expect([...html.matchAll(/class="coin-match-cell /g)]).toHaveLength(37 * 36);
     expect(html).toContain("Hover, focus or tap a cell to compare two proposals.");
@@ -48,8 +49,10 @@ describe("Coinholder tally-pattern insights", () => {
     expect(html).toContain("<strong>×13</strong><span>largest repeat · Abstain</span>");
     expect(html).toContain("Abstain · 13 proposals");
     expect(html).toContain("104,432.375–113,478.375 ZEC");
-    expect(html).toContain("No single voter held a majority of the ZEC voted.");
-    expect(html).toContain("Connaugh Zcash Videos had the smallest leading option of any proposal: Abstain, 1,038,923.25 ZEC, 47.67% of all ZEC voted on it.");
+    expect(html).toContain("No block of ZEC that voted the same way on every proposal held a majority.");
+    expect(html).toContain("Connaugh Zcash Videos had the smallest leading option of any proposal: Abstain, 1,038,923.25 ZEC, 47.67% of all ZEC voted on it, and every such block fits inside that option.");
+    expect(html).toContain("This does not bound a holder who split their weight across options or wallets.");
+    expect(html).not.toMatch(/single voter|one voter/);
     expect(html).toContain("It is also the only proposal whose Abstain alone could have reversed the outcome.");
     expect(html).toContain('<p role="status" aria-live="polite"><strong>Abstain · 13 proposals</strong>');
     expect([...html.matchAll(/class="coin-repeat-count/g)]).toHaveLength(5);

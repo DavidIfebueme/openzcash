@@ -91,8 +91,8 @@ export function CoinholderRecurringAmounts({ proposals, selectedBallot, onSelect
           })}</p> : null}
       </div>
       {cap ? <p className="coin-repeat-callout">
-        {noMajority ? <strong>No single voter held a majority of the ZEC voted. </strong> : null}
-        {titles.get(cap.ballot)} had the smallest leading option of any proposal: {LABELS[cap.option]}, {zec(cap.units)} ZEC, {percent(cap.sharePercent)} of all ZEC voted on it. Any block of ZEC that voted the same way on every proposal, one voter’s included, fits inside that option.
+        {noMajority ? <strong>No block of ZEC that voted the same way on every proposal held a majority. </strong> : null}
+        {titles.get(cap.ballot)} had the smallest leading option of any proposal: {LABELS[cap.option]}, {zec(cap.units)} ZEC, {percent(cap.sharePercent)} of all ZEC voted on it, and every such block fits inside that option. This does not bound a holder who split their weight across options or wallets.
         {swing.length === 1 && swing[0] === cap.ballot ? " It is also the only proposal whose Abstain alone could have reversed the outcome."
           : swing.length ? ` Abstain alone could have reversed the outcome on ${swing.map(ballot => `#${ballot}`).join(", ")}.` : ""}
       </p> : null}
