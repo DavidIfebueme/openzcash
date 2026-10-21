@@ -6,6 +6,8 @@ The public branded page and the isolated chat both exhausted their connection re
 
 The Nym entry-gateway API still listed `CFofVdokf1gUucHwFK7MppJFAu8aRTiPHvGjud7Bdc7h` (`s2.sa.br.nympool.drpip.im`) with performance 0.38 and role Inactive. Its WebSocket accepted an upgrade. Therefore HTTP reachability alone was insufficient: the configured node was rejected by the SDK's eligible topology. No performance or topology protections were relaxed.
 
+Reading `default_debug()` from the exact installed WASM confirmed `minimum_gateway_performance: 50` and `ignore_ingress_epoch_role: true`. The node's 38% performance was below that threshold; its Inactive epoch role was not itself the rejection condition.
+
 ## Remediation
 
 - Validated replacement identity: `5k434EhsMhrsFJVnupQzmjx8bK5qRqBtEhR4pv1EGLdi`.
@@ -21,3 +23,11 @@ The Nym entry-gateway API still listed `CFofVdokf1gUucHwFK7MppJFAu8aRTiPHvGjud7B
 139 chat tests passed; TypeScript, targeted lint and production build passed. The retry regression and worker error classification failed before the code fix and passed afterward. Local browser round-trip checks are not certification of physical mobile devices or separate networks.
 
 The deployment must update both public gateway variables together and rebuild the browser bundle. The web health check remains only an HTTP readiness check. Future gateway health checks should validate the SDK topology and a mixnet round trip, not only HTTP/WSS reachability.
+
+## Public verification
+
+- Chat source commit `ccc285a`; Railway deployment `06c5e836-3d1a-43a9-a301-9171e72852c9` reached SUCCESS.
+- A new synthetic session on `https://openzcash.org/private-chat` reached Connected via Nym, disconnected and reconnected with the same alias. This means the controller's encrypted route probe returned through the mixnet.
+- Served CSP contains only the replacement gateway origin, with the old WSS origin removed. No-store, no-referrer and the sanitized gateway error are present in served responses/assets.
+- Production dependency audit (`npm audit --omit=dev`) reported zero vulnerabilities. Build-time development dependency notices are not included in that claim.
+- No real user chats, invitations or keys were accessed or recorded.
