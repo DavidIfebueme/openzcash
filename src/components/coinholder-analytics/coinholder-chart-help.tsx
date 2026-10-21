@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from "react";
 
-type Chart = "casts" | "reveals" | "comparison" | "margin" | "heatmap";
+type Chart = "casts" | "reveals" | "comparison" | "margin" | "heatmap" | "matching" | "recurring";
 const guides: Record<Chart, { title: string; paragraphs: [string, string] }> = {
   casts: {
     title: "Cast volume",
@@ -37,6 +37,20 @@ const guides: Record<Chart, { title: string; paragraphs: [string, string] }> = {
     paragraphs: [
       "Rows are proposals and columns are UTC days; darkness shows the selected option’s percentage of that proposal’s daily shares across all four options, not the number of shares. A 0% cell has shares in other options, “No shares” means no reveals that day, and Sep 17 begins at round creation.",
       "Hover, tap or focus a cell for counts, use arrow keys or Home/End to explore, and select a proposal name to filter."
+    ]
+  },
+  matching: {
+    title: "Matching tallies",
+    paragraphs: [
+      "Each cell compares the final tallies of two proposals, in the same group order on both axes. A pair’s distance is half the sum of its four option differences, shown as a share of the smaller vote; darker cells are closer. Because about the same ZEC voted on every proposal, a small distance means most of that ZEC chose the same option on both. Groups chain proposals within 2% of the vote; this describes public totals and does not identify holders.",
+      "Hover, tap or focus the matrix and use the arrow keys to compare pairs, Enter to select or clear the row’s proposal and Escape to clear. Select a ballot number to filter every chart."
+    ]
+  },
+  recurring: {
+    title: "Recurring amounts",
+    paragraphs: [
+      "Each tick is one proposal’s final Abstain or lower-amount ZEC on a shared scale; ticks that pile up mark amounts that recur across proposals, and ×N counts them. Totals less than 25,000 ZEC apart count as one amount, and near-zero totals are left out. Recurring amounts are consistent with the same blocks of ZEC making the same choice, but they do not identify holders and can also come from many holders deciding alike.",
+      "Select a recurring amount to list its proposals, or select a proposal to mark its amounts on both scales."
     ]
   }
 };

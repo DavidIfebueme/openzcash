@@ -15,6 +15,12 @@ export function formatInsightZec(value: string): string {
   return `${BigInt(whole).toLocaleString("en-US")}${decimals ? `.${decimals}` : ""}`;
 }
 
+/** Format 1/8-ZEC vote-chain units exactly, without loading the summary schemas in the browser. */
+export function formatInsightUnits(units: bigint): string {
+  if (units < 0n) throw new Error("Invalid ZEC amount");
+  return formatInsightZec(`${units / 8n}.${((units % 8n) * 125n).toString().padStart(3, "0")}`);
+}
+
 /** Retain sub-display precision; outcome decisions always use the raw integers. */
 function ratio(numerator: bigint, denominator: bigint): number | null {
   if (denominator <= 0n) return null;

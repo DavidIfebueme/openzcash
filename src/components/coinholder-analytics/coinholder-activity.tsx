@@ -9,6 +9,8 @@ import type { CoinholderRevealHistory } from "@/lib/coinholder/analytics/reveals
 import { CoinholderShareWeightChart } from "@/components/coinholder-analytics/coinholder-share-weight-chart";
 import { CoinholderDecisionChart } from "@/components/coinholder-analytics/coinholder-decision-chart";
 import { CoinholderHeatmap } from "@/components/coinholder-analytics/coinholder-heatmap";
+import { CoinholderTallyMatchChart } from "@/components/coinholder-analytics/coinholder-tally-match";
+import { CoinholderRecurringAmounts } from "@/components/coinholder-analytics/coinholder-recurring-amounts";
 import { CoinholderChartHelp } from "@/components/coinholder-analytics/coinholder-chart-help";
 import { CoinholderChartAxes, coinholderAxisIndices, coinholderAxisIntervals, coinholderCountScale, coinholderPlot as plot, coinholderTooltipPercent, coinholderPointerX, useCoinholderChartGeometry } from "@/components/coinholder-analytics/coinholder-chart-axis";
 
@@ -164,5 +166,7 @@ export function CoinholderActivityChart({ activity, revealHistory, proposals, se
     <CoinholderShareWeightChart proposals={proposals} history={revealHistory} selectedBallot={selectedBallot} onSelectBallot={onSelectBallot} />
     <CoinholderDecisionChart proposals={proposals} selectedBallot={selectedBallot} onSelectBallot={onSelectBallot} />
     <CoinholderHeatmap proposals={proposals} history={revealHistory} selectedBallot={selectedBallot} onSelectBallot={onSelectBallot} />
+    <CoinholderTallyMatchChart proposals={proposals} activity={activity} selectedBallot={selectedBallot} onSelectBallot={onSelectBallot} />
+    <CoinholderRecurringAmounts proposals={proposals} selectedBallot={selectedBallot} onSelectBallot={onSelectBallot} />
   </div>;
 }
