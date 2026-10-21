@@ -106,6 +106,14 @@ export function proxy(req: NextRequest) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
     response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), browsing-topics=()");
   }
+  if (chatStatus) {
+    // Override the portal's global headers, just as the isolated chat document does.
+    response.headers.set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'");
+    response.headers.set("Cache-Control", "no-store");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.headers.set("Cross-Origin-Resource-Policy", "same-origin");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
   return response;
 }
 

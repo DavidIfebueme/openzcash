@@ -39,6 +39,11 @@ describe("isolated pilot boundary", () => {
   });
   it("keeps network status on the canonical chat origin and disabled outside the chat", () => {
     pilot();
+    const response = proxy(new NextRequest("https://chat.example/api/private-chat/network-status"));
+    expect(response.headers.get("referrer-policy")).toBe("no-referrer");
+    expect(response.headers.get("content-security-policy")).toBe("default-src 'none'; frame-ancestors 'none'");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(response.headers.get("cross-origin-resource-policy")).toBe("same-origin");
     expect(proxy(new NextRequest("https://openzcash.org/api/private-chat/network-status")).status).toBe(404);
     vi.stubEnv("PRIVATE_CHAT_DEPLOYMENT", "");
     expect(proxy(new NextRequest("https://chat.example/api/private-chat/network-status")).status).toBe(404);
