@@ -78,7 +78,7 @@
 .coinholder-analytics .coin-chart figcaption { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; color: var(--muted); font-size: 12px; text-align: center; font-variant-numeric: tabular-nums; }
 .coinholder-analytics .coin-chart-data { color: var(--muted); font-size: 11px; margin-top: 12px; }
 .coinholder-analytics .coin-chart-data summary { cursor: pointer; padding: 5px 0; width: fit-content; }
-.coinholder-analytics .coin-data-scroll { max-height: 270px; overflow: auto; margin: 10px 0; }
+.coinholder-analytics .coin-data-scroll { position: relative; max-height: 270px; overflow: auto; margin: 10px 0; }
 .coinholder-analytics .coin-data-scroll table { width: 100%; font-size: 11px; }
 .coinholder-analytics .coin-data-scroll caption { text-align: left; margin-bottom: 8px; }
 .coinholder-analytics .coin-data-scroll th, .coinholder-analytics .coin-data-scroll td { text-align: right; padding: 6px 10px; }
@@ -156,7 +156,7 @@
 .coinholder-analytics .coin-share-weight-legend li { display: flex; align-items: center; gap: 7px; }
 .coinholder-analytics .coin-share-weight-share { display: block; width: 8px; height: 8px; border: 2px solid var(--muted); border-radius: 50%; background: var(--surface); }
 .coinholder-analytics .coin-share-weight-zec { display: block; width: 7px; height: 7px; background: var(--accent-ink); transform: rotate(45deg); }
-.coinholder-analytics .coin-share-weight-scroll { max-height: 340px; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--dim) transparent; border-radius: 5px; }
+.coinholder-analytics .coin-share-weight-scroll { position: relative; max-height: 340px; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--dim) transparent; border-radius: 5px; }
 .coinholder-analytics .coin-share-weight-scroll:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
 .coinholder-analytics .coin-share-weight-table { width: 100%; min-width: 760px; table-layout: fixed; border-collapse: separate; border-spacing: 0; font-size: 12px; font-variant-numeric: tabular-nums; }
 .coinholder-analytics .coin-share-weight-table th, .coinholder-analytics .coin-share-weight-table td { text-align: right; padding: 10px 12px; vertical-align: middle; }
@@ -218,7 +218,7 @@
 .coinholder-analytics .coin-margin-panel .coin-series-heading { margin-bottom: 14px; }
 .coinholder-analytics .coin-margin-sort { color: var(--muted); font-size: 11px; white-space: nowrap; }
 .coinholder-analytics .coin-margin-sort button { padding: 4px 0; min-height: 32px; color: var(--accent-ink); cursor: pointer; font-size: 12px; }
-.coinholder-analytics .coin-margin-scroll { max-height: 340px; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--dim) transparent; border-radius: 5px; }
+.coinholder-analytics .coin-margin-scroll { position: relative; max-height: 340px; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--dim) transparent; border-radius: 5px; }
 .coinholder-analytics .coin-margin-scroll:focus-visible, .coinholder-analytics .coin-margin-row:focus-visible, .coinholder-analytics .coin-margin-sort button:focus-visible, .coinholder-analytics .coin-margin-details summary:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: -2px; }
 .coinholder-analytics .coin-margin-grid { display: grid; grid-template-columns: minmax(170px, 1.6fr) minmax(110px, 1fr) 70px 88px 72px; gap: 14px; align-items: center; min-width: 625px; width: 100%; }
 .coinholder-analytics .coin-margin-columns { position: sticky; top: 0; z-index: 1; padding: 9px 8px 11px; background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 500; }
@@ -281,7 +281,7 @@
 .coinholder-analytics .coin-heatmap-selection { display: flex; flex-wrap: wrap; gap: 5px 18px; align-items: baseline; margin-bottom: 12px; }
 .coinholder-analytics .coin-heatmap-selection > strong { font-size: 12px; font-weight: 500; color: var(--muted); overflow-wrap: anywhere; }
 .coinholder-analytics .coin-heatmap-selection > button { min-height: 28px; font-size: 12px; color: var(--accent-ink); padding: 6px 0; }
-.coinholder-analytics .coin-heatmap-scroll { max-height: 340px; max-width: 100%; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--dim) transparent; border-radius: 4px; }
+.coinholder-analytics .coin-heatmap-scroll { position: relative; max-height: 340px; max-width: 100%; overflow: auto; scrollbar-width: thin; scrollbar-color: var(--dim) transparent; border-radius: 4px; }
 .coinholder-analytics .coin-heatmap-scroll:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 4px; }
 .coinholder-analytics .coin-heatmap-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-variant-numeric: tabular-nums; }
 .coinholder-analytics .coin-heatmap-table th, .coinholder-analytics .coin-heatmap-table td { padding: 2px; text-align: center; vertical-align: middle; }

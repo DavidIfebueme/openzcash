@@ -32,6 +32,15 @@ function renderActivity(selectedBallot: number | null = null, initial: Coinholde
 }
 
 describe("OpenZcash Coinholder analytics", () => {
+  it("keeps scroll boxes from stretching the page or trapping page scroll", () => {
+    const css = readFileSync("src/app/coinholders/analytics.css", "utf8");
+    // Screen-reader helpers are absolutely positioned; a scroll box must be their containing block.
+    for (const box of ["coin-data-scroll", "coin-share-weight-scroll", "coin-margin-scroll", "coin-heatmap-scroll"]) {
+      expect(css).toMatch(new RegExp(`\\.coin-${box.slice(5)} \\{ position: relative;`));
+    }
+    expect(css).not.toMatch(/overscroll-behavior:\s*contain/);
+  });
+
   it("renders all seven historical charts and their reading guides inside the native page", () => {
     const html = renderToStaticMarkup(<CoinholderDashboardView initial={data} />);
     expect(html).toContain('class="coinholder-analytics"');
