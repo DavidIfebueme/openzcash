@@ -8,6 +8,7 @@ const FAILURE_REASONS = new Set([
   "csp",
   "wasm",
   "network",
+  "gateway-unavailable",
   "no-address",
   "connect-failed",
   "worker-error",

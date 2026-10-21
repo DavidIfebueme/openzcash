@@ -440,7 +440,7 @@ describe("private chat consent and lifecycle", () => {
     a.chat.network(true);
     expect(a.chat.getSnapshot().link).toBe("disconnected");
   });
-  it("bounds automatic retries and stops them when the user disconnects", async () => {
+  it("stops after bounded failures and allows a manual retry without resetting the alias", async () => {
     const h = harness(),
       a = h.client();
     await a.chat.enter("Alice");
@@ -453,11 +453,16 @@ describe("private chat consent and lifecycle", () => {
       a.chat.tick();
     }
     expect(a.chat.getSnapshot().link).toBe("failed");
+    expect(a.chat.getSnapshot().connectionWanted).toBe(false);
+    expect(a.chat.getSnapshot().alias).toBe("Alice");
     expect(h.connects).toHaveLength(4);
-    a.chat.disconnect();
     h.setTime(h.time() + 100_000);
     a.chat.tick();
     expect(h.connects).toHaveLength(4);
+    a.chat.reconnect();
+    await vi.waitFor(() => expect(a.chat.getSnapshot().link).toBe("connected"));
+    expect(a.chat.getSnapshot().connectionWanted).toBe(true);
+    expect(a.chat.getSnapshot().alias).toBe("Alice");
   });
   it("never appends or sends an in-flight message after Leave", async () => {
     const h = harness(),

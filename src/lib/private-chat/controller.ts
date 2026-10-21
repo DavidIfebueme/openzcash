@@ -507,11 +507,16 @@ export class ChatController {
           retry: this.state.retry + 1,
           note: "Connection interrupted. Reconnecting through Nym…",
         });
-      } else
+      } else {
+        this.wanted = false;
         this.patch({
           link: "failed",
-          note: "Could not connect to Nym. Retry when your connection is ready.",
+          connectionWanted: false,
+          note: event.reason === "gateway-unavailable"
+            ? "The configured Nym gateway is unavailable. Please try again later."
+            : "Could not connect through Nym. Try again in a moment.",
         });
+      }
     }
   }
   private async sendPacket(

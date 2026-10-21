@@ -33,6 +33,7 @@ function failReason(error) {
   const text = `${error && error.name ? error.name : ""} ${
     error && error.message ? error.message : ""
   }`.toLowerCase();
+  if (text.includes("no gateway with id")) return "gateway-unavailable";
   if (text.includes("content security") || text.includes("csp")) return "csp";
   if (text.includes("wasm") || text.includes("compile")) return "wasm";
   if (
