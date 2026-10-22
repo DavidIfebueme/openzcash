@@ -51,5 +51,3 @@ next-env.d.ts
 /public/private-chat-nym/
 /skills/zcg-copilot/**/__pycache__/
 /tmp/
-
-/dist-private-chat/

@@ -1,5 +1,7 @@
 # Private Chat — operação de piloto isolado
 
+> **Atualização de 22/10/2026.** O serviço `private-chat-directory` foi retirado do ar e o Discover saiu do código. O piloto roda só com convites diretos: as seções sobre cliente Nym nativo, diretório, armazenamento cifrado, allowlist de salas e as variáveis `PRIVATE_CHAT_DIRECTORY_*` são históricas e não se aplicam ao build atual. O volume do antigo diretório foi preservado no Railway sem deploy.
+
 Estado em 15/10/2026: piloto experimental hospedado, autorizado para um teste humano entre duas pessoas. A instância usa origem HTTPS isolada, gateway fixado e volume durável; o fluxo real Nym/SURB passou antes e depois de recriar o container. Consulte a [evidência da implantação](audits/private-chat-pilot-production-2026-10-15.md). Testes em aparelhos físicos e revisão independente continuam pendentes; este roteiro não aprova um lançamento amplo.
 
 ## Componentes

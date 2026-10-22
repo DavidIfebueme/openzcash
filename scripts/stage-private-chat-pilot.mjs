@@ -2,7 +2,7 @@ import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join, resolve, basename } from 'node:path';
 const root = process.cwd();
 const mode = process.argv[2];
-if (!['web', 'directory'].includes(mode)) throw new Error('Choose web or directory');
+if (mode !== 'web') throw new Error('Choose web');
 const destination = resolve(root, 'tmp', `private-chat-pilot-${mode}`);
 await rm(destination, { recursive: true, force: true });
 await mkdir(destination, { recursive: true });
@@ -10,14 +10,7 @@ const copy = (source, target = source) => cp(join(root, source), join(destinatio
   recursive: true,
   filter: path => !['.DS_Store', '__pycache__'].includes(basename(path)) && !basename(path).startsWith('._') && !basename(path).startsWith('.env'),
 });
-if (mode === 'directory') {
-  await copy('dist-private-chat');
-  await copy('ops/private-chat/directory/package.json', 'package.json');
-  await copy('ops/private-chat/directory/package-lock.json', 'package-lock.json');
-  await copy('ops/private-chat/directory/Dockerfile', 'Dockerfile');
-  for (const file of ['entrypoint.sh', 'native.mjs', 'bootstrap.mjs', 'service.mjs', 'configure.py']) await copy(`ops/private-chat/directory/${file}`, `ops/${file}`);
-  await copy('scripts/private-chat-directory-lock.py', 'ops/private-chat-directory-lock.py');
-} else {
+{
   for (const path of ['src', 'public', 'scripts', 'skills', 'ops/error-fallback', 'data', 'drizzle', 'package.json', 'package-lock.json', 'next.config.ts', 'postcss.config.mjs', 'tsconfig.json']) await copy(path);
   await copy('ops/private-chat/Dockerfile.web', 'Dockerfile');
   await rm(join(destination, 'public/private-chat-nym'), { recursive: true, force: true });

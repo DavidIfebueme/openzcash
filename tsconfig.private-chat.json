@@ -1,9 +1,0 @@
-{
-  "compilerOptions": {
-    "target": "ES2022", "lib": ["ES2022", "DOM"], "module": "CommonJS",
-    "moduleResolution": "Node", "strict": true, "esModuleInterop": true,
-    "skipLibCheck": true, "outDir": "dist-private-chat", "rootDir": ".",
-    "types": ["node"], "declaration": false, "sourceMap": false
-  },
-  "include": ["scripts/private-chat-directory-server.ts", "scripts/private-chat-directory-init.ts"]
-}

@@ -1,5 +1,3 @@
-import { isNymAddress } from "./nym-address";
-import { isPublicKey } from "./keys";
 export type ChatEnvironment = Record<string, string | undefined>;
 export function gatewayOrigin(value: string | undefined): string | null {
   if (!value) return null;
@@ -20,10 +18,6 @@ export function chatOrigin(value: string | undefined): string | null {
 export function validGatewayIdentity(value: string | undefined): boolean {
   return typeof value === "string" && /^[1-9A-HJ-NP-Za-km-z]{32,64}$/.test(value);
 }
-/** Discover (rooms and the Nym directory) is off unless enabled at build time. */
-export function discoverEnabled(env: ChatEnvironment = process.env): boolean {
-  return env.NEXT_PUBLIC_PRIVATE_CHAT_DISCOVER === "true";
-}
 /** Production-mode builds require an explicitly configured pilot. */
 export function pilotDeployment(env: ChatEnvironment = process.env) {
   if (env.PRIVATE_CHAT_DEPLOYMENT !== "pilot" ||
@@ -31,13 +25,7 @@ export function pilotDeployment(env: ChatEnvironment = process.env) {
   const origin = chatOrigin(env.PRIVATE_CHAT_ORIGIN);
   const gateway = gatewayOrigin(env.NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ORIGIN);
   if (!origin || !gateway || !validGatewayIdentity(env.NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ID)) return null;
-  const address = env.PRIVATE_CHAT_DIRECTORY_ADDRESS;
-  const publicKey = env.PRIVATE_CHAT_DIRECTORY_PUBLIC_KEY;
-  const directory = address && isNymAddress(address) && publicKey && isPublicKey(publicKey)
-    ? { address, publicKey, replyMode: "surb" as const } : null;
-  // Direct invites never touch the directory; only Discover needs it configured.
-  if (!directory && discoverEnabled(env)) return null;
-  return { origin, gateway, directory };
+  return { origin, gateway };
 }
 export function chatEnabled(env: ChatEnvironment = process.env): boolean {
   return env.NODE_ENV === "development"

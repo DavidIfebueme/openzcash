@@ -1,7 +1,5 @@
 /** Real-mixnet integration test using two independent Nym WASM workers.
  * Run: node --import tsx scripts/private-chat-real-nym.mts
- * A native SURB descriptor can be selected with PRIVATE_CHAT_TEST_DIRECTORY.
- * PRIVATE_CHAT_TEST_REQUIRE_SURB=true refuses address mode; there is no fallback.
  * This tests the controller/worker/network, not browser rendering or two devices.
  */
 import assert from "node:assert/strict";
@@ -12,7 +10,6 @@ import { ChatController } from "../src/lib/private-chat/controller";
 import { createNymTransport } from "../src/lib/private-chat/transport";
 import { createLiveInvite, inviteToken } from "../src/lib/private-chat/live-invite";
 import { createDeviceIdentity, wipeIdentity } from "../src/lib/private-chat/identity";
-import { validDirectoryConfig, type DirectoryConfig } from "../src/lib/private-chat/directory-wire";
 
 const report = {
   startedAt: new Date().toISOString(),
@@ -20,7 +17,6 @@ const report = {
   sources: {} as Record<string, string>,
   sdk: "@nymproject/nym-client-wasm@1.4.1",
   topology: "two independent WASM workers on one host and one network",
-  directoryMode: "" as string,
   checks: [] as { name: string; durationMs: number }[],
   transport: { submitted: 0, anonymous: 0, received: 0, connections: 0, topologyRequests: 0, unexpectedFetches: 0 },
   success: false,
@@ -56,21 +52,15 @@ class WorkerAdapter {
 }
 Object.defineProperty(globalThis, "Worker", { value: WorkerAdapter, configurable: true });
 const output = process.env.PRIVATE_CHAT_TEST_REPORT;
-const descriptorPath = process.env.PRIVATE_CHAT_TEST_DIRECTORY ?? "tmp/private-chat-directory.json";
-const descriptor = JSON.parse(await readFile(descriptorPath, "utf8")) as DirectoryConfig;
-assert.ok(validDirectoryConfig(descriptor), "Invalid directory descriptor");
-if (process.env.PRIVATE_CHAT_TEST_REQUIRE_SURB === "true")
-  assert.equal(descriptor.replyMode, "surb", "Native SURB directory is required; no address fallback");
-report.directoryMode = descriptor.replyMode;
-for (const file of ["src/lib/private-chat/controller.ts", "src/lib/private-chat/protocol.ts", "src/lib/private-chat/ratchet.ts", "src/lib/private-chat/envelope.ts", "package-lock.json", "scripts/private-chat-directory-server.ts", "src/lib/private-chat/native-wire.ts", "src/lib/private-chat/directory-provider.ts", "scripts/private-chat-nym-worker.js", "public/private-chat-nym/nym_client_wasm_bg.wasm"]) {
+for (const file of ["src/lib/private-chat/controller.ts", "src/lib/private-chat/protocol.ts", "src/lib/private-chat/ratchet.ts", "src/lib/private-chat/envelope.ts", "package-lock.json", "scripts/private-chat-nym-worker.js", "public/private-chat-nym/nym_client_wasm_bg.wasm"]) {
   report.sources[file] = createHash("sha256").update(await readFile(file)).digest("hex");
 }
 let bobSubmissions = 0;
-const alice = new ChatController(createNymTransport, undefined, Date.now, descriptor);
+const alice = new ChatController(createNymTransport);
 const bob = new ChatController((listener) => {
   const transport = createNymTransport(listener);
   return { ...transport, send(input) { bobSubmissions++; transport.send(input); } };
-}, undefined, Date.now, descriptor);
+});
 const pause = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 async function until(check: () => boolean, label: string, timeout = 120_000) {
   const start = Date.now();
@@ -110,17 +100,8 @@ try {
     bob.connect();
     await until(() => bob.getSnapshot().link === "connected", "Bob route");
   });
-  await step("Encrypted private-room Discover over real Nym", async () => {
-    assert.equal(await alice.joinRoom(process.env.PRIVATE_CHAT_TEST_ROOM), true);
-    assert.equal(await bob.joinRoom(alice.getSnapshot().room!.token), true);
-    alice.setDiscover(true); bob.setDiscover(true);
-    alice.setAvailable(true);
-    await until(() => alice.getSnapshot().presence === "online", "presence publication");
-    await bob.loadDirectory();
-    await until(() => bob.getSnapshot().peers.some((peer) => peer.alias === "Nym Test Alice"), "Discover visibility");
-  });
   await step("Invitation and explicit acceptance over real Nym", async () => {
-    const invite = bob.getSnapshot().peers.find((peer) => peer.alias === "Nym Test Alice");
+    const invite = await alice.makeInvite();
     assert.ok(invite);
     await bob.requestChat(inviteToken(invite));
     await until(() => alice.getSnapshot().requests.length === 1, "invite request");
@@ -176,7 +157,6 @@ try {
     } finally { wipeIdentity(identity); }
   });
   assert.equal(report.transport.unexpectedFetches, 0, "Unexpected direct HTTP destination");
-  if (descriptor.replyMode === "surb") assert.ok(report.transport.anonymous > 0, "No anonymous directory requests observed");
   report.success = true;
 } catch (error) {
   report.failure = error instanceof Error ? error.message : "Unknown failure";

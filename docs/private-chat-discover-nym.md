@@ -1,5 +1,7 @@
 # Discover pela Nym — revisão de 15/10/2026
 
+> **Histórico.** O Discover e o diretório Nym foram retirados do produto em 22/10/2026: o serviço `private-chat-directory` saiu do ar (tráfego de cobertura constante do cliente nativo) e o código do diretório, das salas e da presença foi removido do branch do chat. O Private Chat segue só com convites diretos. O texto abaixo documenta o desenho anterior e não descreve o código atual.
+
 Branch `michae2xl/private-chat`. Preview local; publicação em produção continua bloqueada.
 
 ## Estado atual do hardening (15/10/2026)

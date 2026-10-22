@@ -6,8 +6,6 @@ function pilot() {
     NODE_ENV:"production", PRIVATE_CHAT_DEPLOYMENT:"pilot", NEXT_PUBLIC_PRIVATE_CHAT_PILOT:"true",
     PRIVATE_CHAT_ORIGIN:"https://chat.example", PRIVATE_CHAT_ISOLATED:"true",
     NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ORIGIN:"wss://gateway.example:9001", NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ID:"1".repeat(44),
-    PRIVATE_CHAT_DIRECTORY_ADDRESS:"1".repeat(44)+"."+"2".repeat(44)+"@"+"3".repeat(44),
-    PRIVATE_CHAT_DIRECTORY_PUBLIC_KEY:"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   };
   for (const [key,value] of Object.entries(env)) vi.stubEnv(key,value);
 }

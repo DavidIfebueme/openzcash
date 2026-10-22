@@ -21,16 +21,6 @@ import {
   type NymTransport,
   type TransportEvent,
 } from "./transport";
-import {
-  openPresence,
-  presenceCommand,
-  type PresenceService,
-  PRESENCE_HEARTBEAT_MS,
-} from "./presence";
-
-import { NymDirectory } from "./nym-directory";
-import { DIRECTORY_RESPONSE, type DirectoryConfig } from "./directory-wire";
-import { openRoom, type DiscoveryRoom } from "./discovery-room";
 
 export const ROUTE_CHECK_INTERVAL_MS = 30_000;
 export const ROUTE_CHECK_TIMEOUT_MS = 60_000;
@@ -116,11 +106,6 @@ export type ChatSnapshot = {
   requests: ChatRequest[];
   contact: Contact | null;
   lines: ChatLine[];
-  availableUntil: number | null;
-  presence: "off" | "publishing" | "online" | "error";
-  room: { id: string; token: string } | null;
-  peers: LiveInvite[];
-  directory: "idle" | "loading" | "ready" | "error";
   note: string;
   sending: boolean;
   now: number;
@@ -139,11 +124,6 @@ const initial = (): ChatSnapshot => ({
   requests: [],
   contact: null,
   lines: [],
-  availableUntil: null,
-  presence: "off",
-  room: null,
-  peers: [],
-  directory: "idle",
   note: "",
   sending: false,
   now: 0,
@@ -160,15 +140,11 @@ export class ChatController {
   private epoch = 0;
   private connection = 0;
   private sequence = 0;
-  private revision = 0;
   private wanted = false;
   private networkOnline = true;
   private retryAt = 0;
   private routeProbe: { id: string; deadline: number } | null = null;
   private nextRouteCheck = 0;
-  private room: DiscoveryRoom | null = null;
-  private roomIdentity: DeviceIdentity | null = null;
-  private roomEpoch = 0;
   private inviteEpoch = 0;
   private conversations = new Map<string, ConversationState>();
   private activeConversationId: string | null = null;
@@ -177,17 +153,7 @@ export class ChatController {
   private receiveChain: Promise<void> = Promise.resolve();
   private refused = new Set<string>();
   private timer: ReturnType<typeof setInterval> | null = null;
-  private discover = false;
-  private nextList = 0;
-  private peerLeases = new Map<string, number>();
-  private listing = 0;
-  private listVersion = 0;
   private receiving = 0;
-  private nymDirectory: NymDirectory | null = null;
-  private directory: PresenceService;
-  private nextHeartbeat = 0;
-  private publishing = false;
-  private presenceEpoch = 0;
   private accepting = false;
   private conversationEpoch = 0;
   private preparing = false;
@@ -248,31 +214,8 @@ export class ChatController {
 
   constructor(
     private factory = createNymTransport,
-    directory?: PresenceService,
     private clock = Date.now,
-    config: DirectoryConfig | null = null,
-  ) {
-    this.nymDirectory = directory
-      ? null
-      : new NymDirectory(
-          config,
-          (input) => {
-            if (
-              !this.transport ||
-              this.state.link !== "connected" ||
-              !this.wanted
-            )
-              throw new Error("Discover requires Nym");
-            this.transport.send(input);
-          },
-          () =>
-            !!this.transport && this.state.link === "connected" && this.wanted,
-          () => this.address,
-          (roomId) =>
-            this.room?.id === roomId ? this.room.authSecret : null,
-        );
-    this.directory = directory ?? this.nymDirectory!;
-  }
+  ) {}
   getSnapshot = () => this.state;
   subscribe = (listener: () => void) => {
     this.listeners.add(listener);
@@ -337,7 +280,7 @@ export class ChatController {
           ),
         };
       }
-      this.setAvailable(false);
+      this.dropInvite();
       this.patch({
         alias,
         keyReady: true,
@@ -407,12 +350,9 @@ export class ChatController {
     });
   };
   private stopConnection() {
-    this.setAvailable(false);
+    // The invite names this route's address; a new route needs a new invite.
+    this.dropInvite();
     this.connection += 1;
-    this.nymDirectory?.close();
-    this.listVersion++;
-    this.listing = 0;
-    this.peerLeases.clear();
     this.transport?.disconnect();
     this.transport = null;
     this.address = null;
@@ -427,12 +367,7 @@ export class ChatController {
     }
     this.routeProbe = null;
     this.nextRouteCheck = 0;
-    this.patch({
-      peers: [],
-      directory: "idle",
-      invite: null,
-      requests: [],
-    });
+    this.patch({ invite: null, requests: [] });
   }
   network(online: boolean) {
     this.networkOnline = online;
@@ -453,7 +388,6 @@ export class ChatController {
   leave = () => {
     this.epoch += 1;
     this.disconnect();
-    this.leaveRoom();
     for (const conversation of this.conversations.values()) this.clearRatchet(conversation);
     this.conversations.clear();
     this.activeConversationId = null;
@@ -476,9 +410,7 @@ export class ChatController {
       this.receiveChain = this.receiveChain
         .then(() =>
           ticket === this.connection
-            ? event.bytes[0] === DIRECTORY_RESPONSE
-              ? this.nymDirectory?.receive(event.bytes)
-              : this.receive(event.bytes, ticket)
+            ? this.receive(event.bytes, ticket)
             : undefined,
         )
         .catch(() => undefined)
@@ -486,7 +418,6 @@ export class ChatController {
           this.receiving--;
         });
     } else if (event.type === "submitted" || event.type === "submit-failed") {
-      if (event.type === "submit-failed") this.nymDirectory?.fail(event.id);
       for (const conversation of this.conversations.values()) {
         if (!conversation.lines.some(line => line.id === event.id)) continue;
         this.updateConversation(conversation, {
@@ -659,9 +590,15 @@ export class ChatController {
     return invite;
   }
   revokeInvite = () => {
-    this.setAvailable(false);
-    this.patch({ invite: null, requests: [], note: "Invite revoked." });
+    this.dropInvite();
+    this.patch({ note: "Invite revoked." });
   };
+  /** Revocation is local and immediate; pending requests go with the invite. */
+  private dropInvite() {
+    this.inviteEpoch += 1;
+    this.invitationWork = null;
+    this.patch({ invite: null, requests: [] });
+  }
   async requestChat(value: string) {
     if (
       !this.identity ||
@@ -825,7 +762,6 @@ export class ChatController {
       if (generation === this.conversationEpoch) this.accepting = false;
       return;
     }
-    this.unpublish();
     const contact: Contact = {
       alias: item.packet.alias,
       publicKey: item.publicKey,
@@ -933,7 +869,6 @@ export class ChatController {
         retry: 0,
         ...(wasChecking ? { note: "" } : {}),
       });
-      if (wasChecking && this.discover) void this.loadDirectory();
       if (wasChecking) for (const conversation of this.conversations.values()) {
         if (conversation.contact.status === "active") void this.restorePeerAfterReconnect(conversation);
         if (conversation.contact.status === "requesting") void this.retryRequest(conversation.contact.conversation);
@@ -1348,236 +1283,12 @@ export class ChatController {
     }
     return sent;
   }
-  async joinRoom(value?: string) {
-    const ticket = ++this.roomEpoch,
-      epoch = this.epoch;
-    const room = await openRoom(value);
-    if (!room) {
-      this.patch({ note: "This room link is invalid. Ask for a new one." });
-      return false;
-    }
-    const identity = await createDeviceIdentity();
-    if (ticket !== this.roomEpoch || epoch !== this.epoch) {
-      room.key.fill(0);
-      room.authSecret.fill(0);
-      wipeIdentity(identity);
-      return false;
-    }
-    this.setAvailable(false);
-    this.listVersion++;
-    this.listing = 0;
-    this.peerLeases.clear();
-    this.room?.key.fill(0);
-    this.room?.authSecret.fill(0);
-    wipeIdentity(this.roomIdentity);
-    this.room = room;
-    this.roomIdentity = identity;
-    this.patch({
-      room: { id: room.id, token: room.token },
-      peers: [],
-      directory: "idle",
-      note: "",
-    });
-    this.nextList = 0;
-    if (this.discover) void this.loadDirectory();
-    return true;
-  }
-  leaveRoom = () => {
-    this.roomEpoch += 1;
-    this.setAvailable(false);
-    this.listVersion++;
-    this.listing = 0;
-    this.peerLeases.clear();
-    this.room?.key.fill(0);
-    this.room?.authSecret.fill(0);
-    wipeIdentity(this.roomIdentity);
-    this.room = null;
-    this.roomIdentity = null;
-    this.patch({ room: null, peers: [], directory: "idle" });
-  };
-  setDiscover(open: boolean) {
-    this.discover = open;
-    if (open) {
-      this.nextList = 0;
-      void this.loadDirectory();
-    }
-  }
-  async loadDirectory() {
-    const room = this.room;
-    if (
-      this.listing ||
-      !this.discover ||
-      !room ||
-      this.state.link !== "connected" ||
-      !this.wanted
-    )
-      return;
-    const epoch = this.epoch,
-      connection = this.connection,
-      version = ++this.listVersion;
-    this.listing = version;
-    this.patch({
-      directory:
-        this.state.directory === "idle" ? "loading" : this.state.directory,
-    });
-    this.nextList = this.clock() + 30_000;
-    try {
-      const entries = await this.directory.list(room.id);
-      const peers: LiveInvite[] = [];
-      const leases = new Map<string, number>();
-      for (const entry of entries) {
-        if (room !== this.room) break;
-        const invite = await openPresence(room, entry, this.clock());
-        if (
-          invite &&
-          invite.publicKey !== this.identity?.publicKey &&
-          !peers.some((p) => p.publicKey === invite.publicKey)
-        ) {
-          peers.push(invite);
-          leases.set(
-            invite.publicKey,
-            Math.min(entry.onlineUntil, invite.expiresAt),
-          );
-        }
-      }
-      if (
-        epoch === this.epoch &&
-        connection === this.connection &&
-        version === this.listVersion &&
-        room === this.room &&
-        this.discover
-      ) {
-        this.peerLeases = leases;
-        this.patch({ peers, directory: "ready" });
-      }
-    } catch {
-      if (
-        epoch === this.epoch &&
-        connection === this.connection &&
-        version === this.listVersion &&
-        room === this.room
-      )
-        this.patch({ peers: [], directory: "error" });
-    } finally {
-      if (this.listing === version) this.listing = 0;
-    }
-  }
-  setAvailable(enabled: boolean) {
-    this.presenceEpoch += 1;
-    if (!enabled) {
-      this.unpublish();
-      // Revocation is local and immediate, even if the directory removal fails.
-      this.inviteEpoch += 1;
-      this.invitationWork = null;
-      this.patch({ invite: null, requests: [] });
-      return;
-    }
-    if (
-      !this.identity ||
-      !this.room ||
-      !this.roomIdentity ||
-      this.state.link !== "connected" ||
-      !this.state.canStartConversation
-    )
-      return;
-    const ticket = this.presenceEpoch;
-    this.patch({ presence: "publishing", note: "" });
-    void this.makeInvite()
-      .then((invite) => {
-        if (
-          ticket !== this.presenceEpoch ||
-          !invite ||
-          this.state.link !== "connected"
-        )
-          return;
-        this.patch({ availableUntil: invite.expiresAt });
-        void this.heartbeat();
-      })
-      .catch(() => {
-        if (ticket === this.presenceEpoch)
-          this.patch({ presence: "error", availableUntil: null });
-      });
-  }
-  /** Leaves Discover without revoking the invite, so pending requests stay. */
-  private unpublish() {
-    this.presenceEpoch += 1;
-    const invite = this.state.invite,
-      identity = this.roomIdentity,
-      room = this.room;
-    const wasPublished = this.state.availableUntil !== null;
-    this.patch({ availableUntil: null, presence: "off" });
-    if (!wasPublished || !identity || !invite || !room) return;
-    const copy = {
-      ...identity,
-      signingSecret: new Uint8Array(identity.signingSecret),
-    };
-    const revision = ++this.revision,
-      connection = this.connection;
-    void presenceCommand(copy, room, invite, "remove", revision)
-      .then((command) => {
-        if (connection === this.connection && this.state.link === "connected")
-          return this.directory.publish(command);
-      })
-      .catch(() => undefined)
-      .finally(() => copy.signingSecret.fill(0));
-  }
-  private async heartbeat() {
-    const invite = this.state.invite,
-      identity = this.roomIdentity,
-      issuer = this.identity,
-      room = this.room,
-      ticket = this.presenceEpoch;
-    if (
-      this.publishing ||
-      !invite ||
-      !identity ||
-      !issuer ||
-      !room ||
-      !this.state.availableUntil ||
-      this.state.link !== "connected"
-    )
-      return;
-    this.publishing = true;
-    this.nextHeartbeat = this.clock() + PRESENCE_HEARTBEAT_MS;
-    const revision = ++this.revision;
-    try {
-      const command = await presenceCommand(
-        identity,
-        room,
-        invite,
-        "upsert",
-        revision,
-        issuer,
-      );
-      if (ticket !== this.presenceEpoch) return;
-      await this.directory.publish(command);
-      if (ticket === this.presenceEpoch) this.patch({ presence: "online" });
-    } catch {
-      if (ticket === this.presenceEpoch) {
-        this.setAvailable(false);
-        this.patch({
-          presence: "error",
-          note: "Discover is paused. Retry over Nym, or share a chat invite.",
-        });
-      }
-    } finally {
-      this.publishing = false;
-    }
-  }
   tick() {
     const now = this.clock();
-    const changes: Partial<ChatSnapshot> = {
-      now,
-      peers: this.state.peers.filter(
-        (p) =>
-          p.expiresAt > now && (this.peerLeases.get(p.publicKey) ?? 0) > now,
-      ),
-    };
+    const changes: Partial<ChatSnapshot> = { now };
     if (this.state.invite && this.state.invite.expiresAt <= now) {
       const pending = this.state.requests.length;
-      this.setAvailable(false);
-      changes.invite = null;
-      changes.requests = [];
+      this.dropInvite();
       if (pending)
         changes.note = "Your invite expired and its pending requests were cleared. Create a new one.";
       else if (!this.activeConversationId)
@@ -1617,8 +1328,5 @@ export class ChatController {
         this.checkRoute();
     }
     if (this.retryAt && now >= this.retryAt && this.wanted) this.connect();
-    if (this.discover && now >= this.nextList) void this.loadDirectory();
-    if (this.state.availableUntil && now >= this.nextHeartbeat)
-      void this.heartbeat();
   }
 }

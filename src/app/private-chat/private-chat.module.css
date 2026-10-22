@@ -271,9 +271,7 @@
 }
 .aliasForm input,
 .inviteLink,
-.joinInput,
-.roomJoin input,
-.roomLinkDetails input {
+.joinInput {
   min-width: 0;
   width: 100%;
   padding: 11px 12px;
@@ -284,8 +282,7 @@
   font-size: 14px;
 }
 .aliasForm input::placeholder,
-.joinInput::placeholder,
-.roomJoin input::placeholder {
+.joinInput::placeholder {
   color: var(--dim);
 }
 .primaryButton,
@@ -338,98 +335,6 @@
 }
 .textButton:not(:disabled):hover,
 .leaveButton:hover {
-  color: var(--accent-ink);
-}
-.viewControls {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 16px 0;
-}
-.viewControls button {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  width: 100%;
-  padding: 12px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--muted);
-  text-align: left;
-  min-height: 62px;
-}
-.viewControls button > svg {
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-.viewControls button > span:not(.count):not(.roomIndicator) {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-}
-.viewControls strong {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-}
-.viewControls small {
-  font-size: 13px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--dim);
-}
-.viewControls button:hover {
-  background: var(--surface2);
-}
-.viewControls button[aria-selected="true"] {
-  background: var(--surface);
-  border-color: var(--line);
-  color: var(--accent-ink);
-  box-shadow: 0 2px 4px #00000003;
-}
-.count {
-  display: grid;
-  place-items: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--accent-soft);
-  color: var(--accent-ink);
-  font-size: 12px;
-}
-.roomIndicator {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-}
-.availabilityCard {
-  margin: 2px 6px;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
-.availabilityHeading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-.availabilityHeading h2 {
-  font-size: 14px;
-  margin: 0 0 4px;
-  font-weight: 600;
-}
-.availabilityState {
-  font-size: 12px;
-  color: var(--dim);
-  font-variant-numeric: tabular-nums;
-}
-.availabilityCard[data-available="true"] .availabilityState {
   color: var(--accent-ink);
 }
 .fieldHint {
@@ -529,8 +434,7 @@
   font-size: 14px;
   line-height: 1.4;
 }
-.welcome,
-.roomWelcome {
+.welcome {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -541,15 +445,13 @@
   margin: auto;
   padding: 30px 12px;
 }
-.welcome h2,
-.roomWelcome h2 {
+.welcome h2 {
   margin: 0;
   font-size: 26px;
   letter-spacing: -0.04em;
   font-weight: 630;
 }
-.welcome p,
-.roomWelcome p {
+.welcome p {
   font-size: 14px;
   color: var(--muted);
   line-height: 1.6;
@@ -652,76 +554,6 @@
   width: 24px;
   height: 24px;
 }
-.roomWelcome > div {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-.roomWelcome h2 {
-  font-size: 24px;
-}
-.roomJoin {
-  width: 100%;
-  border-top: 1px solid var(--line);
-  padding-top: 20px;
-  margin-top: 4px;
-  text-align: left;
-}
-.roomJoin label {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-}
-.roomJoin > div {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.roomJoin button {
-  flex-shrink: 0;
-}
-.roomWelcome .roomBoundary {
-  font-size: 13px;
-  color: var(--dim);
-}
-.roomBanner {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--bg);
-}
-.roomBanner > div:not(.roomActions) {
-  min-width: 0;
-}
-.roomBanner h2 {
-  margin: 0 0 5px;
-  font-size: 17px;
-  font-weight: 600;
-}
-.roomBanner p {
-  margin: 0;
-  font-size: 13px;
-  color: var(--muted);
-  line-height: 1.5;
-}
-.roomActions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  margin-left: auto;
-  flex-shrink: 0;
-}
-.roomLinkDetails {
-  font-size: 13px;
-  color: var(--muted);
-}
-.roomLinkDetails summary,
 .safety summary {
   cursor: pointer;
   width: fit-content;
@@ -748,80 +580,6 @@
   width: 16px;
   height: 16px;
   color: var(--accent-ink);
-}
-.roomLinkDetails input {
-  margin-top: 10px;
-}
-.roomLinkDetails p {
-  font-size: 13px;
-  line-height: 1.6;
-}
-.discoveryHeading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
-}
-.discoveryHeading h2 {
-  margin: 0 0 4px;
-  font-size: 16px;
-  font-weight: 600;
-}
-.discoveryHeading h2 span {
-  font-size: 13px;
-  color: var(--dim);
-  font-weight: 400;
-  margin-left: 6px;
-}
-.discoveryHeading p {
-  color: var(--dim);
-  font-size: 13px;
-  margin: 0;
-}
-.people {
-  list-style: none;
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-}
-.people li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
-  transition: background 0.15s;
-}
-.people li:hover {
-  background: var(--bg);
-}
-.personInfo {
-  flex: 1;
-  min-width: 0;
-}
-.personInfo h3 {
-  font-size: 14px;
-  font-weight: 600;
-  margin: 0 0 5px;
-  overflow-wrap: anywhere;
-}
-.personInfo p {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 12px;
-  color: var(--dim);
-  margin: 0;
-}
-.onlineDot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: var(--pos);
 }
 .emptyState {
   flex: 1;
@@ -851,13 +609,6 @@
   font-size: 14px;
   line-height: 1.6;
   margin: 0;
-}
-.directoryNote {
-  font-size: 12px;
-  color: var(--dim);
-  text-align: center;
-  margin: auto 0 0;
-  padding-top: 12px;
 }
 /* Pending requests stay listed beside the chats until each is answered. */
 .requestList {
@@ -1444,18 +1195,6 @@
   .paneMeta {
     display: none !important;
   }
-  .roomBanner {
-    flex-wrap: wrap;
-  }
-  .roomBanner > div:not(.roomActions) {
-    flex: 1;
-  }
-  .roomActions {
-    width: 100%;
-    flex-direction: row;
-    justify-content: space-between;
-    margin-left: 0;
-  }
   .tutorial {
     grid-template-columns: 1fr;
   }
@@ -1478,17 +1217,10 @@
   .nymLogo { width: 50px; }
   .connectionStatus { grid-column: 2; grid-row: 1; font-size: 13px; }
   .connectionSwitch { grid-column: 3; }
-  .viewControls { flex-direction: row; gap: 8px; margin: 0; }
-  .viewControls button { min-height: 46px; padding: 8px 12px; gap: 8px; }
-  .viewControls strong { font-size: 14px; }
-  .viewControls small { display: none; }
-  .availabilityCard { margin: 0; padding: 12px 0 0; }
-  .availabilityHeading h2 { font-size: 14px; }
-  .availabilityState, .fieldHint { font-size: 13px; }
+  .fieldHint { font-size: 13px; }
   .sidebarFooter { flex-direction: row; justify-content: space-between; align-items: center; margin: 0; padding: 0; gap: 8px; }
   .sidebarFooter > span, .sidebarFooter .leaveButton { font-size: 12px !important; }
   .workspace[data-onboarding="true"] .sidebarFooter { display: none; }
-  .workspace[data-onboarding="true"] .viewControls { display: none; }
   .conversationCard { min-height: 0; height: auto; }
   .paneHeading { min-height: 48px; padding: 12px 16px; }
   .panel { padding: 20px 16px; gap: 16px; overflow: visible; }
@@ -1498,21 +1230,15 @@
   .onboarding h2 { font-size: 25px; }
   .onboarding p { font-size: 14px; }
   .onboarding .onboardingFoot { margin-top: 2px; font-size: 12px; }
-  .welcome, .roomWelcome { padding: 24px 0; gap: 16px; }
-  .welcome h2, .roomWelcome h2 { font-size: 24px; }
-  .welcome p, .roomWelcome p { font-size: 14px; }
+  .welcome { padding: 24px 0; gap: 16px; }
+  .welcome h2 { font-size: 24px; }
+  .welcome p { font-size: 14px; }
   .welcomeMark { width: 60px; height: 60px; border-radius: 18px; }
   .welcomeMark svg { width: 28px; height: 28px; }
   .newChatActions { width: 100%; }
   .newChatActions button { flex: 1; }
   .primaryButton, .secondaryButton { font-size: 14px !important; }
-  .roomJoin > div { flex-direction: column; align-items: stretch; }
-  .roomJoin input, .joinInput { font-size: 16px; }
-  .roomBanner { padding: 14px; }
-  .roomBanner p { font-size: 13px; }
-  .people li { padding: 12px; gap: 10px; flex-wrap: wrap; }
-  .personInfo h3 { font-size: 15px; }
-  .people button { padding: 8px 12px; }
+  .joinInput { font-size: 16px; }
   .inviteRow { flex-wrap: wrap; }
   .inviteRow input { flex-basis: 100%; }
   .invitePanel { padding: 16px; }
@@ -1543,17 +1269,14 @@
   .workspace[data-chat-active="true"] .identityColumn { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 6px 10px; padding: 8px 12px; }
   .workspace[data-chat-active="true"] .identityCard { min-width: 0; }
   .workspace[data-chat-active="true"] .identityRow .avatar,
-  .workspace[data-chat-active="true"] .identitySummary > span,
-  .workspace[data-chat-active="true"] .availabilityCard,
-  .workspace[data-chat-active="true"] .identityColumn > details,
-  .workspace[data-chat-active="true"] .sidebarFooter { display: none; }
+.workspace[data-chat-active="true"] .identitySummary > span,
+.workspace[data-chat-active="true"] .identityColumn > details,
+.workspace[data-chat-active="true"] .sidebarFooter { display: none; }
   .workspace[data-chat-active="true"] .identitySummary h2 { margin: 0; font-size: 14px; }
   .workspace[data-chat-active="true"] .transport { border: 0; padding: 0; gap: 6px; grid-template-columns: auto auto; background: transparent; }
   .workspace[data-chat-active="true"] .transport .connectionStatus { display: none; }
   .workspace[data-chat-active="true"] .transport .nymLogo { width: 40px; }
   .workspace[data-chat-active="true"] .transport .connectionSwitch { grid-column: 2; }
-  .workspace[data-chat-active="true"] .viewControls { grid-column: 1/-1; }
-  .workspace[data-chat-active="true"] .viewControls button { min-height: 44px; padding: 6px 10px; }
   .workspace[data-chat-active="true"] .conversationCard { flex: 1; min-height: 0; }
   .workspace[data-chat-active="true"] .panel { overflow: hidden; }
   .page:has([data-chat-active="true"]) .help { flex-shrink: 0; max-height: 40%; overflow: auto; }

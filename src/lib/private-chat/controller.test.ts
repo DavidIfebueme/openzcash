@@ -8,9 +8,7 @@ import {
 } from "./controller";
 import { inviteToken, INVITE_TTL_MS } from "./live-invite";
 import * as envelope from "./envelope";
-import { PresenceStore } from "./presence-store";
 import type { NymTransport, TransportEvent } from "./transport";
-import type { PresenceService } from "./presence";
 const base =
   "DguTcdkWWtDyUFLvQxRdcA8qZhardhE1ZXy1YCC7Zfmq.Dxreouj5RhQqMb3ZaAxgXFdGkmfbDKwk457FdeHGKmQQ@4kjgWmFU1tcGAZYRZR57yFuVAexjLbJ5M7jvo3X5Hkcf";
 const controllers: ChatController[] = [];
@@ -21,16 +19,6 @@ afterEach(() => {
 });
 function harness() {
   let now = 100_000;
-  const store = new PresenceStore();
-  const directory: PresenceService = {
-    async list(room) {
-      return store.list(room, now);
-    },
-    async publish(command) {
-      const status = await store.apply(command, now);
-      if (status !== 200) throw new Error(String(status));
-    },
-  };
   const bus = new Map<string, (event: TransportEvent) => void>();
   const logs: Array<{
     from: string;
@@ -77,7 +65,7 @@ function harness() {
         },
       };
     };
-    const chat = new ChatController(factory, directory, () => now);
+    const chat = new ChatController(factory, () => now);
     controllers.push(chat);
     return { chat, address, listeners, rotateAddress: () => {
       nextAddress = "DEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"[clientNumber++] + base.slice(1);
@@ -88,8 +76,6 @@ function harness() {
     client,
     logs,
     connects,
-    store,
-    directory,
     setTime: (n: number) => {
       now = n;
     },
@@ -266,57 +252,6 @@ describe("private chat consent and lifecycle", () => {
     await rejecting;
     expect(h.logs.slice(before)).toHaveLength(0);
   });
-  it("makes opt-in visible to another session, deletes it on opt-out, and never restores it on reconnect", async () => {
-    const h = harness(),
-      a = h.client(),
-      b = h.client();
-    await ready(a.chat, "Alice");
-    await ready(b.chat, "Bob");
-    await a.chat.joinRoom();
-    await b.chat.joinRoom(a.chat.getSnapshot().room!.token);
-    expect(h.store.list(a.chat.getSnapshot().room!.id, h.time())).toEqual([]);
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
-    b.chat.setDiscover(true);
-    await vi.waitFor(() =>
-      expect(b.chat.getSnapshot().peers[0]?.alias).toBe("Alice"),
-    );
-    a.chat.setAvailable(false);
-    await vi.waitFor(() =>
-      expect(h.store.list(a.chat.getSnapshot().room!.id, h.time())).toEqual([]),
-    );
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
-    a.chat.disconnect();
-    a.chat.connect();
-    await vi.waitFor(() => expect(a.chat.getSnapshot().link).toBe("connected"));
-    expect(a.chat.getSnapshot().availableUntil).toBeNull();
-    // An immediate disconnect stops all sends. The old listing expires; its
-    // invite is already locally revoked and cannot open a conversation.
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
-    h.setTime(h.time() + INVITE_TTL_MS);
-    a.chat.tick();
-    expect(h.store.list(a.chat.getSnapshot().room!.id, h.time())).toEqual([]);
-    expect(a.chat.getSnapshot().availableUntil).toBeNull();
-  });
-  it("does not publish a pending opt-in after the switch is turned off", async () => {
-    const h = harness(),
-      a = h.client();
-    await ready(a.chat, "Alice");
-    await a.chat.joinRoom();
-    a.chat.setAvailable(true);
-    a.chat.setAvailable(false);
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(h.store.list(a.chat.getSnapshot().room!.id, h.time())).toEqual([]);
-    expect(a.chat.getSnapshot().availableUntil).toBeNull();
-  });
   it("times out missing acknowledgements and retries the same message without duplicating it", async () => {
     const h = harness(),
       { a, b } = await pair(h);
@@ -427,7 +362,6 @@ describe("private chat consent and lifecycle", () => {
     );
     await b.chat.send("after reconnect");
     await vi.waitFor(() => expect(a.chat.getSnapshot().lines).toHaveLength(2));
-    expect(b.chat.getSnapshot().availableUntil).toBeNull();
   });
   it("recovers from offline without republishing and cancels stale transport callbacks", async () => {
     const h = harness(),
@@ -499,64 +433,6 @@ describe("private chat consent and lifecycle", () => {
     await entering;
     expect(a.chat.getSnapshot().keyReady).toBe(false);
   });
-  it("revokes copied room invitations and pending requests immediately on opt-out", async () => {
-    const h = harness(),
-      a = h.client(),
-      b = h.client();
-    await ready(a.chat, "Alice");
-    await ready(b.chat, "Bob");
-    await a.chat.joinRoom();
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
-    const token = inviteToken(a.chat.getSnapshot().invite!);
-    await b.chat.requestChat(token);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().requests).toHaveLength(1),
-    );
-    const requestId = a.chat.getSnapshot().requests[0].packet.id;
-    a.chat.setAvailable(false);
-    expect(a.chat.getSnapshot().invite).toBeNull();
-    expect(a.chat.getSnapshot().requests).toEqual([]);
-    await a.chat.acceptRequest(requestId);
-    expect(a.chat.getSnapshot().contact).toBeNull();
-    b.chat.endConversation();
-    await b.chat.requestChat(token);
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(a.chat.getSnapshot().requests).toEqual([]);
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
-    expect(inviteToken(a.chat.getSnapshot().invite!)).not.toBe(token);
-  });
-  it("does not query a global directory and isolates rooms even with the same alias", async () => {
-    const h = harness(),
-      a = h.client(),
-      b = h.client();
-    const list = vi.spyOn(h.directory, "list");
-    a.chat.setDiscover(true);
-    expect(list).not.toHaveBeenCalled();
-    await ready(a.chat, "Alice");
-    await ready(b.chat, "Alice");
-    await a.chat.joinRoom();
-    await b.chat.joinRoom();
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
-    b.chat.setDiscover(true);
-    await vi.waitFor(() =>
-      expect(b.chat.getSnapshot().directory).toBe("ready"),
-    );
-    expect(b.chat.getSnapshot().peers).toEqual([]);
-    await b.chat.joinRoom(a.chat.getSnapshot().room!.token);
-    await vi.waitFor(() => expect(b.chat.getSnapshot().peers).toHaveLength(1));
-    b.chat.leaveRoom();
-    expect(b.chat.getSnapshot().peers).toEqual([]);
-    expect(b.chat.getSnapshot().room).toBeNull();
-  });
   it("requires a real round trip and ignores stale probe echoes after disconnect", async () => {
     const h = harness(),
       a = h.client();
@@ -573,28 +449,22 @@ describe("private chat consent and lifecycle", () => {
     await new Promise((resolve) => setTimeout(resolve, 30));
     expect(a.chat.getSnapshot().link).toBe("disconnected");
   });
-  it("detects a silent Nym outage and withdraws presence before reconnecting", async () => {
+  it("detects a silent Nym outage and drops the invite before reconnecting", async () => {
     const h = harness(),
       a = h.client();
     await ready(a.chat, "Alice");
-    await a.chat.joinRoom();
-    a.chat.setAvailable(true);
-    await vi.waitFor(() =>
-      expect(a.chat.getSnapshot().presence).toBe("online"),
-    );
+    expect(await a.chat.makeInvite()).not.toBeNull();
     h.drop(a.address);
     h.setTime(h.time() + ROUTE_CHECK_INTERVAL_MS);
     a.chat.tick();
     h.setTime(h.time() + ROUTE_CHECK_TIMEOUT_MS);
     a.chat.tick();
     expect(a.chat.getSnapshot().link).toBe("reconnecting");
-    expect(a.chat.getSnapshot().availableUntil).toBeNull();
     expect(a.chat.getSnapshot().invite).toBeNull();
     h.drop("");
     h.setTime(h.time() + 2000);
     a.chat.tick();
     await vi.waitFor(() => expect(a.chat.getSnapshot().link).toBe("connected"));
-    expect(a.chat.getSnapshot().presence).toBe("off");
   });
 });
 
@@ -629,53 +499,7 @@ describe("fail-closed reconnect regressions", () => {
       expect(a.chat.getSnapshot().lines.at(-1)?.delivery).toBe("delivered"),
     );
   });
-  it("does not query Discover while disconnected or apply a response from an old connection", async () => {
-    const h = harness(),
-      a = h.client(),
-      list = vi.spyOn(h.directory, "list");
-    await a.chat.enter("Alice");
-    await a.chat.joinRoom();
-    a.chat.setDiscover(true);
-    expect(list).not.toHaveBeenCalled();
-    let resolve!: (v: []) => void;
-    list.mockImplementation(
-      () =>
-        new Promise((r) => {
-          resolve = r;
-        }),
-    );
-    a.chat.connect();
-    await vi.waitFor(() => expect(list).toHaveBeenCalledTimes(1));
-    a.chat.network(false);
-    resolve([]);
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(a.chat.getSnapshot().directory).toBe("idle");
-    expect(a.chat.getSnapshot().peers).toEqual([]);
-    h.setTime(h.time() + 60_000);
-    a.chat.tick();
-    expect(list).toHaveBeenCalledTimes(1);
-  });
 });
-
-it("removes an expired presence locally even while the next directory lookup is pending", async () => {
-  const h = harness(),
-    a = h.client(),
-    b = h.client();
-  await ready(a.chat, "Alice");
-  await ready(b.chat, "Bob");
-  await a.chat.joinRoom();
-  await b.chat.joinRoom(a.chat.getSnapshot().room!.token);
-  a.chat.setAvailable(true);
-  await vi.waitFor(() => expect(a.chat.getSnapshot().presence).toBe("online"));
-  b.chat.setDiscover(true);
-  await vi.waitFor(() => expect(b.chat.getSnapshot().peers).toHaveLength(1));
-  vi.spyOn(h.directory, "list").mockImplementation(() => new Promise(() => {}));
-  h.setTime(h.time() + 120_000);
-  b.chat.tick();
-  expect(b.chat.getSnapshot().peers).toEqual([]);
-});
-
 
 async function addPeer(h: ReturnType<typeof harness>, host: ChatController, name: string) {
   const peer = h.client();

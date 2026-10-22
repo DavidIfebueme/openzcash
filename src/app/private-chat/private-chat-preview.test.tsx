@@ -19,15 +19,6 @@ import type {
   NymTransport,
   TransportEvent,
 } from "@/lib/private-chat/transport";
-import { openRoom } from "@/lib/private-chat/discovery-room";
-import { presenceCommand } from "@/lib/private-chat/presence";
-import type { PresenceService } from "@/lib/private-chat/presence";
-// The interface tests exercise Discover explicitly; the build hides it by default.
-vi.mock("@/lib/private-chat/config", () => ({
-  PRIVATE_CHAT_PREVIEW_ENABLED: true,
-  PRIVATE_CHAT_ENABLED: true,
-  PRIVATE_CHAT_DISCOVER_ENABLED: true,
-}));
 const address =
   "DguTcdkWWtDyUFLvQxRdcA8qZhardhE1ZXy1YCC7Zfmq.Dxreouj5RhQqMb3ZaAxgXFdGkmfbDKwk457FdeHGKmQQ@4kjgWmFU1tcGAZYRZR57yFuVAexjLbJ5M7jvo3X5Hkcf";
 const factory = (listener: (event: TransportEvent) => void): NymTransport => ({
@@ -40,14 +31,6 @@ const factory = (listener: (event: TransportEvent) => void): NymTransport => ({
   },
   disconnect() {},
 });
-function directory(
-  entries: Awaited<ReturnType<PresenceService["list"]>> = [],
-): PresenceService {
-  return {
-    list: vi.fn(async () => entries),
-    publish: vi.fn(async () => undefined),
-  };
-}
 async function enter() {
   fireEvent.change(screen.getByLabelText("Your alias"), {
     target: { value: "Alice" },
@@ -75,7 +58,7 @@ describe("Private Chat interface", () => {
   it("keeps a session until the user confirms leaving through the portal menu", async () => {
     const parent = { postMessage: vi.fn() } as unknown as Window;
     vi.stubGlobal("parent", parent);
-    render(<PrivateChatPreview createTransport={factory} directory={directory()} parentOrigin="https://openzcash.org" portalShell />);
+    render(<PrivateChatPreview createTransport={factory} parentOrigin="https://openzcash.org" portalShell />);
     await enter();
     const request = (id: string, origin = "https://openzcash.org") => act(() => {
       window.dispatchEvent(new MessageEvent("message", { origin, source: parent, data: { type: "openzcash-chat-leave-request-v1", id } }));
@@ -95,63 +78,13 @@ describe("Private Chat interface", () => {
     expect(parent.postMessage).not.toHaveBeenCalledWith(expect.objectContaining({ alias: expect.anything() }), expect.anything());
   });
   it("keeps generated invitations on the branded parent address", async () => {
-    render(<PrivateChatPreview createTransport={factory} directory={directory()} parentOrigin="https://openzcash.org" />);
+    render(<PrivateChatPreview createTransport={factory} parentOrigin="https://openzcash.org" />);
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
     await screen.findByText("Connected via Nym");
     fireEvent.click(screen.getByRole("button", { name: "Create invite" }));
     const link = await screen.findByLabelText("Invite link") as HTMLInputElement;
     expect(link.value).toMatch(/^https:\/\/openzcash\.org\/private-chat#invite=/);
-  });
-  it("starts unlisted and sends no directory request before Discover or explicit availability", async () => {
-    const service = directory();
-    render(
-      <PrivateChatPreview createTransport={factory} directory={service} />,
-    );
-    expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Create invite" })).not.toBeInTheDocument();
-    await enter();
-    expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
-    await screen.findByText("Connected via Nym");
-    expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("tab", { name: "Discover" }));
-    expect(
-      screen.getByRole("heading", { name: "Find your people" }),
-    ).toBeInTheDocument();
-    expect(service.list).not.toHaveBeenCalled();
-    expect(service.publish).not.toHaveBeenCalled();
-  });
-  it("shows real verified directory entries and requires connection before requesting a chat", async () => {
-    const person = await createDeviceIdentity();
-    const invite = await createLiveInvite(person, "Bruno", address);
-    const room = (await openRoom())!;
-    const owner = await createDeviceIdentity();
-    const service = directory([
-      {
-        ...(await presenceCommand(owner, room, invite, "upsert", 1, person)),
-        onlineUntil: Date.now() + 45_000,
-      },
-    ]);
-    window.history.replaceState(null, "", `/private-chat#room=${room.token}`);
-    render(
-      <PrivateChatPreview createTransport={factory} directory={service} />,
-    );
-    await waitFor(() => expect(window.location.hash).toBe(""));
-    expect(screen.getByText("Room invitation received")).toBeInTheDocument();
-    expect(screen.queryByLabelText("Already have a room link?")).not.toBeInTheDocument();
-    expect(service.list).not.toHaveBeenCalled();
-    await enter();
-    expect(service.list).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Connect to Nym" }));
-    await screen.findByText("Connected via Nym");
-    expect(service.list).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: "Join room" }));
-    expect(
-      await screen.findByRole("heading", { name: "Bruno" }),
-    ).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Request chat" })).toBeEnabled();
-    expect(screen.getByText(/Aliases are not verified/)).toBeInTheDocument();
   });
   it("consumes the direct invite URL after sending a request and displays the full safety code", async () => {
     const person = await createDeviceIdentity();
@@ -162,7 +95,7 @@ describe("Private Chat interface", () => {
       `/private-chat#invite=${inviteToken(invite)}`,
     );
     render(
-      <PrivateChatPreview createTransport={factory} directory={directory()} />,
+      <PrivateChatPreview createTransport={factory} />,
     );
     await waitFor(() => expect(window.location.hash).toBe(""));
     expect(screen.getByText("Chat invitation received")).toBeInTheDocument();
@@ -190,7 +123,7 @@ describe("Private Chat interface", () => {
       };
     };
     render(
-      <PrivateChatPreview createTransport={transport} directory={directory()} />,
+      <PrivateChatPreview createTransport={transport} />,
     );
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
@@ -210,7 +143,7 @@ describe("Private Chat interface", () => {
     expect(connections).toHaveBeenCalledTimes(1);
   });
   it("explains alias continuity and offers an explicit new identity", async () => {
-    render(<PrivateChatPreview directory={directory()} />);
+    render(<PrivateChatPreview />);
     await enter();
     fireEvent.click(screen.getByRole("button", { name: "Edit alias" }));
     expect(
@@ -221,62 +154,9 @@ describe("Private Chat interface", () => {
     expect(screen.getByLabelText("Your alias")).toHaveValue("");
     expect(screen.getByRole("button", { name: "Continue" })).toBeInTheDocument();
   });
-  it("distinguishes an empty directory from a failed directory", async () => {
-    const service = directory();
-    vi.mocked(service.list).mockRejectedValue(new Error("offline"));
-    render(
-      <PrivateChatPreview createTransport={factory} directory={service} />,
-    );
-    await enter();
-    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
-    await screen.findByText("Connected via Nym");
-    fireEvent.click(screen.getByRole("tab", { name: "Discover" }));
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create private room" }),
-    );
-    expect(
-      await screen.findByRole("heading", { name: "Room unavailable" }),
-    ).toBeInTheDocument();
-    vi.mocked(service.list).mockResolvedValue([]);
-    fireEvent.click(screen.getByRole("button", { name: "Refresh" }));
-    expect(
-      await screen.findByRole("heading", { name: "Waiting for your people" }),
-    ).toBeInTheDocument();
-  });
-  it("publishes only on opt-in and removes availability when disconnected", async () => {
-    const service = directory();
-    render(
-      <PrivateChatPreview createTransport={factory} directory={service} />,
-    );
-    await enter();
-    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
-    await screen.findByText("Connected via Nym");
-    fireEvent.click(screen.getByRole("tab", { name: "Discover" }));
-    fireEvent.click(
-      screen.getByRole("button", { name: "Create private room" }),
-    );
-    await screen.findByRole("heading", { name: "Private room" });
-    fireEvent.click(screen.getByRole("switch", { name: "Available to chat" }));
-    await waitFor(() =>
-      expect(screen.getByText(/Listed ·/)).toBeInTheDocument(),
-    );
-    expect(service.publish).toHaveBeenCalledWith(
-      expect.objectContaining({ op: "upsert" }),
-    );
-    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
-    expect(
-      screen.getByRole("switch", { name: "Available to chat" }),
-    ).toHaveAttribute("aria-checked", "false");
-    expect(
-      screen.getByRole("heading", { name: "Discover paused" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("switch", { name: "Nym connection" }),
-    ).toHaveAttribute("aria-checked", "false");
-  });
   it("shows invite expiration and revokes the shareable link", async () => {
     render(
-      <PrivateChatPreview createTransport={factory} directory={directory()} />,
+      <PrivateChatPreview createTransport={factory} />,
     );
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
@@ -290,7 +170,7 @@ describe("Private Chat interface", () => {
     expect(screen.queryByLabelText("Invite link")).not.toBeInTheDocument();
   });
   it("rejects invalid aliases and clears identity on Leave", async () => {
-    render(<PrivateChatPreview directory={directory()} />);
+    render(<PrivateChatPreview />);
     fireEvent.change(screen.getByLabelText("Your alias"), {
       target: { value: "a" },
     });
@@ -307,8 +187,7 @@ describe("Private Chat interface", () => {
     expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
   });
   it("keeps the guide discreet and opens tutorial and privacy answers in place", async () => {
-    const service = directory();
-    render(<PrivateChatPreview directory={service} />);
+    render(<PrivateChatPreview />);
     const guide = screen.getByText("Quick guide & FAQ").closest("details")!;
     expect(guide).not.toHaveAttribute("open");
     expect(
@@ -323,27 +202,12 @@ describe("Private Chat interface", () => {
     expect(
       screen.getByText(/site host and Nym entry gateway can see your IP/),
     ).toBeVisible();
-    expect(service.list).not.toHaveBeenCalled();
-    expect(service.publish).not.toHaveBeenCalled();
-  });
-  it("navigates between Chat and Discover with the keyboard", async () => {
-    render(<PrivateChatPreview directory={directory()} />);
-    await enter();
-    const chats = screen.getByRole("tab", { name: "Conversations" });
-    chats.focus();
-    fireEvent.keyDown(chats, { key: "ArrowRight" });
-    const discover = screen.getByRole("tab", { name: "Discover" });
-    expect(discover).toHaveFocus();
-    expect(discover).toHaveAttribute("aria-selected", "true");
-    fireEvent.keyDown(discover, { key: "Home" });
-    expect(chats).toHaveFocus();
-    expect(chats).toHaveAttribute("aria-selected", "true");
   });
 });
 
 it("lets the user cancel Nym while offline and does not silently reconnect", async () => {
   render(
-    <PrivateChatPreview createTransport={factory} directory={directory()} />,
+    <PrivateChatPreview createTransport={factory} />,
   );
   await enter();
   const toggle = screen.getByRole("switch", { name: "Nym connection" });
@@ -360,7 +224,7 @@ it("lets the user cancel Nym while offline and does not silently reconnect", asy
 
 
 it("keeps the session when cancelling exit from the shell", async () => {
-  render(<PrivateChatShell><PrivateChatPreview createTransport={factory} directory={directory()} /></PrivateChatShell>);
+  render(<PrivateChatShell><PrivateChatPreview createTransport={factory} /></PrivateChatShell>);
   await enter();
   fireEvent.click(screen.getByRole("link", { name: "Exit chat and clear session" }));
   const dialog = screen.getByRole("dialog", { name: "Leave this session?" });
@@ -379,14 +243,14 @@ it("preserves history reading, signals new messages and offers a new conversatio
     },
     disconnect() { routes.delete(ownAddress); },
   });
-  const peer = new ChatController(makeTransport("E" + address.slice(1)), directory());
+  const peer = new ChatController(makeTransport("E" + address.slice(1)));
   try {
     await peer.enter("Bruno");
     peer.connect();
     await waitFor(() => expect(peer.getSnapshot().link).toBe("connected"));
     const invite = await peer.makeInvite();
     window.history.replaceState(null, "", `/private-chat#invite=${inviteToken(invite!)}`);
-    render(<PrivateChatPreview createTransport={makeTransport(address)} directory={directory()} />);
+    render(<PrivateChatPreview createTransport={makeTransport(address)} />);
     await enter();
     fireEvent.click(screen.getByRole("button", { name: "Connect to Nym" }));
     await screen.findByText("Connected via Nym");
@@ -429,14 +293,14 @@ it("switches between people with independent drafts and unread messages", async 
     },
     disconnect() { routes.delete(ownAddress); },
   });
-  const bob = new ChatController(transport("E" + address.slice(1)), directory());
-  const carol = new ChatController(transport("F" + address.slice(1)), directory());
+  const bob = new ChatController(transport("E" + address.slice(1)));
+  const carol = new ChatController(transport("F" + address.slice(1)));
   try {
     await bob.enter("Bob"); bob.connect();
     await carol.enter("Carol"); carol.connect();
     await waitFor(() => expect(bob.getSnapshot().link).toBe("connected"));
     await waitFor(() => expect(carol.getSnapshot().link).toBe("connected"));
-    render(<PrivateChatPreview createTransport={transport(address)} directory={directory()} />);
+    render(<PrivateChatPreview createTransport={transport(address)} />);
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
     await screen.findByText("Connected via Nym");
@@ -480,14 +344,14 @@ function routedTransport() {
 
 it("lists pending requests beside the chats and answers each one separately", async () => {
   const transport = routedTransport();
-  const bob = new ChatController(transport("E" + address.slice(1)), directory());
-  const carol = new ChatController(transport("F" + address.slice(1)), directory());
+  const bob = new ChatController(transport("E" + address.slice(1)));
+  const carol = new ChatController(transport("F" + address.slice(1)));
   try {
     await bob.enter("Bob"); bob.connect();
     await carol.enter("Carol"); carol.connect();
     await waitFor(() => expect(bob.getSnapshot().link).toBe("connected"));
     await waitFor(() => expect(carol.getSnapshot().link).toBe("connected"));
-    render(<PrivateChatPreview createTransport={transport(address)} directory={directory()} />);
+    render(<PrivateChatPreview createTransport={transport(address)} />);
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
     await screen.findByText("Connected via Nym");
@@ -496,7 +360,6 @@ it("lists pending requests beside the chats and answers each one separately", as
     await act(async () => { await bob.requestChat(link.value); await carol.requestChat(link.value); });
     const requests = await screen.findByRole("group", { name: "Chat requests" });
     await waitFor(() => expect(within(requests).getAllByRole("button", { name: "Accept" })).toHaveLength(2));
-    expect(screen.getByRole("tab", { name: "Conversations" })).toHaveTextContent("2");
     fireEvent.click(within(within(requests).getByLabelText("Chat request from Bob")).getByRole("button", { name: "Accept" }));
     await waitFor(() => expect(screen.getByRole("textbox", { name: "Message" })).toBeEnabled());
     // Carol is still waiting while Bob's chat is open, and the link still works.
@@ -513,11 +376,11 @@ it("lists pending requests beside the chats and answers each one separately", as
 
 it("offers to accept, not request, when the link belongs to someone who already asked", async () => {
   const transport = routedTransport();
-  const bob = new ChatController(transport("E" + address.slice(1)), directory());
+  const bob = new ChatController(transport("E" + address.slice(1)));
   try {
     await bob.enter("Bob"); bob.connect();
     await waitFor(() => expect(bob.getSnapshot().link).toBe("connected"));
-    render(<PrivateChatPreview createTransport={transport(address)} directory={directory()} />);
+    render(<PrivateChatPreview createTransport={transport(address)} />);
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
     await screen.findByText("Connected via Nym");
@@ -538,26 +401,13 @@ it("offers to accept, not request, when the link belongs to someone who already 
   } finally { bob.dispose(); }
 });
 
-it("hides Discover by default and turns a room link into a notice", async () => {
-  window.history.replaceState(null, "", "/private-chat#room=ozroom2.not-a-real-room");
-  render(<PrivateChatPreview createTransport={factory} directory={directory()} discover={false} />);
-  await waitFor(() => expect(window.location.hash).toBe(""));
-  expect(screen.getByText(/Private rooms are no longer available/)).toBeInTheDocument();
-  await enter();
-  expect(screen.queryByRole("tab", { name: "Discover" })).not.toBeInTheDocument();
-  expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
-  expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
-  expect(screen.queryByText("Who can find me in Discover?")).not.toBeInTheDocument();
-  expect(screen.getByText("Can I reply to one message or react to it?")).toBeInTheDocument();
-});
-
 it("replies with a quote and reacts from the message actions", async () => {
   const transport = routedTransport();
-  const bob = new ChatController(transport("E" + address.slice(1)), directory());
+  const bob = new ChatController(transport("E" + address.slice(1)));
   try {
     await bob.enter("Bob"); bob.connect();
     await waitFor(() => expect(bob.getSnapshot().link).toBe("connected"));
-    render(<PrivateChatPreview createTransport={transport(address)} directory={directory()} />);
+    render(<PrivateChatPreview createTransport={transport(address)} />);
     await enter();
     fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
     await screen.findByText("Connected via Nym");
@@ -592,4 +442,16 @@ it("replies with a quote and reacts from the message actions", async () => {
     await within(bubble).findByRole("button", { name: "Thumbs up, 1" });
     await waitFor(() => expect(bob.getSnapshot().lines[0].reactions).toEqual({ mine: "👍" }));
   } finally { bob.dispose(); }
+});
+
+it("turns a room link into a notice now that private rooms are gone", async () => {
+  window.history.replaceState(null, "", "/private-chat#room=ozroom2.not-a-real-room");
+  render(<PrivateChatPreview createTransport={factory} />);
+  await waitFor(() => expect(window.location.hash).toBe(""));
+  expect(screen.getByText(/Private rooms are no longer available/)).toBeInTheDocument();
+  await enter();
+  expect(screen.queryByRole("tab", { name: "Discover" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
+  expect(screen.queryByText("Who can find me in Discover?")).not.toBeInTheDocument();
+  expect(screen.getByText("Can I reply to one message or react to it?")).toBeInTheDocument();
 });

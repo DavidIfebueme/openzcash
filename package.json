@@ -35,11 +35,7 @@
     "errors:build": "tsx scripts/build-error-fallback.tsx",
     "errors:check": "tsx scripts/build-error-fallback.tsx --check",
     "test:errors": "vitest run src/components/errors/error-state.test.tsx && node --test ops/error-fallback/handler.test.mjs && npm run errors:check",
-    "check:proposal-cards": "node scripts/check-proposal-cards.mjs",
-    "chat:directory": "node --import tsx scripts/private-chat-directory.mts",
-    "chat:directory:build": "tsc -p tsconfig.private-chat.json",
-    "chat:directory:init": "python3 scripts/private-chat-directory-lock.py node dist-private-chat/scripts/private-chat-directory-init.js",
-    "chat:directory:pilot": "python3 scripts/private-chat-directory-lock.py node dist-private-chat/scripts/private-chat-directory-server.js"
+    "check:proposal-cards": "node scripts/check-proposal-cards.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "0.132.0",
