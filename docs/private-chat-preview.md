@@ -2,7 +2,14 @@
 
 Atualizado em 15 de outubro de 2026. Branch `michae2xl/private-chat`; desenvolvimento local, sem publicação em produção.
 
-## Revisão mais recente
+## Revisão de 22 de outubro de 2026
+
+- **Pedidos pendentes.** Aceitar um pedido não apaga os demais nem o convite. Os pedidos ficam em **Requests**, na barra lateral, com Accept e Decline em cada um; novos pedidos continuam chegando enquanto o convite vale (5 minutos) e a expiração limpa só o que ainda está pendente. Um link de quem já pediu é respondido em vez de gerar um pedido de volta; pedidos simultâneos se resolvem pela ordem das chaves (a menor cede e lista o pedido da outra).
+- **Responder citando e reagir.** Passar o mouse sobre um balão (ou tocá-lo no celular) mostra Reply e React. A resposta carrega só o id da mensagem citada (`re` no pacote `text`), nunca o texto, e tocar na citação volta ao original. Reações usam um conjunto fixo de seis emojis (👍 ❤️ 😂 😮 😢 🙏), uma por pessoa por mensagem, no pacote `react` dentro do ratchet; não contam no limite de 200 mensagens nem são persistidas.
+- **Discover escondido.** A aba Discover, a sala e a disponibilidade só aparecem com `NEXT_PUBLIC_PRIVATE_CHAT_DISCOVER=true` no build. Sem a flag, links `#room=` viram um aviso e as variáveis do diretório deixam de ser obrigatórias no piloto. O código do diretório permanece para uma limpeza posterior.
+- **Celular com chat aberto.** O painel de status da rede sai do cabeçalho compacto, o documento não rola sob o shell de altura fixa e html/body seguem a cor do tema.
+
+## Revisão anterior
 
 O Discover migrou para mensagens Nym, com bloqueio de acesso direto e correções de reconexão. Consulte [o funcionamento, limites e execução atualizados](private-chat-discover-nym.md). As notas abaixo preservam o estado anterior à migração; menções a HTTP e aos prazos de 15/45 segundos foram substituídas pela revisão acima.
 

@@ -64,3 +64,6 @@ export const DoubleCheckIcon = glyph(
     <path d="m2 12 4 4L16 6M10 14l2 2L22 6" />
   </>,
 );
+export const ReplyIcon = glyph(
+  <path d="M9 14 4 9l5-5M4 9h9a7 7 0 0 1 7 7v4" />,
+);

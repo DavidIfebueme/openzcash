@@ -931,3 +931,37 @@ describe("pending chat requests", () => {
     expect(b.chat.getSnapshot().requests).toEqual([]);
   });
 });
+
+describe("replies and reactions", () => {
+  it("quotes a known message and syncs one reaction per person", async () => {
+    const h = harness(), { a, b } = await pair(h);
+    await b.chat.send("Did it work?");
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines).toHaveLength(1));
+    const question = a.chat.getSnapshot().lines[0];
+    expect(await a.chat.send("Yes, it did", undefined, question.id)).toBe(true);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines).toHaveLength(2));
+    expect(b.chat.getSnapshot().lines[1]).toMatchObject({ body: "Yes, it did", replyTo: question.id });
+    expect(a.chat.getSnapshot().lines[1].replyTo).toBe(question.id);
+    // An unknown reference is dropped rather than quoted.
+    expect(await a.chat.send("No quote", undefined, "unknown_message")).toBe(true);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines).toHaveLength(3));
+    expect(b.chat.getSnapshot().lines[2].replyTo).toBeUndefined();
+    // Reactions: mine on my side, theirs on the other side; replace and remove.
+    expect(await a.chat.react(question.id, "👍")).toBe(true);
+    expect(a.chat.getSnapshot().lines[0].reactions).toEqual({ mine: "👍" });
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines[0].reactions).toEqual({ theirs: "👍" }));
+    expect(await a.chat.react(question.id, "❤️")).toBe(true);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines[0].reactions).toEqual({ theirs: "❤️" }));
+    expect(await b.chat.react(question.id, "❤️")).toBe(true);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().lines[0].reactions).toEqual({ mine: "❤️", theirs: "❤️" }));
+    expect(await a.chat.react(question.id, "")).toBe(true);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().lines[0].reactions).toEqual({ mine: "❤️" }));
+    expect(a.chat.getSnapshot().lines[0].reactions).toEqual({ theirs: "❤️" });
+    // Invalid input never leaves the tab.
+    const before = h.logs.length;
+    expect(await a.chat.react(question.id, "🦓" as never)).toBe(false);
+    expect(await a.chat.react("unknown_message", "👍")).toBe(false);
+    expect(h.logs).toHaveLength(before);
+    expect(a.chat.getSnapshot().lines).toHaveLength(3);
+  });
+});

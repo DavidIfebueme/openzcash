@@ -15,12 +15,18 @@ describe("explicit pilot deployment", () => {
     expect(chatEnabled({ NODE_ENV: "production", NEXT_PUBLIC_PRIVATE_CHAT_PREVIEW: "true" })).toBe(false);
     expect(chatEnabled({ NODE_ENV: "production", NEXT_PUBLIC_PRIVATE_CHAT_PILOT: "true" })).toBe(false);
     expect(chatEnabled(env)).toBe(true);
-    expect(pilotDeployment(env)?.directory.replyMode).toBe("surb");
+    expect(pilotDeployment(env)?.directory?.replyMode).toBe("surb");
   });
   it.each(["PRIVATE_CHAT_ORIGIN", "NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ORIGIN",
-    "NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ID", "PRIVATE_CHAT_DIRECTORY_ADDRESS",
-    "PRIVATE_CHAT_DIRECTORY_PUBLIC_KEY"])("fails closed without %s", (name) => {
+    "NEXT_PUBLIC_PRIVATE_CHAT_GATEWAY_ID"])("fails closed without %s", (name) => {
       expect(chatEnabled({ ...env, [name]: "" })).toBe(false);
+  });
+  it.each(["PRIVATE_CHAT_DIRECTORY_ADDRESS", "PRIVATE_CHAT_DIRECTORY_PUBLIC_KEY"])(
+    "runs on direct invites without %s while Discover is off, and fails closed when Discover is on", (name) => {
+      expect(chatEnabled({ ...env, [name]: "" })).toBe(true);
+      expect(pilotDeployment({ ...env, [name]: "" })?.directory).toBeNull();
+      expect(chatEnabled({ ...env, [name]: "", NEXT_PUBLIC_PRIVATE_CHAT_DISCOVER: "true" })).toBe(false);
+      expect(pilotDeployment({ ...env, NEXT_PUBLIC_PRIVATE_CHAT_DISCOVER: "true" })?.directory?.replyMode).toBe("surb");
   });
   it("rejects malformed or injected origins", () => {
     for (const value of ["https://gateway.example", "wss://user:secret@gateway.example",

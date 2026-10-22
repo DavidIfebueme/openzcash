@@ -55,12 +55,17 @@ export function ChatComposer({
   onSend,
   enabled,
   sending,
+  replyTo = null,
+  onCancelReply,
 }: {
   value: string;
   onChange(value: string): void;
   onSend(event: FormEvent): void;
   enabled: boolean;
   sending: boolean;
+  /** The message being answered, shown above the input until sent or cancelled. */
+  replyTo?: { name: string; body: string } | null;
+  onCancelReply?(): void;
 }) {
   const [open, setOpen] = useState(false),
     [query, setQuery] = useState(""),
@@ -193,6 +198,22 @@ export function ChatComposer({
           )}
         </div>
       )}
+      {replyTo && (
+        <div className={styles.replyBar} role="status">
+          <div>
+            <strong>Replying to {replyTo.name}</strong>
+            <span>{replyTo.body}</span>
+          </div>
+          <button
+            type="button"
+            className={styles.iconButton}
+            aria-label="Cancel reply"
+            onClick={onCancelReply}
+          >
+            <IconClose />
+          </button>
+        </div>
+      )}
       <div className={styles.composerBar}>
         <button
           type="button"
@@ -234,6 +255,11 @@ export function ChatComposer({
           disabled={!enabled}
           rows={1}
           onKeyDown={(event) => {
+            if (event.key === "Escape" && replyTo && onCancelReply) {
+              event.preventDefault();
+              onCancelReply();
+              return;
+            }
             if (
               event.key === "Enter" &&
               !event.shiftKey &&

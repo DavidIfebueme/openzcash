@@ -4,3 +4,6 @@ export const PRIVATE_CHAT_PREVIEW_ENABLED =
   process.env.NEXT_PUBLIC_PRIVATE_CHAT_PREVIEW === "true";
 export const PRIVATE_CHAT_ENABLED = PRIVATE_CHAT_PREVIEW_ENABLED ||
   process.env.NEXT_PUBLIC_PRIVATE_CHAT_PILOT === "true";
+/** Discover (rooms and the Nym directory) stays hidden unless enabled at build time. */
+export const PRIVATE_CHAT_DISCOVER_ENABLED =
+  process.env.NEXT_PUBLIC_PRIVATE_CHAT_DISCOVER === "true";

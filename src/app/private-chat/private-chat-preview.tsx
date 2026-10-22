@@ -16,6 +16,8 @@ import {
   IconUsers,
 } from "@/components/icons";
 import { ChatController, type ChatLine } from "@/lib/private-chat/controller";
+import { REACTIONS, type Reaction } from "@/lib/private-chat/protocol";
+import { PRIVATE_CHAT_DISCOVER_ENABLED } from "@/lib/private-chat/config";
 import { createNymTransport } from "@/lib/private-chat/transport";
 import { type PresenceService } from "@/lib/private-chat/presence";
 import {
@@ -40,6 +42,8 @@ import {
   ExitIcon,
   LinkIcon,
   PowerIcon,
+  ReplyIcon,
+  SmileIcon,
 } from "./chat-ui-icons";
 import styles from "./private-chat.module.css";
 
@@ -74,6 +78,14 @@ const deliveryLabels: Record<ChatLine["delivery"], string> = {
   delivered: "Delivered",
   unconfirmed: "No confirmation",
 };
+const reactionLabels: Record<Reaction, string> = {
+  "👍": "Thumbs up",
+  "❤️": "Heart",
+  "😂": "Laugh",
+  "😮": "Surprised",
+  "😢": "Sad",
+  "🙏": "Thanks",
+};
 
 export function PrivateChatPreview({
   createTransport = createNymTransport,
@@ -81,12 +93,15 @@ export function PrivateChatPreview({
   directoryConfig = null,
   parentOrigin = null,
   portalShell = false,
+  discover = PRIVATE_CHAT_DISCOVER_ENABLED,
 }: {
   createTransport?: typeof createNymTransport;
   directory?: PresenceService;
   directoryConfig?: DirectoryConfig | null;
   parentOrigin?: string | null;
   portalShell?: boolean;
+  /** Rooms and the directory are hidden unless enabled at build time. */
+  discover?: boolean;
 }) {
   const [chat] = useState(
     () =>
@@ -114,7 +129,7 @@ export function PrivateChatPreview({
   const incomingRoom = location
     ? new URLSearchParams(new URL(location).hash.slice(1)).get("room") || ""
     : "";
-  const view = selectedView ?? (incomingRoom ? "discover" : "conversations");
+  const view = discover ? (selectedView ?? (incomingRoom ? "discover" : "conversations")) : "conversations";
   const [roomDraft, setRoomDraft] = useState<string | null>(null);
   const [roomFromLink, setRoomFromLink] = useState(false);
   const [inviteFromLink, setInviteFromLink] = useState(false);
@@ -128,6 +143,10 @@ export function PrivateChatPreview({
   const [mobileList, setMobileList] = useState(false);
   const captureInvitation = useCallback((kind: "room" | "invite", token: string) => {
     if (kind === "room") {
+      if (!discover) {
+        chat.setNote("Private rooms are no longer available. Ask the person for a direct chat invite instead.");
+        return;
+      }
       setRoomDraft(token);
       setRoomFromLink(true);
       setView("discover");
@@ -139,7 +158,7 @@ export function PrivateChatPreview({
       setView("conversations");
       setMobileList(false);
     }
-  }, [chat]);
+  }, [chat, discover]);
   useEffect(() => {
     if (!incomingInvite && !incomingRoom) return;
     // Capture the fragment in memory, then remove it from the address bar.
@@ -159,6 +178,13 @@ export function PrivateChatPreview({
     return () => window.removeEventListener("message", receive);
   }, [captureInvitation, parentOrigin]);
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  // Replies and the open message menu are per tab, like drafts: nothing is stored.
+  const [replies, setReplies] = useState<Record<string, string>>({});
+  const [messageMenu, setMessageMenu] = useState<{ id: string; picker: boolean } | null>(null);
+  const [flash, setFlash] = useState<string | null>(null);
+  const replyTo = state.activeConversationId ? replies[state.activeConversationId] : undefined;
+  const lineById = useMemo(() => new Map(state.lines.map((line) => [line.id, line])), [state.lines]);
+  const quotedReply = replyTo ? lineById.get(replyTo) : undefined;
   const draft = state.activeConversationId ? drafts[state.activeConversationId] ?? "" : "";
   const unreadCount = state.conversations.reduce((total, conversation) => total + conversation.unread, 0);
   const origin = parentOrigin ?? (location ? new URL(location).origin : "");
@@ -210,6 +236,8 @@ export function PrivateChatPreview({
     setAlias("");
     setAliasError("");
     setDrafts({});
+    setReplies({});
+    setMessageMenu(null);
     setMobileList(false);
     setJoin("");
     setJoinOpen(false);
@@ -274,6 +302,14 @@ export function PrivateChatPreview({
     chat.setDiscover(view === "discover");
   }, [chat, view]);
   useEffect(() => {
+    if (!messageMenu) return;
+    const outside = (event: PointerEvent) => {
+      if (!(event.target as Element | null)?.closest?.(`#message-${messageMenu.id}`)) setMessageMenu(null);
+    };
+    document.addEventListener("pointerdown", outside);
+    return () => document.removeEventListener("pointerdown", outside);
+  }, [messageMenu]);
+  useEffect(() => {
     const updateVisibility = () => chat.setConversationVisible(
       view === "conversations" && !mobileList && document.visibilityState !== "hidden",
     );
@@ -315,6 +351,7 @@ export function PrivateChatPreview({
   function selectConversation(id: string | null) {
     chat.selectConversation(id);
     changeView("conversations");
+    setMessageMenu(null);
     setCopied(false);
   }
   function updateDraft(value: string) {
@@ -363,8 +400,39 @@ export function PrivateChatPreview({
     const id = state.activeConversationId;
     followingMessages.current = true;
     setUnread(false);
-    if (id && await chat.send(text))
+    const quoted = id ? replies[id] : undefined;
+    if (id && await chat.send(text, undefined, quoted)) {
       setDrafts(current => current[id] === text ? { ...current, [id]: "" } : current);
+      setReplies(current => current[id] === quoted
+        ? Object.fromEntries(Object.entries(current).filter(([key]) => key !== id))
+        : current);
+    }
+  }
+
+  function startReply(lineId: string) {
+    const id = state.activeConversationId;
+    if (!id) return;
+    setReplies(current => ({ ...current, [id]: lineId }));
+    setMessageMenu(null);
+    document.getElementById("chat-message")?.focus();
+  }
+  function cancelReply() {
+    const id = state.activeConversationId;
+    if (!id) return;
+    setReplies(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
+  }
+  function toggleReaction(lineId: string, emoji: Reaction) {
+    const mine = lineById.get(lineId)?.reactions?.mine;
+    void chat.react(lineId, mine === emoji ? "" : emoji);
+    setMessageMenu(null);
+  }
+  function jumpTo(lineId: string) {
+    document.getElementById(`message-${lineId}`)?.scrollIntoView?.({
+      block: "center",
+      behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ? "auto" : "smooth",
+    });
+    setFlash(lineId);
+    window.setTimeout(() => setFlash(current => (current === lineId ? null : current)), 1400);
   }
 
   async function acceptPending(id: string) {
@@ -384,6 +452,7 @@ export function PrivateChatPreview({
     const id = clearTarget;
     if (id) chat.endConversation(id);
     setDrafts(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
+    setReplies(current => Object.fromEntries(Object.entries(current).filter(([key]) => key !== id)));
     setUnread(false);
     followingMessages.current = true;
     setClearAction(null);
@@ -562,7 +631,7 @@ export function PrivateChatPreview({
             </button>
           </section>
           <ChatNetworkStatus />
-          {state.keyReady && <nav
+          {state.keyReady && discover && <nav
             className={styles.viewControls}
             role="tablist"
             aria-label="Chat views"
@@ -683,7 +752,7 @@ export function PrivateChatPreview({
             </ul> : <p className={styles.chatListEmpty}>Your conversations appear here.</p>}
             {!state.canStartConversation && <p className={styles.chatListEmpty}>8 chats open. End one to start another.</p>}
           </section>}
-          {state.room && <section
+          {discover && state.room && <section
             className={styles.availabilityCard}
             data-available={state.availableUntil !== null}
             aria-labelledby="availability-title"
@@ -1057,6 +1126,12 @@ export function PrivateChatPreview({
                       aria-label="Messages"
                       aria-live="polite"
                       aria-relevant="additions text"
+                      onKeyDown={(event) => {
+                        if (event.key === "Escape" && messageMenu) {
+                          event.preventDefault();
+                          setMessageMenu(null);
+                        }
+                      }}
                       onScroll={(event) => {
                         const element = event.currentTarget;
                         followingMessages.current = element.scrollHeight - element.scrollTop - element.clientHeight < 72;
@@ -1066,8 +1141,16 @@ export function PrivateChatPreview({
                       {state.lines.map((line, index) => (
                         <li
                           key={line.id}
+                          id={`message-${line.id}`}
                           className={styles.message}
                           data-direction={line.direction}
+                          data-selected={messageMenu?.id === line.id || undefined}
+                          data-flash={flash === line.id || undefined}
+                          onClick={(event) => {
+                            // Tapping the bubble itself shows its actions on touch screens.
+                            if ((event.target as Element).closest("button, a")) return;
+                            setMessageMenu(current => current?.id === line.id && !current.picker ? null : { id: line.id, picker: false });
+                          }}
                           data-grouped={
                             index > 0 &&
                             state.lines[index - 1].direction ===
@@ -1086,6 +1169,22 @@ export function PrivateChatPreview({
                               ? "You"
                               : state.contact?.alias}
                           </span>
+                          {line.replyTo && (() => {
+                            const quoted = lineById.get(line.replyTo);
+                            const author = quoted ? (quoted.direction === "out" ? "You" : state.contact?.alias ?? "") : null;
+                            return (
+                              <button
+                                type="button"
+                                className={styles.quote}
+                                disabled={!quoted}
+                                aria-label={quoted ? `Replying to ${author}: ${quoted.body}. Show the original message` : "Original message not available"}
+                                onClick={() => quoted && jumpTo(quoted.id)}
+                              >
+                                <strong>{author ?? "Message"}</strong>
+                                <span>{quoted ? quoted.body : "Original message not available"}</span>
+                              </button>
+                            );
+                          })()}
                           <p>{line.body}</p>
                           <div className={styles.messageMeta}>
                             <time dateTime={new Date(line.at).toISOString()}>
@@ -1122,6 +1221,64 @@ export function PrivateChatPreview({
                                   Retry
                                 </button>
                               )}
+                          </div>
+                          {line.reactions && (line.reactions.mine || line.reactions.theirs) && (
+                            <div className={styles.reactions} aria-label="Reactions">
+                              {([...new Set([line.reactions.mine, line.reactions.theirs])].filter(Boolean) as Reaction[]).map((emoji) => {
+                                const mine = line.reactions?.mine === emoji;
+                                const count = Number(mine) + Number(line.reactions?.theirs === emoji);
+                                return (
+                                  <button
+                                    type="button"
+                                    key={emoji}
+                                    className={styles.reactionPill}
+                                    data-mine={mine || undefined}
+                                    aria-pressed={mine}
+                                    aria-label={`${reactionLabels[emoji]}, ${count}${mine ? ", including yours" : ""}`}
+                                    disabled={!canSend}
+                                    onClick={() => toggleReaction(line.id, emoji)}
+                                  >
+                                    {emoji}<small>{count}</small>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          )}
+                          {messageMenu?.id === line.id && messageMenu.picker && (
+                            <div className={styles.reactionPicker} role="group" aria-label="Choose a reaction">
+                              {REACTIONS.map((emoji) => (
+                                <button
+                                  type="button"
+                                  key={emoji}
+                                  aria-label={reactionLabels[emoji]}
+                                  aria-pressed={line.reactions?.mine === emoji}
+                                  onClick={() => toggleReaction(line.id, emoji)}
+                                >
+                                  {emoji}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                          <div className={styles.messageTools} role="group" aria-label="Message actions">
+                            <button
+                              type="button"
+                              aria-label="Reply"
+                              title="Reply"
+                              disabled={state.contact?.status !== "active"}
+                              onClick={() => startReply(line.id)}
+                            >
+                              <ReplyIcon />
+                            </button>
+                            <button
+                              type="button"
+                              aria-label="React"
+                              title="React"
+                              aria-expanded={messageMenu?.id === line.id && messageMenu.picker}
+                              disabled={!canSend}
+                              onClick={() => setMessageMenu(current => current?.id === line.id && current.picker ? null : { id: line.id, picker: true })}
+                            >
+                              <SmileIcon />
+                            </button>
                           </div>
                         </li>
                       ))}
@@ -1166,6 +1323,8 @@ export function PrivateChatPreview({
                         onSend={send}
                         enabled={!!canSend}
                         sending={state.sending}
+                        replyTo={quotedReply ? { name: quotedReply.direction === "out" ? "You" : state.contact.alias, body: quotedReply.body } : null}
+                        onCancelReply={cancelReply}
                       />
                     )}
                   </>
@@ -1279,7 +1438,7 @@ export function PrivateChatPreview({
           </div>
         </section>
       </div>
-      <ChatHelp />
+      <ChatHelp discover={discover} />
       {leaveRequest && <ChatConfirm
         title="Leave this session?"
         description="Your alias, invites and messages will be cleared from this tab. You cannot restore them here."

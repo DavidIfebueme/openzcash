@@ -22,6 +22,12 @@ import type {
 import { openRoom } from "@/lib/private-chat/discovery-room";
 import { presenceCommand } from "@/lib/private-chat/presence";
 import type { PresenceService } from "@/lib/private-chat/presence";
+// The interface tests exercise Discover explicitly; the build hides it by default.
+vi.mock("@/lib/private-chat/config", () => ({
+  PRIVATE_CHAT_PREVIEW_ENABLED: true,
+  PRIVATE_CHAT_ENABLED: true,
+  PRIVATE_CHAT_DISCOVER_ENABLED: true,
+}));
 const address =
   "DguTcdkWWtDyUFLvQxRdcA8qZhardhE1ZXy1YCC7Zfmq.Dxreouj5RhQqMb3ZaAxgXFdGkmfbDKwk457FdeHGKmQQ@4kjgWmFU1tcGAZYRZR57yFuVAexjLbJ5M7jvo3X5Hkcf";
 const factory = (listener: (event: TransportEvent) => void): NymTransport => ({
@@ -529,5 +535,61 @@ it("offers to accept, not request, when the link belongs to someone who already 
     await waitFor(() => expect(bob.getSnapshot().contact?.ready).toBe(true));
     expect(screen.queryByText("Waiting for Bob")).not.toBeInTheDocument();
     expect(screen.getAllByRole("button", { name: /^Chat with Bob/ })).toHaveLength(1);
+  } finally { bob.dispose(); }
+});
+
+it("hides Discover by default and turns a room link into a notice", async () => {
+  window.history.replaceState(null, "", "/private-chat#room=ozroom2.not-a-real-room");
+  render(<PrivateChatPreview createTransport={factory} directory={directory()} discover={false} />);
+  await waitFor(() => expect(window.location.hash).toBe(""));
+  expect(screen.getByText(/Private rooms are no longer available/)).toBeInTheDocument();
+  await enter();
+  expect(screen.queryByRole("tab", { name: "Discover" })).not.toBeInTheDocument();
+  expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+  expect(screen.queryByRole("switch", { name: "Available to chat" })).not.toBeInTheDocument();
+  expect(screen.queryByText("Who can find me in Discover?")).not.toBeInTheDocument();
+  expect(screen.getByText("Can I reply to one message or react to it?")).toBeInTheDocument();
+});
+
+it("replies with a quote and reacts from the message actions", async () => {
+  const transport = routedTransport();
+  const bob = new ChatController(transport("E" + address.slice(1)), directory());
+  try {
+    await bob.enter("Bob"); bob.connect();
+    await waitFor(() => expect(bob.getSnapshot().link).toBe("connected"));
+    render(<PrivateChatPreview createTransport={transport(address)} directory={directory()} />);
+    await enter();
+    fireEvent.click(screen.getByRole("switch", { name: "Nym connection" }));
+    await screen.findByText("Connected via Nym");
+    fireEvent.click(screen.getByRole("button", { name: "Create invite" }));
+    const link = (await screen.findByRole("textbox", { name: "Invite link" })) as HTMLInputElement;
+    await act(async () => { await bob.requestChat(link.value); });
+    fireEvent.click(await screen.findByRole("button", { name: "Accept" }));
+    await waitFor(() => expect(screen.getByRole("textbox", { name: "Message" })).toBeEnabled());
+    await act(async () => { await bob.send("Did it work?"); });
+    const messages = screen.getByRole("list", { name: "Messages" });
+    const bubble = (await within(messages).findByText("Did it work?")).closest("li")!;
+    fireEvent.click(within(bubble).getByRole("button", { name: "Reply" }));
+    expect(screen.getByText("Replying to Bob")).toBeInTheDocument();
+    fireEvent.change(screen.getByRole("textbox", { name: "Message" }), { target: { value: "Yes, it did" } });
+    fireEvent.click(screen.getByRole("button", { name: "Send" }));
+    const reply = (await within(messages).findByText("Yes, it did")).closest("li")!;
+    const quote = within(reply).getByRole("button", { name: /^Replying to Bob: Did it work\?/ });
+    expect(screen.queryByText("Replying to Bob")).not.toBeInTheDocument();
+    await waitFor(() => expect(bob.getSnapshot().lines.at(-1)).toMatchObject({ body: "Yes, it did", replyTo: bob.getSnapshot().lines[0].id }));
+    const scroll = vi.fn();
+    Element.prototype.scrollIntoView = scroll;
+    fireEvent.click(quote);
+    expect(scroll).toHaveBeenCalledTimes(1);
+    expect(bubble).toHaveAttribute("data-flash", "true");
+    fireEvent.click(within(bubble).getByRole("button", { name: "React" }));
+    fireEvent.click(within(bubble).getByRole("button", { name: "Thumbs up" }));
+    expect(within(bubble).getByRole("button", { name: "Thumbs up, 1, including yours" })).toHaveAttribute("aria-pressed", "true");
+    expect(within(bubble).queryByRole("group", { name: "Choose a reaction" })).not.toBeInTheDocument();
+    await waitFor(() => expect(bob.getSnapshot().lines[0].reactions).toEqual({ theirs: "👍" }));
+    await act(async () => { await bob.react(bob.getSnapshot().lines[0].id, "👍"); });
+    fireEvent.click(await within(bubble).findByRole("button", { name: "Thumbs up, 2, including yours" }));
+    await within(bubble).findByRole("button", { name: "Thumbs up, 1" });
+    await waitFor(() => expect(bob.getSnapshot().lines[0].reactions).toEqual({ mine: "👍" }));
   } finally { bob.dispose(); }
 });

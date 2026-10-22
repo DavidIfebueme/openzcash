@@ -100,3 +100,24 @@ describe("message composer", () => {
     expect(sent).not.toHaveBeenCalled();
   });
 });
+
+it("shows who is being answered and cancels the reply with the button or Escape", () => {
+  const cancel = vi.fn();
+  render(
+    <ChatComposer
+      value=""
+      onChange={() => {}}
+      onSend={(event) => event.preventDefault()}
+      enabled
+      sending={false}
+      replyTo={{ name: "Bob", body: "Did it work?" }}
+      onCancelReply={cancel}
+    />,
+  );
+  expect(screen.getByText("Replying to Bob")).toBeInTheDocument();
+  expect(screen.getByText("Did it work?")).toBeInTheDocument();
+  fireEvent.keyDown(screen.getByRole("textbox", { name: "Message" }), { key: "Escape" });
+  expect(cancel).toHaveBeenCalledTimes(1);
+  fireEvent.click(screen.getByRole("button", { name: "Cancel reply" }));
+  expect(cancel).toHaveBeenCalledTimes(2);
+});

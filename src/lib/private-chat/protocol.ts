@@ -16,13 +16,19 @@ export type ChatPacket = { v: 3; id: string } & (
   | { t: "accept"; ref: string; address: string; ratchet: RatchetBundle }
   | { t: "ratchet"; c: string; content: RatchetMessage }
   | { t: "reject"; ref: string }
-  | { t: "text"; c: string; body: string }
+  | { t: "text"; c: string; body: string; re?: string }
+  | { t: "react"; c: string; ref: string; emoji: Reaction | "" }
   | { t: "ack"; c: string; ref: string }
   | { t: "resume"; c: string; address: string; sequence: number }
   | { t: "ready"; c: string; ref: string; address: string; sequence: number }
   | { t: "bye"; c: string }
   | { t: "probe" }
 );
+/** The fixed reaction set: one per person per message, inside the ratchet. */
+export const REACTIONS = ["👍", "❤️", "😂", "😮", "😢", "🙏"] as const;
+export type Reaction = (typeof REACTIONS)[number];
+export const isReaction = (v: unknown): v is Reaction =>
+  typeof v === "string" && (REACTIONS as readonly string[]).includes(v);
 const id = (v: unknown): v is string =>
   typeof v === "string" && /^[A-Za-z0-9_-]{8,32}$/.test(v);
 const address = (v: unknown): v is string =>
@@ -61,13 +67,17 @@ export function readPacket(value: unknown): ChatPacket | null {
       break;
     case "text":
       valid =
-        fields === "body,c,id,t,v" &&
+        (fields === "body,c,id,t,v" || (fields === "body,c,id,re,t,v" && id(p.re))) &&
         id(p.c) &&
         typeof p.body === "string" &&
         p.body.trim() === p.body &&
         p.body.length > 0 &&
         p.body.length <= 400 &&
         !/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/.test(p.body);
+      break;
+    case "react":
+      valid = fields === "c,emoji,id,ref,t,v" && id(p.c) && id(p.ref) &&
+        (p.emoji === "" || isReaction(p.emoji));
       break;
     case "ack":
       valid = fields === "c,id,ref,t,v" && id(p.c) && id(p.ref);

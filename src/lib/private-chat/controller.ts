@@ -11,8 +11,8 @@ import {
 } from "./live-invite";
 import { safetyCode } from "./invite";
 import { encodeKey } from "./keys";
-import { messageId } from "./messages";
-import { readPacket, type ChatPacket } from "./protocol";
+import { isMessageId, messageId } from "./messages";
+import { isReaction, readPacket, type ChatPacket, type Reaction } from "./protocol";
 import { ConversationRatchet, type RatchetBundle } from "./ratchet";
 import { openEnvelopeFromHeader, sealEnvelope } from "./envelope";
 import { normalizeAlias } from "./session";
@@ -44,7 +44,19 @@ export type ChatLine = {
   at: number;
   delivery: "sending" | "waiting" | "delivered" | "unconfirmed";
   deadline?: number;
+  /** The id of the message this one quotes, if any. */
+  replyTo?: string;
+  /** One reaction per person; a missing key means none. */
+  reactions?: { mine?: Reaction; theirs?: Reaction };
 };
+function withReaction(line: ChatLine, side: "mine" | "theirs", emoji: Reaction | ""): ChatLine {
+  const reactions = { ...line.reactions };
+  if (emoji) reactions[side] = emoji;
+  else delete reactions[side];
+  const next: ChatLine = { ...line, reactions };
+  if (!Object.keys(reactions).length) delete next.reactions;
+  return next;
+}
 type RequestPacket = Extract<ChatPacket, { t: "request" }>;
 export type ChatRequest = {
   packet: RequestPacket;
@@ -1113,6 +1125,15 @@ export class ChatController {
       });
       return;
     }
+    if (p.t === "react") {
+      const target = p.ref;
+      if (!conversation.lines.some((line) => line.id === target)) return;
+      this.updateConversation(conversation, {
+        lines: conversation.lines.map((line) =>
+          line.id === target ? withReaction(line, "theirs", p.emoji) : line),
+      });
+      return;
+    }
     if (p.t !== "text") return;
     const known = conversation.seen.get(p.id);
     if (known !== undefined && known !== p.body) return;
@@ -1134,6 +1155,7 @@ export class ChatController {
             body: p.body,
             at: this.clock(),
             delivery: "delivered",
+            ...(p.re ? { replyTo: p.re } : {}),
           },
         ],
       });
@@ -1226,7 +1248,7 @@ export class ChatController {
       sequence: this.sequence,
     });
   }
-  async send(body: string, retryId?: string) {
+  async send(body: string, retryId?: string, replyTo?: string) {
     const conversation = this.current();
     const contact = conversation?.contact;
     const trimmed = body.trim();
@@ -1252,6 +1274,10 @@ export class ChatController {
     if (retryId && !existing) return false;
     const id = retryId || messageId(),
       ticket = this.connection;
+    // Only a message of this conversation can be quoted; the quote is an id.
+    const quoted = existing
+      ? existing.replyTo
+      : replyTo && conversation.lines.some((line) => line.id === replyTo) ? replyTo : undefined;
     const line: ChatLine = {
       id,
       direction: "out",
@@ -1259,6 +1285,8 @@ export class ChatController {
       at: existing?.at ?? this.clock(),
       deadline: this.clock() + ACK_TIMEOUT_MS,
       delivery: "sending",
+      ...(quoted ? { replyTo: quoted } : {}),
+      ...(existing?.reactions ? { reactions: existing.reactions } : {}),
     };
     this.updateConversation(conversation, {
       sending: true,
@@ -1272,6 +1300,7 @@ export class ChatController {
       id,
       c: contact.conversation,
       body: line.body,
+      ...(quoted ? { re: quoted } : {}),
     });
     if (
       ticket !== this.connection ||
@@ -1291,6 +1320,34 @@ export class ChatController {
     return sent;
   }
 
+  /** One reaction per person per message; an empty emoji removes yours. */
+  async react(ref: string, emoji: Reaction | "") {
+    const conversation = this.current();
+    const contact = conversation?.contact;
+    if (
+      !conversation || !contact ||
+      contact.status !== "active" ||
+      !contact.ready ||
+      this.state.link !== "connected" ||
+      !isMessageId(ref) ||
+      (emoji !== "" && !isReaction(emoji)) ||
+      !conversation.lines.some((line) => line.id === ref)
+    )
+      return false;
+    const previous = conversation.lines.find((line) => line.id === ref)?.reactions?.mine ?? "";
+    this.updateConversation(conversation, {
+      lines: conversation.lines.map((line) => (line.id === ref ? withReaction(line, "mine", emoji) : line)),
+    });
+    const sent = await this.sendPacket(contact.publicKey, contact.address, {
+      v: 3, t: "react", id: messageId(), c: contact.conversation, ref, emoji,
+    });
+    if (!sent && this.isCurrent(conversation)) {
+      this.updateConversation(conversation, {
+        lines: conversation.lines.map((line) => (line.id === ref ? withReaction(line, "mine", previous) : line)),
+      });
+    }
+    return sent;
+  }
   async joinRoom(value?: string) {
     const ticket = ++this.roomEpoch,
       epoch = this.epoch;

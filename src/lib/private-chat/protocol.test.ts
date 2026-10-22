@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readPacket } from "./protocol";
+import { readPacket, REACTIONS } from "./protocol";
 import { ConversationRatchet } from "./ratchet";
 import { encodeKey } from "./keys";
 const engine = await ConversationRatchet.create("request_123", encodeKey(new Uint8Array(32).fill(1)), encodeKey(new Uint8Array(32).fill(2)));
@@ -33,5 +33,25 @@ describe("unpublished pilot request wire shape", () => {
     delete oldPreview.sequence;
     expect(readPacket(oldPreview)).toBeNull();
     expect(readPacket({ ...request, unexpected: true })).toBeNull();
+  });
+});
+
+describe("replies and reactions", () => {
+  const text = { v: 3, t: "text", id: "message_001", c: "conversation_1", body: "hello" } as const;
+  it("accepts an optional reply reference on text and rejects malformed ones", () => {
+    expect(readPacket(text)).toEqual(text);
+    expect(readPacket({ ...text, re: "message_000" })).toEqual({ ...text, re: "message_000" });
+    expect(readPacket({ ...text, re: "" })).toBeNull();
+    expect(readPacket({ ...text, re: "bad id!" })).toBeNull();
+    expect(readPacket({ ...text, re: "message_000", extra: 1 })).toBeNull();
+  });
+  it("accepts only the fixed reaction set, or an empty emoji to remove one", () => {
+    const react = { v: 3, t: "react", id: "reaction_01", c: "conversation_1", ref: "message_001" } as const;
+    for (const emoji of REACTIONS) expect(readPacket({ ...react, emoji })).toEqual({ ...react, emoji });
+    expect(readPacket({ ...react, emoji: "" })).toEqual({ ...react, emoji: "" });
+    expect(readPacket({ ...react, emoji: "🦓" })).toBeNull();
+    expect(readPacket({ ...react, emoji: "👍👍" })).toBeNull();
+    expect(readPacket({ ...react, emoji: "👍", body: "x" })).toBeNull();
+    expect(readPacket({ v: 3, t: "react", id: "reaction_01", c: "conversation_1", emoji: "👍" })).toBeNull();
   });
 });
