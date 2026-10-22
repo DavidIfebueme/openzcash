@@ -48,13 +48,32 @@ function ChatShellContent({ children }: { children: ReactNode }) {
     return () => window.removeEventListener("message", receive);
   }, []);
 
+  // The canvas behind the shell follows the theme, so nothing light shows if
+  // the document is ever scrolled past the shell (a focused composer can do that).
+  useEffect(() => {
+    const element = shell.current;
+    if (!element) return;
+    const canvas = getComputedStyle(element).getPropertyValue("--bg").trim();
+    if (!canvas) return;
+    document.documentElement.style.backgroundColor = canvas;
+    document.body.style.backgroundColor = canvas;
+  }, [theme]);
+
   useEffect(() => {
     const viewport = window.visualViewport;
     if (!viewport) return;
-    const resize = () => shell.current?.style.setProperty("--chat-viewport-height", `${viewport.height}px`);
+    const resize = () => {
+      shell.current?.style.setProperty("--chat-viewport-height", `${viewport.height}px`);
+      // An open chat fits the visible area; undo any scroll the keyboard caused.
+      if (shell.current?.querySelector('[data-chat-active="true"]') && window.scrollY > 0) window.scrollTo(0, 0);
+    };
     resize();
     viewport.addEventListener("resize", resize);
-    return () => viewport.removeEventListener("resize", resize);
+    viewport.addEventListener("scroll", resize);
+    return () => {
+      viewport.removeEventListener("resize", resize);
+      viewport.removeEventListener("scroll", resize);
+    };
   }, []);
 
   function exit(event: MouseEvent<HTMLAnchorElement>) {

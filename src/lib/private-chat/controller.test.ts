@@ -125,10 +125,10 @@ async function pair(h: ReturnType<typeof harness>) {
   return { a, b, invite: invite! };
 }
 describe("private chat consent and lifecycle", () => {
-  it("requires explicit acceptance, consumes the invite and exchanges authenticated messages", async () => {
+  it("requires explicit acceptance, keeps the invite open and exchanges authenticated messages", async () => {
     const h = harness(),
       { a, b, invite } = await pair(h);
-    expect(a.chat.getSnapshot().invite).toBeNull();
+    expect(a.chat.getSnapshot().invite).toEqual(invite);
     expect(a.chat.getSnapshot().contact?.code).toBe(
       b.chat.getSnapshot().contact?.code,
     );
@@ -142,9 +142,14 @@ describe("private chat consent and lifecycle", () => {
     const c = h.client();
     await ready(c.chat, "Mallory");
     await c.chat.requestChat(inviteToken(invite));
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    expect(a.chat.getSnapshot().requests).toEqual([]);
+    // A later request with the same link waits for an explicit answer.
+    await vi.waitFor(() => expect(a.chat.getSnapshot().requests).toHaveLength(1));
+    expect(a.chat.getSnapshot().requests[0].packet.alias).toBe("Mallory");
     expect(a.chat.getSnapshot().contact?.alias).toBe("Bob");
+    await a.chat.rejectRequest(a.chat.getSnapshot().requests[0].packet.id);
+    await vi.waitFor(() => expect(c.chat.getSnapshot().contact).toBeNull());
+    expect(a.chat.getSnapshot().requests).toEqual([]);
+    expect(a.chat.getSnapshot().conversations.map((item) => item.alias)).toEqual(["Bob"]);
   });
   it("requires inner ratchet encryption even when the static sender key is authentic", async () => {
     const h = harness(), { a, b } = await pair(h);
@@ -829,5 +834,100 @@ describe("multiple independent conversations", () => {
     a.chat.tick();
     expect(a.chat.getSnapshot().conversations.map(c => c.id)).toEqual([bob]);
     expect(a.chat.getSnapshot().canStartConversation).toBe(true);
+  });
+});
+
+describe("pending chat requests", () => {
+  it("keeps the other requests listed after accepting one and answers each later", async () => {
+    const h = harness(), a = h.client(), b = h.client(), c = h.client();
+    await ready(a.chat, "Alice");
+    await ready(b.chat, "Bob");
+    await ready(c.chat, "Carol");
+    const invite = (await a.chat.makeInvite())!;
+    expect(await b.chat.requestChat(inviteToken(invite))).toBe(true);
+    expect(await c.chat.requestChat(inviteToken(invite))).toBe(true);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().requests).toHaveLength(2));
+    const bob = a.chat.getSnapshot().requests.find((item) => item.packet.alias === "Bob")!;
+    await a.chat.acceptRequest(bob.packet.id);
+    await vi.waitFor(() => expect(b.chat.getSnapshot().contact?.ready).toBe(true));
+    expect(a.chat.getSnapshot().requests.map((item) => item.packet.alias)).toEqual(["Carol"]);
+    expect(a.chat.getSnapshot().invite).toEqual(invite);
+    // A request that arrives during the first chat is listed as well.
+    const d = h.client();
+    await ready(d.chat, "Dana");
+    expect(await d.chat.requestChat(inviteToken(invite))).toBe(true);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().requests).toHaveLength(2));
+    const carol = a.chat.getSnapshot().requests.find((item) => item.packet.alias === "Carol")!;
+    await a.chat.acceptRequest(carol.packet.id);
+    await vi.waitFor(() => expect(c.chat.getSnapshot().contact?.ready).toBe(true));
+    await vi.waitFor(() => expect(a.chat.getSnapshot().conversations.every((item) => item.ready)).toBe(true));
+    expect(a.chat.getSnapshot().conversations.map((item) => item.alias)).toEqual(["Bob", "Carol"]);
+    expect(a.chat.getSnapshot().requests.map((item) => item.packet.alias)).toEqual(["Dana"]);
+    await a.chat.rejectRequest(a.chat.getSnapshot().requests[0].packet.id);
+    await vi.waitFor(() => expect(d.chat.getSnapshot().contact).toBeNull());
+    expect(a.chat.getSnapshot().requests).toEqual([]);
+    // Expiry clears only what is still pending; the chats stay.
+    const e = h.client();
+    await ready(e.chat, "Eve");
+    expect(await e.chat.requestChat(inviteToken(invite))).toBe(true);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().requests).toHaveLength(1));
+    h.setTime(invite.expiresAt);
+    a.chat.tick();
+    expect(a.chat.getSnapshot().invite).toBeNull();
+    expect(a.chat.getSnapshot().requests).toEqual([]);
+    expect(a.chat.getSnapshot().note).toMatch(/pending requests were cleared/);
+    expect(a.chat.getSnapshot().conversations).toHaveLength(2);
+  });
+
+  it("answers an existing request instead of sending one back", async () => {
+    const h = harness(), a = h.client(), b = h.client();
+    await ready(a.chat, "Alice");
+    await ready(b.chat, "Bob");
+    const fromAlice = (await a.chat.makeInvite())!;
+    const fromBob = (await b.chat.makeInvite())!;
+    expect(await b.chat.requestChat(inviteToken(fromAlice))).toBe(true);
+    await vi.waitFor(() => expect(a.chat.getSnapshot().requests).toHaveLength(1));
+    expect(await a.chat.requestChat(inviteToken(fromBob))).toBe(true);
+    expect(a.chat.getSnapshot().requests).toEqual([]);
+    expect(a.chat.getSnapshot().contact?.role).toBe("inviter");
+    await vi.waitFor(() => expect(b.chat.getSnapshot().contact?.ready).toBe(true));
+    await vi.waitFor(() => expect(a.chat.getSnapshot().contact?.ready).toBe(true));
+    expect(a.chat.getSnapshot().conversations).toHaveLength(1);
+    expect(b.chat.getSnapshot().conversations).toHaveLength(1);
+    expect(a.chat.getSnapshot().contact?.code).toBe(b.chat.getSnapshot().contact?.code);
+  });
+
+  it("resolves requests sent at the same time without leaving both sides waiting", async () => {
+    const h = harness(), a = h.client(), b = h.client();
+    await ready(a.chat, "Alice");
+    await ready(b.chat, "Bob");
+    const fromAlice = (await a.chat.makeInvite())!;
+    const fromBob = (await b.chat.makeInvite())!;
+    const sent = await Promise.all([
+      a.chat.requestChat(inviteToken(fromBob)),
+      b.chat.requestChat(inviteToken(fromAlice)),
+    ]);
+    expect(sent).toEqual([true, true]);
+    // Either one side yields and lists the other's request, or the late side
+    // answered the request it found. Nobody waits for an acceptance that
+    // cannot come.
+    await vi.waitFor(() => {
+      const pending = a.chat.getSnapshot().requests.length + b.chat.getSnapshot().requests.length;
+      const active = [a, b].filter((side) => side.chat.getSnapshot().contact?.status === "active").length;
+      expect(pending === 1 || active === 2).toBe(true);
+    });
+    for (const side of [a, b]) {
+      const pending = side.chat.getSnapshot().requests[0];
+      if (!pending) continue;
+      expect(side.chat.getSnapshot().conversations).toHaveLength(0);
+      expect(side.chat.getSnapshot().note).toMatch(/also sent you a request/);
+      await side.chat.acceptRequest(pending.packet.id);
+    }
+    await vi.waitFor(() => expect(a.chat.getSnapshot().contact?.ready).toBe(true));
+    await vi.waitFor(() => expect(b.chat.getSnapshot().contact?.ready).toBe(true));
+    expect(a.chat.getSnapshot().conversations).toHaveLength(1);
+    expect(b.chat.getSnapshot().conversations).toHaveLength(1);
+    expect(a.chat.getSnapshot().requests).toEqual([]);
+    expect(b.chat.getSnapshot().requests).toEqual([]);
   });
 });

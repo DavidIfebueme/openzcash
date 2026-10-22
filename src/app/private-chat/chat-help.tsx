@@ -45,7 +45,7 @@ const QUESTIONS = [
   ],
   [
     "Why did my invite expire?",
-    "Invites last 5 minutes and are consumed when accepted. Revoking, disconnecting, leaving the room or turning availability off also invalidates them. Create a new invite to start again.",
+    "Invites last 5 minutes. Everyone who opens the link appears under Requests until you accept or decline, and each accepted request opens its own chat. Revoking, disconnecting, leaving the room or turning availability off invalidates the invite. Create a new one to start again.",
   ],
 ];
 export function ChatHelp() {

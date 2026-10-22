@@ -673,6 +673,15 @@ export class ChatController {
       this.patch({ note: "That invite belongs to this tab." });
       return false;
     }
+    const pending = this.state.requests.find((item) => item.publicKey === invite.publicKey);
+    if (pending) {
+      // The other person already asked. Answer that request instead of
+      // sending one back, which would leave both sides waiting.
+      await this.acceptRequest(pending.packet.id);
+      if (this.conversations.has(pending.packet.id)) return true;
+      this.patch({ note: "Could not accept their request. Try again while connected." });
+      return false;
+    }
     if (this.hasPeer(invite.publicKey)) {
       this.patch({ note: "A conversation with this person is already open. Choose it from Chats." });
       return false;
@@ -707,6 +716,13 @@ export class ChatController {
       return false;
     }
     this.preparing = false;
+    // Their request may have arrived while the keys were being prepared.
+    const answered = this.state.requests.find((item) => item.publicKey === invite.publicKey);
+    if (answered) {
+      engine.close();
+      await this.acceptRequest(answered.packet.id);
+      return this.conversations.has(answered.packet.id);
+    }
     const request: RequestPacket = {
       v: 3,
       t: "request",
@@ -718,7 +734,6 @@ export class ChatController {
       address: this.address,
       sequence: this.sequence,
     };
-    this.revokeInvite();
     this.addConversation({
         alias: invite.alias,
         publicKey: invite.publicKey,
@@ -798,7 +813,7 @@ export class ChatController {
       if (generation === this.conversationEpoch) this.accepting = false;
       return;
     }
-    this.setAvailable(false);
+    this.unpublish();
     const contact: Contact = {
       alias: item.packet.alias,
       publicKey: item.publicKey,
@@ -813,7 +828,7 @@ export class ChatController {
       requestSequence: item.packet.sequence,
     };
     this.addConversation(contact, engine, item.packet.ratchet, "Accepted. Confirming the connection…");
-    this.patch({ invite: null, requests: [] });
+    this.patch({ requests: this.state.requests.filter((pending) => pending !== item) });
     await this.sendPacket(contact.publicKey, contact.address, {
       v: 3,
       t: "accept",
@@ -946,8 +961,14 @@ export class ChatController {
         return;
       }
       const invite = this.state.invite;
+      // Both sides may have asked at once. The lower key yields and lists the
+      // other request; the higher key keeps waiting for its own acceptance.
+      const crossedWith = () => [...this.conversations.values()].find((item) =>
+        item.contact.publicKey === key && item.contact.status === "requesting");
+      let crossed = crossedWith();
+      if (crossed && identity.publicKey > key) return;
       if (
-        !this.state.canStartConversation || this.hasPeer(key) || this.conversations.has(p.id) ||
+        !this.state.canStartConversation || (this.hasPeer(key) && !crossed) || this.conversations.has(p.id) ||
         !invite ||
         invite.id !== p.inviteId ||
         invite.expiresAt !== p.expiresAt ||
@@ -968,16 +989,21 @@ export class ChatController {
       }
       if (this.state.requests.length >= 5) return;
       const code = await safetyCode(identity.publicKey, key);
+      // Our own request to them may have started during the wait.
+      crossed = crossedWith();
+      if (crossed && identity.publicKey > key) return;
       if (
         !code ||
         ticket !== this.connection ||
         this.state.invite !== invite ||
         invite.expiresAt <= this.clock() ||
-        !this.state.canStartConversation || this.hasPeer(key) || this.conversations.has(p.id)
+        !this.state.canStartConversation || (this.hasPeer(key) && !crossed) || this.conversations.has(p.id)
       )
         return;
+      if (crossed) this.removeConversation(crossed, "");
       this.patch({
         requests: [...this.state.requests, { packet: p, publicKey: key, code }],
+        ...(crossed ? { note: `${p.alias} also sent you a request. Accept it to start the chat.` } : {}),
       });
       return;
     }
@@ -1382,37 +1408,11 @@ export class ChatController {
   setAvailable(enabled: boolean) {
     this.presenceEpoch += 1;
     if (!enabled) {
-      const invite = this.state.invite,
-        identity = this.roomIdentity,
-        room = this.room;
-      const wasPublished = this.state.availableUntil !== null;
+      this.unpublish();
       // Revocation is local and immediate, even if the directory removal fails.
       this.inviteEpoch += 1;
       this.invitationWork = null;
-      this.patch({
-        availableUntil: null,
-        presence: "off",
-        invite: null,
-        requests: [],
-      });
-      if (wasPublished && identity && invite && room) {
-        const copy = {
-          ...identity,
-          signingSecret: new Uint8Array(identity.signingSecret),
-        };
-        const revision = ++this.revision,
-          connection = this.connection;
-        void presenceCommand(copy, room, invite, "remove", revision)
-          .then((command) => {
-            if (
-              connection === this.connection &&
-              this.state.link === "connected"
-            )
-              return this.directory.publish(command);
-          })
-          .catch(() => undefined)
-          .finally(() => copy.signingSecret.fill(0));
-      }
+      this.patch({ invite: null, requests: [] });
       return;
     }
     if (
@@ -1440,6 +1440,29 @@ export class ChatController {
         if (ticket === this.presenceEpoch)
           this.patch({ presence: "error", availableUntil: null });
       });
+  }
+  /** Leaves Discover without revoking the invite, so pending requests stay. */
+  private unpublish() {
+    this.presenceEpoch += 1;
+    const invite = this.state.invite,
+      identity = this.roomIdentity,
+      room = this.room;
+    const wasPublished = this.state.availableUntil !== null;
+    this.patch({ availableUntil: null, presence: "off" });
+    if (!wasPublished || !identity || !invite || !room) return;
+    const copy = {
+      ...identity,
+      signingSecret: new Uint8Array(identity.signingSecret),
+    };
+    const revision = ++this.revision,
+      connection = this.connection;
+    void presenceCommand(copy, room, invite, "remove", revision)
+      .then((command) => {
+        if (connection === this.connection && this.state.link === "connected")
+          return this.directory.publish(command);
+      })
+      .catch(() => undefined)
+      .finally(() => copy.signingSecret.fill(0));
   }
   private async heartbeat() {
     const invite = this.state.invite,
@@ -1494,11 +1517,14 @@ export class ChatController {
       ),
     };
     if (this.state.invite && this.state.invite.expiresAt <= now) {
+      const pending = this.state.requests.length;
       this.setAvailable(false);
       changes.invite = null;
       changes.requests = [];
-      changes.note =
-        "Your invite expired. Create a new one to receive requests.";
+      if (pending)
+        changes.note = "Your invite expired and its pending requests were cleared. Create a new one.";
+      else if (!this.activeConversationId)
+        changes.note = "Your invite expired. Create a new one to receive requests.";
     }
     const checkPeers: string[] = [];
     for (const conversation of this.conversations.values()) {

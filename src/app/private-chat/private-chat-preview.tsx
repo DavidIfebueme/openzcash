@@ -3,6 +3,7 @@
 import {
   useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
   useSyncExternalStore,
@@ -20,6 +21,7 @@ import { type PresenceService } from "@/lib/private-chat/presence";
 import {
   liveInviteUrl,
   inviteToken,
+  parseLiveInvite,
   INVITE_TTL_MS,
 } from "@/lib/private-chat/live-invite";
 import type { DirectoryConfig } from "@/lib/private-chat/directory-wire";
@@ -163,6 +165,11 @@ export function PrivateChatPreview({
   const [copied, setCopied] = useState(false);
   const [requestBusy, setRequestBusy] = useState(false);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  // A link from someone who already asked is answered, not requested back.
+  const pendingFromLink = useMemo(() => {
+    const parsed = join.trim() ? parseLiveInvite(join) : null;
+    return parsed ? state.requests.find((item) => item.publicKey === parsed.publicKey) ?? null : null;
+  }, [join, state.requests]);
   const aliasInput = useRef<HTMLInputElement>(null);
   const thread = useRef<HTMLOListElement>(null);
   const followingMessages = useRef(true);
@@ -358,6 +365,19 @@ export function PrivateChatPreview({
     setUnread(false);
     if (id && await chat.send(text))
       setDrafts(current => current[id] === text ? { ...current, [id]: "" } : current);
+  }
+
+  async function acceptPending(id: string) {
+    setAcceptingId(id);
+    changeView("conversations");
+    try {
+      await chat.acceptRequest(id);
+    } finally {
+      setAcceptingId(null);
+    }
+  }
+  function declinePending(id: string) {
+    return chat.rejectRequest(id);
   }
 
   function clearConversation() {
@@ -618,6 +638,24 @@ export function PrivateChatPreview({
             </button>
           </nav>}
           {state.keyReady && <section className={styles.chatList} aria-label="Conversations in this tab">
+            {state.requests.length > 0 && <div className={styles.requestList} role="group" aria-label="Chat requests">
+              <h2 className={styles.requestHeading}>Requests <span className={styles.unreadCount}>{state.requests.length}</span></h2>
+              <ul>
+                {state.requests.map((item) => <li key={item.packet.id} className={styles.requestRow} aria-label={`Chat request from ${item.packet.alias}`}>
+                  <span className={styles.chatAvatar} aria-hidden="true">{item.packet.alias.slice(0, 1)}</span>
+                  <div className={styles.requestInfo}>
+                    <h3>{item.packet.alias}</h3>
+                    <p>Wants to chat with you</p>
+                  </div>
+                  <div className={styles.requestActions}>
+                    <button type="button" className={styles.secondaryButton} onClick={() => void declinePending(item.packet.id)}>Decline</button>
+                    <button type="button" className={styles.primaryButton} disabled={acceptingId !== null} onClick={() => void acceptPending(item.packet.id)}>
+                      {acceptingId === item.packet.id ? "Accepting…" : "Accept"}
+                    </button>
+                  </div>
+                </li>)}
+              </ul>
+            </div>}
             <div className={styles.chatListHeading}>
               <h2>Your chats</h2>
               <button type="button" className={styles.newChatButton}
@@ -732,44 +770,6 @@ export function PrivateChatPreview({
             className={styles.panel}
             data-chat={view === "conversations" && !!state.contact}
           >
-            {state.requests.map((item) => (
-              <section
-                key={item.packet.id}
-                className={styles.requestCard}
-                aria-label={`Chat request from ${item.packet.alias}`}
-              >
-                <span className={styles.avatar}>
-                  {item.packet.alias.slice(0, 1)}
-                </span>
-                <div className={styles.requestInfo}>
-                  <h3>{item.packet.alias}</h3>
-                  <p>Wants to chat with you</p>
-                </div>
-                <div className={styles.actions}>
-                  <button
-                    className={styles.secondaryButton}
-                    onClick={() => void chat.rejectRequest(item.packet.id)}
-                  >
-                    Decline
-                  </button>
-                  <button
-                    className={styles.primaryButton}
-                    disabled={acceptingId !== null}
-                    onClick={async () => {
-                      setAcceptingId(item.packet.id);
-                      changeView("conversations");
-                      try {
-                        await chat.acceptRequest(item.packet.id);
-                      } finally {
-                        setAcceptingId(null);
-                      }
-                    }}
-                  >
-                    {acceptingId === item.packet.id ? "Accepting…" : "Accept"}
-                  </button>
-                </div>
-              </section>
-            ))}
             {state.note &&
               ![
                 "Disconnected.",
@@ -964,7 +964,7 @@ export function PrivateChatPreview({
                               }
                               onClick={() => void request(inviteToken(person))}
                             >
-                              Request chat
+                              {state.requests.some((item) => item.publicKey === person.publicKey) ? "Accept request" : "Request chat"}
                             </button>
                           </li>
                         ))}
@@ -1218,7 +1218,7 @@ export function PrivateChatPreview({
                       </button>
                     </div>
                     <div className={styles.inviteHeading}>
-                      <p>One invite · one conversation</p>
+                      <p>One link · each request opens its own chat</p>
                       <button
                         className={styles.textButton}
                         onClick={chat.revokeInvite}
@@ -1236,7 +1236,7 @@ export function PrivateChatPreview({
                       void request(join);
                     }}
                   >
-                    {inviteFromLink ? <div className={styles.receivedInvite}><span className={styles.roomMark}><LinkIcon /></span><h2>You received a chat invite</h2><p>Send a request. The other person chooses whether to accept.</p></div> : <>
+                    {inviteFromLink ? <div className={styles.receivedInvite}><span className={styles.roomMark}><LinkIcon /></span><h2>{pendingFromLink ? `${pendingFromLink.packet.alias} already wants to chat with you` : "You received a chat invite"}</h2><p>{pendingFromLink ? "Accept their request to open the chat. No new request is needed." : "Send a request. The other person chooses whether to accept."}</p></div> : <>
                     <label htmlFor="join-invite">Chat invite</label>
                     <input
                       id="join-invite"
@@ -1248,12 +1248,24 @@ export function PrivateChatPreview({
                       maxLength={2200}
                     />
                     </>}
+                    {pendingFromLink ? (
+                      <>
+                        {!inviteFromLink && <p className={styles.fieldHint}>{pendingFromLink.packet.alias} already sent you a request.</p>}
+                        <div className={styles.actions}>
+                          <button type="button" className={styles.secondaryButton} onClick={() => void declinePending(pendingFromLink.packet.id)}>Decline</button>
+                          <button type="button" className={styles.primaryButton} disabled={acceptingId !== null} onClick={() => void acceptPending(pendingFromLink.packet.id)}>
+                            {acceptingId === pendingFromLink.packet.id ? "Accepting…" : `Accept ${pendingFromLink.packet.alias}`}
+                          </button>
+                        </div>
+                      </>
+                    ) : (
                     <button
                       className={styles.primaryButton}
                       disabled={!connected || !state.canStartConversation || !join.trim() || requestBusy}
                     >
                       {requestBusy ? "Checking…" : "Request chat"}
                     </button>
+                    )}
                     {inviteFromLink && <button type="button" className={styles.textButton} onClick={() => { setInviteFromLink(false); setJoin(""); }}>Use another link</button>}
                     {!connected && (
                       <p className={styles.fieldHint}>
