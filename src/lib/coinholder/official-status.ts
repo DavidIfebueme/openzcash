@@ -13,6 +13,7 @@
  * normalised title, through the exact titles of the rounds and a short list
  * of the spreadsheet's own wordings; a title shared by two rounds matches none.
  */
+import type { PayoutEntry } from "./fund";
 import { PAYOUTS } from "./program";
 import { ROUNDS } from "./rounds";
 import type { Outcome, Round, RoundProposal } from "./types";
@@ -71,6 +72,9 @@ export type CoinholderGrantView = AggregatedGrant & {
   official: OfficialGrantStatus | null;
 };
 
+/** What the overlay needs of a payout record: its round, and whether FPF has reported it paid. */
+export type PayoutRecord = Pick<PayoutEntry, "roundId" | "status">;
+
 /** The FPF issue number in a link, or null for any other link. */
 export function fpfIssueNumber(link: string | null | undefined): string | null {
   return link?.match(FPF_ISSUE)?.[1] ?? null;
@@ -105,13 +109,10 @@ const SHEET_TITLES: [string, string, string][] = [
   ["Zec.rocks (16 months of uptime for Zcash wallets)", "q3-2026", "61"],
 ];
 
-/** Rounds with published results; their outcomes are final. */
-const CLOSED = ROUNDS.filter((r) => r.status === "results");
-
-function buildIndexes() {
+function buildIndexes(closed: readonly Round[]) {
   const byIssue = new Map<string, Match>();
   const byTitle = new Map<string, Match | null>();
-  for (const round of CLOSED) {
+  for (const round of closed) {
     for (const proposal of round.proposals) {
       // ROUNDS is newest first: a resubmitted issue keeps its latest outcome.
       if (/^\d+$/.test(proposal.id) && !byIssue.has(proposal.id))
@@ -121,7 +122,7 @@ function buildIndexes() {
     }
   }
   for (const [sheetTitle, roundId, id] of SHEET_TITLES) {
-    const round = CLOSED.find((r) => r.id === roundId);
+    const round = closed.find((r) => r.id === roundId);
     const proposal = round?.proposals.find((p) => p.id === id);
     if (round && proposal)
       byTitle.set(titleKey(sheetTitle), { round, proposal });
@@ -129,106 +130,11 @@ function buildIndexes() {
   return { byIssue, byTitle };
 }
 
-const INDEX = buildIndexes();
-
-/** The closed-round proposal a spreadsheet row stands for, or null. */
-function findOfficial(row: {
-  platformLink?: string | null;
-  title: string;
-}): Match | null {
-  const issue = fpfIssueNumber(row.platformLink);
-  if (issue) return INDEX.byIssue.get(issue) ?? null;
-  return INDEX.byTitle.get(titleKey(row.title)) ?? null;
-}
-
-/** Published verdict for a coinholder proposal row of a closed round; null leaves the row as it is. */
-export function officialProposalVerdict(row: {
-  platformLink?: string | null;
-  title: string;
-}): OfficialProposalVerdict | null {
-  const match = findOfficial(row);
-  const status = match ? VERDICT[match.proposal.outcome] : undefined;
-  if (!match || !status) return null;
-  return {
-    status,
-    outcome: match.proposal.outcome,
-    roundId: match.round.id,
-    roundLabel: match.round.label,
-    proposalId: match.proposal.id,
-  };
-}
-
-/** Rounds whose payout FPF has reported. */
-const PAID_ROUNDS: ReadonlySet<string> = new Set(
-  PAYOUTS.filter((p) => p.status === "paid").map((p) => p.roundId),
-);
-
-/** Grants coinholders funded in a closed round whose payout FPF has not reported. */
-const AWAITING: Match[] = CLOSED.filter((r) => !PAID_ROUNDS.has(r.id)).flatMap(
-  (round) =>
-    round.proposals
-      .filter((p) => p.outcome === "funded")
-      .map((proposal) => ({ round, proposal })),
-);
-
 /** Shortest project name matched inside a longer proposal title. */
 const MIN_CONTAINED_KEY = 6;
 
 const toCents = (v: bigint | number | null | undefined) =>
   v === null || v === undefined ? null : Number(v);
-
-/**
- * The awaiting grant a ledger entry stands for. The spreadsheet's own title
- * comes first. FPF's tab can also reuse a project name for a later grant
- * (Unstoppable Wallet: paid in Q4 2025, "Expanding Zcash In Unstoppable
- * Wallet" approved in Q3 2026): an entry whose name sits inside exactly one
- * awaiting grant's title, for exactly its requested amount, is that grant.
- */
-function findAwaitingGrant(
-  title: string,
-  usdCents: number | null,
-): Match | null {
-  const direct = findOfficial({ title });
-  if (
-    direct?.proposal.outcome === "funded" &&
-    !PAID_ROUNDS.has(direct.round.id)
-  )
-    return direct;
-  const key = titleKey(title);
-  if (usdCents === null || key.length < MIN_CONTAINED_KEY) return null;
-  const hits = AWAITING.filter(
-    (m) =>
-      m.proposal.requestedUsdCents === usdCents &&
-      titleKey(m.proposal.title).includes(key),
-  );
-  return hits.length === 1 ? hits[0] : null;
-}
-
-/**
- * The ledger's "Open" on a coinholder grant means approved and not yet paid:
- * retroactive grants are paid in one transfer, and every open row carries no
- * payout date. For a grant coinholders funded in a closed round whose payout
- * FPF has not reported, say so; anything else keeps the ledger's status.
- * `usdCents` lets an entry that reuses an earlier grant's name find its own
- * round (see `findAwaitingGrant`).
- */
-export function officialGrantStatus(grant: {
-  grantKey: string;
-  status: string | null;
-  paidCount?: number;
-  usdCents?: bigint | number | null;
-}): OfficialGrantStatus | null {
-  if (grant.status !== "open" || (grant.paidCount ?? 0) > 0) return null;
-  const match = findAwaitingGrant(grant.grantKey, toCents(grant.usdCents));
-  if (!match) return null;
-  return {
-    status: "awaiting_payment",
-    label: "Awaiting payment",
-    roundId: match.round.id,
-    roundLabel: match.round.label,
-    proposalId: match.proposal.id,
-  };
-}
 
 /** The status every entry shares; null when they differ, which keeps the aggregate. */
 function partStatus(rows: CoinholderLedgerEntry[]): string | null {
@@ -240,63 +146,189 @@ const sumCents = (rows: CoinholderLedgerEntry[]) =>
   rows.reduce((sum, r) => sum + (r.amountUsdCents ?? 0n), 0n);
 
 /**
- * The grants list sums every ledger row under one project name, so a project
- * FPF paid once and coinholders funded again reads "Completed" with 1 of 2
- * paid. When its unpaid rows are a grant still awaiting payment, show the
- * paid and the unpaid grant apart; otherwise keep the aggregate. `entries`
- * are the coinholder ledger rows (any project; only this one's are read).
+ * The overlay for a set of rounds and payout records. The site uses the live
+ * one built below from ROUNDS and PAYOUTS; tests build one around a fixture,
+ * such as a closed round whose payout FPF has not reported yet.
  */
-export function coinholderGrantViews(
-  grant: AggregatedGrant,
-  entries: CoinholderLedgerEntry[],
-): CoinholderGrantView[] {
-  const whole = { ...grant, official: officialGrantStatus(grant) };
-  if (grant.paidCount === 0 || grant.paidCount >= grant.milestoneCount)
-    return [whole];
-  const own = entries.filter((e) => e.project === grant.grantKey);
-  const paid = own.filter((e) => e.isPaid);
-  const unpaid = own.filter((e) => !e.isPaid);
-  if (!paid.length || !unpaid.length) return [whole];
-  const unpaidPart: AggregatedGrant = {
-    grantKey: grant.grantKey,
-    status: partStatus(unpaid),
-    milestoneCount: unpaid.length,
-    paidCount: 0,
-    usdCents: sumCents(unpaid),
-  };
-  const official = officialGrantStatus(unpaidPart);
-  if (!official) return [whole];
-  return [
-    {
+export function createOfficialStatus(
+  rounds: readonly Round[],
+  payouts: readonly PayoutRecord[],
+) {
+  /** Rounds with published results; their outcomes are final. */
+  const closed = rounds.filter((r) => r.status === "results");
+  const index = buildIndexes(closed);
+
+  /** Rounds whose payout FPF has reported. */
+  const paidRounds: ReadonlySet<string> = new Set(
+    payouts.filter((p) => p.status === "paid").map((p) => p.roundId),
+  );
+
+  /** Grants coinholders funded in a closed round whose payout FPF has not reported. */
+  const awaiting: Match[] = closed
+    .filter((r) => !paidRounds.has(r.id))
+    .flatMap((round) =>
+      round.proposals
+        .filter((p) => p.outcome === "funded")
+        .map((proposal) => ({ round, proposal })),
+    );
+
+  /** The closed-round proposal a spreadsheet row stands for, or null. */
+  function findOfficial(row: {
+    platformLink?: string | null;
+    title: string;
+  }): Match | null {
+    const issue = fpfIssueNumber(row.platformLink);
+    if (issue) return index.byIssue.get(issue) ?? null;
+    return index.byTitle.get(titleKey(row.title)) ?? null;
+  }
+
+  /** Published verdict for a coinholder proposal row of a closed round; null leaves the row as it is. */
+  function officialProposalVerdict(row: {
+    platformLink?: string | null;
+    title: string;
+  }): OfficialProposalVerdict | null {
+    const match = findOfficial(row);
+    const status = match ? VERDICT[match.proposal.outcome] : undefined;
+    if (!match || !status) return null;
+    return {
+      status,
+      outcome: match.proposal.outcome,
+      roundId: match.round.id,
+      roundLabel: match.round.label,
+      proposalId: match.proposal.id,
+    };
+  }
+
+  /**
+   * The awaiting grant a ledger entry stands for. The spreadsheet's own title
+   * comes first. FPF's tab can also reuse a project name for a later grant
+   * (Unstoppable Wallet: paid in Q4 2025, "Expanding Zcash In Unstoppable
+   * Wallet" approved in Q3 2026): an entry whose name sits inside exactly one
+   * awaiting grant's title, for exactly its requested amount, is that grant.
+   */
+  function findAwaitingGrant(
+    title: string,
+    usdCents: number | null,
+  ): Match | null {
+    const direct = findOfficial({ title });
+    if (
+      direct?.proposal.outcome === "funded" &&
+      !paidRounds.has(direct.round.id)
+    )
+      return direct;
+    const key = titleKey(title);
+    if (usdCents === null || key.length < MIN_CONTAINED_KEY) return null;
+    const hits = awaiting.filter(
+      (m) =>
+        m.proposal.requestedUsdCents === usdCents &&
+        titleKey(m.proposal.title).includes(key),
+    );
+    return hits.length === 1 ? hits[0] : null;
+  }
+
+  /**
+   * The ledger's "Open" on a coinholder grant means approved and not yet paid:
+   * retroactive grants are paid in one transfer, and every open row carries no
+   * payout date. For a grant coinholders funded in a closed round whose payout
+   * FPF has not reported, say so; anything else keeps the ledger's status.
+   * `usdCents` lets an entry that reuses an earlier grant's name find its own
+   * round (see `findAwaitingGrant`).
+   */
+  function officialGrantStatus(grant: {
+    grantKey: string;
+    status: string | null;
+    paidCount?: number;
+    usdCents?: bigint | number | null;
+  }): OfficialGrantStatus | null {
+    if (grant.status !== "open" || (grant.paidCount ?? 0) > 0) return null;
+    const match = findAwaitingGrant(grant.grantKey, toCents(grant.usdCents));
+    if (!match) return null;
+    return {
+      status: "awaiting_payment",
+      label: "Awaiting payment",
+      roundId: match.round.id,
+      roundLabel: match.round.label,
+      proposalId: match.proposal.id,
+    };
+  }
+
+  /**
+   * The grants list sums every ledger row under one project name, so a project
+   * FPF paid once and coinholders funded again reads "Completed" with 1 of 2
+   * paid. When its unpaid rows are a grant still awaiting payment, show the
+   * paid and the unpaid grant apart; otherwise keep the aggregate. `entries`
+   * are the coinholder ledger rows (any project; only this one's are read).
+   */
+  function coinholderGrantViews(
+    grant: AggregatedGrant,
+    entries: CoinholderLedgerEntry[],
+  ): CoinholderGrantView[] {
+    const whole = { ...grant, official: officialGrantStatus(grant) };
+    if (grant.paidCount === 0 || grant.paidCount >= grant.milestoneCount)
+      return [whole];
+    const own = entries.filter((e) => e.project === grant.grantKey);
+    const paid = own.filter((e) => e.isPaid);
+    const unpaid = own.filter((e) => !e.isPaid);
+    if (!paid.length || !unpaid.length) return [whole];
+    const unpaidPart: AggregatedGrant = {
       grantKey: grant.grantKey,
-      status: partStatus(paid),
-      milestoneCount: paid.length,
-      paidCount: paid.length,
-      usdCents: sumCents(paid),
-      official: null,
-    },
-    { ...unpaidPart, official },
-  ];
+      status: partStatus(unpaid),
+      milestoneCount: unpaid.length,
+      paidCount: 0,
+      usdCents: sumCents(unpaid),
+    };
+    const official = officialGrantStatus(unpaidPart);
+    if (!official) return [whole];
+    return [
+      {
+        grantKey: grant.grantKey,
+        status: partStatus(paid),
+        milestoneCount: paid.length,
+        paidCount: paid.length,
+        usdCents: sumCents(paid),
+        official: null,
+      },
+      { ...unpaidPart, official },
+    ];
+  }
+
+  /**
+   * Grants still awaiting payment that no ledger row stands for yet: FPF's tab
+   * lags the results post (Connaugh Zcash Videos was funded after a correction).
+   * Empty once FPF has reported every closed round paid.
+   */
+  function awaitingGrantsMissingFrom(
+    rows: { grantKey: string; usdCents: bigint | number | null }[],
+  ): { roundLabel: string; title: string; proposalId: string }[] {
+    const listed = new Set(
+      rows
+        .map((r) => findAwaitingGrant(r.grantKey, toCents(r.usdCents)))
+        .filter((m): m is Match => m !== null)
+        .map((m) => `${m.round.id}:${m.proposal.id}`),
+    );
+    return awaiting
+      .filter((m) => !listed.has(`${m.round.id}:${m.proposal.id}`))
+      .map((m) => ({
+        roundLabel: m.round.label,
+        title: m.proposal.title,
+        proposalId: m.proposal.id,
+      }));
+  }
+
+  return {
+    officialProposalVerdict,
+    officialGrantStatus,
+    coinholderGrantViews,
+    awaitingGrantsMissingFrom,
+  };
 }
 
-/**
- * Grants still awaiting payment that no ledger row stands for yet: FPF's tab
- * lags the results post (Connaugh Zcash Videos was funded after a correction).
- */
-export function awaitingGrantsMissingFrom(
-  rows: { grantKey: string; usdCents: bigint | number | null }[],
-): { roundLabel: string; title: string; proposalId: string }[] {
-  const listed = new Set(
-    rows
-      .map((r) => findAwaitingGrant(r.grantKey, toCents(r.usdCents)))
-      .filter((m): m is Match => m !== null)
-      .map((m) => `${m.round.id}:${m.proposal.id}`),
-  );
-  return AWAITING.filter(
-    (m) => !listed.has(`${m.round.id}:${m.proposal.id}`),
-  ).map((m) => ({
-    roundLabel: m.round.label,
-    title: m.proposal.title,
-    proposalId: m.proposal.id,
-  }));
-}
+/** The live overlay: the curated rounds and the payouts FPF has reported. */
+const LIVE = createOfficialStatus(ROUNDS, PAYOUTS);
+
+export const {
+  officialProposalVerdict,
+  officialGrantStatus,
+  coinholderGrantViews,
+  awaitingGrantsMissingFrom,
+} = LIVE;

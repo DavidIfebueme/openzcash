@@ -162,8 +162,10 @@ export default async function FpfCoinholderGrantsPage() {
           </Card>
           <p className="mt-3 text-xs text-stone-600">
             {grantRows.length} grants · one approved grant per row · amounts in
-            USD with ZEC equivalents tracked in the ledger. Awaiting payment:
-            approved by coinholders, no payout recorded yet.
+            USD with ZEC equivalents tracked in the ledger.
+            {grantRows.some((g) => g.status === "awaiting_payment")
+              ? " Awaiting payment: approved by coinholders, no payout recorded yet."
+              : ""}
             {unlisted.length
               ? ` Approved but not in FPF's grants tab yet: ${unlisted
                   .map((u) => `${u.title} (${u.roundLabel})`)

@@ -4,8 +4,9 @@ import {
   ROUND_PROPOSALS,
 } from "@/lib/zcg/coinholder-round";
 import { ROUNDS } from "@/lib/coinholder/rounds";
-import { PROGRAM } from "@/lib/coinholder/program";
+import { PAYOUTS, PROGRAM } from "@/lib/coinholder/program";
 import { OUTCOME_LABEL } from "@/lib/coinholder/derive";
+import { payoutSummary } from "@/lib/coinholder/fund";
 
 // Static curated dataset — safe to serve as a fully static route.
 export const dynamic = "force-static";
@@ -15,8 +16,9 @@ export const revalidate = 3600;
 /**
  * Public, read-only mirror of the latest Coinholder-Directed Retroactive Grants
  * round: the 37 proposals as FPF announced them for review, and, once the vote
- * closed, each outcome and its tally in ZEC. Amounts in USD (dollars). The
- * human-readable page is /coinholders.
+ * closed, each outcome and its tally in ZEC, plus every payout the fund has
+ * made so far, by round. Amounts in USD (dollars). The human-readable pages
+ * are /coinholders and /coinholders/fund.
  */
 export async function GET() {
   // The round this payload describes (dates and proposals come from
@@ -25,6 +27,7 @@ export async function GET() {
     (r) => r.label === COINHOLDER_ROUND.label && r.status === "results",
   );
   const byIssue = new Map(described?.proposals.map((p) => [p.id, p]) ?? []);
+  const payouts = payoutSummary(PAYOUTS, ROUNDS);
   return Response.json({
     program: "coinholder",
     programName: PROGRAM.officialName,
@@ -46,6 +49,23 @@ export async function GET() {
       talliesSource: described?.talliesSource?.href ?? null,
       turnout: described?.turnout ?? null,
       nextRound: PROGRAM.nextRound,
+    },
+    // What the key-holders have paid from the fund, as FPF reports it: grants
+    // are set in USD and paid in ZEC on the day, so each row implies a price.
+    payouts: {
+      totalUsd: payouts.totalUsd,
+      totalZec: payouts.totalZec,
+      totalGrants: payouts.totalGrants,
+      pendingRound: payouts.pending?.round ?? null,
+      rounds: payouts.rows.map((r) => ({
+        round: r.round,
+        paidOn: r.date,
+        grants: r.grants,
+        usd: r.usd,
+        zec: r.zec,
+        zecUsd: Math.round(r.zecUsd * 100) / 100,
+        source: r.source,
+      })),
     },
     bands: ROUND_BANDS.map((b) => ({
       key: b.key,

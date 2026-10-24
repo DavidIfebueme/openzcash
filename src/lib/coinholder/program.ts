@@ -1,3 +1,5 @@
+import type { PayoutEntry } from "./fund";
+
 /**
  * Standing facts about the Coinholder-Directed Retroactive Grants Program:
  * who decides, who pays, who administers, and the next round. Sources beside
@@ -52,7 +54,22 @@ export const DISBURSEMENT_STEPS = [
 
 export const ZIP_1016_PROCESS = "https://zips.z.cash/zip-1016#disbursementprocess";
 
-/** Payouts from the fund, by round, as announced by FPF. Amounts are the grants' USD values; ZEC is what left the multisig. */
+/** FPF's Coinholder Grants tab of the ZCG spreadsheet: one row per payout, with the date, the ZEC sent and the ZEC/USD price. */
+export const COINHOLDER_SHEET_URL =
+  "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit?gid=722519692#gid=722519692";
+
+/** The key-holders' 2-of-3 multisig that received the lockbox at NU6.1 (ZIP 271) and pays the grants. */
+export const FUND_MULTISIG = {
+  address: "t3ev37Q2uL1sfTsiJQJiWJoFzQpDhmnUwYo",
+  explorer:
+    "https://mainnet.zcashexplorer.app/address/t3ev37Q2uL1sfTsiJQJiWJoFzQpDhmnUwYo",
+} as const;
+
+/**
+ * Payouts from the fund, by round. `usdCents` is the grants' value; `zec` is
+ * what the key-holders sent from the multisig to the grantees (fees aside),
+ * as FPF's Coinholder sheet records it; `source` is FPF's announcement.
+ */
 export const PAYOUTS = [
   {
     round: "Q4 2025",
@@ -77,11 +94,11 @@ export const PAYOUTS = [
   {
     round: "Q3 2026",
     roundId: "q3-2026",
-    date: "Pending",
+    date: "Oct 16, 2026",
     usdCents: 838_999_200,
-    zec: null,
-    grants: "17 approved grants, after KYC and a disbursement schedule with FPF",
-    status: "approved",
-    source: "https://forum.zcashcommunity.com/t/q3-coinholder-directed-retroactive-grants-program-results/57909",
+    zec: 7320.535,
+    grants: "17 grants, paid in one day through the shielded pool",
+    status: "paid",
+    source: "https://forum.zcashcommunity.com/t/q3-coinholder-directed-retroactive-grants-program-results/57909/23",
   },
-] as const;
+] as const satisfies readonly PayoutEntry[];

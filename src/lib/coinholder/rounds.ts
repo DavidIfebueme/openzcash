@@ -101,6 +101,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 600000,
     "summary": "Non-custodial ZEC-to-fiat service across 100+ geographies and six fiat apps",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 5.2352 ZEC, the $6,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 1566863.75,
       "reject": 1845.5,
@@ -351,6 +354,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 2200000,
     "summary": "Five short-form films cut from existing Zcash footage, published July–August 2026",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 19.1957 ZEC, the $22,000 at $1,146.09 per ZEC."
+    ],
     
     "tally": {
       "approve": 757044.25,
@@ -435,7 +441,8 @@ const Q3_2026: RoundProposal[] = [
     "summary": "Non-custodial commerce platform: payments, subscriptions, plugins, ticketing, POS",
     "outcome": "funded",
     "notes": [
-      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote."
+      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote.",
+      "Paid October 16, 2026: 30.5386 ZEC, the $35,000 at $1,146.09 per ZEC."
     ],
     "tally": {
       "approve": 1988112.0,
@@ -572,7 +579,8 @@ const Q3_2026: RoundProposal[] = [
     "summary": "Native ZEC cross-chain swaps across THORSwap and Metro wallet",
     "outcome": "funded",
     "notes": [
-      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote."
+      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote.",
+      "Paid October 16, 2026: 52.3519 ZEC, the $60,000 at $1,146.09 per ZEC."
     ],
     "tally": {
       "approve": 1467036.75,
@@ -600,7 +608,8 @@ const Q3_2026: RoundProposal[] = [
     "summary": "Swap aggregation, wallet reliability, and full Ironwood migration support",
     "outcome": "funded",
     "notes": [
-      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote."
+      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote.",
+      "Paid October 16, 2026: 69.8025 ZEC, the $80,000 at $1,146.09 per ZEC."
     ],
     "tally": {
       "approve": 1436595.0,
@@ -680,6 +689,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 15000000,
     "summary": "Bounty for disclosure of a critical Zebra remote denial-of-service vulnerability",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 130.8798 ZEC, the $150,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 1392929.25,
       "reject": 4122.0,
@@ -705,6 +717,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 26105800,
     "summary": "Nomination topping up application #50 to a $1,000,000 total",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 227.7814 ZEC, the $261,058 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2170803.125,
       "reject": 3736.75,
@@ -730,6 +745,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 37500000,
     "summary": "Block explorer and privacy-intelligence platform with a custom Rust indexer",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 327.1994 ZEC, the $375,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2169040.625,
       "reject": 18.875,
@@ -755,6 +773,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 40000000,
     "summary": "Bounty for chained zcashd and Zebra vulnerabilities enabling temporary counterfeiting",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 349.0127 ZEC, the $400,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2145016.875,
       "reject": 3138.125,
@@ -780,6 +801,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 42500000,
     "summary": "Net award for five critical Zebra consensus-divergence disclosures, less $100,000 already paid",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 370.8260 ZEC, the $425,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2095860.875,
       "reject": 4228.625,
@@ -805,6 +829,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 58499200,
     "summary": "Infrastructure powering 16 months of uptime for every major Zcash wallet",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 510.4241 ZEC, the $584,992 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 1970715.0,
       "reject": 29.5,
@@ -830,6 +857,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 59900000,
     "summary": "Reimbursement for external cryptography audits during the Ironwood incident response",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 522.6466 ZEC, the $599,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2175934.375,
       "reject": 60.875,
@@ -856,6 +886,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedNote": "requested; corrected by the applicant in the review thread",
     "summary": "Formal verification of the Ironwood zk-SNARK circuit, machine-checked in Lean",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 644.7504 ZEC, the $738,942 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2177498.25,
       "reject": 0.25,
@@ -881,6 +914,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 75000000,
     "summary": "Bounty for disclosure of the Orchard counterfeiting vulnerability",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 654.3989 ZEC, the $750,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2179062.5,
       "reject": 19.0,
@@ -906,6 +942,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 75000000,
     "summary": "Nomination topping up application #51 to a $1,500,000 total",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 654.3989 ZEC, the $750,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2174540.625,
       "reject": 2823.875,
@@ -931,6 +970,9 @@ const Q3_2026: RoundProposal[] = [
     "requestedUsdCents": 120300000,
     "summary": "Emergency development, integration, testing, and activation work for Ironwood (NU6.3)",
     "outcome": "funded",
+    "notes": [
+      "Paid October 16, 2026: 1,049.6558 ZEC, the $1,203,000 at $1,146.09 per ZEC."
+    ],
     "tally": {
       "approve": 2174891.5,
       "reject": 47.375,
@@ -957,7 +999,8 @@ const Q3_2026: RoundProposal[] = [
     "summary": "Amended: vulnerability remediation, Zallet alpha.4, and ZIP 2005/256 progress",
     "outcome": "funded",
     "notes": [
-      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote."
+      "Submitted for the postponed Q2 2026 round and carried into Q3: its first coinholder vote.",
+      "Paid October 16, 2026: 1,701.4371 ZEC, the $1,950,000 at $1,146.09 per ZEC."
     ],
     "tally": {
       "approve": 1755093.0,
@@ -1460,11 +1503,14 @@ export const ROUNDS: Round[] = [
       "FPF confirmed on September 30, 2026 that abstentions are left out of the majority test: Connaugh Zcash Videos, first published as Abstain, is Funded. No other result changes under either reading.",
       "No proposal ended with “would reconsider at a lower amount” as its result, but the option drew large blocks of ZEC on some questions, including funded ones; each bar shows it separately.",
       "Nine proposals were submitted for the postponed Q2 round and carried into Q3; for them this was the first vote, not a second rejection.",
-      "Funded grantees go through KYC and a disbursement schedule with FPF before the key-holders pay; amounts paid will appear on the fund page.",
+      "Paid on October 16, 2026: the key-holders sent 7,320.535 ZEC from the multisig for the 17 grants ($8,389,992 at $1,146.09 per ZEC, the price FPF set on October 13), through the shielded pool in three transactions. FPF confirmed on October 19 that every Q3 disbursement was complete.",
     ],
     sources: [
       { label: "Official results (FPF)", href: FORUM + "q3-coinholder-directed-retroactive-grants-program-results/57909" },
       { label: "FPF counting and ballot clarification · Oct 2", href: FORUM + "q3-coinholder-directed-retroactive-grants-program-results/57909/19" },
+      { label: "Disbursements complete (FPF) · Oct 19", href: FORUM + "q3-coinholder-directed-retroactive-grants-program-results/57909/23" },
+      { label: "Payments by grant (Coinholder sheet)", href: "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit?gid=722519692#gid=722519692" },
+      { label: "Multisig transactions · Oct 16", href: "https://mainnet.zcashexplorer.app/address/t3ev37Q2uL1sfTsiJQJiWJoFzQpDhmnUwYo" },
       { label: "Tallies (vote chain)", href: VOTE_CHAIN },
       { label: "Vizor transcription and analysis", href: FORUM + "the-hand-of-god-what-q3s-coinholder-retroactive-grants-vote-tells-us/57910" },
       { label: "Zakura vote results", href: "https://zakura.com/voting/" },

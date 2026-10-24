@@ -3,15 +3,23 @@ import { currentLockboxZec } from "@/lib/zcash/lockbox-live";
 import { currentZecUsdQuote } from "@/lib/pricing/live-price";
 import { THIRD_HALVING_HEIGHT } from "@/lib/zcash/lockbox";
 import {
+  COINHOLDER_SHEET_URL,
   DISBURSEMENT_STEPS,
+  FUND_MULTISIG,
   PAYOUTS,
   PROGRAM,
   ZIP_1016_PROCESS,
 } from "@/lib/coinholder/program";
-import { NU6_1_HEIGHT, fundOutlook } from "@/lib/coinholder/fund";
+import {
+  NU6_1_HEIGHT,
+  formatPaidZec,
+  fundOutlook,
+  payoutSummary,
+} from "@/lib/coinholder/fund";
 import { ROUNDS } from "@/lib/coinholder/rounds";
 import { formatPct, formatZec, summarize } from "@/lib/coinholder/derive";
 import { Stat } from "../stat";
+import { Payouts, price } from "./payouts";
 import styles from "../coinholders.module.css";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 
@@ -19,7 +27,7 @@ export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: `The fund · ${PROGRAM.officialName} · OpenZcash`,
   description:
-    "The Coinholder-Controlled Fund under ZIP 1016: its story, live balance, what the approved grants would take and how a grant is paid.",
+    "The Coinholder-Controlled Fund under ZIP 1016: its story, live balance, what has been paid out by round and how a grant is paid.",
   path: "/coinholders/fund",
   card: { title: "The fund" },
 });
@@ -56,10 +64,12 @@ export default async function FundPage() {
     : lock?.snap?.zecusdPriceCents
       ? Number(lock.snap.zecusdPriceCents) / 100
       : null;
-  const pending = PAYOUTS.find((p) => p.status === "approved");
+  const payouts = payoutSummary(PAYOUTS, ROUNDS);
+  const pending = payouts.pending;
+  const q3Payout = payouts.rows.find((r) => r.roundId === "q3-2026");
   const pendingGrants = pending
-    ? (summarize(ROUNDS.find((r) => r.id === pending.roundId)!).counts
-        .funded ?? null)
+    ? (summarize(ROUNDS.find((r) => r.id === pending.roundId)!).counts.funded ??
+      null)
     : null;
   const o = fundOutlook({
     balanceZec,
@@ -105,8 +115,17 @@ export default async function FundPage() {
     {
       when: "Sep 2026",
       what: "Q3 approvals",
-      text: "Coinholders approve 17 grants, now awaiting KYC and payment.",
+      text: "Coinholders approve 17 grants, $8.39 million of finished work: the largest round so far.",
     },
+    ...(q3Payout
+      ? [
+          {
+            when: "Oct 2026",
+            what: "Q3 payouts",
+            text: `The key-holders pay ${q3Payout.grants !== null ? `all ${q3Payout.grants} grants` : "the grants"} in one day: ${formatPaidZec(q3Payout.zec)} ZEC at ${price(q3Payout.zecUsd)} per ZEC, through the shielded pool.`,
+          },
+        ]
+      : []),
     {
       when: live
         ? `≈ ${o.halvingEta.toLocaleDateString("en-US", { month: "short", year: "numeric", timeZone: "UTC" })}`
@@ -182,20 +201,28 @@ export default async function FundPage() {
             />
             <Stat
               label="In ZEC today"
-              value={o.approvedZec !== null ? `≈ ${formatZec(o.approvedZec)}` : "·"}
+              value={
+                o.approvedZec !== null ? `≈ ${formatZec(o.approvedZec)}` : "·"
+              }
               unit={o.approvedZec !== null ? "ZEC" : undefined}
               sub={o.approvedZec !== null ? undefined : "price unavailable"}
             />
             <Stat
               label="Share of the balance"
               value={covered !== null ? formatPct(covered) : "·"}
-              sub={covered !== null ? "at today's price" : "balance unavailable"}
+              sub={
+                covered !== null ? "at today's price" : "balance unavailable"
+              }
             />
             <Stat
               label="Left after paying them"
-              value={leftAfter !== null ? formatZec(Math.max(0, leftAfter)) : "·"}
+              value={
+                leftAfter !== null ? formatZec(Math.max(0, leftAfter)) : "·"
+              }
               unit={leftAfter !== null ? "ZEC" : undefined}
-              sub={leftAfter !== null ? "before new inflow" : "balance unavailable"}
+              sub={
+                leftAfter !== null ? "before new inflow" : "balance unavailable"
+              }
             />
           </div>
           <div className={styles.panelBody}>
@@ -236,6 +263,12 @@ export default async function FundPage() {
           </div>
         </section>
       ) : null}
+
+      <Payouts
+        summary={payouts}
+        sheetUrl={COINHOLDER_SHEET_URL}
+        multisigUrl={FUND_MULTISIG.explorer}
+      />
 
       <h2 className={styles.sectionTitle}>The story of the fund</h2>
       <ol className={styles.story}>
@@ -305,6 +338,12 @@ export default async function FundPage() {
         </a>
         <a href="https://zips.z.cash/zip-0271" target="_blank" rel="noreferrer">
           ZIP 271 ↗
+        </a>
+        <a href={COINHOLDER_SHEET_URL} target="_blank" rel="noreferrer">
+          Coinholder sheet ↗
+        </a>
+        <a href={FUND_MULTISIG.explorer} target="_blank" rel="noreferrer">
+          Multisig ↗
         </a>
         <span>
           Balance: the Coinholder sheet

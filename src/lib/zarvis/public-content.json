@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "033007b2699b5bfc",
+  "sourceRevision": "b0320198f38f33f2",
   "sourceFiles": 71,
   "documents": [
     {
@@ -163,7 +163,7 @@
       "id": "src/app/zcg/fpf/page.tsx:0",
       "url": "https://openzcash.org/zcg/fpf",
       "title": "zcg · fpf",
-      "text": "Financial Privacy Foundation · program administrator · OpenZcash\nThe Financial Privacy Foundation administers the Coinholder-Directed Retroactive Grants Program: submissions, review, KYC and reporting. Coinholders decide the grants.\nFinancial Privacy Foundation\nSubmit a proposal\nSubmit a milestone\nCoinholder-Directed Retroactive Grants Program\n·\nevery round, outcome and vote tally\n→\nGrants\nTotal paid\nProposals\nCoinholder grants\ngrants · one approved grant per row · amounts in USD with ZEC equivalents tracked in the ledger. Awaiting payment: approved by coinholders, no payout recorded yet.\nCoinholder proposals\nproposals · the pipeline upstream of the grants above · only approved proposals become paid grants. Verdicts of closed rounds follow FPF's official results; other rows mirror the spreadsheet."
+      "text": "Financial Privacy Foundation · program administrator · OpenZcash\nThe Financial Privacy Foundation administers the Coinholder-Directed Retroactive Grants Program: submissions, review, KYC and reporting. Coinholders decide the grants.\nFinancial Privacy Foundation\nSubmit a proposal\nSubmit a milestone\nCoinholder-Directed Retroactive Grants Program\n·\nevery round, outcome and vote tally\n→\nGrants\nTotal paid\nProposals\nCoinholder grants\ngrants · one approved grant per row · amounts in USD with ZEC equivalents tracked in the ledger.\nCoinholder proposals\nproposals · the pipeline upstream of the grants above · only approved proposals become paid grants. Verdicts of closed rounds follow FPF's official results; other rows mirror the spreadsheet."
     },
     {
       "id": "src/app/coinholders/page.tsx:0",
@@ -187,13 +187,13 @@
       "id": "src/app/coinholders/fund/page.tsx:0",
       "url": "https://openzcash.org/coinholders/fund",
       "title": "coinholders · fund",
-      "text": "The Coinholder-Controlled Fund under ZIP 1016: its story, live balance, what the approved grants would take and how a grant is paid.\nThe fund\nnumeric\nNU6\nThe lockbox starts: 12% of every block reward is set aside under ZIP 1015, with no way to spend it yet.\nRatification\nCoinholders approve a grants program for finished work, with partial funding when the fund runs short.\nNU6.1\nFirst vote\nCoinholders approve five grants; the key-holders later veto one.\nFirst payouts\nThe key-holders pay the approved grants in ZEC from the multisig.\nPause\nThe Q2 vote is postponed after an Orchard vulnerability; its proposals move to Q3.\nQ3 approvals\nCoinholders approve 17 grants, now awaiting KYC and payment.\nThird halving\nThe 12% stream ends. Whatever is left stays in the fund for later votes, or at rest.\nThe Coinholder-Controlled Fund of ZIP 1016: what coinholders grant from, held by the key-holders and spent only on grants coinholders approve.\nBalance\nValue\nInflow per 30 days\nStill to come\nApproved in\n, awaiting payment\nIn USD\nIn ZEC today\nShare of the balance\nLeft after paying them\nimg\nApproved grants\nRest of the balance\nGrants are set in USD and paid in ZEC on the day, so their ZEC cost moves with the price.\nThe story of the fund\nWhere the money comes from\nSeed\nThe ZIP 1015 lockbox\n12% of every block from NU6 to NU6.1, moved in at block\n.\nStream\n12% of each block\nZEC until block\nCustody"
+      "text": "The Coinholder-Controlled Fund under ZIP 1016: its story, live balance, what has been paid out by round and how a grant is paid.\nThe fund\nnumeric\nNU6\nThe lockbox starts: 12% of every block reward is set aside under ZIP 1015, with no way to spend it yet.\nRatification\nCoinholders approve a grants program for finished work, with partial funding when the fund runs short.\nNU6.1\nFirst vote\nCoinholders approve five grants; the key-holders later veto one.\nFirst payouts\nThe key-holders pay the approved grants in ZEC from the multisig.\nPause\nThe Q2 vote is postponed after an Orchard vulnerability; its proposals move to Q3.\nQ3 approvals\nCoinholders approve 17 grants, $8.39 million of finished work: the largest round so far.\nQ3 payouts\nThird halving\nThe 12% stream ends. Whatever is left stays in the fund for later votes, or at rest.\nThe Coinholder-Controlled Fund of ZIP 1016: what coinholders grant from, held by the key-holders and spent only on grants coinholders approve.\nBalance\nValue\nInflow per 30 days\nStill to come\nApproved in\n, awaiting payment\nIn USD\nIn ZEC today\nShare of the balance\nLeft after paying them\nimg\nApproved grants\nRest of the balance\nGrants are set in USD and paid in ZEC on the day, so their ZEC cost moves with the price.\nThe story of the fund\nWhere the money comes from\nSeed\nThe ZIP 1015 lockbox\n12% of every block from NU6 to NU6.1, moved in at block\n.\nStream"
     },
     {
       "id": "src/app/coinholders/fund/page.tsx:1",
       "url": "https://openzcash.org/coinholders/fund",
       "title": "coinholders · fund",
-      "text": "2-of-3 multisig\nHeld by the key-holders, bound to ZIP 1016. It may be left at rest.\nOut\nPaid in ZEC by the key-holders; FPF runs applications and reporting.\nHow money leaves the fund\nZIP 1016 ↗\nZIP 271 ↗\nBalance: the Coinholder sheet\nplus 0.1875 ZEC a block since.\nLive lockbox feed →"
+      "text": "12% of each block\nZEC until block\nCustody\n2-of-3 multisig\nHeld by the key-holders, bound to ZIP 1016. It may be left at rest.\nOut\nPaid in ZEC by the key-holders; FPF runs applications and reporting.\nHow money leaves the fund\nZIP 1016 ↗\nZIP 271 ↗\nCoinholder sheet ↗\nMultisig ↗\nBalance: the Coinholder sheet\nplus 0.1875 ZEC a block since.\nLive lockbox feed →"
     },
     {
       "id": "src/app/coinholders/verify/page.tsx:0",

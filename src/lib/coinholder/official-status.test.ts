@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { PAYOUTS } from "./program";
 import { ROUNDS } from "./rounds";
 import {
   awaitingGrantsMissingFrom,
   coinholderGrantViews,
+  createOfficialStatus,
   fpfIssueNumber,
   officialGrantStatus,
   officialProposalVerdict,
@@ -12,6 +14,14 @@ import {
 const ISSUE =
   "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/";
 const q3 = ROUNDS.find((r) => r.id === "q3-2026")!;
+
+/** The overlay as it stood between the Q3 results (Sep 29, 2026) and FPF's report of the payout (Oct 19, 2026). */
+const beforeQ3Payout = createOfficialStatus(
+  ROUNDS,
+  PAYOUTS.map((p) =>
+    p.roundId === "q3-2026" ? { ...p, status: "approved" } : p,
+  ),
+);
 
 describe("fpfIssueNumber", () => {
   it("reads the FPF issue number from plain, fragment and trailing-slash links", () => {
@@ -170,24 +180,27 @@ describe("officialProposalVerdict · rows outside a closed round", () => {
   });
 });
 
-describe("officialGrantStatus", () => {
-  const unpaidQ3 = [
-    "Ironwood external audit re-imbursement",
-    "Ironwood zk-SNARK Formal Verification (Project Tachyon)",
-    "Orchard Counterfeiting Vulnerability Bug Bounty",
-    "Project Tachyon - Bonus Grant for Ironwood zk-SNARK Formal Verification",
-    "Taylor Hornby - Bonus Grant for Orchard Counterfeiting Vulnerability Bug Bounty",
-    "Temporary Detectable Unlimited mint and sell Exploit",
-    "THORSwap/Metro",
-    "Valargroup Ironwood work",
-    "zcashtocash via ZcashLabs",
-    "Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)",
-    "Zec.rocks (16 months of uptime for Zcash wallets)",
-    "ZODL Q1 & Q2 2026 Core Protocol Development",
-    "CipherPay",
-    "CipherScan Coinholder Retroactive Grant 2026",
-    "Five Critical Zebra Consensus Divergence Vulnerabilities",
-  ];
+/** Q3 2026 grants as FPF's tab named them while they were open. */
+const unpaidQ3 = [
+  "Ironwood external audit re-imbursement",
+  "Ironwood zk-SNARK Formal Verification (Project Tachyon)",
+  "Orchard Counterfeiting Vulnerability Bug Bounty",
+  "Project Tachyon - Bonus Grant for Ironwood zk-SNARK Formal Verification",
+  "Taylor Hornby - Bonus Grant for Orchard Counterfeiting Vulnerability Bug Bounty",
+  "Temporary Detectable Unlimited mint and sell Exploit",
+  "THORSwap/Metro",
+  "Valargroup Ironwood work",
+  "zcashtocash via ZcashLabs",
+  "Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)",
+  "Zec.rocks (16 months of uptime for Zcash wallets)",
+  "ZODL Q1 & Q2 2026 Core Protocol Development",
+  "CipherPay",
+  "CipherScan Coinholder Retroactive Grant 2026",
+  "Five Critical Zebra Consensus Divergence Vulnerabilities",
+];
+
+describe("officialGrantStatus · while a closed round awaits payment", () => {
+  const { officialGrantStatus } = beforeQ3Payout;
 
   it("labels every approved, unpaid Q3 grant the ledger marks open as awaiting payment", () => {
     for (const grantKey of unpaidQ3) {
@@ -239,6 +252,34 @@ describe("officialGrantStatus", () => {
         grantKey: "A future grant",
         status: "open",
         paidCount: 0,
+      }),
+    ).toBeNull();
+  });
+});
+
+describe("officialGrantStatus · after FPF reported the Q3 2026 payout (Oct 16, 2026)", () => {
+  it("reports every closed round paid, so no grant is awaiting payment", () => {
+    const paid = PAYOUTS.filter((p) => p.status === "paid").map(
+      (p) => p.roundId,
+    );
+    const closed = ROUNDS.filter((r) => r.status === "results").map(
+      (r) => r.id,
+    );
+    expect(paid.sort()).toEqual(closed.sort());
+  });
+
+  it("keeps the ledger's status on every Q3 grant, even a row still marked open", () => {
+    for (const grantKey of unpaidQ3)
+      expect(
+        officialGrantStatus({ grantKey, status: "open", paidCount: 0 }),
+        grantKey,
+      ).toBeNull();
+    expect(
+      officialGrantStatus({
+        grantKey: "Unstoppable Wallet",
+        status: "open",
+        paidCount: 0,
+        usdCents: 8_000_000n,
       }),
     ).toBeNull();
   });
@@ -341,7 +382,9 @@ function aggregate(project: string) {
   };
 }
 
-describe("a project name FPF reused for a later grant", () => {
+describe("a project name FPF reused for a later grant · while Q3 2026 awaited payment", () => {
+  const { officialGrantStatus, coinholderGrantViews } = beforeQ3Payout;
+
   it("places the unpaid Unstoppable Wallet entry in Q3 2026 by its amount", () => {
     expect(
       officialGrantStatus({
@@ -437,20 +480,63 @@ describe("a project name FPF reused for a later grant", () => {
   });
 });
 
+/** FPF's tab as imported on 2026-10-21: every Q3 grant paid on Oct 16, 2026, the two Unstoppable Wallet grants included. */
+const LEDGER_PAID: CoinholderLedgerEntry[] = LEDGER.map((e) =>
+  e.grantStatus === "open"
+    ? { ...e, grantStatus: "completed", isPaid: true }
+    : e,
+);
+
+describe("a project name FPF reused for a later grant · after the Q3 2026 payout", () => {
+  it("shows Unstoppable Wallet as one completed grant, both payments counted", () => {
+    const own = LEDGER_PAID.filter((e) => e.project === "Unstoppable Wallet");
+    const views = coinholderGrantViews(
+      {
+        grantKey: "Unstoppable Wallet",
+        status: "completed",
+        milestoneCount: own.length,
+        paidCount: own.filter((e) => e.isPaid).length,
+        usdCents: own.reduce((s, e) => s + (e.amountUsdCents ?? 0n), 0n),
+      },
+      LEDGER_PAID,
+    );
+    expect(views).toEqual([
+      expect.objectContaining({
+        milestoneCount: 2,
+        paidCount: 2,
+        usdCents: 12_800_000n,
+        official: null,
+      }),
+    ]);
+  });
+
+  it("keeps the aggregate even on the older ledger, since no round awaits payment", () => {
+    expect(
+      coinholderGrantViews(aggregate("Unstoppable Wallet"), LEDGER),
+    ).toHaveLength(1);
+  });
+});
+
 describe("awaitingGrantsMissingFrom", () => {
-  it("names the one Q3 2026 grant FPF's tab does not list yet: Connaugh Zcash Videos", () => {
-    const rows = LEDGER.map((e) => ({
-      grantKey: e.project!,
-      usdCents: e.amountUsdCents,
-    }));
-    expect(awaitingGrantsMissingFrom(rows)).toEqual([
+  const rows = LEDGER.map((e) => ({
+    grantKey: e.project!,
+    usdCents: e.amountUsdCents,
+  }));
+
+  it("named the one Q3 2026 grant FPF's tab did not list while the round awaited payment: Connaugh Zcash Videos", () => {
+    expect(beforeQ3Payout.awaitingGrantsMissingFrom(rows)).toEqual([
       expect.objectContaining({ roundLabel: "Q3 2026", proposalId: "55" }),
     ]);
   });
 
-  it("lists every awaiting grant when the tab has none of them", () => {
+  it("listed every awaiting grant when the tab had none of them", () => {
     const funded = q3.proposals.filter((p) => p.outcome === "funded").length;
-    expect(awaitingGrantsMissingFrom([])).toHaveLength(funded);
+    expect(beforeQ3Payout.awaitingGrantsMissingFrom([])).toHaveLength(funded);
+  });
+
+  it("names nothing once FPF has reported every closed round paid", () => {
+    expect(awaitingGrantsMissingFrom(rows)).toEqual([]);
+    expect(awaitingGrantsMissingFrom([])).toEqual([]);
   });
 });
 
