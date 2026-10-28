@@ -46,5 +46,11 @@
     "route": "/zarvis",
     "title": "Zarvis · knowledge, tests, system and capabilities",
     "text": "Zarvis answers questions about Zcash and OpenZcash using reviewed references, indexed public pages and read-only tools. Static documentation describes workflows; live tools return data with freshness and coverage. It does not read the whole repository, internal test reports, private committee workspaces, deployment dashboards or wallets. A source revision, editorial review date or local preview does not prove tests passed, a PR merged or a production release succeeded. For build, test and publication status it needs current evidence for that exact version; without that evidence the status is unverified. It can draft original pitches adapted to an audience, occasion, channel, language and length, grounded in the library; a draft is not a new verified fact. Reloading clears chat memory. Model answers send recent context and retrieved public records to the configured provider. Availability and limits are shown on /zarvis/about."
+  },
+  {
+    "id": "zarvis-interface-guide",
+    "route": "/zarvis/guide",
+    "title": "Zarvis guide · badges, try-these questions, answer anatomy, depth",
+    "text": "The interactive guide at /zarvis/guide teaches the Zarvis chat by showing it. Live badge samples rendered by the same code as the chat say where an answer came from: Direct from OpenZcash data · no AI, or a model answer naming the model and counting its sources. Try these questions links open /zarvis with the composer pre-filled; nothing is sent until the visitor presses send. An annotated sample answer marks the badge, the sources list, the withheld-figure notice and the copy/share actions. Quick answers are written within 55 seconds and Deep analysis within 110; quotas, retention and limits stay on /zarvis/about."
   }
 ]

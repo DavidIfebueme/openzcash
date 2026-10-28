@@ -12,6 +12,9 @@ configuration and is the authoritative version.
 - Full page at `/zarvis`.
 - The same chat is available across the site, including the Monthly pages,
   through the launcher in the corner.
+- An interactive guide at <https://openzcash.org/zarvis/guide> shows the
+  interface with live badge samples, prefillable questions, an annotated
+  answer and the Quick vs Deep comparison.
 
 ## Asking
 
