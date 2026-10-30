@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Q4 } from "@/lib/coinholder/q4";
 import { Card, Stat } from "@/components/ui";
 import { OrgHeader } from "@/components/org-header";
 import { listGrants } from "@/lib/zcg/grants-repo";
@@ -130,6 +131,11 @@ export default async function FpfCoinholderGrantsPage() {
           </strong>
           {" · "}every round, outcome and vote tally
         </span>
+        <span aria-hidden>→</span>
+      </Link>
+
+      <Link href={Q4.href} className="mb-6 flex items-center justify-between gap-4 rounded-xl border border-stone-200 bg-white px-4 py-3 text-sm text-stone-700 hover:border-amber-500/40">
+        <span><strong className="font-semibold text-stone-900">Coinholder proposals</strong>{" · "}current round</span>
         <span aria-hidden>→</span>
       </Link>
 

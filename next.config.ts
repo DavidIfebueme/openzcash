@@ -79,7 +79,13 @@ const nextConfig: NextConfig = {
       { source: "/zcg/coinholder", destination: "/coinholders", permanent: true },
       { source: "/zcg/coinholder/votes", destination: "/coinholders/results?round=all", permanent: true },
       { source: "/coinholders/votes", destination: "/coinholders/results?round=all", permanent: true },
-      { source: "/coinholders/:round(q[1-4]-\\d{4}|ratification-\\d{4})", destination: "/coinholders/results?round=:round", permanent: true },
+      // The collection keeps a permanent name; old round bookmarks still resolve.
+      { source: "/coinholders/q4-2026", destination: "/coinholders/proposals", permanent: true },
+      { source: "/coinholders/q4-2026/:number", destination: "/coinholders/proposals/:number", permanent: true },
+      // Only completed historical routes belong on Results.
+      ...["q3-2026", "q2-2026", "q1-2026", "q4-2025", "ratification-2025"].map((round) => ({
+        source: `/coinholders/${round}`, destination: `/coinholders/results?round=${round}`, permanent: true,
+      })),
       { source: "/zcg/coinholder/pool", destination: "/coinholders/fund", permanent: true },
       { source: "/coinholder", destination: "/coinholders", permanent: true },
       // Retired standalone pages keep existing bookmarks pointing to their records.

@@ -1,4 +1,5 @@
 import type { PayoutEntry } from "./fund";
+import { ACTIVE_CYCLE, cycleDateRange, cycleDeadline, cycleWindows } from "./cycles";
 
 /**
  * Standing facts about the Coinholder-Directed Retroactive Grants Program:
@@ -18,13 +19,14 @@ export const PROGRAM = {
   zipUrl: "https://zips.z.cash/zip-1016",
   submissionsUrl: "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues",
   nextRound: {
-    label: "Q4 2026",
-    note: "Announced in the Q3 results post, subject to minor adjustments.",
-    windows: [
-      { label: "Proposals", value: "Oct 30 – Nov 13, 2026" },
-      { label: "Review", value: "Nov 16 – Dec 16, 2026" },
-      { label: "Voting", value: "Dec 17 – Dec 29, 2026 · 20:00 UTC" },
-    ],
+    label: ACTIVE_CYCLE.label,
+    note: "Dates announced by FPF for the current cycle.",
+    source: ACTIVE_CYCLE.source,
+    href: ACTIVE_CYCLE.href,
+    windows: cycleWindows().map((w) => ({
+      label: w.label,
+      value: `${cycleDateRange(w.start, w.end)}, ${new Date(w.end).getUTCFullYear()} · ${cycleDeadline()}`,
+    })),
   },
 } as const;
 

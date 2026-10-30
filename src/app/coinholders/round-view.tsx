@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { PROGRAM } from "@/lib/coinholder/program";
+import { ACTIVE_CYCLE, cycleHref } from "@/lib/coinholder/cycles";
+import { CurrentCycle, CycleTab, PendingCycle } from "./cycle-view";
 import { ROUNDS } from "@/lib/coinholder/rounds";
 import { proposalVerifyHref } from "@/lib/coinholder/proposal-decision";
 import {
@@ -35,11 +37,8 @@ const zecCompact = (zec: number) =>
 /** Keeps a short phrase on one line when a sub-line wraps in a narrow cell. */
 const nb = (s: string) => s.replace(/ /g, "\u00a0");
 
-/** Every round is a view of the results page; the newest is the default. */
-export const roundHref = (id: string) =>
-  id === ROUNDS[0].id
-    ? "/coinholders/results"
-    : `/coinholders/results?round=${id}`;
+/** Preserve each historical destination when the current cycle changes. */
+export const roundHref = (id: string) => cycleHref("results", id);
 const CHRONOLOGICAL = [...ROUNDS].reverse();
 const VOTED = ROUNDS.filter((r) => r.proposals.some((p) => p.tally));
 
@@ -70,7 +69,7 @@ function Latest() {
     <section className={styles.panel} aria-labelledby="latest">
       <div className={styles.panelHead}>
         <h2 id="latest" className={styles.panelTitle}>
-          {r.label} <span className={styles.panelTag}>Latest round</span>
+          {r.label} <span className={styles.panelTag}>Latest results</span>
         </h2>
         <Link href={roundHref(r.id)} className={styles.panelLink}>
           See every result →
@@ -261,6 +260,7 @@ function Evolution() {
 function RoundTabs({ current }: { current: string }) {
   return (
     <RoundTabsNav current={current}>
+      <CycleTab view="results" current={current} />
       {ROUNDS.map((r) => (
         <Link
           key={r.id}
@@ -424,11 +424,7 @@ function RoundResults({ round }: { round: Round }) {
             ) : null}
             {round.proposals.some((p) => p.tally) ? (
               <Link
-                href={
-                  round.id === ROUNDS[0].id
-                    ? "/coinholders/verify"
-                    : `/coinholders/verify?round=${round.id}`
-                }
+                href={cycleHref("verify", round.id)}
                 title="Rebuild these results from the published tallies"
               >
                 Verify →
@@ -528,21 +524,6 @@ function AllRounds() {
   );
 }
 
-function NextRound() {
-  return (
-    <section aria-labelledby="next">
-      <h2 id="next" className={styles.sectionTitle}>
-        Next round · {PROGRAM.nextRound.label}
-      </h2>
-      <ul className={`${styles.stats} ${styles.schedule}`}>
-        {PROGRAM.nextRound.windows.map((w) => (
-          <Stat key={w.label} as="li" label={w.label} value={w.value} />
-        ))}
-      </ul>
-    </section>
-  );
-}
-
 function Rules() {
   return (
     <section aria-labelledby="how">
@@ -585,11 +566,11 @@ export function OverviewView({ today }: { today: TodayPrice }) {
         </p>
       </header>
 
+      <CurrentCycle />
       <Latest />
       <Insights />
       <VoteValue today={today} href={roundHref} />
       <Evolution />
-      <NextRound />
       <Rules />
 
       <p className={styles.sources}>
@@ -607,20 +588,19 @@ export function OverviewView({ today }: { today: TodayPrice }) {
 }
 
 /** Every round's results on one page: pick a round, or all of them. */
-export function ResultsView({ selected }: { selected: Round | "all" }) {
+export function ResultsView({ selected }: { selected: Round | "all" | "pending" }) {
   return (
     <div className={styles.page}>
       <header className={styles.head}>
         <h1 className={styles.title}>Results</h1>
-        <p className={styles.lede}>
-          Every proposal coinholders voted on, round by round, with the ZEC
-          behind each answer.
-        </p>
+        {selected !== "pending" ? <p className={styles.lede}>
+          Every proposal coinholders voted on, round by round, with the ZEC behind each answer.
+        </p> : null}
       </header>
-      <RoundTabs current={selected === "all" ? "all" : selected.id} />
-      {selected === "all" ? <AllRounds /> : <RoundResults round={selected} />}
+      <RoundTabs current={selected === "pending" ? ACTIVE_CYCLE.id : selected === "all" ? "all" : selected.id} />
+      {selected === "pending" ? <PendingCycle view="results" /> : selected === "all" ? <AllRounds /> : <RoundResults round={selected} />}
       <p className={styles.sources}>
-        <Link href="/coinholders/activity">Voting activity →</Link>
+        <Link href={cycleHref("activity", selected !== "pending" && selected !== "all" && selected.id === "q3-2026" ? selected.id : ACTIVE_CYCLE.id)}>Voting activity →</Link>
         <Link href="/coinholders">Program overview →</Link>
         <a href={PROGRAM.zipUrl} target="_blank" rel="noreferrer">
           ZIP 1016 ↗

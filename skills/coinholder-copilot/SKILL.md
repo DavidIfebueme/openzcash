@@ -28,7 +28,8 @@ Present evidence and uncertainty. Leave the voting decision to the user.
 
 | Question | Source |
 | --- | --- |
-| Published round and original announcement | https://openzcash.org/api/zcg/coinholder/round |
+| Current official submissions, schedule and source status | https://openzcash.org/api/coinholders/proposals |
+| Dated round archive, published outcomes and payouts | https://openzcash.org/api/zcg/coinholder/round |
 | API index and filters | https://openzcash.org/api/zcg |
 | Grant budgets and ZEC payments | https://openzcash.org/api/zcg/data/grants |
 | Normalized recipient totals | https://openzcash.org/api/zcg/data/recipients |
@@ -40,7 +41,17 @@ Present evidence and uncertainty. Leave the voting decision to the user.
 
 ## Check the round's dates
 
-The round endpoint is a curated, dated mirror, not a live poll feed. Read label,
+Start current-round research with /api/coinholders/proposals and its round label,
+announced dates, status and fetchedAt. It includes only open, undecided applications
+from the current intake with the exact label `Ready For Vote - All Steps Completed`.
+Amounts use requestedUsdCents; divide by 100 for USD. Null is unknown, and
+totals.missingAmounts identifies incomplete totals. A stale snapshot is dated evidence;
+HTTP 503 with unavailable status means the source could not be checked, not zero proposals.
+Use each proposal's url for the full application and discussion. A calendar phase
+does not prove voting is live or establish a result.
+
+The older /api/zcg/coinholder/round endpoint is a curated, dated archive, not the
+current intake or a live poll feed. Read label,
 announcedOn, reviewCloses, pollOpens, and sourceThreadUrl inside round. Verify the
 linked FPF announcement and subsequent amendments before calling a review or poll
 open now. A fresh HTTP response does not advance the underlying round.

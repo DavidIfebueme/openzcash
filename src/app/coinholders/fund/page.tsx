@@ -18,6 +18,7 @@ import {
 } from "@/lib/coinholder/fund";
 import { ROUNDS } from "@/lib/coinholder/rounds";
 import { formatPct, formatZec, summarize } from "@/lib/coinholder/derive";
+import { CurrentCycle } from "../cycle-view";
 import { Stat } from "../stat";
 import { Payouts, price } from "./payouts";
 import styles from "../coinholders.module.css";
@@ -52,7 +53,8 @@ const day = (d: Date) =>
 
 export default async function FundPage() {
   const [lock, quote] = await Promise.all([
-    currentLockboxZec(),
+    // The current cycle and published payouts remain useful when the balance source is unavailable.
+    currentLockboxZec().catch(() => null),
     currentZecUsdQuote(),
   ]);
   // Without a snapshot there is no balance or height to show: those cells say so instead of showing zeros.
@@ -181,6 +183,8 @@ export default async function FundPage() {
           }
         />
       </div>
+
+      <CurrentCycle fund />
 
       {pending ? (
         <section className={styles.panel} aria-labelledby="commitments">
@@ -346,11 +350,11 @@ export default async function FundPage() {
           Multisig ↗
         </a>
         <span>
-          Balance: the Coinholder sheet
+          {live ? <>Balance: the Coinholder sheet
           {lock?.snap?.capturedAt
             ? ` of ${day(new Date(lock.snap.capturedAt))}`
             : ""}{" "}
-          plus 0.1875 ZEC a block since.
+          plus 0.1875 ZEC a block since.</> : "Balance unavailable. Check the Coinholder sheet for the latest record."}
         </span>
         <Link href="/lockbox">Live lockbox feed →</Link>
       </p>

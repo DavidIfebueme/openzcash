@@ -22,7 +22,9 @@ export async function GET() {
             "Per-recipient budgets and recorded payments: usd is budgeted; usdPaid and zecPaid count settled entries. ?internal=1 includes internal costs. ?format=csv supported.",
           "/api/zcg/office": "Proposals currently under review.",
           "/api/zcg/coinholder/round":
-            "The open Coinholder-Directed Retroactive Grants round: proposals, requested amounts, key dates, ballot options.",
+            "Dated Coinholder round archive: proposals, published outcomes, tallies and recorded payouts. Check round.label and round.status.",
+          "/api/coinholders/proposals":
+            "Current Coinholder submissions carrying FPF's exact ready-for-vote label, announced schedule and source freshness. Requested amounts are in USD cents, not awards or payments.",
         },
         zechub: {
           "/api/zechub/treasury":

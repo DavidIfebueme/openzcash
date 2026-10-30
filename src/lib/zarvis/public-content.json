@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "sourceRevision": "778cc967ccd151b2",
-  "sourceFiles": 71,
+  "sourceRevision": "2cd48a0f480663aa",
+  "sourceFiles": 72,
   "documents": [
     {
       "id": "src/app/zcg/page.tsx:0",
@@ -163,13 +163,19 @@
       "id": "src/app/zcg/fpf/page.tsx:0",
       "url": "https://openzcash.org/zcg/fpf",
       "title": "zcg · fpf",
-      "text": "Financial Privacy Foundation · program administrator · OpenZcash\nThe Financial Privacy Foundation administers the Coinholder-Directed Retroactive Grants Program: submissions, review, KYC and reporting. Coinholders decide the grants.\nFinancial Privacy Foundation\nSubmit a proposal\nSubmit a milestone\nCoinholder-Directed Retroactive Grants Program\n·\nevery round, outcome and vote tally\n→\nGrants\nTotal paid\nProposals\nCoinholder grants\ngrants · one approved grant per row · amounts in USD with ZEC equivalents tracked in the ledger.\nCoinholder proposals\nproposals · the pipeline upstream of the grants above · only approved proposals become paid grants. Verdicts of closed rounds follow FPF's official results; other rows mirror the spreadsheet."
+      "text": "Financial Privacy Foundation · program administrator · OpenZcash\nThe Financial Privacy Foundation administers the Coinholder-Directed Retroactive Grants Program: submissions, review, KYC and reporting. Coinholders decide the grants.\nFinancial Privacy Foundation\nSubmit a proposal\nSubmit a milestone\nCoinholder-Directed Retroactive Grants Program\n·\nevery round, outcome and vote tally\n→\nCoinholder proposals\ncurrent round\nGrants\nTotal paid\nProposals\nCoinholder grants\ngrants · one approved grant per row · amounts in USD with ZEC equivalents tracked in the ledger.\nproposals · the pipeline upstream of the grants above · only approved proposals become paid grants. Verdicts of closed rounds follow FPF's official results; other rows mirror the spreadsheet."
     },
     {
       "id": "src/app/coinholders/page.tsx:0",
       "url": "https://openzcash.org/coinholders",
       "title": "coinholders",
       "text": "The Coinholder Grants program across every round: participation, grant outcomes, voting value, funding and counting rules.\nCoinholder Grants"
+    },
+    {
+      "id": "src/app/coinholders/proposals/page.tsx:0",
+      "url": "https://openzcash.org/coinholders/proposals",
+      "title": "coinholders · proposals",
+      "text": "Proposals · Coinholder Grants · OpenZcash\nCoinholder grant proposals, requested funding and the current round's schedule.\nProposals\nSubmit proposal\n↗\nproposal(s) have no specified USD amount.\nSources & method\nOpen applications from this round carrying FPF's exact “\n” label. Requested amounts are not awards.\nChecks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.\nGitHub submissions\nChecked"
     },
     {
       "id": "src/app/coinholders/results/page.tsx:0",
@@ -181,7 +187,7 @@
       "id": "src/app/coinholders/activity/page.tsx:0",
       "url": "https://openzcash.org/coinholders/activity",
       "title": "coinholders · activity",
-      "text": "Explore Q3 2026 Coinholder voting activity: recorded casts, daily revealed shares, final ZEC weights and proposal decisions, with verifiable sources.\nCoinholder Grants"
+      "text": "Follow the current Coinholder round and explore recorded casts, revealed shares and final ZEC weights from previous rounds.\nCoinholder Grants\nQ3 2026\nVoting activity"
     },
     {
       "id": "src/app/coinholders/fund/page.tsx:0",
@@ -199,7 +205,7 @@
       "id": "src/app/coinholders/verify/page.tsx:0",
       "url": "https://openzcash.org/coinholders/verify",
       "title": "coinholders · verify",
-      "text": "Every coinholder vote's ZEC per option, ZIP 1016 applied to it and the published outcome, with the vote-chain data, CSV, JSON and a script to check it yourself.\nVerify it yourself\nWhat this checks, and what it does not yet\nChecked here\nZIP 1016's test, applied for comparison only: the poll set the program's terms. It gives the published result for\n.\nZIP 1016 applied to these tallies gives the published outcome for\nCorrections, vetoes and discarded questions are shown where they changed or ended a result.\nNot checked yet\nThe comparison with the vote chain did not run this time: neither server answered. Reload in a few minutes, or run the steps above.\nRe-deriving the finalized summary from the encrypted shares in the vote chain's blocks. This page reads the summary the chain's servers publish; the hash shows you read the same bytes.\nThat each figure here matches the post it comes from: the table is this site's copy of the published totals, not read from the post on each visit. The post is linked above.\nRecounting the ballots themselves. The published seeds let anyone do it with the tools above.\nHow many holders voted: the vote reveals ZEC, not people.\nEvery tally, the rule that decides it and the published outcome, side by side, with the data and commands to check them without trusting this site.\nAll figures\n(\n)\nresults →\nZIP 1016 ↗\n↗"
+      "text": "Every coinholder vote's ZEC per option, ZIP 1016 applied to it and the published outcome, with the vote-chain data, CSV, JSON and a script to check it yourself.\nVerify it yourself\nWhat this checks, and what it does not yet\nChecked here\nZIP 1016's test, applied for comparison only: the poll set the program's terms. It gives the published result for\n.\nZIP 1016 applied to these tallies gives the published outcome for\nCorrections, vetoes and discarded questions are shown where they changed or ended a result.\nNot checked yet\nThe comparison with the vote chain did not run this time: neither server answered. Reload in a few minutes, or run the steps above.\nRe-deriving the finalized summary from the encrypted shares in the vote chain's blocks. This page reads the summary the chain's servers publish; the hash shows you read the same bytes.\nThat each figure here matches the post it comes from: the table is this site's copy of the published totals, not read from the post on each visit. The post is linked above.\nRecounting the ballots themselves. The published seeds let anyone do it with the tools above.\nHow many holders voted: the vote reveals ZEC, not people.\nCheck published tallies against the voting rules, with source data and a reproducible script.\nAll figures\n(\n)\nresults →\nZIP 1016 ↗\n↗"
     },
     {
       "id": "src/app/zcg/treasury-calculator/page.tsx:0",
@@ -403,7 +409,7 @@
       "id": "src/app/zcg/coinholder/copilot/page.tsx:0",
       "url": "https://openzcash.org/zcg/coinholder/copilot",
       "title": "zcg · coinholder · copilot",
-      "text": "Coinholder Copilot · OpenZcash\nResearch Coinholder grant proposals and funding history in your AI assistant. Start without installation, save instructions, or add an optional agent skill.\nRound mirror\nOpenZcash ledger\nPrior rounds\nFPF GitHub + forum\nCoinholder Copilot\nResearch applications, evidence and funding history before voting.\nResearch retroactive grant proposals with your own AI assistant. Compare submitted evidence, prior rounds, and recorded payments. Check the sources and make your own voting decision.\nThe skill also encodes the round's real traps: repeat submissions at higher asks, same-org multiple proposals, third-party bonus nominations, announcement-vs-spreadsheet drift, and the difference between coinholder approval and actual payment. It lays out the evidence and never tells you how to vote. Methodology:\nhow we compute this\n."
+      "text": "Coinholder Copilot · OpenZcash\nResearch Coinholder grant proposals and funding history in your AI assistant. Start without installation, save instructions, or add an optional agent skill.\nCurrent proposals\nOpenZcash ledger\nPrior rounds\nFPF GitHub + forum\nCoinholder Copilot\nResearch applications, evidence and funding history before voting.\nResearch retroactive grant proposals with your own AI assistant. Compare submitted evidence, prior rounds, and recorded payments. Start with the\nproposals\nand check the sources before making your voting decision.\nThe skill also encodes the round's real traps: repeat submissions at higher asks, same-org multiple proposals, third-party bonus nominations, announcement-vs-spreadsheet drift, and the difference between coinholder approval and actual payment. It lays out the evidence and never tells you how to vote. Methodology:\nhow we compute this\n."
     },
     {
       "id": "src/app/ecosystem/history/page.tsx:0",
@@ -3614,6 +3620,12 @@
       "title": "Zarvis guide · badges, try-these questions, answer anatomy, depth",
       "text": "The interactive guide at /zarvis/guide teaches the Zarvis chat by showing it. Live badge samples rendered by the same code as the chat say where an answer came from: Direct from OpenZcash data · no AI, or a model answer naming the model and counting its sources. Try these questions links open /zarvis with the composer pre-filled; nothing is sent until the visitor presses send. An annotated sample answer marks the badge, the sources list, the withheld-figure notice and the copy/share actions. Quick answers are written within 55 seconds and Deep analysis within 110; quotas, retention and limits stay on /zarvis/about.",
       "url": "https://openzcash.org/zarvis/guide"
+    },
+    {
+      "id": "guide:coinholder-proposals-guide",
+      "title": "Coinholder Grants · Proposals",
+      "text": "The permanent Proposals page at /coinholders/proposals shows the current round, Q4 2026. It lists open applications from the Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram GitHub repository with the exact label Ready For Vote - All Steps Completed, created from October 30 through December 31, 2026. Decided, withdrawn and cancelled applications are excluded. Search by title, applicant or organization, filter by category and sort by amount or date. View proposal opens the full application inside OpenZcash; its GitHub link opens the source and discussion. The FPF schedule accepts proposals October 30–November 13, reviews November 16–December 16 and schedules voting December 17–29, 2026. Each closing deadline is 20:00 UTC. Official submission status is not approval, payment or a vote result. Counts, requested USD and labels are checked on access with a five-minute cache. A stale or unavailable source is marked explicitly; an unavailable source does not mean zero proposals. This static guide cannot establish current proposal counts or funding totals; consult the page and its last successful check. Sources & method contains the exact eligibility label and source link. The page refreshes every five minutes while visible; Refresh also checks the current cached list. Results, Voting activity and Verify default to the active cycle, Q4 2026, with a pending state and the same announced timeline. Q3 and earlier outcomes are selected by round; activity archives currently cover Q3 2026 only. Q4 has no published result, vote-chain tally or verification yet. The program overview and fund show the current cycle separately from historical approvals and payments. FPF announces quarterly cycles; later dates are not inferred automatically.",
+      "url": "https://openzcash.org/coinholders/proposals"
     }
   ]
 }

@@ -22,7 +22,7 @@ export function mergeCoinholderRefresh(previous: CoinholderDashboard, next: Coin
   };
 }
 
-export function CoinholderDashboardView({ initial }: { initial: CoinholderDashboard }) {
+export function CoinholderDashboardView({ initial, embedded = false, navigation }: { initial: CoinholderDashboard; embedded?: boolean; navigation?: ReactNode }) {
   const [data, setData] = useState(initial);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -77,8 +77,8 @@ export function CoinholderDashboardView({ initial }: { initial: CoinholderDashbo
   const sourceLabel = data.source.state === "snapshot" || error ? "Saved snapshot" : "Sources matched";
 
   return <div className="coinholder-analytics"><div className="coin-workspace">
-    <header className="coin-header">
-      <div><h1>Coinholder activity</h1><p>Q3 2026 <span aria-hidden="true">/</span> Retroactive grants</p></div>
+    <header className="coin-header" data-embedded={embedded || undefined}>
+      {embedded ? navigation : <div><h1>Coinholder activity</h1><p>Q3 2026 <span aria-hidden="true">/</span> Retroactive grants</p></div>}
       <div className="coin-source-control">
         <span className="coin-badge coin-badge--final">Finalized</span>
         <button type="button" className="coin-refresh" disabled={refreshing} onClick={() => void refresh()} aria-label="Refresh Coinholder sources" title="Refresh sources">

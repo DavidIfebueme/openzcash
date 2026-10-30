@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ACTIVE_CYCLE } from "@/lib/coinholder/cycles";
 import { CopilotPage } from "@/components/copilot/copilot-page";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 
@@ -12,7 +13,7 @@ export const metadata = pageMetadata({
 
 const USE_CASES = [
   {
-    q: "Run diligence on proposal #21 before I vote.",
+    q: "Review a current proposal before I vote.",
     a: "The ask, the claimed work, prior round verdicts, ledger history, announcement-vs-spreadsheet drift, and the open questions worth taking to the forum thread.",
   },
   {
@@ -31,8 +32,8 @@ const USE_CASES = [
 
 const SOURCES = [
   {
-    name: "Round mirror",
-    desc: "A dated record of proposals, asks, and ballot options from FPF's announcement. Check its dates before treating the round as open.",
+    name: "Current proposals",
+    desc: "Official submissions carrying FPF's ready-for-vote label. The current round is in progress; check the announced dates and published ballot before voting.",
   },
   {
     name: "OpenZcash ledger",
@@ -40,7 +41,7 @@ const SOURCES = [
   },
   {
     name: "Prior rounds",
-    desc: "The Coinholder proposals tab: rejections, withdrawals and late submissions that never reach the ledger.",
+    desc: "The Results archive: published outcomes, rejections and withdrawals from previous rounds.",
   },
   {
     name: "FPF GitHub + forum",
@@ -58,7 +59,8 @@ export default function CoinholderCopilotPage() {
         <>
           Research retroactive grant proposals with your own AI assistant.
           Compare submitted evidence, prior rounds, and recorded payments.
-          Check the sources and make your own voting decision.
+          Start with the <Link href={ACTIVE_CYCLE.href}>{ACTIVE_CYCLE.label} proposals</Link> and
+          check the sources before making your voting decision.
         </>
       }
       examples={USE_CASES}

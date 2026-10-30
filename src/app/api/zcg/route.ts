@@ -13,7 +13,9 @@ export async function GET() {
       "/api/zcg/data/grants":
         "Per-grant aggregation (milestones, paid, status). ?format=csv for CSV.",
       "/api/zcg/coinholder/round":
-        "Open Coinholder-Directed Retroactive Grants review round: proposals, requested amounts, key dates, ballot options.",
+        "Dated Coinholder round archive: proposals, published outcomes, tallies and recorded payouts. Check round.label and round.status.",
+      "/api/coinholders/proposals":
+        "Current Coinholder submissions with FPF's exact ready-for-vote label, announced schedule and source freshness. Requested amounts are in USD cents, not awards or payments.",
       "/api/zcg/office":
         "Published proposals under review (D-1): GitHub applications reconciled with next-day published decisions. Returns { proposals: [...] }, capped at 100.",
     },

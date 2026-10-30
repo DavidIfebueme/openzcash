@@ -92,6 +92,7 @@ export const APPS: AppDef[] = [
     icon: "grant",
     pages: [
       { href: "/coinholders", label: "Program overview", mark: "/logos/glyphs/overview.png" },
+      { href: "/coinholders/proposals", label: "Proposals", mark: "/logos/glyphs/proposals.png" },
       { href: "/coinholders/results", label: "Results", mark: "/logos/glyphs/decisions.png" },
       { href: "/coinholders/activity", label: "Voting activity", mark: "/logos/glyphs/insights.png" },
       // Keep verification beside the results and activity it checks.
@@ -256,6 +257,8 @@ export type Place = {
 export function placeOf(pathname: string): Place | undefined {
   const detail = DETAILS[pathname] ?? (/^\/ecosystem\/history\/[a-z0-9-]+$/.test(pathname)
     ? { parent: "/ecosystem/history", label: "Project history" }
+    : /^\/coinholders\/proposals\/[1-9]\d*$/.test(pathname)
+    ? { parent: "/coinholders/proposals", label: "Proposal detail" }
     : /^\/coinholders\/verify\/[a-z0-9-]+\/[^/]+$/.test(pathname)
     ? { parent: "/coinholders/verify", label: "Proposal detail" }
     : undefined);
@@ -267,8 +270,10 @@ export function placeOf(pathname: string): Place | undefined {
     const page = app.pages.find((p) => pathOf(p.href) === target);
     if (pathOf(app.href) === target && !detail) return { app };
     if (page) {
+      const round = pathname.match(/^\/coinholders\/verify\/([a-z0-9-]+)\/[^/]+$/)?.[1];
+      const parent = round ? { ...page, href: `${page.href}?round=${round}` } : page;
       return detail
-        ? { app, page, detail: { parent: page, label: detail.label } }
+        ? { app, page, detail: { parent, label: detail.label } }
         : { app, page };
     }
   }

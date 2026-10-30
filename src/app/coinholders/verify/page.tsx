@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ACTIVE_CYCLE, cycleHref, roundParam } from "@/lib/coinholder/cycles";
+import { CycleTab, PendingCycle } from "../cycle-view";
 import { formatZec } from "@/lib/coinholder/derive";
 import { PROGRAM } from "@/lib/coinholder/program";
 import {
@@ -35,8 +37,6 @@ import own from "./verify.module.css";
 // The latest round is compared live with the vote chain (cached in-process for an hour).
 export const dynamic = "force-dynamic";
 
-const LATEST = VERIFIABLE_ROUNDS[0];
-const LATEST_COUNTS = verifyRound(LATEST).counts;
 /** The program's name as the sidebar gives it ("Coinholder Grants"). */
 const PROGRAM_LABEL =
   APPS.find((a) => a.id === "coinholders")?.label ?? PROGRAM.officialName;
@@ -49,19 +49,16 @@ export const metadata = pageMetadata({
   card: {
     title: "Verify it yourself",
     kicker: "Every tally, the ZIP 1016 rule and the published outcome",
-    stat: `${LATEST.label} · ${LATEST_COUNTS.ruleAgrees} of ${LATEST_COUNTS.ruleChecked} checks pass`,
+    stat: `${ACTIVE_CYCLE.label} · In progress`,
   },
 });
 
-const verifyHref = (id: string) =>
-  id === LATEST.id ? "/coinholders/verify" : `/coinholders/verify?round=${id}`;
-const resultsHref = (id: string) =>
-  id === LATEST.id
-    ? "/coinholders/results"
-    : `/coinholders/results?round=${id}`;
+const verifyHref = (id: string) => cycleHref("verify", id);
+const resultsHref = (id: string) => cycleHref("results", id);
 function RoundTabs({ current }: { current: string }) {
   return (
     <RoundTabsNav current={current}>
+      <CycleTab view="verify" current={current} />
       {VERIFIABLE_ROUNDS.map((r) => (
         <Link
           key={r.id}
@@ -185,8 +182,15 @@ export default async function VerifyPage({
   searchParams: Promise<{ round?: string | string[] }>;
 }) {
   const { round: param } = await searchParams;
-  const round =
-    findVerifiableRound(Array.isArray(param) ? param[0] : param) ?? LATEST;
+  const id = roundParam(param);
+  const round = id ? findVerifiableRound(id) : undefined;
+  if (!round) {
+    return <div className={styles.page}>
+      <header className={styles.head}><h1 className={styles.title}>Verify it yourself</h1></header>
+      <RoundTabs current={ACTIVE_CYCLE.id} />
+      <PendingCycle view="verify" />
+    </div>;
+  }
   const chainId = VOTE_CHAIN_ROUNDS[round.id];
   const live = chainId ? await fetchVoteSummary(chainId) : null;
   const check = verifyRound(round, live?.ok ? live.summary : null);
@@ -198,9 +202,8 @@ export default async function VerifyPage({
       <header className={styles.head}>
         <h1 className={styles.title}>Verify it yourself</h1>
         <p className={styles.lede}>
-          Every tally, the rule that decides it and the published outcome, side
-          by side, with the data and commands to check them without trusting
-          this site.
+          Check published tallies against the voting rules, with source data
+          and a reproducible script.
         </p>
       </header>
       <RoundTabs current={round.id} />

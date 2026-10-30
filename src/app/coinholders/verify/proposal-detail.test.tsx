@@ -112,7 +112,7 @@ describe("proposal detail route", () => {
       for (const proposal of round.proposals) {
         const href = proposalVerifyHref(round.id, proposal.id);
         expect(html).toContain(`href="${href}"`);
-        expect(backOf(href)).toEqual({ href: "/coinholders/verify", label: "Verify it yourself" });
+        expect(backOf(href)).toEqual({ href: `/coinholders/verify?round=${round.id}`, label: "Verify it yourself" });
       }
     }
   });

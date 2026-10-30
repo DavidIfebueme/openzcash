@@ -314,7 +314,7 @@ export function AppShell({
                   <>
                     <span aria-hidden>›</span>
                     {place.detail ? (
-                      <Link href={place.page.href}>{place.page.label}</Link>
+                      <Link href={place.detail.parent.href}>{place.page.label}</Link>
                     ) : (
                       <span>{place.page.label}</span>
                     )}

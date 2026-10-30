@@ -30,7 +30,7 @@ vi.mock("@/lib/coinholder/vote-chain", () => chain);
 
 import Page, { metadata } from "./page";
 
-const render = async (round?: string) =>
+const render = async (round = "q3-2026") =>
   renderToStaticMarkup(
     await Page({ searchParams: Promise.resolve(round ? { round } : {}) }),
   );
@@ -44,7 +44,7 @@ beforeEach(() => {
 });
 
 describe("Verify it yourself", () => {
-  it("checks Q3 2026 against the live vote chain by default, with the hash, host and time of the fetch", async () => {
+  it("checks an explicitly selected Q3 2026 against the live vote chain, with the hash, host and time of the fetch", async () => {
     const html = await render();
     expect(chain.fetchVoteSummary).toHaveBeenCalledWith(Q3_ID);
     // The verdict: every result checks out, in the positive colour, with its three checks.
@@ -283,15 +283,17 @@ describe("Verify it yourself", () => {
     );
   });
 
-  it("falls back to the latest round for a round that held no vote", async () => {
-    expect(await render("q2-2026")).toContain(HASH);
+  it("does not silently verify Q3 for an unsupported round", async () => {
+    const html = await render("q2-2026");
+    expect(html).not.toContain(HASH);
+    expect(chain.fetchVoteSummary).not.toHaveBeenCalled();
   });
 
-  it("shares a card with the latest round's checks", () => {
+  it("shares a card for the pending current round", () => {
     const [image] = metadata.openGraph?.images as { url: string }[];
     expect(
       new URL(image.url, "https://openzcash.org").searchParams.get("n"),
-    ).toBe("Q3 2026 · 37 of 37 checks pass");
+    ).toBe("Q4 2026 · In progress");
     expect(metadata.openGraph).toMatchObject({ url: "/coinholders/verify" });
   });
 });

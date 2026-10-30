@@ -299,7 +299,7 @@
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface2);
-  color: var(--dim);
+  color: var(--muted);
   font: inherit;
   font-size: 13px;
   text-align: left;
@@ -340,13 +340,13 @@
 }
 .rd-button-primary {
   border-color: transparent;
-  background: var(--accent);
-  color: #ffffff;
+  background: var(--accent-ink);
+  color: var(--surface);
   font-weight: 500;
 }
 .rd-button-primary:hover {
-  background: var(--accent-ink);
-  color: #ffffff;
+  background: color-mix(in srgb, var(--accent-ink) 90%, var(--ink));
+  color: var(--surface);
 }
 .rd-icon-button {
   display: inline-flex;

@@ -18,6 +18,8 @@
 /* coinholder */
 .coinholder-analytics .coin-workspace { --coin-accept: var(--pos); --coin-reject: var(--neg); --coin-lower: var(--accent); --coin-abstain: var(--dim); }
 .coinholder-analytics .coin-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 10px 0 28px; }
+.coinholder-analytics .coin-header[data-embedded] { align-items: flex-start; padding: 0 0 22px; }
+.coinholder-analytics .coin-header[data-embedded] nav { margin: 0; }
 .coinholder-analytics .coin-header h1 { font-size: 34px; line-height: 1.25; letter-spacing: -.045em; margin-top: 3px; }
 .coinholder-analytics .coin-header > div > p:last-child { color: var(--muted); font-size: 13px; margin-top: 7px; }
 .coinholder-analytics .coin-header > div > p > span { margin: 0 8px; color: var(--dim); }

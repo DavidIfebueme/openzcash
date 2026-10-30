@@ -14,7 +14,7 @@ beforeEach(() => reader.readCoinholderDashboard.mockResolvedValue({ round: { id:
 
 describe("Coinholders analytics entry", () => {
   it("mounts historical analytics within the native OpenZcash page", async () => {
-    const html = renderToStaticMarkup(await Page());
+    const html = renderToStaticMarkup(await Page({ searchParams: Promise.resolve({ round: "q3-2026" }) }));
     expect(html).toContain('data-round="q3-2026"');
     expect(html).toContain("Voting activity");
     expect(html).not.toMatch(/Sign in|Community navigation|Sub-DAOs/);

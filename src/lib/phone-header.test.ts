@@ -116,7 +116,7 @@ describe("phoneHeaderOf", () => {
 
   it("uses the back destination as the parent line on every nested route", () => {
     const hrefs = APPS.flatMap((app) => [app.href, ...app.pages.map((page) => page.href)]);
-    for (const href of [...hrefs, "/zcg/grant", "/ecosystem/history/zaino"]) {
+    for (const href of [...hrefs, "/zcg/grant", "/ecosystem/history/zaino", "/coinholders/verify/q3-2026/55"]) {
       const header = phoneHeaderOf(placeOf(href));
       if (header?.over?.href) expect(header.over, href).toEqual(backOf(href));
     }
