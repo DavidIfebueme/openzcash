@@ -7,10 +7,13 @@
 .roundHead { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 16px 20px; }
 .phase { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; color: var(--accent-ink); line-height: 1.5; }
 .phase::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.metrics { display: flex; align-items: center; gap: 22px; margin: 0; }
-.metrics > div { display: grid; gap: 3px; text-align: right; }
-.metrics dt { color: var(--muted); font-size: 12px; }
-.metrics dd { margin: 0; color: var(--ink); font-size: 24px; font-weight: 500; line-height: 1.2; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.metrics { display: grid; grid-template-columns: minmax(96px, .8fr) minmax(0, 1.5fr); flex: 0 1 300px; margin: 0; padding: 8px 0; border: 1px solid var(--line); border-radius: 6px; background: var(--surface2); }
+.metrics > div { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-width: 0; padding: 0 14px; text-align: center; }
+.metrics > div + div { border-left: 1px solid var(--line-strong); }
+.metrics dt { color: var(--muted); font-size: 11px; font-weight: 500; line-height: 1.5; }
+.metrics dd { margin: 0; color: var(--ink); font-family: var(--font-geist-mono), monospace; font-size: 22px; font-weight: 500; line-height: 1.25; letter-spacing: -.7px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.metrics dd small { color: var(--muted); font-family: var(--font-geist), sans-serif; font-size: 10px; font-weight: 500; letter-spacing: 0; }
+.metrics dd.metricFallback { font-family: var(--font-geist), sans-serif; font-size: 13px; letter-spacing: 0; white-space: normal; }
 .method a, .detailBar a { color: var(--accent-ink); }
 .method a:hover, .detailBar a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .amountNote { margin: -6px 24px 16px; font-size: 12px; color: var(--muted); }
@@ -81,7 +84,6 @@
 .markdown blockquote { margin: 12px 0; padding-left: 16px; border-left: 2px solid var(--line-strong); color: var(--muted); }
 @container coinholders (max-width: 760px) {
   .roundHead { gap: 16px; padding: 16px 20px; }
-  .metrics { gap: 22px; }
   .filters { grid-template-columns: minmax(0, 1fr) 180px 150px; }
   .provenance { flex-wrap: wrap; }
   .detailHead { grid-template-columns: minmax(0, 1fr) 160px; gap: 22px; }
@@ -90,11 +92,10 @@
 @container coinholders (max-width: 560px) {
   .head { gap: 12px; margin-bottom: 18px; }
   .primary { min-height: 44px; padding: 8px 12px; }
-  .roundHead { display: grid; gap: 12px; padding: 16px; }
-  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .metrics { padding-top: 12px; border-top: 1px solid var(--line); }
-  .metrics > div { text-align: left; }
-  .metrics dd { font-size: 22px; }
+  .roundHead { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 16px; }
+  .metrics { width: 100%; }
+  .metrics > div { padding-inline: 10px; }
+  .metrics dd { font-size: 20px; }
   .filters { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
   .filters .search { grid-column: 1 / -1; }
   .filters input:not(#_), .filters select:not(#_) { font-size: 16px; }

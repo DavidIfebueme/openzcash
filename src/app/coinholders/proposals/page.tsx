@@ -17,6 +17,7 @@ export default async function ProposalsPage() {
   const phase = q4Phase();
   const proposals = snapshot.proposals?.map(q4Summary) ?? null;
   const totals = proposals === null ? null : q4Totals(proposals);
+  const amountUnspecified = totals !== null && totals.missingAmounts > 0 && totals.missingAmounts === proposals?.length;
   return (
     <div className={`${base.page} ${styles.page}`}>
       <SourceRefresh intervalMs={300_000} />
@@ -29,8 +30,16 @@ export default async function ProposalsPage() {
         <div className={styles.roundHead}>
           <CycleBrand id="current-round" />
           <dl className={styles.metrics}>
-            <div><dt>Proposals</dt><dd>{proposals === null ? "Unavailable" : proposals.length}</dd></div>
-            <div><dt>{totals?.missingAmounts ? "Known requests · USD" : "Requested · USD"}</dt><dd>{totals === null ? "Unavailable" : totals.missingAmounts === proposals?.length && totals.missingAmounts > 0 ? "Not specified" : q4Usd(totals.requestedUsdCents)}</dd></div>
+            <div>
+              <dt>Proposals</dt>
+              <dd className={proposals === null ? styles.metricFallback : undefined}>{proposals === null ? "Unavailable" : proposals.length}</dd>
+            </div>
+            <div>
+              <dt>{totals?.missingAmounts ? "Known requests" : "Total requested"}</dt>
+              <dd className={totals === null || amountUnspecified ? styles.metricFallback : undefined}>
+                {totals === null ? "Unavailable" : amountUnspecified ? "Not specified" : <>{q4Usd(totals.requestedUsdCents)}<small> USD</small></>}
+              </dd>
+            </div>
           </dl>
         </div>
         {totals?.missingAmounts ? <p className={styles.amountNote}>{totals.missingAmounts} proposal(s) have no specified USD amount.</p> : null}
