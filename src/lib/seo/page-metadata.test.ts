@@ -218,7 +218,7 @@ describe("pageMetadata: share title", () => {
 });
 
 describe("pageMetadata: kicker", () => {
-  it("borrows the lead of the description on an inner page", () => {
+  it("keeps the SEO description out of the image unless a caption is explicitly provided", () => {
     const card = cardOf(
       pageMetadata({
         title: "Decisions · ZCG · OpenZcash",
@@ -227,9 +227,7 @@ describe("pageMetadata: kicker", () => {
         path: "/zcg/decisions",
       }),
     );
-    expect(card.get("k")).toBe(
-      "Every verdict the Zcash Community Grants committee has taken on a grant proposal",
-    );
+    expect(card.has("k")).toBe(false);
   });
 
   it("prefers a page's own kicker, then the app's one-liner on its landing page", () => {

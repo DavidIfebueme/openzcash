@@ -36,7 +36,7 @@ describe("text blocks", () => {
 
 describe("titleSize", () => {
   it("sets short titles large", () => {
-    expect(titleSize({ title: "Grants" })).toBe(76);
+    expect(titleSize({ title: "Grants" })).toBe(96);
     expect(
       titleSize({ title: "ZODL Q1 & Q2 2026 Core Protocol Development" }),
     ).toBe(76);
@@ -53,7 +53,7 @@ describe("titleSize", () => {
     ).toBe(58);
   });
 
-  it("allows three lines at 58px only when the rest of the card leaves room", () => {
+  it("keeps long titles legible when the category and figure move outside the body", () => {
     const title =
       "Taylor Hornby - Bonus Grant for Orchard Counterfeiting Vulnerability Bug Bounty";
     expect(
@@ -66,7 +66,7 @@ describe("titleSize", () => {
         kicker: "k".repeat(CARD_LIMITS.kicker),
         stat: "1 of 1 milestone paid",
       }),
-    ).toBe(50);
+    ).toBe(58);
   });
 
   it("sets the site card larger than any page card", () => {

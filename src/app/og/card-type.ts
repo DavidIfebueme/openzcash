@@ -18,18 +18,19 @@ export const TITLE_LEADING = 1.08;
 export const TITLE_MAX_LINES = 3;
 
 export const BAND_HEIGHT = 116;
-/** Breathing room above the centred body. */
+/** Breathing room above the title area. */
 export const BODY_TOP = 32;
-/** The footer line that carries the domain, under the centred body. */
-export const FOOTER_HEIGHT = 76;
+export const BODY_BOTTOM = 28;
+export const ACCENT = { height: 4, gap: 26 } as const;
+/** The footer carries the domain and an optional figure or round label. */
+export const FOOTER_HEIGHT = 96;
 
 /** Vertical rhythm of the body, shared with the card so the title budget matches what is drawn. */
 export const BODY = {
   /** Height left under the band, after the top offset and a bottom margin. */
-  height: CARD_SIZE.height - BAND_HEIGHT - BODY_TOP - FOOTER_HEIGHT,
-  eyebrow: { fontSize: 32, leading: 1.2, gap: 14 },
-  kicker: { fontSize: 36, leading: 1.3, gap: 22, lines: 2 },
-  stat: { fontSize: 38, leading: 1.2, gap: 30 },
+  height: CARD_SIZE.height - BAND_HEIGHT - BODY_TOP - BODY_BOTTOM - ACCENT.height - ACCENT.gap - FOOTER_HEIGHT,
+  kicker: { fontSize: 30, leading: 1.35, gap: 24, lines: 2 },
+  stat: { fontSize: 26, leading: 1.2 },
 } as const;
 
 /** Average advance of Inter Medium at the title's tracking, in ems. */
@@ -56,17 +57,15 @@ export type CardLayoutText = {
   section?: string;
 };
 
-/** Height the title may take once the eyebrow, kicker and stat have theirs. */
-function titleBudget({ kicker, stat, section }: CardLayoutText): number {
-  const { eyebrow, kicker: k, stat: s } = BODY;
+/** Category and figure live outside the title area; only the kicker shares it. */
+function titleBudget({ kicker }: CardLayoutText): number {
+  const { kicker: k } = BODY;
   const kickerLines = kicker
     ? Math.min(k.lines, estimatedLines(kicker, k.fontSize, KICKER_EM))
     : 0;
   return (
     BODY.height -
-    (section ? eyebrow.fontSize * eyebrow.leading + eyebrow.gap : 0) -
-    (kicker ? k.gap + kickerLines * k.fontSize * k.leading : 0) -
-    (stat ? s.gap + s.fontSize * s.leading : 0)
+    (kicker ? k.gap + kickerLines * k.fontSize * k.leading : 0)
   );
 }
 
@@ -76,6 +75,7 @@ function titleBudget({ kicker, stat, section }: CardLayoutText): number {
  */
 export function titleSize(text: CardLayoutText, site = false): number {
   if (site) return SITE_TITLE;
+  if (estimatedLines(text.title, SITE_TITLE, TITLE_EM) === 1) return SITE_TITLE;
   const two = TITLE_SIZES.find((s) => estimatedLines(text.title, s, TITLE_EM) <= 2);
   if (two) return two;
   const three = TITLE_SIZES[TITLE_SIZES.length - 1];

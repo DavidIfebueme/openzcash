@@ -111,6 +111,20 @@ describe("cardImagePath", () => {
 });
 
 describe("readCardParams", () => {
+  it("shows a category only once across legacy preview fields", () => {
+    const params = new URLSearchParams({ t: "Proposals", s: "Coinholder Grants", n: "coinholder grants.", k: " PROPOSALS " });
+    expect(readCardParams(params)).toEqual({ title: "Proposals", section: "Coinholder Grants" });
+    const written = new URL(cardImagePath({ title: "Proposals", section: "Coinholder Grants", stat: "Coinholder Grants" }), "https://x.test");
+    expect(written.searchParams.has("n")).toBe(false);
+  });
+
+  it("preserves a distinct round or amount alongside its category", () => {
+    expect(readCardParams(new URLSearchParams({ t: "Proposals", s: "Coinholder Grants", n: "Q4 2026" })))
+      .toEqual({ title: "Proposals", section: "Coinholder Grants", stat: "Q4 2026" });
+    expect(readCardParams(new URLSearchParams({ t: "10%", n: "$10" })))
+      .toEqual({ title: "10%", stat: "$10" });
+  });
+
   it("round-trips what cardImagePath writes", () => {
     const card = {
       title: "Decisions",

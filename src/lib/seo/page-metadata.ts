@@ -33,8 +33,8 @@ export type PageCard = {
   /** Large text on the card; defaults to the share title minus its app. */
   title?: string;
   /**
-   * One short line under the title; defaults to the app's one-liner on its
-   * landing page, and elsewhere to the lead of the page's description.
+   * One short line under the title; defaults only to the app's one-liner on
+   * its landing page. Page descriptions stay in the link's text metadata.
    */
   kicker?: string;
   /** A headline figure, shown in gold; only static, source-backed values. */
@@ -156,8 +156,7 @@ function cardFor(input: PageMetadataInput, ogTitle: string): CardText {
   // An app's landing page borrows the sidebar's one-liner and its block-reward share.
   const landing =
     place && !place.page && input.path === place.app.href ? place.app : undefined;
-  const kicker =
-    input.card?.kicker ?? landing?.sub ?? descriptionLead(input.description);
+  const kicker = input.card?.kicker ?? landing?.sub;
   return {
     title,
     kicker: kicker === title ? undefined : kicker,

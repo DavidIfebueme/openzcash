@@ -10,7 +10,7 @@ import base from "../coinholders.module.css";
 import styles from "./proposals.module.css";
 
 export const dynamic = "force-dynamic";
-export const metadata = pageMetadata({ title: "Proposals · Coinholder Grants · OpenZcash", description: "Coinholder grant proposals, requested funding and the current round's schedule.", path: Q4.href, card: { title: "Proposals", stat: "Coinholder Grants" } });
+export const metadata = pageMetadata({ title: "Proposals · Coinholder Grants · OpenZcash", description: "Coinholder grant proposals, requested funding and the current round's schedule.", path: Q4.href, card: { title: "Proposals", kicker: "Explore funding requests for the next vote.", stat: Q4.label } });
 
 export default async function ProposalsPage() {
   const snapshot = await readQ4();

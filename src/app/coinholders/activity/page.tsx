@@ -14,7 +14,7 @@ export const metadata = pageMetadata({
   title: `Voting activity · ${PROGRAM.officialName} · OpenZcash`,
   description: "Follow the current Coinholder round and explore recorded casts, revealed shares and final ZEC weights from previous rounds.",
   path: "/coinholders/activity",
-  card: { title: "Coinholder Grants" },
+  card: { title: "Voting activity", stat: ACTIVE_CYCLE.label },
 });
 
 // Activity archives only exist for Q3; other historical rounds remain in Results and Verify.

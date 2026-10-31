@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "0c15c8ca796ae551",
+  "sourceRevision": "2a73a8134506af5c",
   "sourceFiles": 72,
   "documents": [
     {
@@ -187,7 +187,7 @@
       "id": "src/app/coinholders/activity/page.tsx:0",
       "url": "https://openzcash.org/coinholders/activity",
       "title": "coinholders · activity",
-      "text": "Follow the current Coinholder round and explore recorded casts, revealed shares and final ZEC weights from previous rounds.\nCoinholder Grants\nQ3 2026\nVoting activity"
+      "text": "Follow the current Coinholder round and explore recorded casts, revealed shares and final ZEC weights from previous rounds.\nVoting activity\nQ3 2026"
     },
     {
       "id": "src/app/coinholders/fund/page.tsx:0",

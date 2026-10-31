@@ -8,7 +8,7 @@
 export const CARD_ROUTE = "/og";
 
 /** Bumped when the card design changes, so chat apps fetch the new image. */
-export const CARD_VERSION = "2";
+export const CARD_VERSION = "3";
 
 export const CARD_SIZE = { width: 1200, height: 630 } as const;
 
@@ -96,11 +96,28 @@ export function cleanCardText(raw: unknown, max: number): string | undefined {
   return `${head.replace(TRAILING_PUNCTUATION, "")}…`;
 }
 
+/** Keep each label in one place, including older or manually composed card URLs. */
+export function distinctCardText(card: CardText): CardText {
+  const key = (text: string) => text.normalize("NFKC").toLowerCase().replace(/\s+/gu, " ").trim().replace(/[.!?]+$/u, "");
+  const seen = new Set([key(card.title), "openzcash"]);
+  const result: CardText = { title: card.title };
+  for (const field of ["section", "stat", "kicker"] as const) {
+    const value = card[field];
+    if (!value) continue;
+    const normalized = key(value);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    result[field] = value;
+  }
+  return result;
+}
+
 /** Relative URL of a page's card; `null` is the site card. */
 export function cardImagePath(card: CardText | null): string {
-  const fields = card
+  const text = card ? distinctCardText(card) : null;
+  const fields = text
     ? (["title", "kicker", "stat", "section"] as const).flatMap((key) => {
-        const value = cleanCardText(card[key], CARD_LIMITS[key]);
+        const value = cleanCardText(text[key], CARD_LIMITS[key]);
         return value ? [[PARAM[key], value]] : [];
       })
     : [];
@@ -118,5 +135,5 @@ export function readCardParams(params: URLSearchParams): CardText | null {
     const value = read(key);
     return value ? [[key, value] as const] : [];
   });
-  return { title, ...Object.fromEntries(optional) };
+  return distinctCardText({ title, ...Object.fromEntries(optional) });
 }
