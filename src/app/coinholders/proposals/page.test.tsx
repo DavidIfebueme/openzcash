@@ -5,6 +5,7 @@ import { Q4 } from "@/lib/coinholder/q4";
 import config from "../../../../next.config";
 const reader = vi.hoisted(() => ({ readQ4: vi.fn() }));
 vi.mock("@/lib/coinholder/q4-server", () => reader);
+vi.mock("@/lib/coinholder/zcg-history-server", () => ({ readZcgHistory: vi.fn().mockResolvedValue({}) }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }), notFound: () => { throw new Error("NEXT_NOT_FOUND"); } }));
 import Page from "./page";
 import Detail from "./[number]/page";

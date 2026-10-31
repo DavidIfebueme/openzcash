@@ -3,9 +3,31 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Q4, q4Usd, type Q4ProposalSummary } from "@/lib/coinholder/q4";
+import type { PriorZcg } from "@/lib/coinholder/zcg-history";
 import styles from "./proposals.module.css";
 
-export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
+function RequestedAmount({ cents }: { cents: number | null }) {
+  const text = cents === null ? "Not specified" : q4Usd(cents);
+  // Nine characters fit at the display size; longer amounts keep their full precision.
+  const style = cents === null ? undefined : { fontSize: 25 * Math.min(1, 9 / text.length) };
+  return <strong className={cents === null ? styles.requestFallback : undefined} style={style}>{text}</strong>;
+}
+
+function ZcgHistory({ history = { status: "unavailable" }, title }: { history?: PriorZcg; title: string }) {
+  const detail = history.status === "confirmed"
+    ? `${history.basis === "proposal" ? "Previously approved by ZCG" : "Prior ZCG funding or approval for this applicant"}: ${history.title} (${history.recipient})`
+    : history.status === "unavailable" ? "ZCG history could not be fully checked" : "No prior ZCG approval or grant confirmed for this applicant";
+  return <div className={styles.zcgHistory}>
+    <span className={styles.zcgLabel} title="Previous Zcash Community Grants approval or funding">ZCG</span>
+    {history.status === "confirmed"
+      ? <Link className={styles.zcgCheck} href={history.href} title={detail} aria-label={`${detail} — ${title}`}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="m5 12 4 4L19 6" /></svg>
+        </Link>
+      : <span className={styles.zcgUnknown} tabIndex={0} title={detail} aria-label={`${detail} — ${title}`}>{history.status === "unavailable" ? "?" : "—"}</span>}
+  </div>;
+}
+
+export function Proposals({ proposals, zcgHistory = {} }: { proposals: Q4ProposalSummary[]; zcgHistory?: Record<number, PriorZcg> }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("newest");
@@ -42,12 +64,16 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
             {p.summary ? <p className={styles.summary}>{p.summary}</p> : null}
           </div>
           <div className={styles.request}>
-            <span>Requested · USD</span><strong>{p.requestedUsdCents === null ? "Not specified" : q4Usd(p.requestedUsdCents)}</strong>
-            <Link href={`${Q4.href}/${p.number}`}>View proposal <span aria-hidden>→</span><span className="sr-only">: {p.title}</span></Link>
+            <span>Requested</span>
+            <RequestedAmount cents={p.requestedUsdCents} />
+            {p.requestedUsdCents !== null ? <small>USD</small> : null}
           </div>
+          <ZcgHistory history={zcgHistory[p.number]} title={p.title} />
+          <Link className={styles.viewProposal} href={`${Q4.href}/${p.number}`}>View proposal <span aria-hidden>→</span><span className="sr-only">: {p.title}</span></Link>
         </article>
       </li>)}
     </ol>
+    {shown.length ? <p className={styles.zcgLegend}><span>✓</span> Prior ZCG approval or grant <span aria-hidden>·</span> — No confirmed match</p> : null}
     {!shown.length ? <div className={styles.empty}><h2>No matching proposals</h2><p>Try another name or category.</p></div> : null}
   </>;
 }
