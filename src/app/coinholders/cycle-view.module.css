@@ -3,9 +3,8 @@
 .card :where(a):focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 3px; }
 .tabDot { display: inline-block; width: 5px; height: 5px; margin: 0 0 2px 8px; border-radius: 50%; background: var(--accent-ink); }
 .brand { display: flex; align-items: center; gap: 10px; }
-.brandLogo { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 10px; background: #201d16; box-shadow: inset 0 0 0 1px #b897594a, 0 2px 4px #1817130a; }
-.zcashMark { display: block; position: relative; flex: 0 0 auto; width: 28px; height: 28px; overflow: hidden; }
-.zcashMark img { position: absolute; width: 200%; height: 200%; max-width: none; left: -50%; top: -50%; }
+.brandLogo { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border: 1px solid color-mix(in srgb, var(--accent-ink) 28%, var(--line)); border-radius: 50%; background: var(--surface2); color: var(--accent-ink); }
+.zcashMark { display: block; flex: 0 0 auto; width: 26px; height: 26px; background: currentColor; mask: url("/brand/zcash-currency-mark.png") center / auto 100% no-repeat; -webkit-mask: url("/brand/zcash-currency-mark.png") center / auto 100% no-repeat; }
 .brandText { min-width: 0; }
 .brandTitle { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; margin-top: 0; }
 .brandTitle h2 { margin: 0; font-size: 21px; line-height: 1.3; font-weight: 500; letter-spacing: -.035em; }
@@ -24,20 +23,21 @@
 .sealOrbit { position: absolute; inset: 2px 5px; border: 1px solid color-mix(in srgb, var(--accent-ink) 20%, var(--line)); border-radius: 50%; }
 .sealOrbit::before { content: ''; position: absolute; inset: 9px; border: 1px dashed color-mix(in srgb, var(--accent-ink) 22%, transparent); border-radius: 50%; }
 .sealOrbit::after { content: ''; position: absolute; width: 4px; height: 4px; top: 19px; left: 7px; border: 3px solid var(--surface); box-sizing: content-box; border-radius: 50%; background: var(--accent-ink); }
-.sealCoin { position: relative; display: grid; place-items: center; width: 76px; height: 76px; border: 1px solid #b89759; border-radius: 50%; background: linear-gradient(140deg, #3d3525, #17150f 70%); box-shadow: inset 0 0 0 5px #242016, inset 0 0 0 6px #b8975955, 0 10px 24px color-mix(in srgb, var(--ink) 12%, transparent); }
-.sealCoin .zcashMark { width: 49px; height: 49px; }
+.sealCoin { position: relative; display: grid; place-items: center; width: 76px; height: 76px; border: 1px solid color-mix(in srgb, var(--accent-ink) 40%, var(--line)); border-radius: 50%; background: var(--surface2); color: var(--accent-ink); box-shadow: inset 0 0 0 5px var(--surface2), inset 0 0 0 6px color-mix(in srgb, var(--accent-ink) 20%, transparent), 0 8px 20px color-mix(in srgb, var(--ink) 6%, transparent); }
+.sealCoin .zcashMark { width: 44px; height: 44px; }
 .sealClock { position: absolute; right: 15px; bottom: 14px; display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid color-mix(in srgb, var(--accent-ink) 30%, var(--line)); border-radius: 50%; background: var(--surface); color: var(--accent-ink); box-shadow: 0 0 0 3px var(--surface); }
-.timeline { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; padding: 16px 20px 14px; margin: 0; list-style: none; border-top: 1px solid var(--line); background: var(--surface); }
+.timeline { --timeline-gap: 20px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--timeline-gap); padding: 16px 20px 14px; margin: 0; list-style: none; border-top: 1px solid var(--line); background: var(--surface); }
 .timeline[data-outcome] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .timeline li { position: relative; min-width: 0; }
-.track { position: relative; display: block; height: 18px; margin-bottom: 8px; }
-.track::after { content: ''; position: absolute; left: 26px; right: -10px; top: 9px; height: 1px; background: var(--line-strong); }
+.track { position: relative; display: flex; justify-content: center; height: 18px; margin-bottom: 8px; }
+.track::after { content: ''; position: absolute; left: calc(50% + 18px); width: calc(100% + var(--timeline-gap) - 36px); top: 9px; height: 1px; background: var(--line-strong); }
 .timeline li:last-child .track::after { display: none; }
 .step { display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface); color: var(--muted); font-size: 10px; font-weight: 500; font-variant-numeric: tabular-nums; }
 .timeline li[data-active] .step { border-color: var(--accent-ink); background: var(--accent-ink); color: var(--surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-ink) 10%, transparent); }
-.stageText { display: grid; gap: 3px; }
-.stageLabel { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.5; }
-.now { padding: 1px 5px; border-radius: 4px; background: color-mix(in srgb, var(--accent-ink) 8%, var(--surface)); color: var(--accent-ink); font-size: 10px; font-weight: 500; }
+.stageText { display: grid; gap: 3px; text-align: center; }
+.stageLabel { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.5; }
+.stageName { grid-column: 2; }
+.now { justify-self: start; padding: 1px 5px; border-radius: 4px; background: color-mix(in srgb, var(--accent-ink) 8%, var(--surface)); color: var(--accent-ink); font-size: 10px; font-weight: 500; }
 .timeline strong { color: var(--muted); font-size: 12px; font-weight: 400; line-height: 1.5; font-variant-numeric: tabular-nums; }
 .calendarNote { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 16px; padding: 7px 20px; border-top: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 11px; }
 .calendarNote a, .links a { color: var(--accent-ink); }
@@ -49,16 +49,15 @@
 .links a { padding: 4px 0; }
 @container coinholders (max-width: 760px) {
   .pendingHero { gap: 16px; padding: 18px; }
-  .timeline { gap: 16px; padding: 16px 20px 14px; }
-  .track::after { right: -7px; }
+  .timeline { --timeline-gap: 16px; padding: 16px 20px 14px; }
   .calendarNote { padding-inline: 20px; }
   .compactHead { padding: 18px; }
   .brandTitle { gap: 7px 12px; }
 }
 @container coinholders (max-width: 560px) {
   .brand { gap: 10px; }
-  .brandLogo { width: 36px; height: 36px; border-radius: 9px; }
-  .brandLogo .zcashMark { width: 26px; height: 26px; }
+  .brandLogo { width: 36px; height: 36px; }
+  .brandLogo .zcashMark { width: 24px; height: 24px; }
   .brandTitle { align-items: flex-start; gap: 5px; flex-direction: column; }
   .brandTitle h2 { font-size: 20px; }
   .phase { font-size: 11px; padding-block: 3px; }
@@ -70,17 +69,18 @@
   .seal { width: 52px; height: 52px; }
   .sealOrbit { inset: 0; }
   .sealOrbit::before, .sealOrbit::after { display: none; }
-  .sealCoin { width: 40px; height: 40px; box-shadow: inset 0 0 0 3px #242016, inset 0 0 0 4px #b8975955; }
-  .sealCoin .zcashMark { width: 26px; height: 26px; }
+  .sealCoin { width: 40px; height: 40px; box-shadow: inset 0 0 0 3px var(--surface2), inset 0 0 0 4px color-mix(in srgb, var(--accent-ink) 20%, transparent); }
+  .sealCoin .zcashMark { width: 24px; height: 24px; }
   .sealClock { width: 18px; height: 18px; right: 0; bottom: 0; box-shadow: 0 0 0 2px var(--surface); }
   .sealClock svg { width: 12px; height: 12px; }
-  .timeline, .timeline[data-outcome] { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 14px 16px; }
-  .timeline li { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: start; gap: 12px; padding-bottom: 14px; }
+  .timeline, .timeline[data-outcome] { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 0; padding: 14px 16px; }
+  .timeline li { display: grid; grid-template-columns: 18px minmax(0, 1fr); align-items: start; gap: 12px; width: 100%; max-width: 320px; padding-bottom: 14px; }
   .timeline li:last-child { padding-bottom: 0; }
-  .track { height: 100%; margin: 0; }
+  .track { justify-content: flex-start; height: 100%; margin: 0; }
   .track::after { left: 9px; top: 24px; bottom: auto; right: auto; width: 1px; height: calc(100% - 16px); }
   .timeline li:last-child .track { height: 18px; }
-  .stageText { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 22px; }
+  .stageText { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px; min-height: 22px; text-align: left; }
+  .stageLabel { display: flex; justify-content: flex-start; }
   .stageLabel, .timeline strong { font-size: 12px; }
   .timeline strong { text-align: right; }
   .now { display: none; }

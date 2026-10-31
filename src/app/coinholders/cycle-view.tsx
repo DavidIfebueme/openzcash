@@ -1,12 +1,11 @@
 import Link from "next/link";
-import Image from "next/image";
 import type { ReactNode } from "react";
 import { ACTIVE_CYCLE, cycleDateRange, cycleDeadline, cycleHref, cyclePhase, cycleWindows } from "@/lib/coinholder/cycles";
 import base from "./coinholders.module.css";
 import styles from "./cycle-view.module.css";
 
 function ZcashMark() {
-  return <span className={styles.zcashMark}><Image src="/brand/zcash-secondary-yellow.svg" alt="Zcash" width={112} height={112} /></span>;
+  return <span className={styles.zcashMark} role="img" aria-label="Zcash" />;
 }
 
 export function CycleCard({ labelledBy, children }: { labelledBy: string; children: ReactNode }) {
@@ -40,7 +39,7 @@ export function CycleTimeline({ outcome = false, now }: { outcome?: boolean; now
     <ol className={styles.timeline} data-outcome={outcome || undefined} aria-label={`${ACTIVE_CYCLE.label} schedule`}>
       {stages.map((stage, i) => <li key={stage.label} data-active={phase.step === i || undefined} aria-current={phase.step === i ? "step" : undefined}>
         <span className={styles.track} aria-hidden><span className={styles.step}>{String(i + 1).padStart(2, "0")}</span></span>
-        <div className={styles.stageText}><span className={styles.stageLabel}>{stage.label}{phase.step === i ? <span className={styles.now}>Now</span> : null}</span><strong>{stage.dates}</strong></div>
+        <div className={styles.stageText}><span className={styles.stageLabel}><span className={styles.stageName}>{stage.label}</span>{phase.step === i ? <span className={styles.now}>Now</span> : null}</span><strong>{stage.dates}</strong></div>
       </li>)}
     </ol>
     <div className={styles.calendarNote}>
