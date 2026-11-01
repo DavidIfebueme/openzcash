@@ -6,6 +6,7 @@ const jobs = vi.hoisted(() => ({
   startNewsSchedule: vi.fn(),
   startLegalSchedule: vi.fn(),
   startEcosystemSchedule: vi.fn(),
+  startCoinholderTopicSchedule: vi.fn(),
   refreshZcg: vi.fn(async () => ({
     ok: true,
     ms: 1,
@@ -22,6 +23,7 @@ const jobs = vi.hoisted(() => ({
 }));
 vi.mock("@/lib/news/feed", () => ({ startNewsSchedule: jobs.startNewsSchedule }));
 vi.mock("@/lib/ecosystem/schedule", () => ({ startEcosystemSchedule: jobs.startEcosystemSchedule }));
+vi.mock("@/lib/coinholder/topic-schedule", () => ({ startCoinholderTopicSchedule: jobs.startCoinholderTopicSchedule }));
 vi.mock("@/lib/legal/schedule", () => ({ startLegalSchedule: jobs.startLegalSchedule }));
 vi.mock("@/lib/markets/sources", () => ({ startMarketSnapshots: jobs.startMarketSnapshots }));
 vi.mock("@/lib/zcg/refresh", () => ({ refreshZcg: jobs.refreshZcg }));
@@ -62,6 +64,7 @@ describe("server data collection scheduling", () => {
     expect(jobs.startMarketSnapshots).toHaveBeenCalledTimes(1);
     expect(jobs.startLegalSchedule).toHaveBeenCalledTimes(1);
     expect(jobs.startEcosystemSchedule).toHaveBeenCalledTimes(1);
+    expect(jobs.startCoinholderTopicSchedule).toHaveBeenCalledTimes(1);
     // The canary reads public data only; a frozen snapshot still gets probed.
     expect(jobs.startCanarySchedule).toHaveBeenCalledTimes(1);
     expect(vi.getTimerCount()).toBe(2);
@@ -98,6 +101,7 @@ describe("server data collection scheduling", () => {
     expect(jobs.startLegalSchedule).not.toHaveBeenCalled();
     expect(jobs.startEcosystemSchedule).not.toHaveBeenCalled();
     expect(jobs.startCanarySchedule).not.toHaveBeenCalled();
+    expect(jobs.startCoinholderTopicSchedule).not.toHaveBeenCalled();
     expect(vi.getTimerCount()).toBe(0);
   });
 });

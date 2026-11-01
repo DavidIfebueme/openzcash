@@ -21,6 +21,8 @@ export async function register() {
   // Public policy collection has its own durable daily checkpoint.
   const { startLegalSchedule } = await import("@/lib/legal/schedule");
   startLegalSchedule();
+  const { startCoinholderTopicSchedule } = await import("@/lib/coinholder/topic-schedule");
+  startCoinholderTopicSchedule();
   // Public read-only market snapshots are shared with both page and API bundles.
   // Start collection off the request path so visitors do not each wait on providers.
   const { startMarketSnapshots } = await import("@/lib/markets/sources");

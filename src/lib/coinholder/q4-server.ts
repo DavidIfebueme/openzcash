@@ -2,6 +2,7 @@ import "server-only";
 import { z } from "zod";
 import { ghHeaders } from "@/lib/zcg/github-headers";
 import { COINHOLDER_REPOSITORY, READY_FOR_VOTE_LABEL, q4Proposals, type Q4Snapshot } from "./q4";
+import { proposalTopicService } from "./topic-service";
 
 const issueSchema = z.object({
   number: z.number().int().positive(), title: z.string(),
@@ -53,4 +54,8 @@ export function createQ4Reader(fetcher: typeof fetch = fetch, now = Date.now) {
   };
 }
 
-export const readQ4 = createQ4Reader();
+const readSource = createQ4Reader();
+export async function readQ4(): Promise<Q4Snapshot> {
+  const snapshot = await readSource();
+  return snapshot.proposals ? { ...snapshot, proposals: await proposalTopicService.enrich(snapshot.proposals, snapshot.status === "current") } : snapshot;
+}

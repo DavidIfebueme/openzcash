@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Q4, q4Usd, type Q4ProposalSummary } from "@/lib/coinholder/q4";
-import { proposalTopic } from "@/lib/coinholder/proposal-topics";
+import { displayProposalTopics } from "@/lib/coinholder/proposal-topics";
 import styles from "./proposals.module.css";
 
 function RequestedAmount({ cents }: { cents: number | null }) {
@@ -17,11 +17,11 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("newest");
-  const entries = proposals.map((p) => ({ ...p, topic: proposalTopic(p) }));
-  const categories = [...new Set(entries.map((p) => p.topic))].sort();
+  const entries = proposals.map((p) => ({ ...p, topics: displayProposalTopics(p) }));
+  const categories = [...new Set(entries.flatMap((p) => p.topics.map((t) => t.label)))].sort();
   const needle = query.trim().toLowerCase();
-  const shown = entries.filter((p) => (!category || p.topic === category) &&
-    `${p.number} ${p.title} ${p.organization ?? ""} ${p.applicant} ${p.summary ?? ""} ${p.topic} ${p.category ?? ""}`.toLowerCase().includes(needle))
+  const shown = entries.filter((p) => (!category || p.topics.some((t) => t.label === category)) &&
+    `${p.number} ${p.title} ${p.organization ?? ""} ${p.applicant} ${p.summary ?? ""} ${p.topics.map((t) => t.label).join(" ")} ${p.category ?? ""}`.toLowerCase().includes(needle))
     .sort((a, b) => {
       if (sort === "title") return a.title.localeCompare(b.title);
       if (sort === "highest" || sort === "lowest") {
@@ -37,7 +37,7 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
   return <>
     <div className={styles.filters}>
       <label className={styles.search}><span className="sr-only">Search proposals</span><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" aria-hidden><circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4.5 4.5" /></svg><input type="search" placeholder="Search proposals" value={query} onChange={(e) => setQuery(e.target.value)} /></label>
-      <label><span className="sr-only">Category</span><select value={category} onChange={(e) => setCategory(e.target.value)}><option value="">All categories</option>{categories.map((c) => <option key={c}>{c}</option>)}</select></label>
+      <label><span className="sr-only">Topic</span><select value={category} onChange={(e) => setCategory(e.target.value)}><option value="">All topics</option>{categories.map((c) => <option key={c}>{c}</option>)}</select></label>
       <label><span className="sr-only">Sort</span><select value={sort} onChange={(e) => setSort(e.target.value)}><option value="newest">Newest first</option><option value="highest">Highest request</option><option value="lowest">Lowest request</option><option value="title">Project A–Z</option></select></label>
     </div>
     <div className={styles.resultCount} role="status">{query || category ? <><span>{shown.length} of {proposals.length} proposals</span><button type="button" onClick={clear}>Clear filters</button></> : null}</div>
@@ -47,7 +47,7 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
           <div className={styles.proposalContent}>
             <div className={styles.meta}>
               <span className={styles.proposalNumber}>#{p.number}</span>
-              <span className={styles.category} data-category={p.topic} title={p.category && p.topic !== p.category ? `Source category: ${p.category}` : undefined}>{p.topic}</span>
+              {p.topics.map((topic) => <span key={topic.id} className={styles.category} data-category={topic.label} data-tone={topic.tone} title={topic.note}>{topic.label}</span>)}
             </div>
             <h2><Link href={`${Q4.href}/${p.number}`}>{p.title}</Link></h2>
             <p className={styles.applicant}>
@@ -68,6 +68,6 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
         </article>
       </li>)}
     </ol>
-    {!shown.length ? <div className={styles.empty}><h2>No matching proposals</h2><p>Try another name or category.</p></div> : null}
+    {!shown.length ? <div className={styles.empty}><h2>No matching proposals</h2><p>Try another name or topic.</p></div> : null}
   </>;
 }

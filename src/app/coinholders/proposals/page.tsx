@@ -20,7 +20,7 @@ export default async function ProposalsPage() {
   const amountUnspecified = totals !== null && totals.missingAmounts > 0 && totals.missingAmounts === proposals?.length;
   return (
     <div className={`${base.page} ${styles.page}`}>
-      <SourceRefresh intervalMs={300_000} />
+      <SourceRefresh intervalMs={proposals?.some((p) => p.topicsPending) ? 30_000 : 300_000} />
       <header className={styles.head}>
         <h1 className={base.title}>Proposals</h1>
         {phase.step === 0 ? <a href={Q4.applyUrl} target="_blank" rel="noreferrer" className={styles.primary}>Submit proposal <span aria-hidden>↗</span></a> : null}
@@ -56,6 +56,7 @@ export default async function ProposalsPage() {
           <div className={styles.method}>
             <p>Open applications from this round carrying FPF&apos;s exact “{READY_FOR_VOTE_LABEL}” label. Requested amounts are not awards.</p>
             <p>Checks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.</p>
+            <p>AI-generated tags describe the work, not funding decisions. Full applications are reanalyzed when their content changes; original categories remain in the source.</p>
             <a href={Q4.issuesUrl} target="_blank" rel="noreferrer">GitHub submissions <span aria-hidden>↗</span></a>
           </div>
         </details>

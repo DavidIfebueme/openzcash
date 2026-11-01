@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { readQ4 } from "@/lib/coinholder/q4-server";
 import { Q4, q4Timestamp, q4Usd } from "@/lib/coinholder/q4";
+import { displayProposalTopics } from "@/lib/coinholder/proposal-topics";
 import { ProposalMarkdown } from "@/components/participate/workspace/proposal-markdown";
 import { SourceStatus } from "../source-status";
 import base from "../../coinholders.module.css";
@@ -22,6 +23,7 @@ export default async function ProposalPage({ params }: { params: Promise<{ numbe
         <div>
           <p className={styles.eyebrow}>{Q4.label} <span>·</span> #{proposal.number}</p>
           <h1 className={`${base.title} ${styles.detailTitle}`}>{proposal.title}</h1>
+          {proposal.topicAnalysis?.tags.length ? <div className={styles.detailTopics}>{displayProposalTopics(proposal).map((topic) => <span key={topic.id} className={styles.category} data-tone={topic.tone} title={topic.note}>{topic.label}</span>)}</div> : null}
           <p className={styles.detailIdentity}>{proposal.organization ?? proposal.applicant} · {proposal.category ?? "Uncategorized"}</p>
         </div>
         <div className={styles.detailAmount}>

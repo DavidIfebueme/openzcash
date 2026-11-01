@@ -78,6 +78,13 @@
       "when": 1792122064611,
       "tag": "0010_ecosystem_public_snapshots",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1793534400000,
+      "tag": "0011_coinholder_topic_cache",
+      "breakpoints": true
     }
   ]
 }

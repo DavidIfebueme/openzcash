@@ -9,6 +9,7 @@
 import type { EcosystemCheckpoint } from "../ecosystem/checkpoint";
 import type { Snapshot as EcosystemSnapshot } from "../ecosystem/types";
 import type { LegalArchiveSource } from "../legal/archive";
+import type { TopicAnalysis } from "../coinholder/proposal-topics";
 
 import {
   bigint,
@@ -637,5 +638,17 @@ export const ecosystemPublicSnapshots = pgTable("ecosystem_public_snapshots", {
   checkpoint: jsonb("checkpoint").$type<EcosystemCheckpoint>().notNull(),
   collectedAt: timestamp("collected_at", { withTimezone: true }),
   snapshot: jsonb("snapshot").$type<EcosystemSnapshot>(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/** Semantic topics for an immutable revision of a public Coinholder application. */
+export const coinholderTopicCache = pgTable("coinholder_topic_cache", {
+  inputHash: text("input_hash").primaryKey(),
+  proposalNumber: integer("proposal_number").notNull(),
+  analysis: jsonb("analysis").$type<TopicAnalysis>(),
+  leaseId: text("lease_id"),
+  leaseUntil: timestamp("lease_until", { withTimezone: true }),
+  retryAfter: timestamp("retry_after", { withTimezone: true }).notNull().defaultNow(),
+  attempts: integer("attempts").notNull().default(0),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });

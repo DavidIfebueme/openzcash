@@ -37,10 +37,14 @@
 .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-bottom: 9px; font-size: 11px; line-height: 1.5; }
 .proposalNumber { display: inline-flex; align-items: center; min-height: 24px; padding: 2px 7px; border: 1px solid var(--line); border-radius: 5px; background: var(--surface2); color: var(--muted); font-family: var(--font-geist-mono), monospace; font-weight: 500; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .category { --category-ink: var(--muted); display: inline-flex; align-items: center; min-height: 24px; max-width: 100%; padding: 2px 8px; border: 1px solid color-mix(in srgb, var(--category-ink) 15%, transparent); border-radius: 5px; background: color-mix(in srgb, var(--category-ink) 7%, var(--surface)); color: var(--category-ink); font-weight: 500; overflow-wrap: anywhere; }
-.category[data-category="Research & Development"], .category[data-category="Security research"] { --category-ink: #455f9a; }
-.category[data-category="Integration"] { --category-ink: #26746b; }
-:global(.rd-shell[data-theme="dark"]) .category[data-category="Research & Development"], :global(.rd-shell[data-theme="dark"]) .category[data-category="Security research"] { --category-ink: #a8bff0; }
-:global(.rd-shell[data-theme="dark"]) .category[data-category="Integration"] { --category-ink: #8ed2c4; }
+.category[data-tone="blue"] { --category-ink: #455f9a; }
+.category[data-tone="teal"] { --category-ink: #26746b; }
+.category[data-tone="purple"] { --category-ink: #725296; }
+.category[data-tone="amber"] { --category-ink: #94601c; }
+:global(.rd-shell[data-theme="dark"]) .category[data-tone="blue"] { --category-ink: #a8bff0; }
+:global(.rd-shell[data-theme="dark"]) .category[data-tone="teal"] { --category-ink: #8ed2c4; }
+:global(.rd-shell[data-theme="dark"]) .category[data-tone="purple"] { --category-ink: #c6b3e4; }
+:global(.rd-shell[data-theme="dark"]) .category[data-tone="amber"] { --category-ink: #eac487; }
 .proposal h2 { margin: 0; color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.015em; overflow-wrap: anywhere; }
 .proposal h2 a:hover { color: var(--accent-ink); }
 .applicant { display: flex; align-items: center; gap: 6px; color: color-mix(in srgb, var(--ink) 75%, var(--muted)); font-size: 13px; font-weight: 500; margin: 8px 0 0; line-height: 1.5; }
@@ -76,6 +80,7 @@
 .eyebrow { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; font-size: 13px; color: var(--muted); }
 .detailTitle { font-size: 27px; font-weight: 500; line-height: 1.35; text-wrap: initial; overflow-wrap: anywhere; }
 .detailIdentity { margin: 12px 0 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.detailTopics { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; font-size: 11px; line-height: 1.5; }
 .detailAmount { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; text-align: right; padding-top: 4px; }
 .detailAmount > span:first-child { color: var(--muted); font-size: 13px; }
 .detailAmount strong { color: var(--ink); font-size: 30px; font-weight: 500; line-height: 1.3; font-variant-numeric: tabular-nums; letter-spacing: -.03em; }

@@ -1,4 +1,5 @@
 import { applicationSections, projectSummaryFromBody } from "@/lib/zcg/github-applications-parse";
+import type { TopicAnalysis } from "./proposal-topics";
 
 import { ACTIVE_CYCLE, COINHOLDER_REPOSITORY, READY_FOR_VOTE_LABEL, cyclePhase } from "./cycles";
 
@@ -29,6 +30,8 @@ export type Q4Proposal = {
   createdAt: string;
   updatedAt: string;
   body: string;
+  topicAnalysis?: TopicAnalysis;
+  topicsPending?: boolean;
 };
 export type Q4ProposalSummary = Omit<Q4Proposal, "body">;
 export type Q4Snapshot = {
