@@ -6,6 +6,7 @@ import Link from "next/link";
 import { MonthlyReader, type MonthlyReaderHandle } from "./monthly-reader";
 import { editionLabel, type MonthlyEdition, type MonthlyReadingSet } from "@/lib/monthly/catalog";
 import { publicationTarget, publicationView, type PublicationView } from "@/lib/monthly/reading-set";
+import { monthlySourceCsv } from "@/lib/monthly/source-csv";
 import { PHONE_QUERY } from "@/lib/monthly/full-screen";
 import { sourceUrl } from "@/lib/monthly/reader";
 import styles from "./monthly-bundle-preview.module.css";
@@ -51,8 +52,7 @@ function SourcesPanel({data}: {data: MonthlyReadingSet}) {
   const labels = {sources:"Source index",communities:"Community coverage",requests:"Coinholder requests",zcg:"ZCG proposals and decisions"};
   const registerNames = {sources:"Sources",communities:"Communities",requests:"Coinholder",zcg:"ZCG"};
   function exportCsv() {
-    const quote = (s: string) => `"${s.replaceAll('"','""')}"`;
-    const csv = ["Name,Detail,USD requested,Source",...matches.map(e=>[e.name,e.detail,e.amount?.toString()||e.amountLabel||"",e.url].map(quote).join(","))].join("\r\n");
+    const csv = monthlySourceCsv(matches);
     const url = URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"}));
     const link = document.createElement("a");link.href=url;link.download=`OpenZcash-${data.id}-${register}.csv`;link.click();URL.revokeObjectURL(url);
   }

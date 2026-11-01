@@ -2,6 +2,1948 @@
   {
     "sources": [
       {
+        "name": "Financial authority and reporting window",
+        "detail": "Google Sheets is authoritative for recorded financial amounts. Close: October 1–31, 2026, America/Sao_Paulo; comparison September 1–30. Requested, approved, committed and paid are separate. Paid entries do not establish delivery.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit"
+      },
+      {
+        "name": "Evidence cutoff",
+        "detail": "Captured through 2026-11-01T14:38:21+00:00. Published/reviewed November 1. Retrospectives published after October are identified; future events are not October delivery. Complete API and original CSV captures retained privately with hashes.",
+        "url": "https://openzcash.org/monthly/2026-10"
+      },
+      {
+        "name": "Mexico #447 · source discrepancy",
+        "detail": "Sheet row 886 records USD 7,980 and 6.162 ZEC paid October 2. The public payment comment states USD 7,900; the earlier request amendment and decision minutes cite USD 6,380. This close uses the Sheet paid amount. The difference remains documented and does not establish an incorrect transfer.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A886",
+        "amount": 7980.0,
+        "amountLabel": "Paid · $7,980"
+      },
+      {
+        "name": "Mexico #447 · payment comment",
+        "detail": "FPF public comment states USD 7,900 and 6.162 ZEC. It differs from the Sheet USD amount; no substitution was made.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447#issuecomment-5961521167"
+      },
+      {
+        "name": "Mexico #447 · amended request",
+        "detail": "Applicant amendment reduces request to USD 6,380. This is not a replacement for the recorded paid USD amount.",
+        "url": "https://forum.zcashcommunity.com/t/57829/4",
+        "amount": 6380.0,
+        "amountLabel": "Amended request · $6,380"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 16 · Taylor Hornby - Bonus Grant for Orchard Counterfeiting Vulnerability Bug Bounty",
+        "detail": "Recipient: Taylor Hornby. Paid date: 2026-10-16. Recorded ZEC: 654.3989. Milestone: not specified. Record ID: de205bd4a22c0f16594f3220199ed978c59a7172ab6bda9cbacaaf4664381e09. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A16",
+        "amount": 750000.0,
+        "amountLabel": "Paid · $750,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 18 · Valargroup Ironwood work",
+        "detail": "Recipient: Valargroup. Paid date: 2026-10-16. Recorded ZEC: 1049.6558. Milestone: not specified. Record ID: 7f40792bb70be2938d2fe89f5cb3d9431f2a7edbb9d51d8820e01f5a836f6fab. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A18",
+        "amount": 1203000.0,
+        "amountLabel": "Paid · $1,203,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 19 · Temporary Detectable Unlimited mint and sell Exploit",
+        "detail": "Recipient: Alex Sol. Paid date: 2026-10-16. Recorded ZEC: 349.0127. Milestone: not specified. Record ID: 78a1f2cc83eea103dee8e8a467868b201280a18df43d3c59126eb59f8ec3b828. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A19",
+        "amount": 400000.0,
+        "amountLabel": "Paid · $400,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 20 · Zebra Critical Vulnerability Bug Bounty (CVE-2026-34202)",
+        "detail": "Recipient: robustfengbin. Paid date: 2026-10-16. Recorded ZEC: 130.8798. Milestone: not specified. Record ID: 28c0145ec0bf0ef8916ce8317372778c1eb5d8a346a464e310f3d06b3f53a70d. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A20",
+        "amount": 150000.0,
+        "amountLabel": "Paid · $150,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 21 · Five Critical Zebra Consensus Divergence Vulnerabilities",
+        "detail": "Recipient: sangsoo-osec. Paid date: 2026-10-16. Recorded ZEC: 370.826. Milestone: not specified. Record ID: d6806a565641099bb228a087610fa1abb3efe82b08aa9785ffa354b016dcec79. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A21",
+        "amount": 425000.0,
+        "amountLabel": "Paid · $425,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 22 · zcashtocash via ZcashLabs",
+        "detail": "Recipient: ZcashLabs. Paid date: 2026-10-16. Recorded ZEC: 5.2352. Milestone: not specified. Record ID: 225f4613ed3f45c5a86bc77993c65976d4dc4f77dc084483e8043d8bafd28646. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A22",
+        "amount": 6000.0,
+        "amountLabel": "Paid · $6,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 23 · Zec.rocks (16 months of uptime for Zcash wallets)",
+        "detail": "Recipient: Zec.rocks. Paid date: 2026-10-16. Recorded ZEC: 510.4241. Milestone: not specified. Record ID: 0db89f4fd2bd290184bb3e0336d1e3a846ff1b450ff4c05665c2d88abf900cab. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A23",
+        "amount": 584992.0,
+        "amountLabel": "Paid · $584,992"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 24 · Connaugh Zcash Videos",
+        "detail": "Recipient: Connaugh. Paid date: 2026-10-16. Recorded ZEC: 19.1957. Milestone: not specified. Record ID: b2c9da77f4663973fbb5388a9be1be4bc12645377eb3f4d5ec5ebbf765c6f5a1. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A24",
+        "amount": 22000.0,
+        "amountLabel": "Paid · $22,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 14 · Project Tachyon - Bonus Grant for Ironwood zk-SNARK Formal Verification",
+        "detail": "Recipient: Tachyon Foundation. Paid date: 2026-10-16. Recorded ZEC: 227.7814. Milestone: not specified. Record ID: d2e4592b1a0baaa28c89240a29c15cb21609e19f1fc3bace6072b978e46b4c4b. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A14",
+        "amount": 261058.0,
+        "amountLabel": "Paid · $261,058"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 13 · Ironwood zk-SNARK Formal Verification (Project Tachyon)",
+        "detail": "Recipient: Tachyon Foundation. Paid date: 2026-10-16. Recorded ZEC: 644.7504. Milestone: not specified. Record ID: 543cadc60ccd728d7308265c9e74d97e2206b12bbaf6c045ab1aab5517f8605e. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A13",
+        "amount": 738942.0,
+        "amountLabel": "Paid · $738,942"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 12 · ZODL Q1 & Q2 2026 Core Protocol Development",
+        "detail": "Recipient: Zcash Open Development Lab (ZODL). Paid date: 2026-10-16. Recorded ZEC: 1701.4371. Milestone: not specified. Record ID: 63075a42dab2c82dcb431462c260100f54b36bedb33b4d482ba02c6a921223b9. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A12",
+        "amount": 1950000.0,
+        "amountLabel": "Paid · $1,950,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 11 · THORSwap/Metro",
+        "detail": "Recipient: THORSwap Labs. Paid date: 2026-10-16. Recorded ZEC: 52.3519. Milestone: not specified. Record ID: 964dc73654567205403e0057d6194385b635cbcbe20958242cb57e8e46eca4c2. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A11",
+        "amount": 60000.0,
+        "amountLabel": "Paid · $60,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 10 · CipherScan Coinholder Retroactive Grant 2026",
+        "detail": "Recipient: Kenbak. Paid date: 2026-10-16. Recorded ZEC: 327.1994. Milestone: not specified. Record ID: 8c3a62d78ace2d7c144174e0eeefd981156aa21ecac9c1f6c662640a02ef268c. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A10",
+        "amount": 375000.0,
+        "amountLabel": "Paid · $375,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 9 · CipherPay",
+        "detail": "Recipient: Atmosphere Labs (Kenbak). Paid date: 2026-10-16. Recorded ZEC: 30.5386. Milestone: not specified. Record ID: c7f5aa85cd73c47fbf616f7a171f85d70691bfe5ef46aa152ffe6f0d69a2a725. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A9",
+        "amount": 35000.0,
+        "amountLabel": "Paid · $35,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 8 · Unstoppable Wallet",
+        "detail": "Recipient: Horizontal Systems. Paid date: 2026-10-16. Recorded ZEC: 69.8025. Milestone: not specified. Record ID: 3ff09e5f46c36c4daf5c007caf580fc7c227b1b58026f5547b326868c9244e8c. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A8",
+        "amount": 80000.0,
+        "amountLabel": "Paid · $80,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 15 · Orchard Counterfeiting Vulnerability Bug Bounty",
+        "detail": "Recipient: Taylor Hornby. Paid date: 2026-10-16. Recorded ZEC: 654.3989. Milestone: not specified. Record ID: bc162fa874cfc423ee722e0a60ca3763597cc62aeaf2ea9e8207be3658260555. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A15",
+        "amount": 750000.0,
+        "amountLabel": "Paid · $750,000"
+      },
+      {
+        "name": "Paid · coinholder_grants · row 17 · Ironwood external audit re-imbursement",
+        "detail": "Recipient: Valargroup. Paid date: 2026-10-16. Recorded ZEC: 522.6466. Milestone: not specified. Record ID: 4363f97eefb3be75da177a81e317a4f0fbb56679c37a4475fc66656e1e9a17d9. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=722519692&range=A17",
+        "amount": 599000.0,
+        "amountLabel": "Paid · $599,000"
+      },
+      {
+        "name": "Paid · discretionary · row 61 · ",
+        "detail": "Recipient: Zerodartz. Paid date: 2026-10-23. Recorded ZEC: 0.6026. Milestone: not specified. Record ID: 4bff30658605b1f774fe4ebde6c7e8086052fa75b8e198c607c68eddfdbe7755. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A61",
+        "amount": 749.95,
+        "amountLabel": "Paid · $749.95"
+      },
+      {
+        "name": "Paid · discretionary · row 60 · ",
+        "detail": "Recipient: ouicate. Paid date: 2026-10-19. Recorded ZEC: 65.234. Milestone: not specified. Record ID: 0cb08b53068425997608ba74f8834160f5e3d6cbfc20b389f90edf481ffefd0f. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A60",
+        "amount": 75000.0,
+        "amountLabel": "Paid · $75,000"
+      },
+      {
+        "name": "Paid · discretionary · row 57 · ",
+        "detail": "Recipient: Hanh. Paid date: 2026-10-16. Recorded ZEC: not recorded. Milestone: not specified. Record ID: 0bacaba34977db4e2a514ea1d269eb31ba1e6fe45e387b91bcf3e99e05eb562b. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A57",
+        "amount": 730.74,
+        "amountLabel": "Paid · $730.74"
+      },
+      {
+        "name": "Paid · discretionary · row 59 · ",
+        "detail": "Recipient: Gguy. Paid date: 2026-10-16. Recorded ZEC: 0.6257. Milestone: not specified. Record ID: 52fbc7e56a75d49d36a91eb6ff983c033d847ccf600708ae333d7093872f7585. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A59",
+        "amount": 714.0,
+        "amountLabel": "Paid · $714"
+      },
+      {
+        "name": "Paid · discretionary · row 58 · ",
+        "detail": "Recipient: PGP for Crypto (Paul Brigner). Paid date: 2026-10-16. Recorded ZEC: 0.5258. Milestone: not specified. Record ID: 5c4ede2c7dc3234847dc77a9b4e99f325611e01cab73cce70faa3b0e166228da. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A58",
+        "amount": 600.0,
+        "amountLabel": "Paid · $600"
+      },
+      {
+        "name": "Paid · discretionary · row 53 · ",
+        "detail": "Recipient: sangsoo-osec. Paid date: 2026-10-08. Recorded ZEC: 158.3588. Milestone: not specified. Record ID: 99b12b2a103e5e258e61b7b52851aeb14c6bb2558b3171b4e4b6b32cf761deab. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A53",
+        "amount": 187500.0,
+        "amountLabel": "Paid · $187,500"
+      },
+      {
+        "name": "Paid · discretionary · row 52 · ",
+        "detail": "Recipient: robustfengbin. Paid date: 2026-10-08. Recorded ZEC: 31.6718. Milestone: not specified. Record ID: 3dd51838651ecbece8f0092261e0e64adfe73f0d825d8649d272ef7206306b3d. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A52",
+        "amount": 37500.0,
+        "amountLabel": "Paid · $37,500"
+      },
+      {
+        "name": "Paid · discretionary · row 54 · ",
+        "detail": "Recipient: y4ssi. Paid date: 2026-10-08. Recorded ZEC: 15.8359. Milestone: not specified. Record ID: ec959dc343df272e4b91bc8d8c0f08e1920824fb60060859465a587cbc2f80de. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A54",
+        "amount": 18750.0,
+        "amountLabel": "Paid · $18,750"
+      },
+      {
+        "name": "Paid · discretionary · row 55 · ",
+        "detail": "Recipient: zknd3r. Paid date: 2026-10-08. Recorded ZEC: 63.3435. Milestone: not specified. Record ID: 819edaa20799d220ae60653be940cd732bbe69f879df2daf5113cb6d82a67d97. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A55",
+        "amount": 75000.0,
+        "amountLabel": "Paid · $75,000"
+      },
+      {
+        "name": "Paid · discretionary · row 56 · ",
+        "detail": "Recipient: Prince. Paid date: 2026-10-08. Recorded ZEC: 31.6718. Milestone: not specified. Record ID: e733985f5a745a84547c808499ec02af64c554ebd3dfb840afc015e6bb6f6ed4. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A56",
+        "amount": 37500.0,
+        "amountLabel": "Paid · $37,500"
+      },
+      {
+        "name": "Paid · discretionary · row 51 · ",
+        "detail": "Recipient: princechaddha. Paid date: 2026-10-08. Recorded ZEC: 15.8359. Milestone: not specified. Record ID: 43c470374b33fb393580d98e8f2f9935f4be98c46e95e4667f74ff530c688bac. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A51",
+        "amount": 18750.0,
+        "amountLabel": "Paid · $18,750"
+      },
+      {
+        "name": "Paid · discretionary · row 50 · ",
+        "detail": "Recipient: ouicate. Paid date: 2026-10-08. Recorded ZEC: 39.5897. Milestone: not specified. Record ID: 9c71b81cba286067c76c7730ef0e1871f22ead08a579d81b12f6eb77039375b5. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A50",
+        "amount": 46875.0,
+        "amountLabel": "Paid · $46,875"
+      },
+      {
+        "name": "Paid · discretionary · row 49 · ",
+        "detail": "Recipient: ipwning. Paid date: 2026-10-08. Recorded ZEC: 55.4256. Milestone: not specified. Record ID: 07cc04173511825e4686484786cd30ff5f04becd8aa328964cf890c575e4cdfe. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A49",
+        "amount": 65625.0,
+        "amountLabel": "Paid · $65,625"
+      },
+      {
+        "name": "Paid · discretionary · row 48 · ",
+        "detail": "Recipient: iamfadhlu. Paid date: 2026-10-08. Recorded ZEC: 23.7538. Milestone: not specified. Record ID: 3cfaef159dab59de73660e702c9cbc143c48e165715b8dd79c03e2ac79308ba8. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A48",
+        "amount": 28125.0,
+        "amountLabel": "Paid · $28,125"
+      },
+      {
+        "name": "Paid · discretionary · row 47 · ",
+        "detail": "Recipient: haxonittech. Paid date: 2026-10-08. Recorded ZEC: 7.9179. Milestone: not specified. Record ID: dbe101e20887b817051631b476126003f6be2a14a8ad6adac62425a4904e4b77. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A47",
+        "amount": 9375.0,
+        "amountLabel": "Paid · $9,375"
+      },
+      {
+        "name": "Paid · discretionary · row 46 · ",
+        "detail": "Recipient: fivelittleducks. Paid date: 2026-10-08. Recorded ZEC: 63.3435. Milestone: not specified. Record ID: 31bb6b50ce4d0103108640b6a6d4644750e8b8ad562e8f51feb371e907db0d04. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A46",
+        "amount": 75000.0,
+        "amountLabel": "Paid · $75,000"
+      },
+      {
+        "name": "Paid · discretionary · row 45 · ",
+        "detail": "Recipient: dingledropper. Paid date: 2026-10-08. Recorded ZEC: 7.9179. Milestone: not specified. Record ID: def250fd0cd1e539b3696f3fde7cc087dc000d306f6fb0cf25044327a127bf97. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A45",
+        "amount": 9375.0,
+        "amountLabel": "Paid · $9,375"
+      },
+      {
+        "name": "Paid · discretionary · row 44 · ",
+        "detail": "Recipient: defuse. Paid date: 2026-10-08. Recorded ZEC: 31.6718. Milestone: not specified. Record ID: 488911f39ab38920f2edd26dcefbc6ded87e2d7b33b0ca846556afb21c89569f. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A44",
+        "amount": 37500.0,
+        "amountLabel": "Paid · $37,500"
+      },
+      {
+        "name": "Paid · discretionary · row 43 · ",
+        "detail": "Recipient: Zellic. Paid date: 2026-10-07. Recorded ZEC: not recorded. Milestone: not specified. Record ID: e892911239ae3c3553a8bb149427e79e9ca35a199986e78d00799f2a61a123ff. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=2043949055&range=A43",
+        "amount": 20000.0,
+        "amountLabel": "Paid · $20,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 852 · Zcash Arabia (August to December 2026)",
+        "detail": "Recipient: ZcashArabia. Paid date: 2026-10-31. Recorded ZEC: 3.1877. Milestone: 3. Record ID: dfe2b46c175b1f72d48c046012c6cc52ae6c2db670850182fc6c291da12caac0. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A852",
+        "amount": 4000.0,
+        "amountLabel": "Paid · $4,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 897 · Zcash Privacy & Adoption in Two Bolivian Universities by BlockivIA",
+        "detail": "Recipient: BlockivIA. Paid date: 2026-10-23. Recorded ZEC: 0.6026. Milestone: Startup Funding. Record ID: 4c6f3df207c956db6ed5f856e89b148c345bbebe7758d829ab0969b5b52ea7b2. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A897",
+        "amount": 750.0,
+        "amountLabel": "Paid · $750"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 873 · Zcash East Africa @ Africa Blockchain Festival 2026",
+        "detail": "Recipient: Zcash East Africa Community. Paid date: 2026-10-22. Recorded ZEC: 1.02645. Milestone: 1. Record ID: f3e6c1901eb7d0c9d65dacb6c8fe4ba185f1d36eca4a55436dfb6235c506909d. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A873",
+        "amount": 1240.0,
+        "amountLabel": "Paid · $1,240"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 798 · Zcash Türkiye 2026 Q3-4 - 2027 Q1-2-3-4",
+        "detail": "Recipient: Batuhan. Paid date: 2026-10-20. Recorded ZEC: 3.4742. Milestone: 4. Record ID: 7b913d54a0052a8b08a6e29317d64f7168f0bd496c27804f556e3e48064c3da4. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A798",
+        "amount": 4400.0,
+        "amountLabel": "Paid · $4,400"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 883 · Zcash Ghana (October 2026 - December 2026)",
+        "detail": "Recipient: @ZcashGH. Paid date: 2026-10-16. Recorded ZEC: 3.6805. Milestone: 1. Record ID: 4b8816d7c6c27f0225e5b1326279e93ba5167f7bc3cb4c47cc98f808bbf7c275. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A883",
+        "amount": 4200.0,
+        "amountLabel": "Paid · $4,200"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 876 · GraphSense Zcash Shielded Accounting Repair",
+        "detail": "Recipient: Steven Hert. Paid date: 2026-10-16. Recorded ZEC: 1.7526. Milestone: 3. Record ID: e87b457e75fe9942ad0c9746e4052b89ba0f1286fb7ce3939948853707af40c9. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A876",
+        "amount": 2000.0,
+        "amountLabel": "Paid · $2,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 889 · 0xramp: ZEC payments and wallet integrations",
+        "detail": "Recipient: 0xramp Labs. Paid date: 2026-10-13. Recorded ZEC: 6.04. Milestone: Startup Funding. Record ID: f4390f070788cd3462e7e4e2ba9c0520f773b93151a26da7fcc6278e5134a719. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A889",
+        "amount": 7500.0,
+        "amountLabel": "Paid · $7,500"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 633 · Zcash Nigeria 2026",
+        "detail": "Recipient: Zcash Nigeria. Paid date: 2026-10-12. Recorded ZEC: 3.22. Milestone: Startup Funding: Conferences. Record ID: 17e9d9d405234551b6e9d86c1f6ee1b614791ef782e14cc6ba8349e6023512b5. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A633",
+        "amount": 4000.0,
+        "amountLabel": "Paid · $4,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 841 · BTCPayServer Multi-Store GraphQL Client",
+        "detail": "Recipient: 1337bytes. Paid date: 2026-10-09. Recorded ZEC: 6.895. Milestone: 1. Record ID: 3a7fec760fa0c38e3b99d0212cf4f7be5954a3fe3f5c855dafbd7a57a40a0548. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A841",
+        "amount": 8400.0,
+        "amountLabel": "Paid · $8,400"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 848 · Zcash Hack-to-Dark At Devcon 8, Mumbai",
+        "detail": "Recipient: WebZero. Paid date: 2026-10-09. Recorded ZEC: 35.725. Milestone: Startup Funding. Record ID: d26dcd401d5653b247ede2055db41ea5255f7e8ffb8748910fce59a5bb58fe48. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A848",
+        "amount": 43524.0,
+        "amountLabel": "Paid · $43,524"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 874 · GraphSense Zcash Shielded Accounting Repair",
+        "detail": "Recipient: Steven Hert. Paid date: 2026-10-09. Recorded ZEC: 2.4625. Milestone: 1. Record ID: d6908ac7bf02482f8417b07c18d29d790bfe55da841c386ec8bc4e208c41c122. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A874",
+        "amount": 3000.0,
+        "amountLabel": "Paid · $3,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 875 · GraphSense Zcash Shielded Accounting Repair",
+        "detail": "Recipient: Steven Hert. Paid date: 2026-10-09. Recorded ZEC: 2.4625. Milestone: 2. Record ID: c28bfb8599ecdee410176c9ff17244c6cd3204b5dfd3074d3dac91583b5f0bf1. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A875",
+        "amount": 3000.0,
+        "amountLabel": "Paid · $3,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 887 · Zcash Türkiye University Tour 2026 — ZCG",
+        "detail": "Recipient: Batuhan. Paid date: 2026-10-09. Recorded ZEC: 22.162. Milestone: Startup Funding. Record ID: 2f9bbf8d4da2414b0aeb6ab8fa6e5a78954cce3272be0a61c591a331492ec42a. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A887",
+        "amount": 27000.0,
+        "amountLabel": "Paid · $27,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 691 · Zcash Global en Español 2026",
+        "detail": "Recipient: Zcash Español. Paid date: 2026-10-07. Recorded ZEC: 7.25. Milestone: 9. Record ID: 18d51c05531bc79cc90c8023ff0ab3de1d24d8003b18dd3f898c1bbc56836e1d. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A691",
+        "amount": 9525.0,
+        "amountLabel": "Paid · $9,525"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 886 · Mexico Tech Week October 2026 - Zcash México",
+        "detail": "Recipient: Zcash México. Paid date: 2026-10-02. Recorded ZEC: 6.162. Milestone: Startup Funding. Record ID: 54a5e800e65ca26d799ad3a80e33c0143f73e7d68229ebdefbce020eac3c8407. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A886",
+        "amount": 7980.0,
+        "amountLabel": "Paid · $7,980"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 627 · ZecHub 2026",
+        "detail": "Recipient: ZecHub. Paid date: 2026-10-02. Recorded ZEC: 24.4593. Milestone: 9. Record ID: 041564c839df68bff2ff0f69f689e29e64e6e0697153367dbbe8f8a30ea25a8d. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A627",
+        "amount": 31360.0,
+        "amountLabel": "Paid · $31,360"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 651 · Zcash Nigeria 2026",
+        "detail": "Recipient: Zcash Nigeria. Paid date: 2026-10-01. Recorded ZEC: 3.9753. Milestone: 9. Record ID: d8949427878bcd76968fc2fb999d620cccb1f3c5ebc6f0206dc8401bfa57ae05. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A651",
+        "amount": 5300.0,
+        "amountLabel": "Paid · $5,300"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 834 · Zcash WalletConnect Integration",
+        "detail": "Recipient: Noir Wallet. Paid date: 2026-10-01. Recorded ZEC: 4.1253. Milestone: 1. Record ID: ffa2cfc6c8fdfa58204ecc50377981d12e66f158e454d56d06793988a4e13c64. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A834",
+        "amount": 5500.0,
+        "amountLabel": "Paid · $5,500"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 679 · Zcash Brazil 2026",
+        "detail": "Recipient: Zcash Brazil. Paid date: 2026-10-01. Recorded ZEC: 16.376. Milestone: 9. Record ID: ea0d2f7f6e8521a638273e570932a9bfaf35bdc9dc432fc4fa0b40722e09ca7d. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A679",
+        "amount": 21833.0,
+        "amountLabel": "Paid · $21,833"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 774 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 3.0002. Milestone: 6. Record ID: 468b35f759c8a14096e228761d4562a07f17fc83cc52c4f783cd243ad741c836. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A774",
+        "amount": 4000.0,
+        "amountLabel": "Paid · $4,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 773 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 4.5003. Milestone: 5. Record ID: a08ad5045b1c6ff5bfaedcecfa4abeaeb5622998535122b981b22ee80801ae2b. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A773",
+        "amount": 6000.0,
+        "amountLabel": "Paid · $6,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 772 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 3.7503. Milestone: 4. Record ID: 65932486f1f778ed0e99d9e36b230d95f8918e24db9d4364af006e87954d438f. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A772",
+        "amount": 5000.0,
+        "amountLabel": "Paid · $5,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 771 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 10.6508. Milestone: 3. Record ID: 84710ae9e0555e3d20b4a3f0f9198b6cc33d5c05bfbe5763f6d5ceb546554287. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A771",
+        "amount": 14200.0,
+        "amountLabel": "Paid · $14,200"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 770 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 6.0005. Milestone: 2. Record ID: 0bb93a9cbab6b1a1281d58bc600f72a01ad2c45f7a974b998adeae670d6623ce. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A770",
+        "amount": 8000.0,
+        "amountLabel": "Paid · $8,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 769 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 0.7501. Milestone: 1. Record ID: 39e3e157a6d55983260c5254788404b71764b15c555c2efef9a6c658e520eb86. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A769",
+        "amount": 1000.0,
+        "amountLabel": "Paid · $1,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 768 · Zcash Name Service",
+        "detail": "Recipient: ZcashMe, Inc.. Paid date: 2026-10-01. Recorded ZEC: 36.0028. Milestone: Startup Funding. Record ID: 27a6fea872c3716dd91e4c27430dccc26ab7c94506fea46c7722956c19c429db. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A768",
+        "amount": 48000.0,
+        "amountLabel": "Paid · $48,000"
+      },
+      {
+        "name": "Paid · grants_disbursed · row 666 · Zcash Brazil 2026",
+        "detail": "Recipient: Zcash Brazil. Paid date: 2026-10-01. Recorded ZEC: 2.2494. Milestone: Event Reimbursement. Record ID: e77b9e68c3a40dbe006977d99affcc9529899e928c0923a85a8381543324c314. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=803214474&range=A666",
+        "amount": 2999.0,
+        "amountLabel": "Paid · $2,999"
+      },
+      {
+        "name": "Paid · ic_payments · row 74 · Arborist Call Meeting Notes",
+        "detail": "Recipient: Chidi Olisa. Paid date: 2026-10-31. Recorded ZEC: 0.47815. Milestone: not specified. Record ID: ee9b34b47383505ec475d520938fb02ead9528aa278e9c677a4e7997e8b7f2ed. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1267338970&range=A74",
+        "amount": 600.0,
+        "amountLabel": "Paid · $600"
+      },
+      {
+        "name": "Paid · ic_payments · row 73 · Zcash Ecosystem Security Lead",
+        "detail": "Recipient: Least Authority. Paid date: 2026-10-14. Recorded ZEC: 3.7624. Milestone: not specified. Record ID: 5389a670fa91a277d0625c564ee7047e3e334c75a47600f03a77fb988d023933. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1267338970&range=A73",
+        "amount": 4341.12,
+        "amountLabel": "Paid · $4,341.12"
+      },
+      {
+        "name": "Paid · monthly · row 52 · ",
+        "detail": "Recipient: Hanh. Paid date: 2026-10-30. Recorded ZEC: 11.3997. Milestone: not specified. Record ID: 74ebd1d20c4d95754e7804280aa0cd270d448e23e6a515db44c0d506c63ae9ad. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=598263567&range=A52",
+        "amount": 14049.47,
+        "amountLabel": "Paid · $14,049.47"
+      },
+      {
+        "name": "Paid · monthly · row 54 · ",
+        "detail": "Recipient: Zerodartz. Paid date: 2026-10-30. Recorded ZEC: 11.3997. Milestone: not specified. Record ID: db53fd76ce1ee73b3d45e82368736efabb454039ce4491b0351f5a933f32704b. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=598263567&range=A54",
+        "amount": 14049.47,
+        "amountLabel": "Paid · $14,049.47"
+      },
+      {
+        "name": "Paid · monthly · row 53 · ",
+        "detail": "Recipient: PGP for Crypto (Paul Brigner). Paid date: 2026-10-30. Recorded ZEC: 11.3997. Milestone: not specified. Record ID: 9b7cd115d2eb5c0007d088a01c54e503492cf4230591542553a6cf9b946e458a. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=598263567&range=A53",
+        "amount": 14049.47,
+        "amountLabel": "Paid · $14,049.47"
+      },
+      {
+        "name": "Paid · monthly · row 51 · ",
+        "detail": "Recipient: GGuy. Paid date: 2026-10-30. Recorded ZEC: 11.3997. Milestone: not specified. Record ID: 95f01f79d41a72d6c3cb28c98dc39ac9ea0f9475dfa95702fb3f95d52ca9a2c0. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=598263567&range=A51",
+        "amount": 14049.47,
+        "amountLabel": "Paid · $14,049.47"
+      },
+      {
+        "name": "Paid · monthly · row 50 · ",
+        "detail": "Recipient: Artkor. Paid date: 2026-10-30. Recorded ZEC: 11.3997. Milestone: not specified. Record ID: 14c854b00fef99ba7a13642feca05d584bd9d32d7530eb76ff56183a77a492ce. Payment is not delivery evidence.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=598263567&range=A50",
+        "amount": 14049.47,
+        "amountLabel": "Paid · $14,049.47"
+      },
+      {
+        "name": "Sheet proposal row 688 · P2P Cash-to-ZEC Onboarding via Bank CDMs",
+        "detail": "Rejected; submitted 2026-09-19; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A688"
+      },
+      {
+        "name": "Sheet proposal row 692 · ZKP-cryptography course",
+        "detail": "Rejected; submitted 2026-09-20; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A692"
+      },
+      {
+        "name": "Sheet proposal row 695 · Bitcointalk Signature Campaign & ZEC Community Engagement — 3 Months",
+        "detail": "Rejected; submitted 2026-09-22; decision 2026-10-02. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A695"
+      },
+      {
+        "name": "Sheet proposal row 696 · ZCASH AFRICA PRIVACY ENGINEERING RESIDENCY",
+        "detail": "Rejected; submitted 2026-09-23; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A696"
+      },
+      {
+        "name": "Sheet proposal row 698 · Independent Recomputation of the Zcash Supply Ledger, including the NU7 NSM Reserve",
+        "detail": "Rejected; submitted 2026-09-25; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A698"
+      },
+      {
+        "name": "Sheet proposal row 700 · Mexico Tech Week October 2026 - Zcash México",
+        "detail": "Approved; submitted 2026-09-26; decision 2026-10-02. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A700"
+      },
+      {
+        "name": "Sheet proposal row 701 · Zcash Privacy Ecosystem Mapping & Adoption Data",
+        "detail": "Rejected; submitted 2026-09-26; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A701"
+      },
+      {
+        "name": "Sheet proposal row 702 · Zcash Türkiye University Tour 2026 — ZCG",
+        "detail": "Approved; submitted 2026-09-27; decision 2026-10-09. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A702"
+      },
+      {
+        "name": "Sheet proposal row 703 · Zcash Global Community & Marketing Operations",
+        "detail": "Rejected; submitted 2026-09-28; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A703"
+      },
+      {
+        "name": "Sheet proposal row 706 · zswap by stalllion labs",
+        "detail": "Rejected; submitted 2026-09-29; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A706"
+      },
+      {
+        "name": "Sheet proposal row 707 · Nozy Sync Engine public ($45k)",
+        "detail": "Rejected; submitted 2026-09-29; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A707"
+      },
+      {
+        "name": "Sheet proposal row 708 · 0xramp: ZEC payments and wallet integrations (revision of #408)",
+        "detail": "Approved; submitted 2026-09-29; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A708"
+      },
+      {
+        "name": "Sheet proposal row 709 · Zcash Privacy Payment Rail & NFC Programmable Cards",
+        "detail": "Rejected; submitted 2026-09-30; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A709"
+      },
+      {
+        "name": "Sheet proposal row 710 · Build Buddies x Zcash: Privacy Education and Community Adoption in Latin America and Asia",
+        "detail": "Rejected; submitted 2026-09-30; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A710"
+      },
+      {
+        "name": "Sheet proposal row 711 · VaihtoFX: Shielded ZEC On/Off-Ramp via M-Pesa & Airtel Money in Kenya",
+        "detail": "Rejected; submitted 2026-10-01; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A711"
+      },
+      {
+        "name": "Sheet proposal row 712 · Zcash Education Laboratory at Polytechnic University",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-01; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A712"
+      },
+      {
+        "name": "Sheet proposal row 713 · Fixing, Updating & Streamlining of Zcash Documentation (https://zcash.readthedocs.io/en/master/index.html)",
+        "detail": "Rejected; submitted 2026-10-01; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A713"
+      },
+      {
+        "name": "Sheet proposal row 714 · Tells: a privacy checkup for Zcash wallets",
+        "detail": "Rejected; submitted 2026-10-02; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A714"
+      },
+      {
+        "name": "Sheet proposal row 715 · Solana StealthShield",
+        "detail": "Application Withdrawn; submitted 2026-10-03; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A715"
+      },
+      {
+        "name": "Sheet proposal row 716 · Zcash BuildPath India: Four-City Developer Onboarding Pilot",
+        "detail": "Rejected; submitted 2026-10-03; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A716"
+      },
+      {
+        "name": "Sheet proposal row 717 · ZAgentPay: shielded Zcash payments for AI agents under human-defined mandates (MCP server)",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-04; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A717"
+      },
+      {
+        "name": "Sheet proposal row 718 · Zcash Shielded Payments: An English/Korean Research Report",
+        "detail": "Rejected; submitted 2026-10-04; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A718"
+      },
+      {
+        "name": "Sheet proposal row 719 · Hito Zcash: Stable Firmware, Internal Security Review, and Maintenance",
+        "detail": "Rejected; submitted 2026-10-05; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A719"
+      },
+      {
+        "name": "Sheet proposal row 720 · Zcash Kenya — Privacy, Community & Economic Adoption Initiative",
+        "detail": "ZCG to discuss; submitted 2026-10-08; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A720"
+      },
+      {
+        "name": "Sheet proposal row 721 · VKX Wallet: Native Shielded Zcash Integration & Open-Source React Native Module",
+        "detail": "Rejected; submitted 2026-10-08; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A721"
+      },
+      {
+        "name": "Sheet proposal row 722 · Travel Support for Devcon 8 Mumbai — Speaker, Curator, Performer (ZK-Music)",
+        "detail": "Rejected; submitted 2026-10-08; decision 2026-10-12. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A722"
+      },
+      {
+        "name": "Sheet proposal row 723 · Zcash Private Receive Bridge",
+        "detail": "Rejected; submitted 2026-10-08; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A723"
+      },
+      {
+        "name": "Sheet proposal row 724 · Skyhook and ESMASTe: Cross-chain Bridging, Messaging and Execution Layer",
+        "detail": "ZCG to discuss; submitted 2026-10-09; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A724"
+      },
+      {
+        "name": "Sheet proposal row 725 · ZEC Order Pay: shielded ZEC checkout, refunds and creator payouts for service marketplaces",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-10; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A725"
+      },
+      {
+        "name": "Sheet proposal row 726 · CENTIREINGS Zcash Market Segmentation & Comparative Intelligence",
+        "detail": "Rejected; submitted 2026-10-12; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A726"
+      },
+      {
+        "name": "Sheet proposal row 727 · Konclave: taking the viewing key off the coordinator",
+        "detail": "Approved; submitted 2026-10-12; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A727"
+      },
+      {
+        "name": "Sheet proposal row 728 · Zecboat: Wake v1, a custom Halo 2 circuit for note lineage",
+        "detail": "Rejected; submitted 2026-10-13; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A728"
+      },
+      {
+        "name": "Sheet proposal row 729 · ZEC Order Pay: shielded ZEC checkout, refunds and creator payouts for service marketplaces",
+        "detail": "Rejected; submitted 2026-10-13; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A729"
+      },
+      {
+        "name": "Sheet proposal row 730 · Interoperable FROST co-signing for shielded ZEC: open specs and a reference implementation",
+        "detail": "ZCG to discuss; submitted 2026-10-13; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A730"
+      },
+      {
+        "name": "Sheet proposal row 731 · Canadian Zcash Community and red·bridge public testnet launch",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-13; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A731"
+      },
+      {
+        "name": "Sheet proposal row 732 · Zocial World — Privacy-First Social, Learning and Collaboration Platform for Zcash",
+        "detail": "Rejected; submitted 2026-10-13; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A732"
+      },
+      {
+        "name": "Sheet proposal row 733 · Zcash Early Builders Lab (ZEBL) Cape Town",
+        "detail": "Rejected; submitted 2026-10-14; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A733"
+      },
+      {
+        "name": "Sheet proposal row 734 · Zcash Privacy & Adoption in Two Bolivian Universities by BlockivIA",
+        "detail": "Approved; submitted 2026-10-14; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A734"
+      },
+      {
+        "name": "Sheet proposal row 735 · Zcash Wallet Finder: Needs-Based Selection and Verifiable Capability Data",
+        "detail": "Application Withdrawn; submitted 2026-10-15; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A735"
+      },
+      {
+        "name": "Sheet proposal row 736 · Zcash 中文入门包 / Zcash Chinese Onboarding Pack",
+        "detail": "ZCG to discuss; submitted 2026-10-15; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A736"
+      },
+      {
+        "name": "Sheet proposal row 737 · Zcash RPC Streaming Redaction Audit",
+        "detail": "Rejected; submitted 2026-10-16; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A737"
+      },
+      {
+        "name": "Sheet proposal row 738 · KeyAI: reproducible ECDLP evaluation for Zcash",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-17; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A738"
+      },
+      {
+        "name": "Sheet proposal row 739 · ZIP-321 Conformance Notebook",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-17; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A739"
+      },
+      {
+        "name": "Sheet proposal row 740 · Develop a Go interface to +state-of-the-art Zcash light-wallet tech",
+        "detail": "ZCG to discuss; submitted 2026-10-18; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A740"
+      },
+      {
+        "name": "Sheet proposal row 741 · zreceipt: payment disclosures for shielded Zcash (ZIP 311)",
+        "detail": "ZCG to discuss; submitted 2026-10-19; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A741"
+      },
+      {
+        "name": "Sheet proposal row 742 · Zcash @BlockchainLife 2026",
+        "detail": "Rejected; submitted 2026-10-19; decision 2026-10-23. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A742"
+      },
+      {
+        "name": "Sheet proposal row 743 · Pasta GLV Scalar Split Assurance: Source-Linked Proofs for Pallas and Vesta",
+        "detail": "ZCG to discuss; submitted 2026-10-19; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A743"
+      },
+      {
+        "name": "Sheet proposal row 744 · Zash: free, open-source Zcash education bot and channel in Spanish",
+        "detail": "ZCG to discuss; submitted 2026-10-20; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A744"
+      },
+      {
+        "name": "Sheet proposal row 745 · Develop a Go interface to state-of-the-art Zcash light-wallet tech",
+        "detail": "ZCG to discuss; submitted 2026-10-20; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A745"
+      },
+      {
+        "name": "Sheet proposal row 746 · Zcash Durable Payment Outbox",
+        "detail": "Waiting on applicant to post to forum; submitted 2026-10-20; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A746"
+      },
+      {
+        "name": "Sheet proposal row 747 · CryptoMondays Community Events",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-20; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A747"
+      },
+      {
+        "name": "Sheet proposal row 748 · Rypto: Zcash Privacy Content & Amplification Campaign",
+        "detail": "ZCG to discuss; submitted 2026-10-21; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A748"
+      },
+      {
+        "name": "Sheet proposal row 749 · Lean proof of the GLV recoding and ladder in pasta_curves (part 3 of pasta_curves#174)",
+        "detail": "ZCG to discuss; submitted 2026-10-21; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A749"
+      },
+      {
+        "name": "Sheet proposal row 750 · Zcash Durable Payment Outbox",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met; submitted 2026-10-21; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A750"
+      },
+      {
+        "name": "Sheet proposal row 751 · Zcash NU7 Compatibility for Wallet Core",
+        "detail": "ZCG to discuss; submitted 2026-10-22; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A751"
+      },
+      {
+        "name": "Sheet proposal row 752 · Zcash Localization Hub RU/UA",
+        "detail": "ZCG to discuss; submitted 2026-10-22; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A752"
+      },
+      {
+        "name": "Sheet proposal row 753 · ZecLink — Making Zcash Payments Simple and Accessible",
+        "detail": "ZCG to discuss; submitted 2026-10-22; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A753"
+      },
+      {
+        "name": "Sheet proposal row 754 · Post-quantum readiness inventory for the Zcash stack",
+        "detail": "ZCG to discuss; submitted 2026-10-22; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A754"
+      },
+      {
+        "name": "Sheet proposal row 755 · Zbeam: A Trustless gRPC Network for Zcash",
+        "detail": "ZCG to discuss; submitted 2026-10-26; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A755"
+      },
+      {
+        "name": "Sheet proposal row 756 · Zcash Durable Payment Outbox",
+        "detail": "ZCG to discuss; submitted 2026-10-26; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A756"
+      },
+      {
+        "name": "Sheet proposal row 757 · Authenticated Shielded Sync Gateway",
+        "detail": "ZCG to discuss; submitted 2026-10-27; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A757"
+      },
+      {
+        "name": "Sheet proposal row 758 · Unpair",
+        "detail": "ZCG to discuss; submitted 2026-10-27; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A758"
+      },
+      {
+        "name": "Sheet proposal row 759 · Zynova: Online Zcash Privacy Education and Adoption Programme",
+        "detail": "ZCG to discuss; submitted 2026-10-29; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A759"
+      },
+      {
+        "name": "Sheet proposal row 760 · Pasta Assembly Verification Bridge",
+        "detail": "ZCG to discuss; submitted 2026-10-29; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A760"
+      },
+      {
+        "name": "Sheet proposal row 761 · Zarcade",
+        "detail": "ZCG to discuss; submitted 2026-10-29; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A761"
+      },
+      {
+        "name": "Sheet proposal row 762 · Counzil DAO Manager",
+        "detail": "Waiting on applicant to post to forum; submitted 2026-10-30; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A762"
+      },
+      {
+        "name": "Sheet proposal row 763 · Block explorer + Testnet infrastructure 2026-27",
+        "detail": "Waiting on applicant to post to forum; submitted 2026-10-30; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A763"
+      },
+      {
+        "name": "Sheet proposal row 764 · Zecmap The Global Map Of Businesses Accepting Zcash",
+        "detail": "ZCG to discuss; submitted 2026-10-30; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A764"
+      },
+      {
+        "name": "Sheet proposal row 765 · Canadian Zcash Community and red·bridge public testnet launch",
+        "detail": "Waiting on applicant to post to forum; submitted 2026-10-30; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A765"
+      },
+      {
+        "name": "Sheet proposal row 766 · Shielded Quest 2026",
+        "detail": "ZCG to discuss; submitted 2026-10-31; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A766"
+      },
+      {
+        "name": "Sheet proposal row 767 · Shielded 2-of-3 FROST escrow for P2P commerce",
+        "detail": "Waiting on applicant to post to forum; submitted 2026-10-31; decision not recorded. Original row preserved. #501 appears twice; #506 has both waiting and filtered rows; latest Sheet row used in normalized proposal register.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/edit#gid=1164534734&range=A767"
+      },
+      {
+        "name": "Additional ZCG issue #473 · V12 Credits Application - Zorg",
+        "detail": "Created 2026-10-07; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/473"
+      },
+      {
+        "name": "Additional ZCG issue #485 · V12 Credits Application - zshield-mcp",
+        "detail": "Created 2026-10-13; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/485"
+      },
+      {
+        "name": "Additional ZCG issue #514 · V12 Credits Application - Zafe",
+        "detail": "Created 2026-10-23; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/514"
+      },
+      {
+        "name": "Additional ZCG issue #476 · V12 Credits Application - Konclave",
+        "detail": "Created 2026-10-08; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/476"
+      },
+      {
+        "name": "Additional ZCG issue #471 · V12 Credits Application - zkool",
+        "detail": "Created 2026-10-07; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/471"
+      },
+      {
+        "name": "Additional ZCG issue #484 · V12 Credits Application - VKX Wallet",
+        "detail": "Created 2026-10-12; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/484"
+      },
+      {
+        "name": "Additional ZCG issue #488 · V12 Credits Application - Vizor",
+        "detail": "Created 2026-10-13; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/488"
+      },
+      {
+        "name": "Additional ZCG issue #472 · V12 Credits Application - {Nozy Wallet}",
+        "detail": "Created 2026-10-07; GitHub state open. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/472"
+      },
+      {
+        "name": "Additional ZCG issue #482 · V12 Credits Application - zshield-mcp",
+        "detail": "Created 2026-10-12; GitHub state closed. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/482"
+      },
+      {
+        "name": "Additional ZCG issue #475 · V12 Credits Application - Konclave",
+        "detail": "Created 2026-10-08; GitHub state closed. Supplementary application/credit record, not included as a cash grant payment or approval.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/475"
+      },
+      {
+        "name": "Sheet Overview",
+        "detail": "Captured 2026-11-01T13:46:09.770129+00:00; HTTP 200; SHA-256 8506db2c4813423de64b0c6248be0fe7903b1d8fc1b02f490bd26b99d63ad643. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=892150625"
+      },
+      {
+        "name": "Sheet Grants",
+        "detail": "Captured 2026-11-01T13:46:09.771697+00:00; HTTP 200; SHA-256 3cbabdd2daea0e803400d9a11c95aac2fb350d7a0f3a52e60a237edb135f49f9. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=803214474"
+      },
+      {
+        "name": "Sheet Coinholder Paid",
+        "detail": "Captured 2026-11-01T13:46:12.498595+00:00; HTTP 200; SHA-256 b696b2614a2d562c8158e6ce9127ed02b526738ac2c6d0f1202364e71729660d. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=722519692"
+      },
+      {
+        "name": "Sheet Discretionary",
+        "detail": "Captured 2026-11-01T13:46:12.693372+00:00; HTTP 200; SHA-256 dc8b85f0047bcfe9a7c9a5e46cd04e5f1f53a67330305acf65735d76a6c2c30f. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=2043949055"
+      },
+      {
+        "name": "Sheet Ic",
+        "detail": "Captured 2026-11-01T13:46:09.771834+00:00; HTTP 200; SHA-256 d1851efa068b0099e1d4adbb6d9faa1c99aac8ce079912f6110a229375caf12c. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=1267338970"
+      },
+      {
+        "name": "Sheet Stipends",
+        "detail": "Captured 2026-11-01T13:46:12.743493+00:00; HTTP 200; SHA-256 838247fbfff0c8cf4cce98a366f4483fa28c58f4ae74d371b59bf2099e921ab9. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=598263567"
+      },
+      {
+        "name": "Sheet Proposals",
+        "detail": "Captured 2026-11-01T13:46:14.982844+00:00; HTTP 200; SHA-256 b0c6398efb5bab17eb31468f477bd3a028789884e13d6a7ddcb7922cc05bd19a. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/1FQ28rDCyRW0TiNxrm3rgD8ai2KGUsXAjPieQmI1kKKg/export?format=csv&gid=1164534734"
+      },
+      {
+        "name": "Api Zechub",
+        "detail": "Captured 2026-11-01T13:46:17.020350+00:00; HTTP 200; SHA-256 24e9854dbffb91a61b07ecf2bcfdd72be502f701dd2df64e87fcc91374968d9d. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://openzcash.org/api/zechub/treasury"
+      },
+      {
+        "name": "Sheet Zechub 228848690",
+        "detail": "Captured 2026-11-01T14:31:11.810423+00:00; HTTP 200; SHA-256 8eef51945fb3e5252a3cd03df27bc1077732770fc34433c2d992e8012a844476. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://docs.google.com/spreadsheets/d/19Zy5hp3dMix8pyP8_PxMF32vkl-OyNWU07jrlCTFfso/export?format=csv&gid=228848690"
+      },
+      {
+        "name": "Zec Price Context",
+        "detail": "Captured 2026-11-01T14:13:57.569308+00:00; HTTP 200; SHA-256 7ac5cdd10e2189d30972cff281b42b1284b39e4fd3b576a0bd6061435d8745b2. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd&include_last_updated_at=true"
+      },
+      {
+        "name": "Zf Stable",
+        "detail": "Captured 2026-11-01T13:50:13.825561+00:00; HTTP 200; SHA-256 2a63b52b4e3ecfcdce37d6ba24b109f05625adcdbc8b7ddbaa49c42f9806d0b2. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zfnd.org/zebra-7-0-0-release/"
+      },
+      {
+        "name": "Zf Andale",
+        "detail": "Captured 2026-11-01T13:50:13.882711+00:00; HTTP 200; SHA-256 5191a53c80bf5b12ff3fe9fb7a0da6b2db4cee429d56dd20ef07af5e661f61f5. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zfnd.org/zebra-andale-the-fastest-zebra-yet/"
+      },
+      {
+        "name": "Zf Director",
+        "detail": "Captured 2026-11-01T13:50:14.024424+00:00; HTTP 200; SHA-256 64f448af0a94842a982a784c26a12092eab4484b700212e62b67fa8d143cab74. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zfnd.org/zcash-foundation-names-david-campbell-executive-director/"
+      },
+      {
+        "name": "Shielded Epoch",
+        "detail": "Captured 2026-11-01T13:50:14.361064+00:00; HTTP 200; SHA-256 0787ac23d2a0ab673da3becf5a64ff52cd35a5beb98e8c8b18263f947531523d. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://shieldedlabs.net/epoch-future-proof-cryptography-for-zcash/"
+      },
+      {
+        "name": "Arborist 133",
+        "detail": "Captured 2026-11-01T14:02:41.844416+00:00; HTTP 200; SHA-256 4a7f3f21a5e6757a9fde9fc6411e33f9ac951c046a29292e14514d49b623a2bd. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://raw.githubusercontent.com/ZcashCommunityGrants/arboretum-notes/main/AllArboristCallNotes/Arborist%20call%20133%20-%20notes.md"
+      },
+      {
+        "name": "Arborist 134",
+        "detail": "Captured 2026-11-01T14:02:41.845181+00:00; HTTP 200; SHA-256 715743606ea52cb8f0df4f801f1d42bed5731880cd8e981fed59ecdcb1e50243. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://raw.githubusercontent.com/ZcashCommunityGrants/arboretum-notes/main/AllArboristCallNotes/Arborist%20call%20134%20-%20notes.md"
+      },
+      {
+        "name": "Github Tachyon Commits",
+        "detail": "Captured 2026-11-01T14:01:30.366048+00:00; HTTP 200; SHA-256 5e8eb117e767101e985bb1ea219c87d18da6c519d1d4ca94a2b1c20da8eb0023. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/tachyon-zcash/tachyon/commits?since=2026-10-01T03:00:00Z&until=2026-11-01T02:59:59Z&per_page=100"
+      },
+      {
+        "name": "Github Ragu Commits",
+        "detail": "Captured 2026-11-01T14:01:30.368101+00:00; HTTP 200; SHA-256 6a350507414f63d4fd91f0dcfc8c641177b43e4a0e7632340d53c7146d862fbb. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/tachyon-zcash/ragu/commits?since=2026-10-01T03:00:00Z&until=2026-11-01T02:59:59Z&per_page=100"
+      },
+      {
+        "name": "Releases Zebra",
+        "detail": "Captured 2026-11-01T13:46:19.681189+00:00; HTTP 200; SHA-256 e47cc66ac93cc789ac98cf9bc84aa11b60e24009895f4f7850faedcf34f10f02. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/ZcashFoundation/zebra/releases?per_page=100"
+      },
+      {
+        "name": "Releases Zakura",
+        "detail": "Captured 2026-11-01T13:46:19.809763+00:00; HTTP 200; SHA-256 2801175e9533c9c3245bca9f531de22b8dc3474837ae9347d4dc95eb8200e795. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/zakura-core/zakura/releases?per_page=100"
+      },
+      {
+        "name": "Releases Zodl Android",
+        "detail": "Captured 2026-11-01T13:46:20.400164+00:00; HTTP 200; SHA-256 b1b19c66fd29fbd0605e26a80560047bf6c5d1b726c3fe2ee79cad8b00456a67. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/zodl-inc/zodl-android/releases?per_page=100"
+      },
+      {
+        "name": "Github Zingo Mobile Releases",
+        "detail": "Captured 2026-11-01T14:01:33.212251+00:00; HTTP 200; SHA-256 c913f0281d2b7d73ff9d24744439fece87e50f737aa4a9fc546529853209fc81. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/zingolabs/zingo-mobile/releases?per_page=100"
+      },
+      {
+        "name": "Releases Zingo",
+        "detail": "Captured 2026-11-01T13:46:21.261068+00:00; HTTP 200; SHA-256 e0376b04e7f0e3da721209297bff2cfd60b191f3317f0fb47c1f8745728325d1. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/zingolabs/zingo-pc/releases?per_page=100"
+      },
+      {
+        "name": "Releases Vizor",
+        "detail": "Captured 2026-11-01T13:46:22.388491+00:00; HTTP 200; SHA-256 f7dc3f0dd695069ea511e6136880a1233925386a36bf792b42a7ab01a07aedbd. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/chainapsis/vizor-wallet/releases?per_page=100"
+      },
+      {
+        "name": "Releases Zkool",
+        "detail": "Captured 2026-11-01T13:46:22.399041+00:00; HTTP 200; SHA-256 daf2893fe948792f2e806671c99db91f0092a43dc67ca559cefa1351a0f7254e. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/hhanh00/zkool2/releases?per_page=100"
+      },
+      {
+        "name": "Releases Zaino",
+        "detail": "Captured 2026-11-01T13:46:22.403895+00:00; HTTP 200; SHA-256 019b13543232b06fccf461ccd42068840b9807ce47b39b21a78417edd3ef9bfa. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/zingolabs/zaino/releases?per_page=100"
+      },
+      {
+        "name": "Releases Zallet",
+        "detail": "Captured 2026-11-01T13:46:23.190439+00:00; HTTP 200; SHA-256 c7957815781d1d1ebb514528691907b47aed6c9ac46a0aa6bb8e3f6fc93e73e9. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://api.github.com/repos/zcash/wallet/releases?per_page=100"
+      },
+      {
+        "name": "Recap Linked Zakura 1 6 0",
+        "detail": "Captured 2026-11-01T14:13:57.513358+00:00; HTTP 200; SHA-256 bf934458fe46aed4b321c00c0143c856533117e7b8f46988600735bfd5285edf. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/announcements/zakura-1-6-0/"
+      },
+      {
+        "name": "Recap Linked P2Pv2",
+        "detail": "Captured 2026-11-01T14:13:57.461196+00:00; HTTP 200; SHA-256 ff87ebfcbc605b0f1ad4488c6b3f16ffbdd4031e3ef233ff14f312d7cdbfe3a6. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/engineering/p2pv2/"
+      },
+      {
+        "name": "Recap Linked Cpu Compiler Diversity",
+        "detail": "Captured 2026-11-01T14:13:57.289879+00:00; HTTP 200; SHA-256 f6403c1ed3342a7aeeabd165e5926c6197b9402b3fb97b415334fb1713dda696. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/engineering/cpu-compiler-diversity/"
+      },
+      {
+        "name": "Recap Linked Transparent Pir Rotating Addresses",
+        "detail": "Captured 2026-11-01T14:13:57.227179+00:00; HTTP 200; SHA-256 8d703e42d51c690c2db03057c8f99be0385ddbdbec29240117dfcba80ccb28c3. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/engineering/transparent-pir-rotating-addresses/"
+      },
+      {
+        "name": "Recap Linked P2Pv2 Resource Budgets",
+        "detail": "Captured 2026-11-01T14:13:56.592786+00:00; HTTP 200; SHA-256 e2d42832989229aa348e9fb1b7c3798869419025cd056fc7f7e1b4c105e5d155. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/engineering/p2pv2-resource-budgets/"
+      },
+      {
+        "name": "Recap Linked Adversarial Audit Formal Verification",
+        "detail": "Captured 2026-11-01T14:13:57.562928+00:00; HTTP 200; SHA-256 49c5a382aa895a470813ad1a5cb5f6dc8e452f90d9238fc860a184699e753e05. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/engineering/adversarial-audit-formal-verification/"
+      },
+      {
+        "name": "Recap Linked Nu7",
+        "detail": "Captured 2026-11-01T14:13:56.592319+00:00; HTTP 200; SHA-256 1a34ade71d065072970b7ec26293dca78effe060da75f59eb4a17f2a4fae4f95. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/nu7/"
+      },
+      {
+        "name": "Recap Linked Zakura 1 7 0",
+        "detail": "Captured 2026-11-01T14:13:56.593104+00:00; HTTP 200; SHA-256 95cf544a50a0d8b66ab37a3d3bd34c07ee059a6b4c32a35d178f04c3f03e7570. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/announcements/zakura-1-7-0/"
+      },
+      {
+        "name": "Recap Linked Zakura Common",
+        "detail": "Captured 2026-11-01T14:13:57.204696+00:00; HTTP 200; SHA-256 8f1471ea4f436783038ca9b391f303af888cb4f0a4e510f6f31d3f3dfae0ce49. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/announcements/zakura-common/"
+      },
+      {
+        "name": "Recap Linked Quantum Unlinkability",
+        "detail": "Captured 2026-11-01T14:13:56.592952+00:00; HTTP 200; SHA-256 988c2ebd979546ce1a12f0220929c9bfbdba50bcdc2299427bb4eab85e02d48e. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://zakura.com/engineering/quantum-unlinkability/"
+      },
+      {
+        "name": "Recap Linked Auditing Formal Verifications",
+        "detail": "Captured 2026-11-01T14:13:57.221284+00:00; HTTP 200; SHA-256 6c5e291d8eddcb6d522edc8f982798efce3b5ffee64486a192b6eb34b17a232a. Primary publication/API snapshot; dates and scope are stated in the report.",
+        "url": "https://blog.zksecurity.xyz/posts/auditing-formal-verifications/"
+      },
+      {
+        "name": "Zakura October recap · published November 1",
+        "detail": "Official account recap covers October activity. Cross-checked with linked engineering posts and releases. Adoption and performance figures are team-reported; experimental and integrated-but-not-deployed work remains labeled.",
+        "url": "https://x.com/ZakuraZcash/status/2116742953456881666"
+      },
+      {
+        "name": "ZF Engineering Update: 21 September - 5 October 2026",
+        "detail": "Public topic 58059; all 1 of 1 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58059/1"
+      },
+      {
+        "name": "ZF Engineering Update: 6 - 19 October 2026",
+        "detail": "Public topic 58410; all 1 of 1 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58410/1"
+      },
+      {
+        "name": "Zcash Community Grants Meeting Minutes 10/12/2026",
+        "detail": "Public topic 58182; all 2 of 2 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58182/1"
+      },
+      {
+        "name": "Zcash Community Grants Meeting Minutes 10/23/2026",
+        "detail": "Public topic 58488; all 2 of 2 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58488/1"
+      },
+      {
+        "name": "Q4 Coinholder-Directed Retroactive Grant Program - Call for Proposals",
+        "detail": "Public topic 58598; all 8 of 8 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58598/1"
+      },
+      {
+        "name": "Future Dev and Legal Defense Fund ZIP",
+        "detail": "Public topic 58611; all 38 of 38 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58611/1"
+      },
+      {
+        "name": "Draft Proposal: ZecHub Communities sub-DAO for Ambassadors and emerging communities",
+        "detail": "Public topic 58135; all 12 of 12 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58135/1"
+      },
+      {
+        "name": "Grant Application - ZECsy Community Building: 12 Months of Zcash on the Ground",
+        "detail": "Public topic 56890; all 28 of 28 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/56890/1"
+      },
+      {
+        "name": "Zcash East Africa @ Africa Blockchain Festival 2026",
+        "detail": "Public topic 57437; all 13 of 13 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/57437/1"
+      },
+      {
+        "name": "Introducing LeekWallet Zcash: a DIY hardware wallet you can build for about $25",
+        "detail": "Public topic 58642; all 6 of 6 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58642/1"
+      },
+      {
+        "name": "Zafe multisig is launched (beta), looking for groups to test it",
+        "detail": "Public topic 58636; all 2 of 2 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58636/1"
+      },
+      {
+        "name": "ZecLearn: a free live quiz tool for Zcash meetups and classes",
+        "detail": "Public topic 58661; all 3 of 3 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58661/1"
+      },
+      {
+        "name": "Zecmap The Global Map Of Businesses Accepting Zcash",
+        "detail": "Public topic 58641; all 4 of 4 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58641/1"
+      },
+      {
+        "name": "Zcash-faucet: testnet TAZ from your terminal with npx zcash-faucet <address>",
+        "detail": "Public topic 58647; all 5 of 5 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58647/1"
+      },
+      {
+        "name": "Can I Shield? A live, re-checkable list of where shielded ZEC actually works (+ a live NU7 countdown)",
+        "detail": "Public topic 58594; all 1 of 1 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58594/1"
+      },
+      {
+        "name": "Formally verifying the Equihash verifier",
+        "detail": "Public topic 58667; all 3 of 3 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/58667/1"
+      },
+      {
+        "name": "PGPZ Community Weekly Policy Memos",
+        "detail": "Public topic 56324; all 17 of 17 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/56324/1"
+      },
+      {
+        "name": "Cypherpunk Policy Dinner (“CPD”) ZCG Anchor Sponsorship",
+        "detail": "Public topic 55592; all 41 of 41 captured posts retained privately. Reports, proposals and discussion are distinguished; no member-only content used.",
+        "url": "https://forum.zcashcommunity.com/t/55592/1"
+      },
+      {
+        "name": "Zakura recap · detailed coverage map",
+        "detail": "Monthly pages 5 and 7 plus Operations engineering detail cover dependencies, formalization audit, CPU/compiler diversity, NU7, network health, adoption, PIR, rotation/WOTS, swaps, P2Pv2 and Ledger. No claim of deployed swaps or default Mainnet P2Pv2.",
+        "url": "https://x.com/ZakuraZcash/status/2116742953456881666"
+      },
+      {
+        "name": "Valuation basis",
+        "detail": "Publication-context quote: USD 1240.19/ZEC, provider timestamp 2026-11-01T14:13:38+00:00. ZCG/lockbox holdings October 30; ZecHub holdings October 20. Price-only revaluation is not an inflow.",
+        "url": "https://api.coingecko.com/api/v3/simple/price?ids=zcash&vs_currencies=usd&include_last_updated_at=true"
+      }
+    ],
+    "communities": [
+      {
+        "name": "ZecHub",
+        "detail": "October discussion developed a community sub-DAO proposal; Greek wiki contributor reports an October 23 launch. The October 1 September report is prior-period context, not October output.",
+        "url": "https://forum.zcashcommunity.com/t/58135/12"
+      },
+      {
+        "name": "Zcash Brazil",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/53702/1"
+      },
+      {
+        "name": "ZK AV Club",
+        "detail": "October 19 announcement introduced monthly Community Workshops calls. October 26 thread shared a documentary on the first Zcash ceremony. Publication/announcement evidence, not audited attendance.",
+        "url": "https://forum.zcashcommunity.com/t/53913/60"
+      },
+      {
+        "name": "Zcash en Español",
+        "detail": "October 23 operator report: Zebra 7.0.0 and lightwalletd 0.6.0 upgrade with node verification. Earlier September metrics remain labeled September.",
+        "url": "https://forum.zcashcommunity.com/t/55530/16"
+      },
+      {
+        "name": "Zcash Türkiye",
+        "detail": "October: University Tour proposal approved and USD 27,000 paid in the Sheet. Ongoing public updates and NU7/testnet discussion captured. Funding is distinct from verified tour delivery.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/449"
+      },
+      {
+        "name": "Zcash Nigeria",
+        "detail": "September monthly report published October 1; not treated as October delivery. October Sheet payments total USD 9,300. No complete October activity report verified in the captured thread.",
+        "url": "https://forum.zcashcommunity.com/t/53654/20"
+      },
+      {
+        "name": "Zcash Ghana",
+        "detail": "October 4 report covers an October 1 meetup at Google AI Centre, Accra, on privacy and payments. Team-reported event, not independent attendance verification.",
+        "url": "https://forum.zcashcommunity.com/t/57632/4"
+      },
+      {
+        "name": "Zcash Arabia",
+        "detail": "October 29 report describes an Algeria anniversary meetup, Arabic educational articles, translated resources and videos on NU7 and ecosystem projects.",
+        "url": "https://forum.zcashcommunity.com/t/57170/12"
+      },
+      {
+        "name": "Club Zcash Caracas",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://free2z.cash/Yoditar/zpage/club-zcash-caracas-1o-meetup"
+      },
+      {
+        "name": "Club Zcash Barcelona",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/51247/1"
+      },
+      {
+        "name": "CodeRaiz México",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/55506/1"
+      },
+      {
+        "name": "Pesa Ya Siri (Zcash Tanzania)",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/56593/1"
+      },
+      {
+        "name": "ruZcash",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/38485/1"
+      },
+      {
+        "name": "Boston Zcash",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/56748/1"
+      },
+      {
+        "name": "Zcash China",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/33064/1"
+      },
+      {
+        "name": "Zcash México",
+        "detail": "October public discussion covers mobile connectivity and privacy in Mexico; this is policy/community context, not a completed grant milestone.",
+        "url": "https://forum.zcashcommunity.com/t/56305/7"
+      },
+      {
+        "name": "Zcash East Africa",
+        "detail": "October 22 post-event report: team reports 111 ZODL wallet onboards and 50 side-event attendees on October 16. Day-30 retention remains pending; counts are not independent adoption metrics.",
+        "url": "https://forum.zcashcommunity.com/t/57437/11"
+      },
+      {
+        "name": "Zcash France",
+        "detail": "October 23 discussion recruits native-language review for ZecHub translations. Recruitment is not evidence that the translation review is completed.",
+        "url": "https://forum.zcashcommunity.com/t/5544/121"
+      },
+      {
+        "name": "Zcash Global Germany",
+        "detail": "October 23 call requests paid proofreading of German ZecHub translations. No completed proofreading milestone inferred.",
+        "url": "https://forum.zcashcommunity.com/t/50169/4"
+      },
+      {
+        "name": "Zcash India",
+        "detail": "October 30 report: team reports Pune and Indore events (141 and 102 attendees), 19 video bounty entries and USD 150 in rewards. Mumbai Zcash World on November 1 is post-period.",
+        "url": "https://forum.zcashcommunity.com/t/54762/22"
+      },
+      {
+        "name": "Zcash Indonesia",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/38678/1"
+      },
+      {
+        "name": "Zcash Japan",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/54827/1"
+      },
+      {
+        "name": "Zcash Korea",
+        "detail": "October thread shows translation contributor interest. No complete October outcome report verified in the captured sources.",
+        "url": "https://forum.zcashcommunity.com/t/56458/6"
+      },
+      {
+        "name": "Elzz — Global Ambassador",
+        "detail": "September report published October 6; treated as prior-period context, not October delivery.",
+        "url": "https://forum.zcashcommunity.com/t/58032/1"
+      },
+      {
+        "name": "Zcash Ukraine",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/54059/1"
+      },
+      {
+        "name": "ZcashSA (Zcash South Africa)",
+        "detail": "No dated October outcome report verified in the captured public sources. This is a coverage gap, not evidence of inactivity or non-delivery.",
+        "url": "https://forum.zcashcommunity.com/t/57133/1"
+      },
+      {
+        "name": "Zcast",
+        "detail": "October anniversary programming and October 31 recap of Madrid events/meetups published. Team report supports activity, not independently measured reach.",
+        "url": "https://forum.zcashcommunity.com/t/54291/47"
+      },
+      {
+        "name": "Greek ZecHub contributors",
+        "detail": "Contributor reports glossary approval and Greek wiki launch on October 23. Emerging initiative; not an independently verified regional organization.",
+        "url": "https://forum.zcashcommunity.com/t/58135/12"
+      },
+      {
+        "name": "BlockivIA · Bolivia",
+        "detail": "University education proposal approved October 23; USD 750 startup paid. Planned programme, not completed university delivery.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/494"
+      }
+    ],
+    "requests": [
+      {
+        "name": "Coinholder Q4 #71 · Retroactive Grant Application - Critical Zebra Block Discovery DoS (CVE-2026-44499)",
+        "detail": "Submitted 2026-10-31. Request only; no Q4 result or payment. Voting scheduled December 17–29.",
+        "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/71",
+        "amount": 150000.0,
+        "amountLabel": "Requested · $150,000"
+      },
+      {
+        "name": "Coinholder Q4 #70 · Retroactive Grant Application - Maya Protocol: Zcash upstream contributions, NU6.2/NU6.3 Ironwood, Zebra migration and ZEC signing hardening",
+        "detail": "Submitted 2026-10-30. Request only; no Q4 result or payment. Voting scheduled December 17–29.",
+        "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/70",
+        "amount": 50000.0,
+        "amountLabel": "Requested · $50,000"
+      },
+      {
+        "name": "Coinholder Q4 #69 · Retroactive Grant Application - Zebra High-Severity Mempool DoS Disclosure (GHSA-7jp4-mq53-4cvq)",
+        "detail": "Submitted 2026-10-30. Request only; no Q4 result or payment. Voting scheduled December 17–29.",
+        "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/69",
+        "amount": 75000.0,
+        "amountLabel": "Requested · $75,000"
+      },
+      {
+        "name": "Coinholder Q4 #68 · Retroactive Grant Application - Zebra High-Severity Mempool DoS Disclosure (GHSA-7jp4-mq53-4cvq)",
+        "detail": "Submitted 2026-10-30. Closed duplicate of #69; excluded from active request total.",
+        "url": "https://github.com/Financial-Privacy-Foundation/ZcashCoinholderGrantsProgram/issues/68",
+        "amount": 75000.0,
+        "amountLabel": "Requested · $75,000"
+      }
+    ],
+    "zcg": [
+      {
+        "name": "ZCG #435 · P2P Cash-to-ZEC Onboarding via Bank CDMs",
+        "detail": "Rejected. Submitted 2026-09-19. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/435",
+        "amount": 40500.0,
+        "amountLabel": "Requested · $40,500"
+      },
+      {
+        "name": "ZCG #386 · ZKP-cryptography course",
+        "detail": "Rejected. Submitted 2026-09-20. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/386",
+        "amount": 5000.0,
+        "amountLabel": "Requested · $5,000"
+      },
+      {
+        "name": "ZCG #441 · Bitcointalk Signature Campaign & ZEC Community Engagement — 3 Months",
+        "detail": "Rejected. Submitted 2026-09-22. Decision 2026-10-02. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/441",
+        "amount": 90000.0,
+        "amountLabel": "Requested · $90,000"
+      },
+      {
+        "name": "ZCG #442 · ZCASH AFRICA PRIVACY ENGINEERING RESIDENCY",
+        "detail": "Rejected. Submitted 2026-09-23. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/442",
+        "amount": 49000.0,
+        "amountLabel": "Requested · $49,000"
+      },
+      {
+        "name": "ZCG #444 · Independent Recomputation of the Zcash Supply Ledger, including the NU7 NSM Reserve",
+        "detail": "Rejected. Submitted 2026-09-25. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/444",
+        "amount": 50000.0,
+        "amountLabel": "Requested · $50,000"
+      },
+      {
+        "name": "ZCG #447 · Mexico Tech Week October 2026 - Zcash México",
+        "detail": "Approved. Submitted 2026-09-26. Decision 2026-10-02. Google Sheets Proposals. Original request USD 7,980; September 28 amendment and October 12 minutes cite USD 6,380. Sheet paid entry remains USD 7,980; these are separate states.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/447",
+        "amount": 7980.0,
+        "amountLabel": "Requested · $7,980"
+      },
+      {
+        "name": "ZCG #448 · Zcash Privacy Ecosystem Mapping & Adoption Data",
+        "detail": "Rejected. Submitted 2026-09-26. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/448",
+        "amount": 5000.0,
+        "amountLabel": "Requested · $5,000"
+      },
+      {
+        "name": "ZCG #449 · Zcash Türkiye University Tour 2026 — ZCG",
+        "detail": "Approved. Submitted 2026-09-27. Decision 2026-10-09. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/449",
+        "amount": 27000.0,
+        "amountLabel": "Requested · $27,000"
+      },
+      {
+        "name": "ZCG #450 · Zcash Global Community & Marketing Operations",
+        "detail": "Rejected. Submitted 2026-09-28. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/450",
+        "amount": 12000.0,
+        "amountLabel": "Requested · $12,000"
+      },
+      {
+        "name": "ZCG #453 · zswap by stalllion labs",
+        "detail": "Rejected. Submitted 2026-09-29. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/453",
+        "amount": 50000.0,
+        "amountLabel": "Requested · $50,000"
+      },
+      {
+        "name": "ZCG #455 · Nozy Sync Engine public ($45k)",
+        "detail": "Rejected. Submitted 2026-09-29. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/455",
+        "amount": 45000.0,
+        "amountLabel": "Requested · $45,000"
+      },
+      {
+        "name": "ZCG #454 · 0xramp: ZEC payments and wallet integrations (revision of #408)",
+        "detail": "Approved. Submitted 2026-09-29. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/454",
+        "amount": 45000.0,
+        "amountLabel": "Requested · $45,000"
+      },
+      {
+        "name": "ZCG #456 · Zcash Privacy Payment Rail & NFC Programmable Cards",
+        "detail": "Rejected. Submitted 2026-09-30. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/456",
+        "amount": 150000.0,
+        "amountLabel": "Requested · $150,000"
+      },
+      {
+        "name": "ZCG #457 · Build Buddies x Zcash: Privacy Education and Community Adoption in Latin America and Asia",
+        "detail": "Rejected. Submitted 2026-09-30. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/457",
+        "amount": 10000.0,
+        "amountLabel": "Requested · $10,000"
+      },
+      {
+        "name": "ZCG #458 · VaihtoFX: Shielded ZEC On/Off-Ramp via M-Pesa & Airtel Money in Kenya",
+        "detail": "Rejected. Submitted 2026-10-01. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/458",
+        "amount": 132092.0,
+        "amountLabel": "Requested · $132,092"
+      },
+      {
+        "name": "ZCG #459 · Zcash Education Laboratory at Polytechnic University",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-01. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/459",
+        "amount": 190000.0,
+        "amountLabel": "Requested · $190,000"
+      },
+      {
+        "name": "ZCG #460 · Fixing, Updating & Streamlining of Zcash Documentation (https://zcash.readthedocs.io/en/master/index.html)",
+        "detail": "Rejected. Submitted 2026-10-01. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/460",
+        "amount": 40904.0,
+        "amountLabel": "Requested · $40,904"
+      },
+      {
+        "name": "ZCG #462 · Tells: a privacy checkup for Zcash wallets",
+        "detail": "Rejected. Submitted 2026-10-02. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/462",
+        "amount": 24000.0,
+        "amountLabel": "Requested · $24,000"
+      },
+      {
+        "name": "ZCG #464 · Solana StealthShield",
+        "detail": "Application Withdrawn. Submitted 2026-10-03. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/464",
+        "amount": 25000.0,
+        "amountLabel": "Requested · $25,000"
+      },
+      {
+        "name": "ZCG #465 · Zcash BuildPath India: Four-City Developer Onboarding Pilot",
+        "detail": "Rejected. Submitted 2026-10-03. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/465",
+        "amount": 17600.0,
+        "amountLabel": "Requested · $17,600"
+      },
+      {
+        "name": "ZCG #466 · ZAgentPay: shielded Zcash payments for AI agents under human-defined mandates (MCP server)",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-04. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/466",
+        "amount": 40000.0,
+        "amountLabel": "Requested · $40,000"
+      },
+      {
+        "name": "ZCG #467 · Zcash Shielded Payments: An English/Korean Research Report",
+        "detail": "Rejected. Submitted 2026-10-04. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/467",
+        "amount": 20000.0,
+        "amountLabel": "Requested · $20,000"
+      },
+      {
+        "name": "ZCG #468 · Hito Zcash: Stable Firmware, Internal Security Review, and Maintenance",
+        "detail": "Rejected. Submitted 2026-10-05. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/468",
+        "amount": 88000.0,
+        "amountLabel": "Requested · $88,000"
+      },
+      {
+        "name": "ZCG #474 · Zcash Kenya — Privacy, Community & Economic Adoption Initiative",
+        "detail": "ZCG to discuss. Submitted 2026-10-08. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/474",
+        "amount": 16500.0,
+        "amountLabel": "Requested · $16,500"
+      },
+      {
+        "name": "ZCG #477 · VKX Wallet: Native Shielded Zcash Integration & Open-Source React Native Module",
+        "detail": "Rejected. Submitted 2026-10-08. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/477",
+        "amount": 48000.0,
+        "amountLabel": "Requested · $48,000"
+      },
+      {
+        "name": "ZCG #478 · Travel Support for Devcon 8 Mumbai — Speaker, Curator, Performer (ZK-Music)",
+        "detail": "Rejected. Submitted 2026-10-08. Decision 2026-10-12. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/478",
+        "amount": 1000.0,
+        "amountLabel": "Requested · $1,000"
+      },
+      {
+        "name": "ZCG #479 · Zcash Private Receive Bridge",
+        "detail": "Rejected. Submitted 2026-10-08. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/479",
+        "amount": 38000.0,
+        "amountLabel": "Requested · $38,000"
+      },
+      {
+        "name": "ZCG #480 · Skyhook and ESMASTe: Cross-chain Bridging, Messaging and Execution Layer",
+        "detail": "ZCG to discuss. Submitted 2026-10-09. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/480",
+        "amount": 255000.0,
+        "amountLabel": "Requested · $255,000"
+      },
+      {
+        "name": "ZCG #481 · ZEC Order Pay: shielded ZEC checkout, refunds and creator payouts for service marketplaces",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-10. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/481",
+        "amount": 36000.0,
+        "amountLabel": "Requested · $36,000"
+      },
+      {
+        "name": "ZCG #483 · CENTIREINGS Zcash Market Segmentation & Comparative Intelligence",
+        "detail": "Rejected. Submitted 2026-10-12. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/483",
+        "amount": 22500.0,
+        "amountLabel": "Requested · $22,500"
+      },
+      {
+        "name": "ZCG #486 · Konclave: taking the viewing key off the coordinator",
+        "detail": "Approved. Submitted 2026-10-12. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/486",
+        "amount": 18000.0,
+        "amountLabel": "Requested · $18,000"
+      },
+      {
+        "name": "ZCG #487 · Zecboat: Wake v1, a custom Halo 2 circuit for note lineage",
+        "detail": "Rejected. Submitted 2026-10-13. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/487",
+        "amount": 61400.0,
+        "amountLabel": "Requested · $61,400"
+      },
+      {
+        "name": "ZCG #489 · ZEC Order Pay: shielded ZEC checkout, refunds and creator payouts for service marketplaces",
+        "detail": "Rejected. Submitted 2026-10-13. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/489",
+        "amount": 36000.0,
+        "amountLabel": "Requested · $36,000"
+      },
+      {
+        "name": "ZCG #490 · Interoperable FROST co-signing for shielded ZEC: open specs and a reference implementation",
+        "detail": "ZCG to discuss. Submitted 2026-10-13. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/490",
+        "amount": 16500.0,
+        "amountLabel": "Requested · $16,500"
+      },
+      {
+        "name": "ZCG #492 · Canadian Zcash Community and red·bridge public testnet launch",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-13. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/492",
+        "amount": 34000.0,
+        "amountLabel": "Requested · $34,000"
+      },
+      {
+        "name": "ZCG #491 · Zocial World — Privacy-First Social, Learning and Collaboration Platform for Zcash",
+        "detail": "Rejected. Submitted 2026-10-13. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/491",
+        "amount": 45000.0,
+        "amountLabel": "Requested · $45,000"
+      },
+      {
+        "name": "ZCG #493 · Zcash Early Builders Lab (ZEBL) Cape Town",
+        "detail": "Rejected. Submitted 2026-10-14. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/493",
+        "amount": 47300.0,
+        "amountLabel": "Requested · $47,300"
+      },
+      {
+        "name": "ZCG #494 · Zcash Privacy & Adoption in Two Bolivian Universities by BlockivIA",
+        "detail": "Approved. Submitted 2026-10-14. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/494",
+        "amount": 1500.0,
+        "amountLabel": "Requested · $1,500"
+      },
+      {
+        "name": "ZCG #495 · Zcash Wallet Finder: Needs-Based Selection and Verifiable Capability Data",
+        "detail": "Application Withdrawn. Submitted 2026-10-15. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/495",
+        "amount": 3000.0,
+        "amountLabel": "Requested · $3,000"
+      },
+      {
+        "name": "ZCG #498 · Zcash 中文入门包 / Zcash Chinese Onboarding Pack",
+        "detail": "ZCG to discuss. Submitted 2026-10-15. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/498",
+        "amount": 3000.0,
+        "amountLabel": "Requested · $3,000"
+      },
+      {
+        "name": "ZCG #497 · Zcash RPC Streaming Redaction Audit",
+        "detail": "Rejected. Submitted 2026-10-16. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/497",
+        "amount": 6000.0,
+        "amountLabel": "Requested · $6,000"
+      },
+      {
+        "name": "ZCG #499 · KeyAI: reproducible ECDLP evaluation for Zcash",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-17. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/499",
+        "amount": 18000.0,
+        "amountLabel": "Requested · $18,000"
+      },
+      {
+        "name": "ZCG #500 · ZIP-321 Conformance Notebook",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-17. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/500",
+        "amount": 9000.0,
+        "amountLabel": "Requested · $9,000"
+      },
+      {
+        "name": "ZCG #501 · Develop a Go interface to state-of-the-art Zcash light-wallet tech",
+        "detail": "ZCG to discuss. Submitted 2026-10-20. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/501",
+        "amount": 48000.0,
+        "amountLabel": "Requested · $48,000"
+      },
+      {
+        "name": "ZCG #502 · zreceipt: payment disclosures for shielded Zcash (ZIP 311)",
+        "detail": "ZCG to discuss. Submitted 2026-10-19. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/502",
+        "amount": 15000.0,
+        "amountLabel": "Requested · $15,000"
+      },
+      {
+        "name": "ZCG #503 · Zcash @BlockchainLife 2026",
+        "detail": "Rejected. Submitted 2026-10-19. Decision 2026-10-23. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/503",
+        "amount": 35000.0,
+        "amountLabel": "Requested · $35,000"
+      },
+      {
+        "name": "ZCG #504 · Pasta GLV Scalar Split Assurance: Source-Linked Proofs for Pallas and Vesta",
+        "detail": "ZCG to discuss. Submitted 2026-10-19. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/504",
+        "amount": 13200.0,
+        "amountLabel": "Requested · $13,200"
+      },
+      {
+        "name": "ZCG #505 · Zash: free, open-source Zcash education bot and channel in Spanish",
+        "detail": "ZCG to discuss. Submitted 2026-10-20. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/505",
+        "amount": 9600.0,
+        "amountLabel": "Requested · $9,600"
+      },
+      {
+        "name": "ZCG #506 · Zcash Durable Payment Outbox",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-21. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/506",
+        "amount": 30000.0,
+        "amountLabel": "Requested · $30,000"
+      },
+      {
+        "name": "ZCG #508 · CryptoMondays Community Events",
+        "detail": "Filtered by FPF / Outside of Scope / Guidelines Not Met. Submitted 2026-10-20. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/508",
+        "amount": 35000.0,
+        "amountLabel": "Requested · $35,000"
+      },
+      {
+        "name": "ZCG #509 · Rypto: Zcash Privacy Content & Amplification Campaign",
+        "detail": "ZCG to discuss. Submitted 2026-10-21. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/509",
+        "amount": 9000.0,
+        "amountLabel": "Requested · $9,000"
+      },
+      {
+        "name": "ZCG #507 · Lean proof of the GLV recoding and ladder in pasta_curves (part 3 of pasta_curves#174)",
+        "detail": "ZCG to discuss. Submitted 2026-10-21. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/507",
+        "amount": 7000.0,
+        "amountLabel": "Requested · $7,000"
+      },
+      {
+        "name": "ZCG #511 · Zcash NU7 Compatibility for Wallet Core",
+        "detail": "ZCG to discuss. Submitted 2026-10-22. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/511",
+        "amount": 24000.0,
+        "amountLabel": "Requested · $24,000"
+      },
+      {
+        "name": "ZCG #510 · Zcash Localization Hub RU/UA",
+        "detail": "ZCG to discuss. Submitted 2026-10-22. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/510",
+        "amount": 7200.0,
+        "amountLabel": "Requested · $7,200"
+      },
+      {
+        "name": "ZCG #512 · ZecLink — Making Zcash Payments Simple and Accessible",
+        "detail": "ZCG to discuss. Submitted 2026-10-22. Google Sheets Proposals. Application requests USD 40,000; meeting summary cites USD 35,000. No approval inferred.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/512",
+        "amount": 40000.0,
+        "amountLabel": "Requested · $40,000"
+      },
+      {
+        "name": "ZCG #515 · Post-quantum readiness inventory for the Zcash stack",
+        "detail": "ZCG to discuss. Submitted 2026-10-22. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/515",
+        "amount": 12000.0,
+        "amountLabel": "Requested · $12,000"
+      },
+      {
+        "name": "ZCG #517 · Zbeam: A Trustless gRPC Network for Zcash",
+        "detail": "ZCG to discuss. Submitted 2026-10-26. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/517",
+        "amount": 85000.0,
+        "amountLabel": "Requested · $85,000"
+      },
+      {
+        "name": "ZCG #518 · Zcash Durable Payment Outbox",
+        "detail": "ZCG to discuss. Submitted 2026-10-26. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/518",
+        "amount": 30000.0,
+        "amountLabel": "Requested · $30,000"
+      },
+      {
+        "name": "ZCG #520 · Authenticated Shielded Sync Gateway",
+        "detail": "ZCG to discuss. Submitted 2026-10-27. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/520",
+        "amount": 25000.0,
+        "amountLabel": "Requested · $25,000"
+      },
+      {
+        "name": "ZCG #519 · Unpair",
+        "detail": "ZCG to discuss. Submitted 2026-10-27. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/519",
+        "amount": 34000.0,
+        "amountLabel": "Requested · $34,000"
+      },
+      {
+        "name": "ZCG #522 · Zynova: Online Zcash Privacy Education and Adoption Programme",
+        "detail": "ZCG to discuss. Submitted 2026-10-29. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/522",
+        "amount": 15000.0,
+        "amountLabel": "Requested · $15,000"
+      },
+      {
+        "name": "ZCG #523 · Pasta Assembly Verification Bridge",
+        "detail": "ZCG to discuss. Submitted 2026-10-29. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/523",
+        "amount": 25000.0,
+        "amountLabel": "Requested · $25,000"
+      },
+      {
+        "name": "ZCG #521 · Zarcade",
+        "detail": "ZCG to discuss. Submitted 2026-10-29. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/521",
+        "amount": 21750.0,
+        "amountLabel": "Requested · $21,750"
+      },
+      {
+        "name": "ZCG #524 · Counzil DAO Manager",
+        "detail": "Waiting on applicant to post to forum. Submitted 2026-10-30. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/524",
+        "amount": 136400.0,
+        "amountLabel": "Requested · $136,400"
+      },
+      {
+        "name": "ZCG #525 · Block explorer + Testnet infrastructure 2026-27",
+        "detail": "Waiting on applicant to post to forum. Submitted 2026-10-30. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/525",
+        "amount": 17502.0,
+        "amountLabel": "Requested · $17,502"
+      },
+      {
+        "name": "ZCG #526 · Zecmap The Global Map Of Businesses Accepting Zcash",
+        "detail": "ZCG to discuss. Submitted 2026-10-30. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/526",
+        "amount": 14500.0,
+        "amountLabel": "Requested · $14,500"
+      },
+      {
+        "name": "ZCG #527 · Canadian Zcash Community and red·bridge public testnet launch",
+        "detail": "Waiting on applicant to post to forum. Submitted 2026-10-30. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/527",
+        "amount": 29700.0,
+        "amountLabel": "Requested · $29,700"
+      },
+      {
+        "name": "ZCG #528 · Shielded Quest 2026",
+        "detail": "ZCG to discuss. Submitted 2026-10-31. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/528",
+        "amount": 1450.0,
+        "amountLabel": "Requested · $1,450"
+      },
+      {
+        "name": "ZCG #529 · Shielded 2-of-3 FROST escrow for P2P commerce",
+        "detail": "Waiting on applicant to post to forum. Submitted 2026-10-31. Google Sheets Proposals.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/529",
+        "amount": 15000.0,
+        "amountLabel": "Requested · $15,000"
+      },
+      {
+        "name": "ZCG #513 · NU7-Compatible ZEC Swaps for Vultisig/SwapKit",
+        "detail": "Not yet in Sheet; GitHub open. Submitted 2026-10-23. GitHub supplement, not a Sheet decision.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/513",
+        "amount": 24500.0,
+        "amountLabel": "Requested · $24,500"
+      },
+      {
+        "name": "ZCG #516 · CryptoMondays With Minds by Animoca Brands",
+        "detail": "Not yet in Sheet; GitHub closed. Submitted 2026-10-25. GitHub supplement, not a Sheet decision.",
+        "url": "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/516",
+        "amount": 35000.0,
+        "amountLabel": "Requested · $35,000"
+      }
+    ],
+    "id": "2026-10",
+    "evidenceCutoff": "2026-10-31",
+    "reviewedAt": "2026-11-01",
+    "documents": {
+      "monthly": {
+        "id": "2026-10",
+        "month": "2026-10",
+        "label": "October 1–31",
+        "kind": "monthly",
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-31",
+        "financialMonth": "2026-10",
+        "designVersion": "Editorial 4.0 / Covers 2",
+        "pdf": "/monthly/editions/2026-10/c9dcacb064cb/OpenZcash-Monthly-October-2026.pdf",
+        "manifest": "/monthly/editions/2026-10/c9dcacb064cb/pages.json",
+        "pageCount": 10,
+        "cover": "/monthly/editions/2026-10/c9dcacb064cb/cover.jpg",
+        "assetBase": "/monthly/editions/2026-10/c9dcacb064cb",
+        "sha256": "c9dcacb064cb588e4b07ef85c7d8ae093490822bc46e7131757cc8d04ac9922e",
+        "bytes": 1263040,
+        "pageWidth": 1200,
+        "pageHeight": 675
+      },
+      "operations": {
+        "id": "2026-10",
+        "month": "2026-10",
+        "label": "October 1–31",
+        "kind": "monthly",
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-31",
+        "financialMonth": "2026-10",
+        "designVersion": "Editorial 4.0 / Covers 2",
+        "pdf": "/monthly/editions/2026-10/daf4dd4efd00/OpenZcash-Operations-October-2026.pdf",
+        "manifest": "/monthly/editions/2026-10/daf4dd4efd00/pages.json",
+        "pageCount": 28,
+        "cover": "/monthly/editions/2026-10/daf4dd4efd00/cover.jpg",
+        "assetBase": "/monthly/editions/2026-10/daf4dd4efd00",
+        "sha256": "daf4dd4efd003042ea8dac04037c1f1c111cc96938108b8134e7b2e7614f4b19",
+        "bytes": 1176580,
+        "pageWidth": 1200,
+        "pageHeight": 675
+      }
+    }
+  },
+  {
+    "sources": [
+      {
         "name": "api-coinholder",
         "detail": "Public source captured 2026-10-01T15:58:11.784095+00:00. Activity scope is recorded with each item; publication dates are not activity dates.",
         "url": "https://openzcash.org/api/zcg/coinholder/round"

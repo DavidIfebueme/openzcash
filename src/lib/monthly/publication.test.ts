@@ -72,7 +72,8 @@ describe("monthly publication integrity", () => {
     expect(set).toBeDefined();
     expect(readingSetSchema.safeParse({...set, documents:{monthly:set.documents.monthly}}).success).toBe(false);
     expect(readingSetSchema.safeParse({...set, evidenceCutoff:"2026-09-11"}).success).toBe(false);
-    expect(readingSetSchema.safeParse({...set, documents:{...set.documents, operations:{...set.documents.operations, id:"2026-10"}}}).success).toBe(false);
+    const otherIssue = set.id === "2026-01" ? "2026-02" : "2026-01";
+    expect(readingSetSchema.safeParse({...set, documents:{...set.documents, operations:{...set.documents.operations, id:otherIssue}}}).success).toBe(false);
   });
 
   it("keeps the PDF module, worker and fonts from the same pinned distribution", () => {
