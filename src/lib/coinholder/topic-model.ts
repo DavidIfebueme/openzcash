@@ -1,14 +1,14 @@
 import "server-only";
 import { createHash } from "node:crypto";
-import OpenAI from "openai";
-import { zodTextFormat } from "openai/helpers/zod";
+import Anthropic from "@anthropic-ai/sdk";
+import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { z } from "zod";
 import { MAX_PROPOSAL_TOPICS, PROPOSAL_TOPICS, TOPIC_ANALYSIS_VERSION, type ProposalTopicId, type TopicAnalysis, type TopicInput } from "./proposal-topics";
 
-export const TOPIC_MODEL = process.env.COINHOLDER_TAGS_MODEL?.trim() || "gpt-5-mini";
+export const TOPIC_MODEL = process.env.COINHOLDER_TAGS_MODEL?.trim() || "claude-opus-5-5";
 export const MAX_TOPIC_INPUT_CHARS = 100_000;
 export const TOPIC_MODEL_TIMEOUT_MS = 45_000;
-export const topicModelEnabled = () => process.env.COINHOLDER_TAGS_ENABLED !== "false" && Boolean(process.env.OPENAI_API_KEY?.trim());
+export const topicModelEnabled = () => process.env.COINHOLDER_TAGS_ENABLED !== "false" && Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 const tagIds = PROPOSAL_TOPICS.map((tag) => tag.id) as [ProposalTopicId, ...ProposalTopicId[]];
 export const topicOutputSchema = z.object({ tags: z.array(z.object({
   id: z.enum(tagIds), confidence: z.number().min(0).max(1), evidence: z.string().min(20).max(400),
@@ -20,7 +20,7 @@ export function topicInput(proposal: TopicInput): string {
   return JSON.stringify({ title: proposal.title, sourceCategory: proposal.category, application: proposal.body });
 }
 export function topicInputHash(proposal: TopicInput, model = TOPIC_MODEL): string {
-  return createHash("sha256").update(`${TOPIC_ANALYSIS_VERSION}\n${model}\n${topicInput(proposal)}`).digest("hex");
+  return createHash("sha256").update(`${TOPIC_ANALYSIS_VERSION}\nanthropic\n${model}\n${topicInput(proposal)}`).digest("hex");
 }
 const normalize = (text: string) => text.normalize("NFKC").replace(/\s+/g, " ").trim();
 export function validateTopicOutput(raw: unknown, proposal: TopicInput, model = TOPIC_MODEL, now = Date.now()): TopicAnalysis {
@@ -47,12 +47,12 @@ export async function analyzeProposalTopics(proposal: TopicInput): Promise<Topic
   const input = topicInput(proposal);
   if (!proposal.body.trim() || input.length > MAX_TOPIC_INPUT_CHARS) throw new Error("PROPOSAL_TOPIC_INPUT_LIMIT");
   if (!topicModelEnabled()) throw new Error("PROPOSAL_TOPIC_MODEL_DISABLED");
-  const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY!.trim(), baseURL: "https://api.openai.com/v1", maxRetries: 0, timeout: TOPIC_MODEL_TIMEOUT_MS });
-  const response = await client.responses.parse({
-    model: TOPIC_MODEL, instructions: TOPIC_INSTRUCTIONS, input: [{ role: "user", content: input }],
-    text: { format: zodTextFormat(topicOutputSchema, "proposal_topics") },
-    reasoning: { effort: "low" }, max_output_tokens: 2_000, store: false,
+  const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY!.trim(), baseURL: "https://api.anthropic.com", maxRetries: 0, timeout: TOPIC_MODEL_TIMEOUT_MS });
+  const response = await client.messages.parse({
+    model: TOPIC_MODEL, system: TOPIC_INSTRUCTIONS, messages: [{ role: "user", content: input }],
+    output_config: { format: zodOutputFormat(topicOutputSchema), effort: "low" },
+    max_tokens: 4_000,
   });
-  if (response.status !== "completed" || !response.output_parsed) throw new Error("INCOMPLETE_PROPOSAL_TOPICS");
-  return validateTopicOutput(response.output_parsed, proposal);
+  if (response.stop_reason !== "end_turn" || !response.parsed_output) throw new Error("INCOMPLETE_PROPOSAL_TOPICS");
+  return validateTopicOutput(response.parsed_output, proposal);
 }
