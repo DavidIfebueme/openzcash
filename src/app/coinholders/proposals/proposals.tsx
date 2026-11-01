@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Q4, q4Usd, type Q4ProposalSummary } from "@/lib/coinholder/q4";
+import { proposalTopic } from "@/lib/coinholder/proposal-topics";
 import styles from "./proposals.module.css";
 
 function RequestedAmount({ cents }: { cents: number | null }) {
@@ -16,10 +17,11 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("");
   const [sort, setSort] = useState("newest");
-  const categories = [...new Set(proposals.map((p) => p.category ?? "Unspecified"))].sort();
+  const entries = proposals.map((p) => ({ ...p, topic: proposalTopic(p) }));
+  const categories = [...new Set(entries.map((p) => p.topic))].sort();
   const needle = query.trim().toLowerCase();
-  const shown = proposals.filter((p) => (!category || (p.category ?? "Unspecified") === category) &&
-    `${p.number} ${p.title} ${p.organization ?? ""} ${p.applicant} ${p.summary ?? ""}`.toLowerCase().includes(needle))
+  const shown = entries.filter((p) => (!category || p.topic === category) &&
+    `${p.number} ${p.title} ${p.organization ?? ""} ${p.applicant} ${p.summary ?? ""} ${p.topic} ${p.category ?? ""}`.toLowerCase().includes(needle))
     .sort((a, b) => {
       if (sort === "title") return a.title.localeCompare(b.title);
       if (sort === "highest" || sort === "lowest") {
@@ -43,9 +45,15 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
       {shown.map((p) => <li key={p.number}>
         <article className={styles.proposal}>
           <div className={styles.proposalContent}>
-            <div className={styles.meta}><span>#{p.number}</span><span>{p.category ?? "Uncategorized"}</span></div>
+            <div className={styles.meta}>
+              <span className={styles.proposalNumber}>#{p.number}</span>
+              <span className={styles.category} data-category={p.topic} title={p.category && p.topic !== p.category ? `Source category: ${p.category}` : undefined}>{p.topic}</span>
+            </div>
             <h2><Link href={`${Q4.href}/${p.number}`}>{p.title}</Link></h2>
-            <p className={styles.applicant}>{p.organization ?? (p.applicant ? `@${p.applicant}` : "Applicant not specified")}</p>
+            <p className={styles.applicant}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="8" r="3.5" /><path d="M5 20v-1.5a7 7 0 0 1 14 0V20" /></svg>
+              <span>{p.organization ?? (p.applicant ? `@${p.applicant}` : "Applicant not specified")}</span>
+            </p>
             {p.summary ? <p className={styles.summary}>{p.summary}</p> : null}
           </div>
           <div className={styles.request}>
@@ -53,7 +61,10 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
             <RequestedAmount cents={p.requestedUsdCents} />
             {p.requestedUsdCents !== null ? <small>USD</small> : null}
           </div>
-          <Link className={styles.viewProposal} href={`${Q4.href}/${p.number}`}>View proposal <span aria-hidden>→</span><span className="sr-only">: {p.title}</span></Link>
+          <Link className={styles.viewProposal} href={`${Q4.href}/${p.number}`}>
+            View proposal <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M5 12h14m-5-5 5 5-5 5" /></svg>
+            <span className="sr-only">: {p.title}</span>
+          </Link>
         </article>
       </li>)}
     </ol>

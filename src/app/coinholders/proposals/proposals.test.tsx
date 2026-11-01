@@ -12,6 +12,20 @@ const proposals: Q4ProposalSummary[] = [
   { ...base, number: 71, title: "Unspecified request", category: null, requestedUsdCents: null },
 ];
 describe("Q4 proposal exploration", () => {
+  it("filters by the displayed security topic and keeps source categories searchable", () => {
+    const securityProposal = { ...proposals[1], title: "Zebra DoS (CVE-2026-44499)", category: "Research & Development" };
+    render(<Proposals proposals={[proposals[0], securityProposal]} />);
+    fireEvent.change(screen.getByLabelText("Category"), { target: { value: "Security research" } });
+    expect(screen.getAllByRole("article")).toHaveLength(1);
+    expect(screen.getByTitle("Source category: Research & Development").textContent).toBe("Security research");
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Research & Development" } });
+    expect(screen.getAllByRole("article")).toHaveLength(1);
+    fireEvent.click(screen.getByRole("button", { name: "Clear filters" }));
+    fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Security research" } });
+    expect(screen.getAllByRole("article")).toHaveLength(1);
+    expect(screen.getByRole("link", { name: `View proposal : ${securityProposal.title}` }).getAttribute("href")).toBe("/coinholders/proposals/69");
+    expect(securityProposal.category).toBe("Research & Development");
+  });
   it("keeps the full amount and cents for large requests", () => {
     render(<Proposals proposals={[{ ...proposals[0], requestedUsdCents: 123456789 }]} />);
     expect(screen.getByText("$1,234,567.89")).toBeTruthy();
