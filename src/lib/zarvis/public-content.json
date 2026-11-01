@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "620c4f913fd6dd4d",
+  "sourceRevision": "2a73a8134506af5c",
   "sourceFiles": 72,
   "documents": [
     {
@@ -175,7 +175,7 @@
       "id": "src/app/coinholders/proposals/page.tsx:0",
       "url": "https://openzcash.org/coinholders/proposals",
       "title": "coinholders · proposals",
-      "text": "Proposals · Coinholder Grants · OpenZcash\nCoinholder grant proposals, requested funding and the current round's schedule.\nProposals\nSubmit proposal\n↗\nUSD\nproposal(s) have no specified USD amount.\nSources & method\nOpen applications from this round carrying FPF's exact “\n” label. Requested amounts are not awards.\nChecks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.\nThe ZCG check links to an earlier published approval or grant payment for the same applicant. Exact recipient names and reviewed aliases are matched against ZCG records. A dash means no confirmed match; it does not mean rejected. Coinholder grants, related projects and third-party audits do not establish funding of the applicant.\nGitHub submissions\nChecked"
+      "text": "Proposals · Coinholder Grants · OpenZcash\nCoinholder grant proposals, requested funding and the current round's schedule.\nProposals\nSubmit proposal\n↗\nUSD\nproposal(s) have no specified USD amount.\nSources & method\nOpen applications from this round carrying FPF's exact “\n” label. Requested amounts are not awards.\nChecks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.\nGitHub submissions\nChecked"
     },
     {
       "id": "src/app/coinholders/results/page.tsx:0",

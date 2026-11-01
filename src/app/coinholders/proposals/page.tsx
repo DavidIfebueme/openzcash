@@ -1,6 +1,5 @@
 import { pageMetadata } from "@/lib/seo/page-metadata";
 import { readQ4 } from "@/lib/coinholder/q4-server";
-import { readZcgHistory } from "@/lib/coinholder/zcg-history-server";
 import { Q4, READY_FOR_VOTE_LABEL, q4Phase, q4Summary, q4Timestamp, q4Totals, q4Usd } from "@/lib/coinholder/q4";
 import { CycleBrand, CycleCard, CycleTimeline } from "../cycle-view";
 import { SourceRefresh } from "@/components/source-refresh";
@@ -17,7 +16,6 @@ export default async function ProposalsPage() {
   const snapshot = await readQ4();
   const phase = q4Phase();
   const proposals = snapshot.proposals?.map(q4Summary) ?? null;
-  const zcgHistory = await readZcgHistory(proposals ?? []);
   const totals = proposals === null ? null : q4Totals(proposals);
   const amountUnspecified = totals !== null && totals.missingAmounts > 0 && totals.missingAmounts === proposals?.length;
   return (
@@ -50,7 +48,7 @@ export default async function ProposalsPage() {
 
       <section aria-label="Proposal list">
         <SourceStatus snapshot={snapshot} />
-        {proposals !== null ? <Proposals proposals={proposals} zcgHistory={zcgHistory} /> : null}
+        {proposals !== null ? <Proposals proposals={proposals} /> : null}
       </section>
       <footer className={styles.provenance}>
         <details>
@@ -58,7 +56,6 @@ export default async function ProposalsPage() {
           <div className={styles.method}>
             <p>Open applications from this round carrying FPF&apos;s exact “{READY_FOR_VOTE_LABEL}” label. Requested amounts are not awards.</p>
             <p>Checks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.</p>
-            <p>The ZCG check links to an earlier published approval or grant payment for the same applicant. Exact recipient names and reviewed aliases are matched against ZCG records. A dash means no confirmed match; it does not mean rejected. Coinholder grants, related projects and third-party audits do not establish funding of the applicant.</p>
             <a href={Q4.issuesUrl} target="_blank" rel="noreferrer">GitHub submissions <span aria-hidden>↗</span></a>
           </div>
         </details>

@@ -16,16 +16,6 @@ describe("Q4 proposal exploration", () => {
     render(<Proposals proposals={[{ ...proposals[0], requestedUsdCents: 123456789 }]} />);
     expect(screen.getByText("$1,234,567.89")).toBeTruthy();
   });
-  it("shows a source-linked check only for confirmed ZCG history", () => {
-    render(<Proposals proposals={proposals} zcgHistory={{
-      70: { status: "confirmed", basis: "recipient", title: "Earlier integration", recipient: "Maya Protocol", href: "/zcg/grant?g=Earlier%20integration" },
-      69: { status: "unconfirmed" }, 71: { status: "unavailable" },
-    }} />);
-    expect(screen.getByRole("link", { name: /Prior ZCG funding or approval/ }).getAttribute("href")).toBe("/zcg/grant?g=Earlier%20integration");
-    expect(screen.getByLabelText(/No prior ZCG approval or grant confirmed/).textContent).toBe("—");
-    expect(screen.getByLabelText(/ZCG history could not be fully checked/).textContent).toBe("?");
-    expect(screen.queryByRole("checkbox")).toBeNull();
-  });
   it("combines search and category and lets the reader clear an empty search", () => {
     render(<Proposals proposals={proposals} />);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "Maya Protocol" } });
