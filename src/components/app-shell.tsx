@@ -208,7 +208,7 @@ export function AppShell({
       data-layout={
         /^\/coinholders\/verify\/[^/]+\/[^/]+\/?$/.test(pathname)
           ? "proposal"
-          : pathname === "/zcg/participate"
+          : (pathname === "/zcg/participate" || pathname === "/opportunities" || pathname.startsWith("/opportunities/"))
             ? "workspace"
             : undefined
       }

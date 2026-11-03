@@ -140,6 +140,7 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
               >
                 {!page.brandLogo && <PageMark mark={page.mark} href={page.href} />}
                 <span className="rd-side-label">{page.label}</span>
+                {page.beta ? <small className="rd-nav-beta">Beta</small> : null}
                 {page.brandLogo ? <span className="rd-side-page-brand" aria-hidden="true">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={page.brandLogo} alt="" width={17} height={19} />
