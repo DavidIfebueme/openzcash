@@ -39,6 +39,9 @@ export function searchTerms(value: string): string[] {
 }
 // Concept expansion is explicit and auditable; no embedding API is needed for this corpus.
 const concepts: Array<[string, RegExp, string[]]> = [
+  ["ecc-zodl-transition", /\b(?:ecc|electric coin|zodl)\b/, ["zodl", "transition"]],
+  ["zakura-builders", /\bzakura\b/, ["zakura", "valar", "tachyon"]],
+  ["zcash-labs-identity", /\bzcash labs\b/, ["zcashlabs", "independent"]],
   ["viewing-keys", /viewing|visualizacao|\bivk\b|\bfvk\b|\bufvk\b|\buivk\b|read.only|somente leitura|see.*sender|ver.*remetente|can.*viewer|prov(?:o|ar|e)\b.*(?:recebi|pagamento|payment)|proof of payment|comprovante|auditor/, ["viewing", "key", "sender", "recipient"]],
   ["addresses", /unified|unificad|receiver|recebedor|endereco|address/, ["unified", "addresses", "receiver"]],
   ["privacy", /privac|shield|blindad|anonim|anonym|rastre|trace|hide.*amount|ocult.*valor|endereco [tz]\b|\b[tz]-addr|t-address|z-address|transparente/, ["privacy", "shielded", "transparent"]],
@@ -51,8 +54,8 @@ const concepts: Array<[string, RegExp, string[]]> = [
   ["calculator", /coverage|cobertura|runway|simul|cenario|scenario|\bmeta\b|ownership|participacao|calculad|calculator|cypherpunk|cipherpunk|20[x×]|quanto.*anos|how many years/, ["calculator", "treasury", "scenario"]],
   ["governance", /governan|governanc|ativad|activated|consensus|consenso|votacao|poll|enquete/, ["governance", "activation", "decision"]],
   ["ecosystem", /carteira|wallet|zingo|zashi|zodl|zebra|zaino|ecossistema|ecosystem/, ["ecosystem", "wallet"]],
-  // "What did ECC announce" must reach the blog corpus even when the post never repeats the question's verb.
-  ["news", /announc|anunci|\bnews\b|noticia|\bblog\b|press release|comunicado|\brelease|lancou|lancamento|publicou|published|\becc\b|electric coin|zcash foundation|\bzf\b|zfnd|\bzodl\b/, ["announcement", "announced", "blog", "news", "release", "update"]],
+  // Announcement intent reaches blogs; an organization name alone must not bury its identity record under unrelated releases.
+  ["news", /announc|anunci|\bnews\b|noticia|\bblog\b|press release|comunicado|\brelease|lancou|lancamento|publicou|published/, ["announcement", "announced", "blog", "news", "release", "update"]],
 ];
 type ReferenceSource = { id: string; title: string; url: string; text: string; retrievedAt: string; sourceUpdatedOn: string | null; note: string };
 function referenceChunks(source: ReferenceSource, kind: KnowledgeDocument["kind"] = "reference", extra: Pick<KnowledgeDocument, "publishedOn" | "site"> = {}): KnowledgeDocument[] {

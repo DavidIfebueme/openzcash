@@ -117,6 +117,7 @@ describe("Zarvis on the Anthropic Messages API", () => {
   it.each([
     ["current Zcash hashrate", GROK_SEARCH_DOMAINS.mining],
     ["latest ZIP", ["zips.z.cash"]],
+    ["Latest Zakura, Shielded Labs, ZODL and Zcash Labs announcements", SEARCH_DOMAINS],
   ])("narrows the search domains by topic for %s", async (query, domains) => {
     mocks.prepare.mockResolvedValue({ query, documents: [], evidence: [], external: true });
     mocks.stream.mockReturnValueOnce(reply([text("A scoped answer.")]));

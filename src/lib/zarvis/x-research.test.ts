@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({ reserve: vi.fn(), settle: vi.fn(), fetch: vi.f
 vi.mock("./x-research-budget", () => ({ reserveXResearch: mocks.reserve }));
 import { lookupXResearch, resetXResearchForTests, xResearchEvidence, xResearchRequest } from "./x-research";
 import { xResearchConfig } from "./x-research-config";
-import { safeXPostUrl, X_RESEARCH_CACHE_MS } from "./x-research-policy";
+import { safeXPostUrl, X_RESEARCH_ACCOUNTS, X_RESEARCH_CACHE_MS } from "./x-research-policy";
 import { safeSourceUrl, fetchableSourceUrl } from "./sources";
 
 const now = Date.parse("2026-11-03T12:00:00Z");
@@ -62,12 +62,24 @@ describe("Research permission boundaries", () => {
     const body = JSON.parse(init.body);
     expect(body).toEqual(xResearchRequest("bounties", now));
     expect(body.tools).toHaveLength(1); expect(body.tools[0]).toMatchObject({ type: "x_search", enable_image_understanding: false, enable_video_understanding: false, from_date: "2026-10-04", to_date: "2026-11-04" });
-    expect(body).toMatchObject({ max_turns: 2, max_output_tokens: 2000, store: false });
+    expect(body).toMatchObject({ model: "grok-4.3", reasoning: { effort: "none" }, max_turns: 2, max_output_tokens: 2000, store: false });
     expect(init.body).not.toContain("server-only-test-key"); expect(JSON.stringify(result)).not.toContain("server-only-test-key");
     expect(mocks.settle).toHaveBeenCalledWith(0.125);
   });
 });
 describe("Untrusted social evidence", () => {
+  it("covers current independent builders without admitting arbitrary accounts", () => {
+    const handles = xResearchRequest("news", now).tools[0].allowed_x_handles;
+    expect(handles).toEqual(expect.arrayContaining(["ZakuraZcash", "ShieldedLabs", "zodl_co", "zodl_app", "ZcashLabs", "ZcashFoundation", "TachyonZcash", "qeditzkp"]));
+    expect(handles.length).toBeLessThanOrEqual(20);
+    expect(new Set(handles.map(h => h.toLowerCase())).size).toBe(handles.length);
+    for (const { handle } of X_RESEARCH_ACCOUNTS) {
+      const url = `https://x.com/${handle}/status/1982000000000000000`;
+      expect(xResearchEvidence(response([{ ...post, url }], [url]), "news", now).sources?.[0].url).toBe(url);
+    }
+    expect(safeXPostUrl("https://x.com/ZakuraZcashFake/status/1982000000000000000")).toBeNull();
+    expect(safeXPostUrl("https://x.com/ElectricCoinCo/status/1982000000000000000")).toBeNull();
+  });
   it("keeps source/date coverage and distinguishes generated paraphrases from primary facts", () => {
     const evidence = xResearchEvidence(response(), "bounties", now);
     const data = JSON.parse(evidence.content);
@@ -120,6 +132,9 @@ describe("Cost and failure containment", () => {
     mocks.fetch.mockImplementation(async () => new Response("secret provider body", { status }));
     const result = await lookup(); expect(result).toMatchObject({ used: false, requests: 1, reportedUsd: null });
     expect(mocks.fetch).toHaveBeenCalledTimes(1); expect(mocks.settle).toHaveBeenCalledWith(null); expect(JSON.stringify(result)).not.toContain("secret");
+    const log = JSON.parse(vi.mocked(console.info).mock.calls.at(-1)![0]);
+    expect(log).toMatchObject({ failure: "provider_http", providerStatus: status });
+    expect(JSON.stringify(log)).not.toContain("secret provider body");
   });
   it("charges known cost even when evidence validation fails", async () => {
     mocks.fetch.mockImplementation(async () => Response.json(response([post], [])));
@@ -138,11 +153,13 @@ describe("Cost and failure containment", () => {
     mocks.reserve.mockResolvedValue(null); expect((await lookup()).used).toBe(false);
     expect(mocks.fetch).toHaveBeenCalledTimes(1);
   });
-  it("propagates cancellation to HTTP while preserving the unknown charge", async () => {
+  it.each(["visitor", "deadline"])("propagates %s cancellation to HTTP while preserving the unknown charge", async kind => {
     const controller = new AbortController();
+    if (kind === "deadline") vi.spyOn(AbortSignal, "timeout").mockReturnValue(controller.signal);
     mocks.fetch.mockImplementation(async (_url, init) => new Promise((_resolve, reject) => init.signal.addEventListener("abort", () => reject(new Error("aborted")), { once: true })));
-    const pending = lookup({ topic: "news" }, controller.signal);
+    const pending = lookup({ topic: "news" }, kind === "visitor" ? controller.signal : new AbortController().signal);
     await vi.waitFor(() => expect(mocks.fetch).toHaveBeenCalledTimes(1)); controller.abort();
     expect(await pending).toMatchObject({ used: false, requests: 1, reportedUsd: null }); expect(mocks.settle).toHaveBeenCalledWith(null);
+    expect(JSON.parse(vi.mocked(console.info).mock.calls.at(-1)![0])).toMatchObject({ failure: kind === "visitor" ? "aborted" : "timeout", providerStatus: null });
   });
 });

@@ -115,7 +115,7 @@ export function relevantTopics(query: string): Array<typeof lookupSchema._output
     [/\b(?:communities|comunidades|communit(?:y|ies) (?:in|of|group|groups|directory|page|near)|comunidade (?:em|de|do|da|no|na|local)|local communit(?:y|ies)|zcash communit(?:y|ies)(?! grants?\b)|ambassadors?|embaixador\w*|zcash (?:brasil|brazil|nigeria|ghana|arabia|india|indonesia|japan|korea|china|france|ukraine|turkiye|turkey|east africa|south africa|en espanol|club|global germany|caracas|barcelona|queretaro)|zechub nigeria|zcashsa|ruzcash|zcast|coderaiz|pesa ya siri|boston zcash)\b/, "communities"],
     [/^(?!.*\b(?:zips?|improvement|melhoria)\b).*\b(?:decid\w*|decis(?:ao|oes)|verdicts?|veredito\w*|approved|rejected|declined|withdrawn|vetoed|aprovad\w*|rejeitad\w*|recusad\w*|retirad\w*|vetad\w*)\b/, "decisions"],
     [/^(?!.*\b(?:zips?|improvement|melhoria)\b).*\b(?:proposals?|propostas?|(?:grant|funding|zcg) applications?|applicants?|candidaturas?|under review|em (?:analise|revisao))\b/, "proposals"],
-    [/\b(?:ecosystem|repositori\w*|ecossistema|zebra|zaino|zingo)\b/, "ecosystem"],
+    [/\b(?:ecosystem|repositori\w*|ecossistema|zebra|zaino|zingo|zakura|zodl|shielded labs|zcash labs|tachyon|valar|qedit)\b/, "ecosystem"],
     [/\b(?:funding history|historico de financiamento)\b/, "funding_history"],
     [/\b(?:block height|chain tip|current block|latest block|altura (?:do |de )?bloco|bloco atual|halvings?|shielded (?:supply|pools?|value)|(?:circulating|total|chain) supply|oferta (?:circulante|total)|pools? blindad\w*|value pools?)\b/, "chain"],
     [/\b(?:recipients?|beneficiarios?)\b/, "recipients"],

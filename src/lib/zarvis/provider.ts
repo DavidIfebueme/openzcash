@@ -17,7 +17,7 @@ export function providerClient(config: Config, timeout = 50_000) {
 export const GROK_SEARCH_DOMAINS: Record<Exclude<ResearchScope, "zip">, string[]> = {
   general: ["openzcash.org", "zechub.wiki", "z.cash", "zips.z.cash", "forum.zcashcommunity.com"],
   governance: ["openzcash.org", "forum.zcashcommunity.com", "zfnd.org", "electriccoin.co", "z.cash"],
-  news: ["electriccoin.co", "zfnd.org", "forum.zcashcommunity.com", "z.cash", "openzcash.org"],
+  news: ["zodl.com", "zakura.com", "shieldedlabs.net", "zcashlabs.org", "zfnd.org"],
   mining: ["zcashinfo.com", "zecstats.com", "zips.z.cash", "z.cash", "electriccoin.co"],
   history: ["openzcash.org", "z.cash", "electriccoin.co", "shieldedlabs.net", "zfnd.org"],
 };

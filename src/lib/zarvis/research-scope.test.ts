@@ -57,6 +57,10 @@ describe("Sources match the question's subject", () => {
     for (const url of ["https://zcashinfo.com/pools/", "https://zecstats.com/chart/hashrate"]) expect(safeSourceUrl(url)).toBe(url);
     for (const url of ["https://zcashinfo.com.evil.org", "https://zecstats.com@evil.org", "http://zecstats.com", "https://user@zcashinfo.com/", "https://zecstats.com:8443/"]) expect(safeSourceUrl(url)).toBeNull();
   });
+  it("can cite current builders and their repositories without admitting lookalike hosts or unrelated GitHub owners", () => {
+    for (const url of ["https://zakura.com/announcements/", "https://zodl.com/about/", "https://zcashlabs.org/", "https://tachyon.z.cash/", "https://valargroup.dev/", "https://qed-it.com/", "https://github.com/zakura-core/zakura", "https://github.com/tachyon-zcash/ragu", "https://github.com/zcashlabs/"]) expect(safeSourceUrl(url)).toBe(url);
+    for (const url of ["https://zakura.com.attacker.test/", "https://zcashlabs.org@attacker.test/", "https://github.com/zakura-core-fake/zakura"]) expect(safeSourceUrl(url)).toBeNull();
+  });
   it.each([
     ["What is solrate?", "hashrate"], ["O que é hashrate?", "hashrate"],
     ["What is a mining pool?", "mining_pool"], ["O que é um pool de mineração?", "mining_pool"],

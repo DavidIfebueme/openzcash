@@ -25,7 +25,7 @@ export function anthropicClient(config: Pick<ProviderConfig, "apiKey">, timeout 
 const convertTool = (tool: FunctionTool): Tool => ({ name: tool.name, ...(tool.description ? { description: tool.description } : {}), input_schema: tool.parameters as Tool.InputSchema });
 /** Direct server-side search (no dynamic filtering), two uses per request, the whole reviewed list for general questions and the topic lists otherwise. */
 export function anthropicSearchTool(scope: ResearchScope): WebSearchTool20260318 {
-  const domains = scope === "zip" ? ["zips.z.cash"] : scope === "general" ? SEARCH_DOMAINS : GROK_SEARCH_DOMAINS[scope];
+  const domains = scope === "zip" ? ["zips.z.cash"] : scope === "mining" || scope === "history" ? GROK_SEARCH_DOMAINS[scope] : SEARCH_DOMAINS;
   return { type: "web_search_20260318", name: "web_search", allowed_callers: ["direct"], max_uses: 2, allowed_domains: domains };
 }
 /** Fetched page text is capped so one long thread cannot fill the context; the cap is approximate and does not apply to PDFs. */

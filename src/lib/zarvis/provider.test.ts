@@ -43,7 +43,7 @@ describe("Explicit provider configuration", () => {
     }
     expect(domains("general")).toEqual(expect.arrayContaining(["openzcash.org", "zechub.wiki", "z.cash", "zips.z.cash", "forum.zcashcommunity.com"]));
     expect(domains("governance")).toEqual(expect.arrayContaining(["openzcash.org", "forum.zcashcommunity.com", "zfnd.org", "electriccoin.co"]));
-    expect(domains("news")).toEqual(expect.arrayContaining(["electriccoin.co", "zfnd.org"]));
+    expect(domains("news")).toEqual(expect.arrayContaining(["zodl.com", "zakura.com", "shieldedlabs.net", "zcashlabs.org", "zfnd.org"]));
     expect(domains("mining")).toContain("zcashinfo.com");
     vi.stubEnv("ZARVIS_PROVIDER", "openai");
     expect((providerSearchTool(zarvisConfig(), "governance") as { filters: { allowed_domains: string[] } }).filters.allowed_domains).toEqual(SEARCH_DOMAINS);

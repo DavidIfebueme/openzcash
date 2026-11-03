@@ -41,7 +41,7 @@ export const DIRECT_ROUTES = [
   { label: "Arborist calls, wallets, communities, decisions, chain", detail: "The site's own directories and on-chain reader: latest call notes and recordings, wallet and community listings with revision dates, ZCG decisions, tip height and next halving estimate." },
 ] as const;
 export const LIMITATIONS = [
-  "Zarvis is a guide, not an official spokesperson for Zcash, the Electric Coin Company, the Zcash Foundation, ZCG or the Financial Privacy Foundation, and it can be wrong.",
+  "Zarvis is a guide, not an official spokesperson for Zcash, its development teams, the Zcash Foundation, ZCG or the Financial Privacy Foundation, and it can be wrong.",
   "For model answers backed by recognized financial evidence, a numeric guard checks USD, ZEC and percentage figures against the retrieved records and protocol constants. Unsupported figures may be restated once, when time permits; those still unsupported are withheld with a notice. Other answers and currencies are not fully covered, and a matching figure can still be out of context. Check the sources.",
   "Calendar dates for future blocks are estimates; ZIP statuses and listed activation heights are not proof that a change is live on the network.",
   "Zarvis reads public records only. It cannot see wallets, private balances or anything you did not type or dictate, and it cannot send, sign or contact anyone.",

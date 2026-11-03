@@ -6,6 +6,7 @@ export const SEARCH_DOMAINS = [
   "z.cash", "zips.z.cash", "zcash.github.io", "zcash.readthedocs.io",
   "zfnd.org", "zcashfoundation.org", "electriccoin.co", "zechub.wiki",
   "forum.zcashcommunity.com", "shieldedlabs.net", "openzcash.org", "zcashinfo.com", "zecstats.com",
+  "zakura.com", "zodl.com", "zcashlabs.org", "valargroup.dev", "zingolabs.org", "qed-it.com",
 ];
 
 /** Hosts the site's curated datasets and readers cite. X is handled separately: only reviewed accounts' post permalinks, never whole social domains. */
@@ -15,7 +16,7 @@ export const CITATION_DOMAINS = [
   "zcashbrasil.com.br", "zcashesp.com", "zkav.club", "free2z.cash", "zcashjapan.com", "zcashind.com", "zcasharabia.xyz", "pro.zcash.ru", "zechub.substack.com", "zcashbrazil.substack.com", "zcashesp.substack.com", "zechubnigeria.substack.com", "zcashukraine.substack.com", "zcashidn.substack.com", "zcasheastafrica.substack.com",
 ];
 /** GitHub organizations the site imports from or lists as a project's source: applications, coinholder rounds, Arborist notes, core teams and the catalogued wallets. */
-const GITHUB_ORGS = /^\/(?:zcash|zcashfoundation|zechub|zingolabs|shieldedlabs|zcashcommunitygrants|financial-privacy-foundation|electric-coin-company|zodl-inc|zecdev|zcash-hackworks|nighthawk-apps|qed-it|hhanh00|brave|chainsafe|chainapsis|cake-tech|edgeapp|horizontalsystems|atmospherelabs-dev|gemwalletcom|keystonehq|trezor)(?:\/|$)/i;
+const GITHUB_ORGS = /^\/(?:zcash|zcashfoundation|zechub|zingolabs|shieldedlabs|zcashcommunitygrants|financial-privacy-foundation|electric-coin-company|zodl-inc|zakura-core|tachyon-zcash|zcashlabs|zecdev|zcash-hackworks|nighthawk-apps|qed-it|hhanh00|brave|chainsafe|chainapsis|cake-tech|edgeapp|horizontalsystems|atmospherelabs-dev|gemwalletcom|keystonehq|trezor)(?:\/|$)/i;
 /** Allowlist, not evidence: a URL the model or a user supplies still renders only when its host is one the site itself cites. */
 export function safeSourceUrl(raw: string): string | null {
   const post = safeXPostUrl(raw);
@@ -41,6 +42,21 @@ export function fetchableSourceUrl(raw: string): string | null {
 export type KnowledgeNote = ZarvisSource & { id: string; keywords: string; text: string; reviewedOn: string };
 const reviewedOn = "2026-09-25";
 export const KNOWLEDGE: KnowledgeNote[] = [
+  {
+    id: "ecc-zodl-transition", title: "Zcash: ECC is historical; its team moved to ZODL", url: "https://z.cash/ecosystem/electric-coin-company/",
+    keywords: "ecc electric coin company zodl current atual today hoje team equipe builders development desenvolvimento ecosystem ecossistema transition transicao",
+    text: "Reviewed November 3, 2026: Zcash's official ecosystem record states that Electric Coin Company concluded operations in 2026 and its full team transitioned to the independent Zcash Open Development Lab (ZODL). ECC references are historical, not evidence of an active current development company. ZODL continues protocol and wallet work; the Zodl wallet was formerly Zashi. Zcash Labs is a separate organization, not another name for ZODL. Other independent teams also develop Zcash. This identity snapshot is not a current release or announcement feed.", reviewedOn: "2026-11-03",
+  },
+  {
+    id: "zakura-builders", title: "Zakura: Valar Group and Project Tachyon", url: "https://zakura.com/about/",
+    keywords: "zakura valar tachyon node full client no completo current atual builders development desenvolvimento ecosystem ecossistema",
+    text: "Reviewed November 3, 2026: Zakura is a Zcash full node developed by Valar Group and Project Tachyon. It is a distinct implementation forked from Zebra. Its maintainers include Sean Bowe and Dev Ojha. Use Zakura's announcements and release records for current versions; this team snapshot does not establish a latest release, upgrade activation or delivery of every proposed feature.", reviewedOn: "2026-11-03",
+  },
+  {
+    id: "zcash-labs-identity", title: "Zcash Labs: independent integrations and adoption", url: "https://zcashlabs.org/",
+    keywords: "zcash labs zcashlabs integration integracao adoption adocao grants current atual builders ecosystem ecossistema zodl",
+    text: "Reviewed November 3, 2026: Zcash Labs identifies itself as an independent organization offering Zcash integrations, technical support, co-marketing and grants. It is separate from Zcash Open Development Lab (ZODL) and is not affiliated with Zcash Foundation. Check its project and funding records before treating an announcement, upfront expense or reimbursement request as a paid grant or proven adoption.", reviewedOn: "2026-11-03",
+  },
   {
     id: "privacy", title: "Zcash: using shielded transactions", url: "https://z.cash/learn/how-to-use-zcash/",
     keywords: "privacy shielded transparent privacidade blindada transacao transaction beginner basics zcash",

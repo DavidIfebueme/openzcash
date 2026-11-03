@@ -6,6 +6,13 @@ import { compactData } from "./data";
 import { decimalUnits, ledgerQuerySchema } from "./ledger";
 import { systemPrompt } from "./prompt";
 describe("Local knowledge coverage and size", () => {
+  it.each([
+    ["ECC Electric Coin Company current development team", "ecc-zodl-transition"],
+    ["Zakura Valar Tachyon development", "zakura-builders"],
+    ["Zcash Labs e ZODL são a mesma organização?", "zcash-labs-identity"],
+  ])("retrieves reviewed current organization identities: %s", (query, id) => {
+    expect(searchKnowledge(query, 4, 5000).some(doc => doc.id === id)).toBe(true);
+  });
   it.each([["como funciona a metodologia dos pagamentos", "/zcg/methodology"], ["Zcash ceremony participants", "/ceremony/people"], ["viewing keys sender recipient", "zip-0310"], ["treasury calculator cypherpunk", "treasury-calculator"]])("finds relevant public material: %s", (q, target) => {
     expect(searchKnowledge(q).some((d) => d.url.includes(target))).toBe(true);
   });
