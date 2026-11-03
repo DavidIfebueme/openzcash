@@ -2479,6 +2479,9 @@
   );
 }
 @media (max-width: 690px) {
+  .opportunities-beta .listing-meta {
+    flex-wrap: wrap;
+  }
   .opportunities-beta .listing-tools .op-search {
     flex: 1 1 0%;
     width: auto;
@@ -2491,6 +2494,8 @@
     width: 150px;
   }
   .opportunities-beta .results-sort {
+    flex: 0 0 auto;
+    margin-left: auto;
     min-width: 0;
   }
 }
