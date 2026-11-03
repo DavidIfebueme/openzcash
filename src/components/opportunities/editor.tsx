@@ -12,7 +12,8 @@ import {
 } from "./model";
 import { useApp, Link } from "./state";
 import { Heading, Field, OrganizerTag, LocaleSummary } from "./components";
-import { languages, countries, countryFlag } from "./locales";
+import { languages } from "./locales";
+import { CountryPicker } from "./country-picker";
 import { Icon, Coin, Illustration } from "./visuals";
 import { CoverPicker } from "./cover-picker";
 import { resolveCover } from "./covers";
@@ -258,22 +259,12 @@ export function Editor() {
                     ))}
                   </select>
                 </Field>
-                <Field
-                  label="Country"
+                <CountryPicker
+                  value={d.country}
+                  onChange={(country) => update({ country })}
                   error={errors.country}
                   hint="Choose Global for worldwide participation."
-                >
-                  <select
-                    value={d.country}
-                    onChange={(e) => update({ country: e.target.value })}
-                  >
-                    {countries.map((c) => (
-                      <option key={c.code} value={c.code}>
-                        {countryFlag(c.code)} {c.name}
-                      </option>
-                    ))}
-                  </select>
-                </Field>
+                />
               </div>
               <CoverPicker
                 value={d.art}

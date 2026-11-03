@@ -20,17 +20,32 @@ export function Dialog({
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   useEffect(() => {
-    if (open && !ref.current?.open) ref.current?.showModal();
-    else if (!open && ref.current?.open) ref.current.close();
+    const dialog = ref.current;
+    if (!open || !dialog) return;
+    const overflow = document.body.style.overflow;
+    if (!dialog.open) dialog.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      if (dialog.open) dialog.close();
+      document.body.style.overflow = overflow;
+    };
   }, [open]);
   return (
     <dialog
       ref={ref}
       className={"op-dialog " + className}
       aria-label={title}
-      onCancel={onClose}
+      onCancel={(e) => {
+        e.preventDefault();
+        onClose();
+      }}
       onClick={(e) => {
-        if (e.target === ref.current) onClose();
+        if (e.target !== ref.current) return;
+        const rect = e.currentTarget.getBoundingClientRect();
+        if (
+          e.clientX < rect.left || e.clientX > rect.right ||
+          e.clientY < rect.top || e.clientY > rect.bottom
+        ) onClose();
       }}
     >
       <div className="dialog-head">
@@ -44,7 +59,7 @@ export function Dialog({
           <Icon name="close" />
         </button>
       </div>
-      {children}
+      <div className="dialog-body">{children}</div>
     </dialog>
   );
 }

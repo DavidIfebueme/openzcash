@@ -17,7 +17,8 @@ import {
   Field,
   LocaleSummary,
 } from "./components";
-import { languages, countries, countryFlag, matchesLocale } from "./locales";
+import { languages, matchesLocale } from "./locales";
+import { CountryPicker } from "./country-picker";
 import { Editor, Setup } from "./editor";
 import { Coin, Icon, Illustration } from "./visuals";
 import { formatDate, zec } from "./data";
@@ -113,7 +114,12 @@ function Listing({
         )}
       </div>
       {filters && (
-        <div className="op-filters" id="op-filters">
+        <div
+          className="op-filters"
+          id="op-filters"
+          role="region"
+          aria-label="Opportunity filters"
+        >
           <Field label="Category">
             <select
               value={category}
@@ -153,25 +159,19 @@ function Listing({
               ))}
             </select>
           </Field>
-          <Field label="Country">
-            <select
-              value={country}
-              onChange={(e) => a.filter("country", e.target.value)}
-            >
-              <option value="all">All countries</option>
-              {countries.map((c) => (
-                <option key={c.code} value={c.code}>
-                  {countryFlag(c.code)} {c.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <button className="op-text" onClick={reset}>
-            Clear filters
-          </button>
-          <Link to={BASE + "?tab=communities"} className="op-text">
-            Browse organizers <Icon name="arrow" size={14} />
-          </Link>
+          <CountryPicker
+            value={country}
+            allowAll
+            onChange={(value) => a.filter("country", value)}
+          />
+          <div className="op-filter-actions">
+            <button className="op-text" onClick={reset}>
+              Clear filters
+            </button>
+            <Link to={BASE + "?tab=communities"} className="op-text">
+              Browse organizers <Icon name="arrow" size={14} />
+            </Link>
+          </div>
         </div>
       )}
       <div className="listing-meta">
@@ -225,6 +225,7 @@ function Overview() {
   return (
     <>
       <Hero
+        compact
         title="Zcash Opportunities"
         description={
           BETA_PREVIEW

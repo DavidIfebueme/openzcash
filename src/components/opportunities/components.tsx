@@ -169,26 +169,41 @@ export function Hero({
   title,
   description,
   stats,
+  compact = false,
 }: {
   title: string;
   description: string;
   stats: [string, string][];
+  compact?: boolean;
 }) {
   return (
-    <section className="op-hero">
-      <div className="hero-pattern left" aria-hidden="true">
-        {Array.from({ length: 9 }, (_, i) => (
-          <Coin key={i} black={i % 3 === 2} />
-        ))}
-      </div>
-      <div className="hero-pattern right" aria-hidden="true">
-        {Array.from({ length: 9 }, (_, i) => (
-          <Coin key={i} black={i % 3 === 2} />
-        ))}
-      </div>
+    <section className={"op-hero" + (compact ? " op-hero-compact" : "")}>
+      {!compact && (
+        <>
+          <div className="hero-pattern left" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => (
+              <Coin key={i} black={i % 3 === 2} />
+            ))}
+          </div>
+          <div className="hero-pattern right" aria-hidden="true">
+            {Array.from({ length: 9 }, (_, i) => (
+              <Coin key={i} black={i % 3 === 2} />
+            ))}
+          </div>
+        </>
+      )}
       <div className="op-hero-content">
-        <h1>{title}</h1>
-        <p>{description}</p>
+        <div className="op-hero-intro">
+          <h1>{title}</h1>
+          <p>{description}</p>
+        </div>
+        {compact && (
+          <div className="op-hero-art" aria-hidden="true">
+            {Array.from({ length: 5 }, (_, i) => (
+              <Coin key={i} black={i === 2 || i === 4} />
+            ))}
+          </div>
+        )}
         <div className="hero-stats">
           {stats.map(([label, value]) => (
             <div key={label}>

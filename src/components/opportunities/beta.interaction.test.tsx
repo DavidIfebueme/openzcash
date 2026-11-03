@@ -88,6 +88,53 @@ it("keeps randomized order when filtering and returning from a detail", () => {
   expect(links()).toEqual(order);
 });
 
+it("searches countries, filters by the selection and keeps the other filters", () => {
+  navigation.search = "language=pt&type=Task";
+  const history = vi.spyOn(window.history, "replaceState");
+  const view = render(<Beta />);
+  fireEvent.click(screen.getByRole("button", { name: "Filters" }));
+  fireEvent.click(screen.getByRole("button", { name: "Country: All countries" }));
+  const dialog = screen.getByRole("dialog", { name: "Choose a country" });
+  const search = within(dialog).getByRole("textbox", { name: "Search countries" });
+  expect(document.activeElement).toBe(search);
+  expect(document.body.style.overflow).toBe("hidden");
+  fireEvent.change(search, { target: { value: "Brazil" } });
+  expect(within(dialog).getAllByRole("button", { pressed: false })).toHaveLength(1);
+  fireEvent.click(within(dialog).getByRole("button", { name: "Brazil" }));
+  expect(history.mock.lastCall?.[2]).toBe("/opportunities?language=pt&type=Task&country=BR");
+  expect(screen.queryByRole("dialog")).toBeNull();
+  expect(document.body.style.overflow).toBe("");
+
+  navigation.search = "language=pt&type=Task&country=BR";
+  view.rerender(<Beta />);
+  expect(screen.getByRole("button", { name: "Country: Brazil" })).toBeTruthy();
+  const results = view.container.querySelectorAll(".op-card");
+  expect(results.length).toBeGreaterThan(0);
+  for (const card of results) {
+    expect(card.querySelector(".locale-country")?.getAttribute("aria-label")).toBe("Country: Brazil");
+    expect(card.querySelector(".locale-language")?.textContent).toBe("Português");
+  }
+});
+
+it("searches by country code, cancels without changing the editor and keeps language independent", () => {
+  navigation.path = "/opportunities/new";
+  render(<Beta />);
+  fireEvent.change(screen.getByRole("combobox", { name: /^Language/ }), { target: { value: "pt" } });
+  fireEvent.click(screen.getByRole("button", { name: "Country: Global" }));
+  let dialog = screen.getByRole("dialog", { name: "Choose a country" });
+  fireEvent.change(within(dialog).getByRole("textbox", { name: "Search countries" }), { target: { value: "no-match" } });
+  expect(within(dialog).getByText(/No countries found/)).toBeTruthy();
+  fireEvent(dialog, new Event("cancel", { bubbles: false, cancelable: true }));
+  expect(screen.getByRole("button", { name: "Country: Global" })).toBeTruthy();
+  expect(document.body.style.overflow).toBe("");
+  fireEvent.click(screen.getByRole("button", { name: "Country: Global" }));
+  dialog = screen.getByRole("dialog", { name: "Choose a country" });
+  fireEvent.change(within(dialog).getByRole("textbox", { name: "Search countries" }), { target: { value: "PT" } });
+  fireEvent.click(within(dialog).getByRole("button", { name: "Portugal" }));
+  expect(screen.getByRole("button", { name: "Country: Portugal" })).toBeTruthy();
+  expect((screen.getByRole("combobox", { name: /^Language/ }) as HTMLSelectElement).value).toBe("pt");
+});
+
 it("allows choosing stock art but cannot advance, upload or publish, even with a draft query", () => {
   navigation.path = "/opportunities/new";
   navigation.search = "draft=legacy&step=3";
