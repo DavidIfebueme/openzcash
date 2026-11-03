@@ -5,9 +5,15 @@ import { BASE, type Opportunity } from "./model";
 import { zec, formatDate } from "./data";
 import { Link, useApp } from "./state";
 import { Coin, Icon, Illustration } from "./visuals";
-export function BetaNote({ children }: { children: ReactNode }) {
+export function BetaNote({
+  children,
+  compact = false,
+}: {
+  children: ReactNode;
+  compact?: boolean;
+}) {
   return (
-    <div className="beta-note">
+    <div className={"beta-note" + (compact ? " beta-note-compact" : "")}>
       <span className="beta-label">Beta</span>
       <p>{children}</p>
       <Icon name="lock" size={15} />
@@ -18,15 +24,18 @@ export function Heading({
   title,
   description,
   action,
+  level = 1,
 }: {
   title: string;
   description?: string;
   action?: ReactNode;
+  level?: 1 | 2;
 }) {
+  const Title = level === 1 ? "h1" : "h2";
   return (
     <div className="op-heading">
       <div>
-        <h1>{title}</h1>
+        <Title>{title}</Title>
         {description && <p>{description}</p>}
       </div>
       {action}
@@ -97,11 +106,6 @@ export function Card({ item }: { item: Opportunity }) {
         <Link to={BASE + "/tasks/" + item.id} aria-label={"View " + item.title}>
           <Illustration kind={item.art} />
         </Link>
-        <span className="reward-badge">
-          <Coin />
-          {zec(item.reward)} ZEC
-        </span>
-        <span className="status-badge">{BETA_PREVIEW ? "Beta" : "Open"}</span>
       </div>
       <div className="op-card-body">
         <div className="op-card-organizer">
@@ -118,9 +122,14 @@ export function Card({ item }: { item: Opportunity }) {
         <h2>
           <Link to={BASE + "/tasks/" + item.id}>{item.title}</Link>
         </h2>
-        <div className="op-tags">
-          <span>{item.type}</span>
-          <span>{item.category}</span>
+        <div className="op-card-tagline">
+          <div className="op-tags">
+            <span>{item.type}</span>
+            <span>{item.category}</span>
+          </div>
+          <span className="op-card-status">
+            {BETA_PREVIEW ? "Beta" : "Open"}
+          </span>
         </div>
         <div className="op-card-facts">
           <div
@@ -130,21 +139,24 @@ export function Card({ item }: { item: Opportunity }) {
                 : undefined
             }
           >
-            <span>
-              {BETA_PREVIEW
-                ? "Example value"
-                : item.type === "Task"
-                  ? "Applicants"
-                  : "Entries"}
-            </span>
-            <strong>
-              {BETA_PREVIEW
-                ? "≈ " + betaUsd(item.reward)
-                : item.applicants +
-                  submissions.filter((s) => s.opportunityId === item.id).length}
+            <span>{BETA_PREVIEW ? "Example reward" : "Reward"}</span>
+            <strong className="op-card-amount">
+              <Coin />
+              {zec(item.reward)} <small>ZEC</small>
             </strong>
+            {BETA_PREVIEW ? (
+              <small className="op-card-conversion">
+                ≈ {betaUsd(item.reward)}
+              </small>
+            ) : (
+              <small className="op-card-conversion">
+                {item.applicants +
+                  submissions.filter((s) => s.opportunityId === item.id).length}{" "}
+                {item.type === "Task" ? "applicants" : "entries"}
+              </small>
+            )}
           </div>
-          <div>
+          <div className="op-card-deadline">
             <span>
               {BETA_PREVIEW
                 ? "Example deadline"
@@ -152,9 +164,10 @@ export function Card({ item }: { item: Opportunity }) {
                   ? "Apply by"
                   : "Submit by"}
             </span>
-            <strong>{formatDate(item.deadline)}</strong>
+            <strong>
+              <time dateTime={item.deadline}>{formatDate(item.deadline)}</time>
+            </strong>
           </div>
-          <Icon name="arrow" size={19} />
         </div>
         <LocaleSummary
           language={item.language}

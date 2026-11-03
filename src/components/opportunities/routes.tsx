@@ -28,7 +28,6 @@ import {
   BETA_LOCK_MESSAGE,
   BETA_RATE_DATE,
 } from "./beta";
-import { stockCovers } from "./covers";
 import { BetaNote } from "./components";
 
 function Listing({
@@ -82,128 +81,134 @@ function Listing({
   }
   return (
     <>
-      <div className="listing-tools">
-        <label className="op-search">
-          <Icon name="search" size={17} />
-          <input
-            aria-label="Search opportunities"
-            placeholder="Search opportunities"
-            value={q}
-            onChange={(e) => a.filter("q", e.target.value)}
-          />
-          {q && (
-            <button onClick={() => a.filter("q", "")} aria-label="Clear search">
-              <Icon name="close" size={15} />
-            </button>
-          )}
-        </label>
-        <button
-          className={"op-button " + (active ? "selected" : "")}
-          aria-expanded={filters}
-          aria-controls="op-filters"
-          onClick={() => setFilters((v) => !v)}
-        >
-          <Icon name="filter" size={16} />
-          Filters{active && <span className="filter-dot" />}
-        </button>
-        {create && (
-          <Link to={createTo} className="op-button primary create-opportunity">
-            <Icon name="plus" size={17} />
-            <span>Create opportunity</span>
-          </Link>
-        )}
-      </div>
-      {filters && (
-        <div
-          className="op-filters"
-          id="op-filters"
-          role="region"
-          aria-label="Opportunity filters"
-        >
-          <Field label="Category">
-            <select
-              value={category}
-              onChange={(e) => a.filter("category", e.target.value)}
-            >
-              <option value="all">All categories</option>
-              {categories.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Organizer">
-            <select
-              value={organizer}
-              onChange={(e) => a.filter("community", e.target.value)}
-            >
-              <option value="all">All organizers</option>
-              {a.organizers
-                .filter((c) => items.some((o) => o.community === c.id))
-                .map((c) => (
-                  <option value={c.id} key={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-            </select>
-          </Field>
-          <Field label="Language">
-            <select
-              value={language}
-              onChange={(e) => a.filter("language", e.target.value)}
-            >
-              <option value="all">All languages</option>
-              {languages.map((l) => (
-                <option key={l.code} value={l.code}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <CountryPicker
-            value={country}
-            allowAll
-            onChange={(value) => a.filter("country", value)}
-          />
-          <div className="op-filter-actions">
-            <button className="op-text" onClick={reset}>
-              Clear filters
-            </button>
-            <Link to={BASE + "?tab=communities"} className="op-text">
-              Browse organizers <Icon name="arrow" size={14} />
+      <section
+        className={"op-listing-controls" + (create ? " with-create" : "")}
+        aria-label="Find opportunities"
+      >
+        <div className="listing-tools">
+          <label className="op-search">
+            <Icon name="search" size={17} />
+            <input
+              aria-label="Search opportunities"
+              placeholder="Search opportunities"
+              value={q}
+              onChange={(e) => a.filter("q", e.target.value)}
+            />
+            {q && (
+              <button onClick={() => a.filter("q", "")} aria-label="Clear search">
+                <Icon name="close" size={15} />
+              </button>
+            )}
+          </label>
+          <button
+            className={"op-button " + (active ? "selected" : "")}
+            aria-expanded={filters}
+            aria-controls="op-filters"
+            onClick={() => setFilters((v) => !v)}
+          >
+            <Icon name="filter" size={16} />
+            Filters{active && <span className="filter-dot" />}
+          </button>
+          {create && (
+            <Link to={createTo} className="op-button primary create-opportunity">
+              <Icon name="plus" size={17} />
+              <span>Create opportunity</span>
             </Link>
+          )}
+        </div>
+        <div className="listing-meta">
+          <div className="op-segment" aria-label="Opportunity format">
+            {[
+              ["all", "All"],
+              ["Task", "Tasks"],
+              ["Contest", "Contests"],
+            ].map(([v, l]) => (
+              <button
+                aria-pressed={type === v}
+                className={type === v ? "active" : ""}
+                key={v}
+                onClick={() => a.filter("type", v)}
+              >
+                {l}
+              </button>
+            ))}
+          </div>
+          <div className="results-sort">
+            <span aria-live="polite">{matching.length} results</span>
+            <select
+              className="op-sort-select"
+              aria-label="Sort opportunities"
+              value={sort}
+              onChange={(e) => a.filter("sort", e.target.value)}
+            >
+              <option value="random">Random order</option>
+              <option value="deadline">Closing soon</option>
+              <option value="reward">Highest reward</option>
+            </select>
           </div>
         </div>
-      )}
-      <div className="listing-meta">
-        <div className="op-segment" aria-label="Opportunity format">
-          {[
-            ["all", "All"],
-            ["Task", "Tasks"],
-            ["Contest", "Contests"],
-          ].map(([v, l]) => (
-            <button
-              aria-pressed={type === v}
-              className={type === v ? "active" : ""}
-              key={v}
-              onClick={() => a.filter("type", v)}
-            >
-              {l}
-            </button>
-          ))}
-        </div>
-        <div className="results-sort">
-          <span>{matching.length} results</span>
-          <select
-            aria-label="Sort opportunities"
-            value={sort}
-            onChange={(e) => a.filter("sort", e.target.value)}
+        {filters && (
+          <div
+            className="op-filters"
+            id="op-filters"
+            role="region"
+            aria-label="Opportunity filters"
           >
-            <option value="random">Random order</option>
-            <option value="deadline">Closing soon</option>
-            <option value="reward">Highest reward</option>
-          </select>
-        </div>
-      </div>
+            <Field label="Category">
+              <select
+                value={category}
+                onChange={(e) => a.filter("category", e.target.value)}
+              >
+                <option value="all">All categories</option>
+                {categories.map((c) => (
+                  <option key={c}>{c}</option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Organizer">
+              <select
+                value={organizer}
+                onChange={(e) => a.filter("community", e.target.value)}
+              >
+                <option value="all">All organizers</option>
+                {a.organizers
+                  .filter((c) => items.some((o) => o.community === c.id))
+                  .map((c) => (
+                    <option value={c.id} key={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+              </select>
+            </Field>
+            <Field label="Language">
+              <select
+                value={language}
+                onChange={(e) => a.filter("language", e.target.value)}
+              >
+                <option value="all">All languages</option>
+                {languages.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.name}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <CountryPicker
+              value={country}
+              allowAll
+              onChange={(value) => a.filter("country", value)}
+            />
+            <div className="op-filter-actions">
+              <button className="op-text" onClick={reset}>
+                Clear filters
+              </button>
+              <Link to={BASE + "?tab=communities"} className="op-text">
+                Browse organizers <Icon name="arrow" size={14} />
+              </Link>
+            </div>
+          </div>
+        )}
+      </section>
       {matching.length ? (
         <div className="op-grid">
           {matching.map((o) => (
@@ -222,36 +227,7 @@ function Listing({
 }
 function Overview() {
   const a = useApp();
-  return (
-    <>
-      <Hero
-        compact
-        title="Zcash Opportunities"
-        description={
-          BETA_PREVIEW
-            ? "Discover ways to build with Zcash."
-            : "Contribute your skills. Earn Zcash."
-        }
-        stats={[
-          [
-            BETA_PREVIEW ? "Per opportunity" : "Pledged rewards",
-            BETA_PREVIEW
-              ? "< 1 ZEC"
-              : zec(a.items.reduce((n, o) => n + o.reward, 0)) + " ZEC",
-          ],
-          ["Opportunities", String(a.items.length)],
-          ["Organizers", String(new Set(a.items.map((o) => o.community)).size)],
-        ]}
-      />
-      {BETA_PREVIEW && (
-        <BetaNote>
-          Example rewards up to $100. Explore {stockCovers.length} covers;
-          publishing and submissions are coming soon.
-        </BetaNote>
-      )}
-      <Listing items={a.items} />
-    </>
-  );
+  return <Listing items={a.items} create={false} />;
 }
 function CampaignCard({ campaign }: { campaign: Campaign }) {
   const a = useApp();
@@ -286,6 +262,7 @@ function Campaigns() {
     <>
       <Heading
         title="Campaigns"
+        level={2}
         description="Tasks and contests around a shared goal."
         action={
           <Link to={BASE + "/campaigns/new"} className="op-button primary">
@@ -453,6 +430,7 @@ function Work() {
     <>
       <Heading
         title="My work"
+        level={2}
         description={
           BETA_PREVIEW
             ? "Publishing and contributions open after beta. Saved opportunities are available now."
