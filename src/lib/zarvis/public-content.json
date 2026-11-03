@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "67d07a9fbf9ec7b7",
+  "sourceRevision": "21ab981750b8a7e7",
   "sourceFiles": 72,
   "documents": [
     {
@@ -355,7 +355,7 @@
       "id": "src/app/ceremony/ten-years/page.tsx:0",
       "url": "https://openzcash.org/ceremony/ten-years",
       "title": "ceremony · ten years",
-      "text": "Ten years · Zcash Ceremony · OpenZcash\nTen years of Zcash since the genesis block of October 28, 2016: every generation of shielded pools, the end of the trusted setup, the halvings, and the claims that keep circulating.\nTen years\nFrom the genesis block to NU5, which ended the need for any ceremony, through two halvings and an emergency, to the tenth anniversary. Upgrades and votes follow the ZIPs and this site's own records.\nSince the genesis block\ndays\nTo the tenth anniversary\nIn Ironwood now\nEvery activation height and how it was decided is on\nZcash governance\n; every ZEC paid outside mining on\nZcash's Since block zero\n.\nOften misstated"
+      "text": "Ten years · Zcash Ceremony · OpenZcash\nTen years of Zcash since the genesis block of October 28, 2016: every generation of shielded pools, the end of the trusted setup, the halvings, and the claims that keep circulating.\nnumeric\nTen years\nFrom the genesis block to NU5, which ended the need for any ceremony, through two halvings and an emergency, to the tenth anniversary. Upgrades and votes follow the ZIPs and this site's own records.\nSince the genesis block\nand\nTenth anniversary\nIn Ironwood now\nEvery activation height and how it was decided is on\nZcash governance\n; every ZEC paid outside mining on\nZcash's Since block zero\n.\nOften misstated"
     },
     {
       "id": "src/app/ceremony/watch/page.tsx:0",

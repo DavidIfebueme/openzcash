@@ -20,7 +20,7 @@ import {
   uniquePeople,
 } from "./people";
 import { RECORDS } from "./record";
-import { CHAPTERS, CORRECTIONS, TIMELINE, daysUntil } from "./story";
+import { CHAPTERS, CORRECTIONS, TIMELINE, daysUntil, genesisAge } from "./story";
 
 const PUBLIC = path.join(process.cwd(), "public");
 
@@ -112,6 +112,19 @@ describe("the people and the record", () => {
 });
 
 describe("the story", () => {
+  it.each([
+    ["2016-10-28T00:00:00Z", 0, 0],
+    ["2026-10-27T23:59:59Z", 9, 364],
+    ["2026-10-28T00:00:00Z", 10, 0],
+    ["2026-11-03T06:00:00Z", 10, 6],
+    ["2026-11-03T23:59:59Z", 10, 6],
+    ["2026-11-03T21:00:00-03:00", 10, 7],
+    ["2028-10-27T12:00:00Z", 11, 365],
+    ["2028-10-28T12:00:00Z", 12, 0],
+  ])("shows calendar years and days at %s, including leap years and UTC boundaries", (date, years, days) => {
+    expect(genesisAge(new Date(date))).toEqual({ years, days });
+  });
+
   it("counts the days to the tenth anniversary", () => {
     expect(daysUntil("2026-10-28", new Date("2026-09-25T12:00:00Z"))).toBe(33);
     expect(daysUntil("2026-10-28", new Date("2026-10-28T08:00:00Z"))).toBe(0);

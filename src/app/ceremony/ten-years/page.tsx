@@ -6,7 +6,7 @@ import {
   GENESIS,
   TENTH_ANNIVERSARY,
   TIMELINE,
-  daysUntil,
+  genesisAge,
 } from "@/lib/ceremony/story";
 import { Pager, PartHeader, partEyebrow } from "../part-chrome";
 import styles from "../ceremony.module.css";
@@ -22,10 +22,10 @@ export const metadata = pageMetadata({
 
 export default async function TenYearsPage() {
   const now = new Date();
-  const toTen = daysUntil(TENTH_ANNIVERSARY, now);
-  const sinceGenesis = Math.floor(
-    (now.getTime() - new Date(`${GENESIS}T00:00:00Z`).getTime()) / 86_400_000,
-  );
+  const age = genesisAge(now);
+  const dateLabel = (date: string) => new Date(`${date}T00:00:00Z`).toLocaleDateString("en-US", {
+    month: "long", day: "numeric", year: "numeric", timeZone: "UTC",
+  });
   const node = await nodeValuePools().catch(() => null);
   const ironwood = node?.pools.ironwood;
   const orchard = node?.pools.orchard;
@@ -45,16 +45,13 @@ export default async function TenYearsPage() {
         <div className={styles.stat}>
           <span className={styles.statLabel}>Since the genesis block</span>
           <span className={styles.statValue}>
-            {sinceGenesis.toLocaleString("en-US")} days
+            {age.years} {age.years === 1 ? "year" : "years"} and {age.days} {age.days === 1 ? "day" : "days"}
           </span>
+          <span className={styles.note}><time dateTime={GENESIS}>{dateLabel(GENESIS)}</time></span>
         </div>
         <div className={styles.stat}>
-          <span className={styles.statLabel}>To the tenth anniversary</span>
-          <span className={styles.statValue}>
-            {toTen > 0
-              ? `${toTen} ${toTen === 1 ? "day" : "days"}`
-              : "Today or past"}
-          </span>
+          <span className={styles.statLabel}>Tenth anniversary</span>
+          <time className={styles.statValue} dateTime={TENTH_ANNIVERSARY}>{dateLabel(TENTH_ANNIVERSARY)}</time>
         </div>
         <div className={styles.stat}>
           <span className={styles.statLabel}>In Ironwood now</span>

@@ -12,6 +12,21 @@ import type { Link } from "./people";
 export const GENESIS = "2016-10-28";
 export const TENTH_ANNIVERSARY = "2026-10-28";
 
+/** Calendar years and remaining days since launch, using UTC dates and leap years. */
+export function genesisAge(now: Date): { years: number; days: number } {
+  const genesis = new Date(`${GENESIS}T00:00:00Z`);
+  const today = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  if (today <= genesis.getTime()) return { years: 0, days: 0 };
+  const month = genesis.getUTCMonth();
+  const day = genesis.getUTCDate();
+  let year = now.getUTCFullYear();
+  if (today < Date.UTC(year, month, day)) year -= 1;
+  return {
+    years: year - genesis.getUTCFullYear(),
+    days: (today - Date.UTC(year, month, day)) / 86_400_000,
+  };
+}
+
 /** Whole days from `now` to the start (UTC) of `dateIso`; 0 once it has come. */
 export function daysUntil(dateIso: string, now: Date): number {
   const target = new Date(`${dateIso}T00:00:00Z`).getTime();
