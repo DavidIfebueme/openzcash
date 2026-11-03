@@ -5,6 +5,8 @@ import { systemPrompt } from "@/lib/zarvis/prompt";
 import { DIRECT_ROUTES, FAQ, FRESHNESS_NOTE, INCIDENTS, KEPT_AT_OPENZCASH, LIMITATIONS, PROVIDER_RETENTION, TOKEN_DISCLAIMER, modelLine, quotaLines } from "@/lib/zarvis/about";
 import { modelLabel } from "@/lib/zarvis/provenance";
 import { pageMetadata } from "@/lib/seo/page-metadata";
+import { xResearchConfig } from "@/lib/zarvis/x-research-config";
+import { X_RESEARCH_ACCOUNTS } from "@/lib/zarvis/x-research-policy";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
@@ -26,6 +28,7 @@ const shortDate = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateStri
 
 export default function AboutZarvisPage() {
   const config = zarvisConfig();
+  const xResearch = config.enabled && xResearchConfig().enabled;
   const quotas = quotaLines(config);
   const retention = PROVIDER_RETENTION[config.providerLabel];
   return (
@@ -64,6 +67,11 @@ export default function AboutZarvisPage() {
       <Section title="How fresh is the data?">
         <p>{FRESHNESS_NOTE}</p>
       </Section>
+      {xResearch ? <Section title="Research on X">
+        <p>Zarvis can look for public Zcash announcements, bounties, grants, releases and events from the last 30 days. Coverage currently includes {X_RESEARCH_ACCOUNTS.map(a => `@${a.handle}`).join(", ")}. Results can be cached for up to 30 minutes and include post links and retrieval dates.</p>
+        <p className="mt-3">This search uses xAI. It receives a predefined Zcash topic, without your question or conversation history. Public results are summarized by xAI and passed to the model answering you. <a href={PROVIDER_RETENTION["xAI (Grok)"].url} target="_blank" rel="noreferrer" className="text-amber-700 hover:underline">xAI data policy ↗</a></p>
+        <p className="mt-3">Coverage is limited and separate usage limits apply. A missing result does not mean an opportunity does not exist. Check the original post and the project&apos;s current terms. Zarvis cannot post, send messages or access private accounts, Discord or Telegram.</p>
+      </Section> : null}
       <Section title="What is kept, and for how long">
         <ul className="space-y-1.5">
           <li><span className="font-medium text-stone-800">In your browser:</span> the conversation stays in page memory while you move around the site, including the Monthly pages. Reloading or New chat clears it. Zarvis never writes your question into the page address; “Copy question link” under an answer makes a link that carries that one question and only fills the composer when opened. Shared calculator links carry only scenario assumptions.</li>

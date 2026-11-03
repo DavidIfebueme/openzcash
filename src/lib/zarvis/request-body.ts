@@ -1,5 +1,5 @@
 /** Read a small JSON body with an absolute deadline, including slow chunked uploads. */
-export async function readBoundedJson(request: Request, maxBytes: number, timeoutMs = 5_000): Promise<unknown> {
+export async function readBoundedJson(request: Pick<Request, "headers" | "body" | "signal">, maxBytes: number, timeoutMs = 5_000): Promise<unknown> {
   if (!/^application\/json(?:\s*;|\s*$)/i.test(request.headers.get("content-type") ?? "")) throw new Error("INVALID_REQUEST");
   if (Number(request.headers.get("content-length")) > maxBytes) throw new Error("BODY_TOO_LARGE");
   request.signal.throwIfAborted();

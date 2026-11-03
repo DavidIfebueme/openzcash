@@ -10,6 +10,7 @@ import { queueTopic, spendTodayUsd } from "@/lib/zarvis/metrics-store";
 import { conversationTopic } from "@/lib/zarvis/topics";
 import { answerLanguage, directLanguage, type DirectLanguage } from "@/lib/zarvis/language";
 import { voiceConfig } from "@/lib/zarvis/voice";
+import { xResearchConfig } from "@/lib/zarvis/x-research-config";
 import type { ZarvisEvent } from "@/lib/zarvis/types";
 
 export const runtime = "nodejs";
@@ -22,7 +23,7 @@ const SPEND_CAP = "Zarvis has reached today's limit for model-assisted answers. 
 
 export function GET() {
   const config = zarvisConfig();
-  return Response.json({ available: config.enabled, provider: config.providerLabel, webSearch: config.webSearch, voice: config.enabled && voiceConfig().enabled }, { headers });
+  return Response.json({ available: config.enabled, provider: config.providerLabel, webSearch: config.webSearch, voice: config.enabled && voiceConfig().enabled, ...(config.enabled && xResearchConfig().enabled ? { xResearch: true } : {}) }, { headers });
 }
 
 export async function POST(request: Request) {

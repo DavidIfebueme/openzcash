@@ -14,7 +14,7 @@ export function provenanceLabel(p: AnswerProvenance, sources: number, provider?:
   const lang = p.language;
   if (p.route === "local") return pick(lang, { en: "Direct from OpenZcash data · no AI", pt: "Direto dos dados OpenZcash · sem IA", es: "Directo de los datos de OpenZcash · sin IA" });
   const count = `${sources} ${pick(lang, { en: sources === 1 ? "source" : "sources", pt: sources === 1 ? "fonte" : "fontes", es: sources === 1 ? "fuente" : "fuentes" })}`;
-  return [modelLabel(p.model, provider), ...(p.webSearch ? [pick(lang, { en: "web search", pt: "busca na web", es: "búsqueda web" })] : []), count, pick(lang, { en: "check them", pt: "confira", es: "verifícalas" })].join(" · ");
+  return [modelLabel(p.model, provider), ...(p.webSearch ? [pick(lang, { en: "web search", pt: "busca na web", es: "búsqueda web" })] : []), ...(p.xResearch ? [pick(lang, { en: "X research via xAI", pt: "pesquisa no X via xAI", es: "investigación en X vía xAI" })] : []), count, pick(lang, { en: "check them", pt: "confira", es: "verifícalas" })].join(" · ");
 }
 /** Rendered under a partial answer so dropped sentences or table rows never read as complete; the count comes from provenance, never the withheld text. */
 export function fallbackNotice(p: AnswerProvenance): string | undefined {

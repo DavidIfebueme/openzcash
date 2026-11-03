@@ -4,7 +4,7 @@ import { APIConnectionError as ClaudeConnectionError, APIConnectionTimeoutError 
 export const ERROR_CLASSES = ["provider_timeout", "provider_connection", "provider_billing", "provider_http_429", "provider_http_4xx", "provider_http_5xx", "provider_not_configured", "incomplete_response", "empty_response", "tool_limit", "public_read_timeout", "model_required", "deadline", "aborted", "unknown"] as const;
 export type ErrorClass = typeof ERROR_CLASSES[number];
 /** Usage accumulated before a failure; carries the model and whether every round reported usage so the billed part can still be priced. */
-export type PartialUsage = { route: "local" | "model"; depth?: "quick" | "deep"; model: string; modelCalls: number; webSearchCalls: number; webFetchCalls?: number; inputTokens: number; cachedInputTokens: number; cacheWriteTokens?: number; outputTokens: number; usageReported: boolean; groundingFallbacks?: number; repairRounds?: number };
+export type PartialUsage = { route: "local" | "model"; depth?: "quick" | "deep"; model: string; modelCalls: number; webSearchCalls: number; webFetchCalls?: number; inputTokens: number; cachedInputTokens: number; cacheWriteTokens?: number; outputTokens: number; usageReported: boolean; groundingFallbacks?: number; repairRounds?: number; xResearchUsd?: number | null };
 /** Thrown by the answer pipeline: a class plus the usage accumulated before the failure. The cause stays in memory for tests and debuggers; only the class is logged. */
 export class GenerationFailure extends Error {
   constructor(readonly errorClass: ErrorClass, readonly usage?: PartialUsage, cause?: unknown) { super(cause instanceof Error ? cause.message : errorClass, cause === undefined ? undefined : { cause }); this.name = "GenerationFailure"; }

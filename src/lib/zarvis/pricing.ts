@@ -32,14 +32,16 @@ export function modelRates(model: string): Partial<ModelRates> {
   return rates;
 }
 /** inputTokens is the whole input; cachedInputTokens and cacheWriteTokens (absent means none) are the parts of it billed at the cache rates. */
-export type UsageForPricing = { model: string; modelCalls: number; usageReported: boolean; webSearchCalls: number; inputTokens: number; cachedInputTokens: number; cacheWriteTokens?: number; outputTokens: number };
+export type UsageForPricing = { model: string; modelCalls: number; usageReported: boolean; webSearchCalls: number; inputTokens: number; cachedInputTokens: number; cacheWriteTokens?: number; outputTokens: number; xResearchUsd?: number | null };
 export function estimateUsageUsd(metrics: UsageForPricing): number | null {
-  if (!metrics.modelCalls) return 0;
+  const researchUsd = metrics.xResearchUsd ?? 0;
+  if (metrics.xResearchUsd === null || !Number.isFinite(researchUsd) || researchUsd < 0) return null;
+  if (!metrics.modelCalls) return researchUsd;
   if (!metrics.usageReported) return null;
   const written = metrics.cacheWriteTokens ?? 0;
   const { inputUsdPerMillion: input, cachedInputUsdPerMillion: cached, cacheWriteUsdPerMillion: write, outputUsdPerMillion: output, webSearchUsdPerCall: search } = modelRates(metrics.model);
   if (input === undefined || output === undefined || (metrics.cachedInputTokens > 0 && cached === undefined) || (written > 0 && write === undefined) || (metrics.webSearchCalls > 0 && search === undefined)) return null;
-  return ((metrics.inputTokens - metrics.cachedInputTokens - written) * input + metrics.cachedInputTokens * (cached ?? 0) + written * (write ?? 0) + metrics.outputTokens * output) / 1e6 + metrics.webSearchCalls * (search ?? 0);
+  return ((metrics.inputTokens - metrics.cachedInputTokens - written) * input + metrics.cachedInputTokens * (cached ?? 0) + written * (write ?? 0) + metrics.outputTokens * output) / 1e6 + metrics.webSearchCalls * (search ?? 0) + researchUsd;
 }
 /** Optional application-level daily estimated-spend ceiling in USD; unset or invalid means no ceiling. */
 export function dailyUsdCap(): number | null {

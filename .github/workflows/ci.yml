@@ -33,6 +33,22 @@ jobs:
     name: Test (Node ${{ matrix.node-version }})
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+          POSTGRES_DB: openzcash_x_research_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d openzcash_x_research_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      ZARVIS_X_RESEARCH_TEST_DB_URL: postgres://ci:ci@127.0.0.1:5432/openzcash_x_research_test
     strategy:
       fail-fast: false
       matrix:

@@ -1,5 +1,6 @@
 import { APPS } from "@/lib/design-routes";
 import type { ZarvisSource } from "./types";
+import { safeXPostUrl } from "./x-research-policy";
 
 export const SEARCH_DOMAINS = [
   "z.cash", "zips.z.cash", "zcash.github.io", "zcash.readthedocs.io",
@@ -7,7 +8,7 @@ export const SEARCH_DOMAINS = [
   "forum.zcashcommunity.com", "shieldedlabs.net", "openzcash.org", "zcashinfo.com", "zecstats.com",
 ];
 
-/** Hosts the site's own curated datasets and readers cite: recordings, explorers, vote tallies, wallet makers' sites and audits, community sites. Social profiles stay links on /communities, not citations. */
+/** Hosts the site's curated datasets and readers cite. X is handled separately: only reviewed accounts' post permalinks, never whole social domains. */
 export const CITATION_DOMAINS = [
   ...SEARCH_DOMAINS, "shieldedscan.xyz", "zecblock.com", "daodao.zone", "youtube.com", "youtu.be", "cipherscan.app", "zcashcommunitygrants.org", "vote.heliosvoting.org", "siv.org", "valargroup.org",
   "zodl.com", "zingolabs.org", "ywallet.app", "brave.com", "zknoir.com", "zucchinifi.xyz", "snaps.metamask.io", "vizor.cash", "cakewallet.com", "edge.app", "unstoppable.money", "zipher.to", "zstash.app", "justzappit.xyz", "gemwallet.com", "keyst.one", "ledger.com", "trezor.io", "defuse.ca", "hacken.io",
@@ -17,6 +18,8 @@ export const CITATION_DOMAINS = [
 const GITHUB_ORGS = /^\/(?:zcash|zcashfoundation|zechub|zingolabs|shieldedlabs|zcashcommunitygrants|financial-privacy-foundation|electric-coin-company|zodl-inc|zecdev|zcash-hackworks|nighthawk-apps|qed-it|hhanh00|brave|chainsafe|chainapsis|cake-tech|edgeapp|horizontalsystems|atmospherelabs-dev|gemwalletcom|keystonehq|trezor)(?:\/|$)/i;
 /** Allowlist, not evidence: a URL the model or a user supplies still renders only when its host is one the site itself cites. */
 export function safeSourceUrl(raw: string): string | null {
+  const post = safeXPostUrl(raw);
+  if (post) return post;
   try {
     const u = new URL(raw);
     if (u.protocol !== "https:" || u.username || u.password || u.port) return null;

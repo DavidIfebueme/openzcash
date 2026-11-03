@@ -1,5 +1,7 @@
 # Zarvis
 
+Optional public X research, its privacy boundaries, independent abuse controls and enablement prerequisites are documented in [Public X research](zarvis-x-research.md). It is disabled by default and supplements the selected answer provider.
+
 Zarvis is the OpenZcash AI guide: `/zarvis`, the navigation entry, and a floating conversation on public workspace pages. The UI follows OpenZcash's light and dark themes. Answers follow the language of the question; the interface itself stays in English.
 
 ## Language selection (2026-09-28)
