@@ -17,7 +17,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@matrix-org/matrix-sdk-crypto-wasm": "18.9.0",
+    "@matrix-org/matrix-sdk-crypto-wasm": "19.0.0",
     "@nymproject/nym-client-wasm": "1.4.1",
     "libsodium-wrappers": "^0.8.4",
     "next": "16.4.2",
