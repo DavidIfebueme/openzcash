@@ -20,6 +20,13 @@ from participate_database import database_command, database_source
 DIRECTORY = Path('/var/lib/participate-monitor')
 CONFIG = Path('/etc/participate/monitor.json')
 PUBLIC = 'https://openzcash.org'
+# The timer runs every 2 minutes. A probe must stay healthy for 30 minutes
+# before its recovery email, so a flapping check stays one open incident.
+RECOVERY_CHECKS = 15
+# Alerts share the Resend quota with login and invite emails. Past this rolling
+# 24-hour cap an alert is recorded as suppressed instead of sent.
+DAILY_EMAIL_LIMIT = 12
+OUTBOX_RETENTION_SECONDS = 14 * 24 * 3600
 MESSAGES = {
     'public_site': 'A página pública do Participate não respondeu corretamente.',
     'public_data': 'A leitura pública das propostas não respondeu corretamente.',
@@ -94,9 +101,9 @@ def database_snapshot(host):
       'review', (SELECT count(*) FROM "ParticipateAutomationJob"
         WHERE "hostId" = '%s' AND state = 'NEEDS_REVIEW'),
       'oldestPending', (SELECT extract(epoch from min("createdAt")) FROM "ParticipateAutomationJob"
-        WHERE "hostId" = '%s' AND state NOT IN ('VERIFIED', 'NEEDS_REVIEW')),
+        WHERE "hostId" = '%s' AND state NOT IN ('VERIFIED', 'NEEDS_REVIEW') AND txid IS NULL),
       'activityReview', (SELECT count(*) FROM "ActivityAutomationJob" j JOIN "ArchiveActivityBatch" b ON b.id = j."batchId" WHERE b."communityId" = '%s' AND j.state = 'NEEDS_REVIEW'),
-      'activityFailures', (SELECT count(*) FROM "ActivityAutomationJob" j JOIN "ArchiveActivityBatch" b ON b.id = j."batchId" WHERE b."communityId" = '%s' AND j.attempts >= 3),
+      'activityFailures', (SELECT count(*) FROM "ActivityAutomationJob" j JOIN "ArchiveActivityBatch" b ON b.id = j."batchId" WHERE b."communityId" = '%s' AND j.state <> 'VERIFIED' AND j.attempts >= 3),
       'oldestActivity', (SELECT extract(epoch from min(e."createdAt")) FROM "ArchiveActivityEvent" e JOIN "ProposalArchive" a ON a.id = e."archiveId"
         LEFT JOIN "ArchiveActivityInclusion" i ON i."eventId" = e.id LEFT JOIN "ActivityAutomationJob" j ON j."batchId" = i."batchId"
         LEFT JOIN "ArchiveActivityActor" actor ON actor.id = e."eventJson"::jsonb->>'actor' AND actor."archiveId" = e."archiveId"
@@ -219,7 +226,8 @@ def probes(config, state, now):
 
 
 def update_incidents(state, checks, now):
-    """Unknown/dependent probes retain their incident; two observations open/close it."""
+    """Unknown/dependent probes retain their incident; two bad observations open it and
+    RECOVERY_CHECKS consecutive good ones close it."""
     changes = []
     for key, healthy in checks.items():
         entry = state.setdefault('incidents', {}).setdefault(key, {'active': False, 'bad': 0, 'good': 0})
@@ -229,7 +237,7 @@ def update_incidents(state, checks, now):
         if not entry['active'] and entry['bad'] >= threshold:
             entry.update(active=True, openedAt=now)
             changes.append({'key': key, 'kind': 'failure'})
-        elif entry['active'] and entry['good'] >= 2:
+        elif entry['active'] and entry['good'] >= RECOVERY_CHECKS:
             entry.update(active=False, recoveredAt=now)
             changes.append({'key': key, 'kind': 'recovery'})
     state['checkedAt'] = now
@@ -278,9 +286,25 @@ def send_email(key, payload, idempotency):
         return result['id']
 
 
+def prune_outbox(outbox, now):
+    """Drop settled alerts past retention; ambiguous sends stay for manual review."""
+    return [item for item in outbox if item['status'] not in ('accepted', 'suppressed')
+            or now - item['createdAt'] < OUTBOX_RETENTION_SECONDS]
+
+
+def sent_last_day(outbox, now):
+    return sum(1 for item in outbox if item['status'] == 'accepted' and
+               now - item.get('acceptedAt', item['createdAt']) < 24 * 3600)
+
+
 def deliver(state, config, save, now, sender=send_email):
     for item in state.get('outbox', []):
         if item['status'] != 'pending' or item['nextAttemptAt'] > now:
+            continue
+        if not item.get('firstAttemptAt') and sent_last_day(state['outbox'], now) >= DAILY_EMAIL_LIMIT:
+            item.update(status='suppressed', suppressedAt=now)
+            save(state)
+            print(json.dumps({'event': 'alert_suppressed_daily_limit', 'id': item['id']}))
             continue
         # Resend only retains idempotency keys for 24h. Never retry an ambiguous send past it.
         if item.get('firstAttemptAt') and now - item['firstAttemptAt'] >= 23 * 3600:
@@ -333,6 +357,7 @@ def main():
                 return
             update_incidents(state, checks, now)
             print(json.dumps({'event': 'monitor_checked', 'failures': [key for key, ok in checks.items() if not ok]}))
+        state['outbox'] = prune_outbox(state.get('outbox', []), now)
         save = lambda value: atomic_json(state_file, value)
         save(state)
         deliver(state, config, save, now)

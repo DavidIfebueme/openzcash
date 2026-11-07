@@ -43,6 +43,10 @@ class MonitorTest(unittest.TestCase):
             monitor.update_incidents(state, {'public_data': healthy}, NOW)
         self.assertFalse(state.get('outbox'))
 
+    def recover(self, state, key, at):
+        for step in range(monitor.RECOVERY_CHECKS):
+            monitor.update_incidents(state, {key: True}, at + step * 120)
+
     def test_failure_and_recovery_only_on_stable_transitions(self):
         state = self.failure()
         for _ in range(100):
@@ -50,7 +54,8 @@ class MonitorTest(unittest.TestCase):
         self.assertEqual(len(state['outbox']), 1)
         monitor.update_incidents(state, {}, NOW + 300)
         self.assertTrue(state['incidents']['public_data']['active'])
-        monitor.update_incidents(state, {'public_data': True}, NOW + 360)
+        for _ in range(monitor.RECOVERY_CHECKS - 1):
+            monitor.update_incidents(state, {'public_data': True}, NOW + 360)
         self.assertEqual(len(state['outbox']), 1)
         monitor.update_incidents(state, {'public_data': True}, NOW + 480)
         self.assertEqual(state['outbox'][-1]['changes'], [{'key': 'public_data', 'kind': 'recovery'}])
@@ -58,14 +63,61 @@ class MonitorTest(unittest.TestCase):
             monitor.update_incidents(state, {'public_data': True}, NOW + 600)
         self.assertEqual(len(state['outbox']), 2)
 
+    def test_flapping_probe_keeps_one_incident_open(self):
+        # 11/2026: anchor_delay alternated two bad and two good checks for weeks
+        # and produced 1,245 emails. A flap shorter than 30 minutes is one incident.
+        state = {}
+        for cycle in range(50):
+            for offset, healthy in enumerate([False, False, True, True, True, True]):
+                monitor.update_incidents(state, {'anchor_delay': healthy}, NOW + (cycle * 6 + offset) * 120)
+        self.assertEqual(len(state['outbox']), 1)
+        self.assertTrue(state['incidents']['anchor_delay']['active'])
+
     def test_needs_review_is_immediate_and_new_incident_has_new_key(self):
         state = {}
         monitor.update_incidents(state, {'anchor_review': False}, NOW)
         self.assertEqual(len(state['outbox']), 1)
-        for _ in range(2):
-            monitor.update_incidents(state, {'anchor_review': True}, NOW + 120)
-        monitor.update_incidents(state, {'anchor_review': False}, NOW + 240)
+        self.recover(state, 'anchor_review', NOW + 120)
+        monitor.update_incidents(state, {'anchor_review': False}, NOW + 4000)
         self.assertEqual(len({item['id'] for item in state['outbox']}), 3)
+
+    def test_reverification_of_anchored_jobs_is_not_an_anchor_delay(self):
+        queries = []
+        original_run, original_command = monitor.run, monitor.database_command
+        monitor.run = lambda args, query, timeout: queries.append(query) or json.dumps({'review': 0})
+        monitor.database_command = lambda *args, **kwargs: ['psql']
+        try:
+            monitor.database_snapshot('zcg-host')
+        finally:
+            monitor.run, monitor.database_command = original_run, original_command
+        pending = queries[0].split("'oldestPending'")[1].split("'activityReview'")[0]
+        failures = queries[0].split("'activityFailures'")[1].split("'oldestActivity'")[0]
+        self.assertIn('txid IS NULL', pending)
+        self.assertIn("j.state <> 'VERIFIED'", failures)
+
+    def accepted(self, count, at):
+        return [{'id': 'sent-%d' % index, 'createdAt': at, 'status': 'accepted', 'attempts': 1,
+                 'nextAttemptAt': at, 'acceptedAt': at, 'changes': []} for index in range(count)]
+
+    def test_daily_limit_suppresses_excess_alerts(self):
+        state = self.failure()
+        state['outbox'] = self.accepted(monitor.DAILY_EMAIL_LIMIT, NOW) + state['outbox']
+        monitor.deliver(state, CONFIG, lambda x: None, NOW + 120,
+                        lambda *args: self.fail('Must not send past the daily limit'))
+        self.assertEqual(state['outbox'][-1]['status'], 'suppressed')
+        later = self.failure()
+        later['outbox'] = self.accepted(monitor.DAILY_EMAIL_LIMIT, NOW - 25 * 3600) + later['outbox']
+        sent = []
+        monitor.deliver(later, CONFIG, lambda x: None, NOW + 120, lambda *args: sent.append(args) or 'message-2')
+        self.assertEqual(len(sent), 1)
+
+    def test_old_delivered_alerts_are_pruned(self):
+        state = {'outbox': self.accepted(3, NOW - 15 * 24 * 3600) + self.accepted(2, NOW) +
+                 [{'id': 'review', 'createdAt': NOW - 40 * 24 * 3600, 'status': 'unknown_requires_review'}]}
+        pruned = monitor.prune_outbox(state['outbox'], NOW)
+        self.assertEqual(len(pruned), 3)
+        self.assertEqual(len(state['outbox']), 6)
+        self.assertIn('review', [item['id'] for item in pruned])
 
     def test_worker_is_not_stale_during_legitimate_long_proving(self):
         snap = {'state': {'lastRun': NOW - 25 * 60, 'lastSuccess': NOW - 25 * 60, 'failures': 0},
@@ -105,8 +157,8 @@ class MonitorTest(unittest.TestCase):
 
     def test_delivery_failure_preserves_pending_and_order(self):
         state = self.failure()
-        for _ in range(2):
-            monitor.update_incidents(state, {'public_data': True}, NOW + 240)
+        self.recover(state, 'public_data', NOW + 240)
+        self.assertEqual(len(state['outbox']), 2)
         calls = []
         def fail(*args):
             calls.append(args)
