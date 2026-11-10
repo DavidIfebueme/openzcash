@@ -11,7 +11,10 @@ import { Badge, Card, PageHeader, Stat } from "@/components/ui";
 import { recipientMilestones } from "@/lib/zcg/grants-repo";
 import { normalizeKey } from "@/lib/zcg/normalize";
 import { formatUsdCents } from "@/lib/zcg/format";
-import { canonicalRecipient } from "@/lib/zcg/recipient-aliases";
+import {
+  canonicalRecipient,
+  recordedRecipientNames,
+} from "@/lib/zcg/recipient-aliases";
 import { recipientEntryPresentation } from "@/lib/zcg/recipient-entry";
 import { formatZec } from "@/lib/zcash/units";
 import { SourceRecordLink } from "@/components/source-record-link";
@@ -97,6 +100,8 @@ export default async function RecipientPage({
   const name = canonicalRecipient(
     rows.find((m) => m.recipientNameRaw)?.recipientNameRaw ?? r,
   );
+  // The sheet can record one recipient under several names; say which.
+  const recordedAs = recordedRecipientNames(rows.map((m) => m.recipientNameRaw));
   const open = rows.filter((m) => !m.isPaid);
   const paid = rows.filter((m) => m.isPaid);
   const sum = (xs: typeof rows) =>
@@ -144,6 +149,9 @@ export default async function RecipientPage({
               title="Recipient profile"
               rows={[
                 ["Name", name],
+                ...(recordedAs.length > 1
+                  ? [["Recorded as", recordedAs.join(" · ")] as [string, string]]
+                  : []),
                 ["Paid entries", String(paid.length)],
                 ["Unpaid entries", String(open.length)],
                 ["Coverage", "Grants, stipends and reimbursements"],

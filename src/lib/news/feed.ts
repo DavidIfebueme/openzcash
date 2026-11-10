@@ -1,13 +1,13 @@
 import "server-only";
-import { desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import { getDb } from "@/lib/db/client";
-import { zcgDisbursements, zcgProposals } from "@/lib/db/schema";
-import { formatUsdCents } from "@/lib/zcg/format";
+import { zcgChangelog, zcgDisbursements, zcgProposals } from "@/lib/db/schema";
 import { getZechubProposals } from "@/lib/dao/zechub";
 import { getGrantApplications } from "@/lib/zcg/github-applications";
 import { mergeNews } from "./merge";
 import { NEWS_REFRESH_MS } from "./config";
 import { NEWS_GITHUB_REPOSITORIES, readGitHubNews, githubNewsHealth } from "./github";
+import { LATE_RECORD_MAX_MS, sheetNewsItems, type RecordedPayment } from "./sheet";
 export { githubNewsHealth } from "./github";
 
 /**
@@ -48,6 +48,13 @@ export type NewsItem = {
  * turned the list into a month-long archive that contradicted its own label.
  */
 const NEWS_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
+/** A payment recorded this week may have been paid up to this long ago. */
+const SHEET_LOOKBACK_MS = NEWS_WINDOW_MS + LATE_RECORD_MAX_MS;
+/**
+ * Safety bound only; the lookback holds roughly a hundred paid rows. Both
+ * queries read newest first, so reaching it would drop the oldest records.
+ */
+const SHEET_ROW_LIMIT = 500;
 type FeedStore = {
   cache: { at: number; items: NewsItem[] } | null;
   inflight: Promise<NewsItem[]> | null;
@@ -119,31 +126,52 @@ async function fetchForum(): Promise<NewsItem[]> {
     }));
 }
 
+/**
+ * When the ledger recorded each payment, from the changelog. Without it the
+ * feed still lists the payments, dated by their paid-out date.
+ */
+async function readRecordedPayments(since: Date): Promise<RecordedPayment[]> {
+  try {
+    return await getDb()
+      .select({
+        title: zcgChangelog.title,
+        detail: zcgChangelog.detail,
+        at: zcgChangelog.at,
+      })
+      .from(zcgChangelog)
+      .where(and(eq(zcgChangelog.kind, "payment"), gte(zcgChangelog.at, since)))
+      .orderBy(desc(zcgChangelog.at))
+      .limit(SHEET_ROW_LIMIT);
+  } catch {
+    console.error("[news] payment record history unavailable; dating payments by paid-out date");
+    return [];
+  }
+}
+
 async function fetchSheet(): Promise<NewsItem[]> {
-  const rows = await getDb()
-    .select({
-      id: zcgDisbursements.id,
-      recipient: zcgDisbursements.recipientNameRaw,
-      usd: zcgDisbursements.amountUsdCents,
-      paid: zcgDisbursements.paidOutDate,
-      project: zcgDisbursements.project,
-    })
-    .from(zcgDisbursements)
-    .where(eq(zcgDisbursements.isPaid, true))
-    .orderBy(desc(zcgDisbursements.paidOutDate))
-    .limit(12);
-  return rows
-    .filter((r) => r.paid)
-    .map((r) => ({
-      id: `sheet:${r.id}`,
-      source: "sheet" as const,
-      kind: "ZCG ledger",
-      title: `${r.recipient ?? "Grant"} — ${formatUsdCents(r.usd ?? 0n)}`,
-      url: r.project
-        ? `/zcg/grant?g=${encodeURIComponent(r.project)}`
-        : "/zcg/disbursements",
-      ts: iso(`${r.paid}T00:00:00Z`),
-    }));
+  const since = new Date(Date.now() - SHEET_LOOKBACK_MS);
+  const [rows, recorded] = await Promise.all([
+    getDb()
+      .select({
+        id: zcgDisbursements.id,
+        recipient: zcgDisbursements.recipientNameRaw,
+        usd: zcgDisbursements.amountUsdCents,
+        paid: zcgDisbursements.paidOutDate,
+        project: zcgDisbursements.project,
+        isTest: zcgDisbursements.isTest,
+      })
+      .from(zcgDisbursements)
+      .where(
+        and(
+          eq(zcgDisbursements.isPaid, true),
+          gte(zcgDisbursements.paidOutDate, since.toISOString().slice(0, 10)),
+        ),
+      )
+      .orderBy(desc(zcgDisbursements.paidOutDate))
+      .limit(SHEET_ROW_LIMIT),
+    readRecordedPayments(since),
+  ]);
+  return sheetNewsItems(rows, recorded);
 }
 
 async function fetchProposals(): Promise<NewsItem[]> {

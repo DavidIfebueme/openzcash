@@ -219,6 +219,7 @@ export default async function NewsPage({
         <summary>Sources &amp; updates</summary>
         <div>
           <p>Forum and proposals refresh every 5 minutes, releases hourly, and spreadsheet records every 6 hours.</p>
+          <p>Spreadsheet payments are dated by when the ledger recorded them when that is known, otherwise by their paid date; each title shows the paid date.</p>
           <p>{fetchedAgo ? `Feed checked ${fetchedAgo}. ` : ""}This feed covers the last seven days. Older entries remain on their source pages.</p>
         </div>
       </details>

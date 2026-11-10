@@ -4,6 +4,7 @@ import {
   isAliasName,
   RECIPIENT_ALIASES,
   recipientLedgerKeys,
+  recordedRecipientNames,
 } from "./recipient-aliases";
 
 describe("canonicalRecipient", () => {
@@ -63,5 +64,47 @@ describe("canonicalRecipient", () => {
       pgpKeys,
     );
     expect(recipientLedgerKeys("GGuy")).toEqual(["gguy"]);
+  });
+
+  it("folds one applicant's organisation and project rows into one recipient", () => {
+    // Kenbak opened all four public applications: ZCG #179 (ledger grantee
+    // "CipherScan"), ZCG #255 ("Atmosphere Labs"), Coinholder #30
+    // ("Atmosphere Labs (Kenbak)") and Coinholder #47 ("Kenbak").
+    for (const name of [
+      "CipherScan",
+      "Atmosphere Labs",
+      "Atmosphere Labs (Kenbak)",
+    ]) {
+      expect(canonicalRecipient(name)).toBe("Kenbak");
+      expect(isAliasName(name)).toBe(true);
+    }
+    const family = [
+      "kenbak",
+      "atmosphere labs (kenbak)",
+      "atmosphere labs",
+      "cipherscan",
+    ];
+    expect(recipientLedgerKeys("Kenbak")).toEqual(family);
+    expect(recipientLedgerKeys("cipherscan")).toEqual(family);
+    expect(recipientLedgerKeys("Atmosphere  Labs")).toEqual(family);
+  });
+});
+
+describe("recordedRecipientNames", () => {
+  it("lists every ledger spelling once, canonical name first", () => {
+    expect(
+      recordedRecipientNames([
+        "CipherScan",
+        " CipherScan ",
+        "Atmosphere Labs",
+        "Kenbak",
+        null,
+        "",
+      ]),
+    ).toEqual(["Kenbak", "CipherScan", "Atmosphere Labs"]);
+  });
+
+  it("returns the single spelling of an unmerged recipient", () => {
+    expect(recordedRecipientNames(["QEDIT", "QEDIT"])).toEqual(["QEDIT"]);
   });
 });

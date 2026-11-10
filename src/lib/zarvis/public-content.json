@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "a5a74e1f6cab2cdf",
+  "sourceRevision": "b64feacb3498cd6e",
   "sourceFiles": 72,
   "documents": [
     {
@@ -259,7 +259,7 @@
       "id": "src/app/news/page.tsx:0",
       "url": "https://openzcash.org/news",
       "title": "news",
-      "text": "News · OpenZcash\nThe last seven days across Zcash: proposals, community discussions, releases and grant payments.\nForum\nReleases\nSpreadsheet\nProposals\nZecHub DAO\nNews\nProposals, discussions, releases and grant payments from the last seven days.\nAll sources\nsearch\nSearch\nq\nsource\nClear\n·\nnew in 48 hours\nstatus\nTemporarily unable to refresh\n. Showing the last available records; retrying automatically.\nGitHub updates are incomplete:\nof\nrepositories could not be refreshed. Previously verified releases are kept within the seven-day window.\nBrowse development activity ↗\n↗\nSources & updates\nForum and proposals refresh every 5 minutes, releases hourly, and spreadsheet records every 6 hours.\nThis feed covers the last seven days. Older entries remain on their source pages."
+      "text": "News · OpenZcash\nThe last seven days across Zcash: proposals, community discussions, releases and grant payments.\nForum\nReleases\nSpreadsheet\nProposals\nZecHub DAO\nNews\nProposals, discussions, releases and grant payments from the last seven days.\nAll sources\nsearch\nSearch\nq\nsource\nClear\n·\nnew in 48 hours\nstatus\nTemporarily unable to refresh\n. Showing the last available records; retrying automatically.\nGitHub updates are incomplete:\nof\nrepositories could not be refreshed. Previously verified releases are kept within the seven-day window.\nBrowse development activity ↗\n↗\nSources & updates\nForum and proposals refresh every 5 minutes, releases hourly, and spreadsheet records every 6 hours.\nSpreadsheet payments are dated by when the ledger recorded them when that is known, otherwise by their paid date; each title shows the paid date.\nThis feed covers the last seven days. Older entries remain on their source pages."
     },
     {
       "id": "src/app/monthly/page.tsx:0",
