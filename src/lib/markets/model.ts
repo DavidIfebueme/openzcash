@@ -3,12 +3,16 @@ import { z } from "zod";
 export const ZAT = 100_000_000;
 export const MAX_SUPPLY = 21_000_000;
 export const HOUR = 3_600_000;
-const amount = z
+export const amount = z
   .union([z.number(), z.string().regex(/^\d+(?:\.\d+)?$/)])
   .transform(Number)
   .pipe(z.number().finite().nonnegative());
 const date = z.string().refine((s) => Number.isFinite(Date.parse(s)));
 const zat = amount.pipe(z.number().int().safe());
+
+/** One freshness window for every reported quote: two hours back, five minutes ahead. */
+export const quoteIsFresh = (at: number, now: number): boolean =>
+  now - at <= 2 * HOUR && at <= now + 5 * 60_000;
 
 export type Venue = {
   id: string;
@@ -68,6 +72,13 @@ export const DIRECT_VENUES = new Set([
   "raydium",
   "meteora",
 ]);
+
+/**
+ * Exchanges read from their own public API (`exchanges-direct.ts`), listed by
+ * CoinPaprika exchange ID as verified 2026-11-11. An aggregator row for one of
+ * them is dropped rather than added to the direct figure.
+ */
+export const DIRECT_EXCHANGE_IDS = new Set(["bitget", "bingx", "bitstamp"]);
 
 /**
  * Public order-book aliases verified 2026-09-23. These are execution identities,
@@ -164,13 +175,12 @@ export function parseMarkets(
     )
       reason = "Derivatives excluded";
     else if (m.outlier) reason = "Flagged as an outlier by CoinPaprika";
-    else if (
-      now - Date.parse(m.last_updated) > 2 * HOUR ||
-      Date.parse(m.last_updated) > now + 5 * 60_000
-    )
+    else if (!quoteIsFresh(Date.parse(m.last_updated), now))
       reason = "Quote outside the freshness window";
     else if (DIRECT_VENUES.has(m.exchange_id))
       reason = "Replaced by the direct protocol source";
+    else if (DIRECT_EXCHANGE_IDS.has(m.exchange_id))
+      reason = "Replaced by the exchange's own public API";
     else if (!kind || kind.includes("cex") === kind.includes("dex"))
       reason = "Venue type not verified";
     else if (seen.has(key))

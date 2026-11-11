@@ -1,6 +1,8 @@
 import "server-only";
 import { z } from "zod";
 import { cachedFeed, type Feed } from "./cache";
+import { html, json } from "./http";
+import { DIRECT_EXCHANGES, readDirectExchange } from "./exchanges-direct";
 import { PUBLIC_ADDRESS_ATTRIBUTIONS } from "./attributions";
 import {
   GRAYSCALE_ISSUER_URL,
@@ -71,31 +73,6 @@ const numeric = z
   .pipe(z.number().finite().nonnegative());
 const iso = () => new Date().toISOString();
 
-async function request(url: string, init?: RequestInit, timeoutMs = 12_000) {
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      accept: "application/json,text/html",
-      "User-Agent": "OpenZcash/1.0 (+https://openzcash.org)",
-      ...init?.headers,
-    },
-    signal: AbortSignal.timeout(timeoutMs),
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Public source unavailable");
-  return res;
-}
-async function json(
-  url: string,
-  init?: RequestInit,
-  timeoutMs?: number,
-): Promise<unknown> {
-  return (await request(url, init, timeoutMs)).json();
-}
-async function html(url: string): Promise<string> {
-  return (await request(url)).text();
-}
-
 // Spread indexer requests across SSR/API bundles in the same server process.
 // Fail a saturated queue rather than extending the page's wait indefinitely.
 const geckoSchedule = globalThis as typeof globalThis & {
@@ -122,6 +99,11 @@ const markets = cachedFeed(async () => {
   ]);
   if (!e.data || e.stale) throw new Error("Venue classification unavailable");
   return parseMarkets(m, e.data, Date.now());
+});
+// Exchanges the aggregator does not list for ZEC, each read from its own API.
+const directExchanges = DIRECT_EXCHANGES.map((exchange) => {
+  const read = cachedFeed(() => readDirectExchange(exchange, json));
+  return async () => ({ exchange, feed: await read() });
 });
 const supply = cachedFeed(async () =>
   parseSupply(await json(`${CIPHER}/api/blockchain-info`)),
@@ -505,6 +487,7 @@ async function collectMarketDashboard() {
     mn,
     thh,
     tn,
+    direct,
   ] = await Promise.all([
     markets(),
     supply(),
@@ -532,11 +515,12 @@ async function collectMarketDashboard() {
     mayaNetwork(),
     thorHistory(),
     thorNetwork(),
+    Promise.all(directExchanges.map((read) => read())),
   ]);
   // A failed or stale volume source stays visible in coverage but cannot
   // silently enter a rolling-day comparison alongside fresh numbers.
   const tracked = m.data && !m.stale ? [...m.data.venues] : [];
-  for (const feed of [n, hy])
+  for (const feed of [n, hy, ...direct.map((d) => d.feed)])
     if (feed.data && !feed.stale) tracked.push(feed.data);
   if (ma.data && !ma.stale) tracked.push(ma.data.venue);
   if (th.data?.venue && !th.stale) tracked.push(th.data.venue);
@@ -549,10 +533,15 @@ async function collectMarketDashboard() {
   tracked.push(...wrappedMarkets.venues);
   const { venues, metrics } = spotBenchmark(tracked);
   venues.sort((a, b) => b.volumeUsd - a.volumeUsd);
+  // Every feed that enters the comparison, the direct exchanges included.
+  const volumeFeeds = [
+    ...[m, hy, ma, th, rh],
+    ...direct.map((d) => d.feed),
+    ...wrapped.map((u) => u.feed),
+  ];
   const volumeComplete =
-    ![m, hy, ma, th, rh, ...wrapped.map((u) => u.feed)].some(
-      (f) => f.stale || !f.data,
-    ) && !wrapped.some((w) => w.feed.data?.partial);
+    !volumeFeeds.some((f) => f.stale || !f.data) &&
+    !wrapped.some((w) => w.feed.data?.partial);
   // Newest dated Grayscale figure (a live issuer read, the saved issuer
   // disclosure, or a newer SEC filing), with a Sources note that says what
   // actually happened to the issuer read. Each keeps its own date and origin.
@@ -573,6 +562,9 @@ async function collectMarketDashboard() {
       `${PAPRIKA}/coins/zec-zcash/markets`,
       m,
       "All returned ZEC markets examined; classification from the exchange registry.",
+    ),
+    ...direct.map(({ exchange, feed }) =>
+      status(exchange.name, exchange.endpoint, feed, exchange.coverage),
     ),
     {
       ...status(

@@ -89,3 +89,6 @@ Brand matching is anchored to the entity before the network suffix. In particula
 
 - unit.png: https://hyperunit.xyz/brands/unit/apple-touch-icon.png — official Unit bridge site https://hyperunit.xyz/.
 - thorchain.png: https://cdn.sanity.io/images/355nlzcp/production/c973725813bf6fcd1c3a0a37adf3252677529ace-512x512.png?w=128&h=128&q=100&fm=png — site icon declared by https://thorchain.org/ (retrieved November 11, 2026).
+- bitget.png: https://www.bitget.com/baseasset/favicon4.png — site icon declared by https://www.bitget.com/ (retrieved November 11, 2026).
+- bingx.png: https://bingx.com/apple-touch-icon.png — official site icon served by https://bingx.com/ (retrieved November 11, 2026).
+- bitstamp.png: https://www.google.com/s2/favicons?domain=www.bitstamp.net&sz=128 — cached official site icon; https://www.bitstamp.net/ answered direct requests with a bot check (retrieved November 11, 2026).

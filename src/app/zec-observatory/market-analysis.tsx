@@ -1389,7 +1389,8 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               <p>
                 CEX uses reported spot markets; quotes older than two hours,
                 derivatives, outliers and unknown classifications are excluded.
-                Direct feeds replace the same aggregator venues. Provider USD
+                Bitget, BingX and Bitstamp are read from their own public
+                tickers. Direct feeds replace the same aggregator venues. Provider USD
                 conversions can differ; this is not a consolidated trade tape or
                 an independent wash-trading audit. Shared Coinbase/Gemini quote
                 books and verified HitBTC-family execution aliases count once.
