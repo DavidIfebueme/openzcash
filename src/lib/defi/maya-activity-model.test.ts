@@ -3,6 +3,7 @@ import {
   parseMayaHealth,
   parseMayaNetwork,
   mayaIndexCurrent,
+  midgardIndexRecent,
   parseMayaPool,
   parseSwapSummary,
   parseVolumeHistory,
@@ -51,6 +52,48 @@ describe("Maya ZEC activity", () => {
     expect(() =>
       parseMayaNetwork([{ chain: "ZEC", halted: "false" }]),
     ).toThrow();
+  });
+  it("reads a node that publishes only the halt flag", () => {
+    // MayaNode's inbound_addresses row for ZEC, checked November 11, 2026,
+    // carries `halted` and no trading-pause fields.
+    expect(parseMayaNetwork([{ chain: "ZEC", halted: false }]).paused).toBe(
+      false,
+    );
+    expect(parseMayaNetwork([{ chain: "ZEC", halted: true }]).paused).toBe(
+      true,
+    );
+    expect(
+      parseMayaNetwork([
+        {
+          chain: "ZEC",
+          halted: false,
+          chain_trading_paused: false,
+          global_trading_paused: true,
+        },
+      ]).paused,
+    ).toBe(true);
+    expect(() =>
+      parseMayaNetwork([
+        { chain: "ZEC", halted: false, chain_trading_paused: "no" },
+      ]),
+    ).toThrow();
+  });
+  it("judges a Midgard index by its block age when inSync is not published reliably", () => {
+    const now = Date.UTC(2026, 10, 11);
+    const health = (age: number, inSync = false) => ({
+      inSync,
+      indexedAt: new Date(now - age).toISOString(),
+    });
+    expect(midgardIndexRecent(health(80_000), now)).toBe(true);
+    expect(midgardIndexRecent(health(301_000), now)).toBe(false);
+    expect(midgardIndexRecent(health(-61_000), now)).toBe(false);
+    expect(midgardIndexRecent({ inSync: true, indexedAt: null }, now)).toBe(
+      false,
+    );
+    expect(midgardIndexRecent(null, now)).toBe(false);
+    // Maya keeps requiring both.
+    expect(mayaIndexCurrent(health(80_000), now)).toBe(false);
+    expect(mayaIndexCurrent(health(80_000, true), now)).toBe(true);
   });
   it("rejects a frozen index even when inSync remains true", () => {
     const now = Date.UTC(2026, 8, 23);

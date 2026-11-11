@@ -31,6 +31,11 @@ describe("market brand identity", () => {
     expect(marketLogo("Unit · Hyperliquid bridge")).toBe("/logos/markets/unit.png");
   });
 
+  it("identifies THORChain in the highlight card and the market list", () => {
+    expect(marketLogo("THORChain")).toBe("/logos/markets/thorchain.png");
+    expect(marketLogo("Thor Exchange")).toBeNull();
+  });
+
   it("preserves known aliases and custody labels", () => {
     expect(marketLogo("Grayscale Zcash Trust")).toBe(
       marketLogo("Grayscale · The Zcash ETF"),

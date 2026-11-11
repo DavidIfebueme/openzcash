@@ -27,6 +27,7 @@ import {
 } from "@/lib/markets/model";
 import styles from "./markets.module.css";
 import { marketLogo } from "@/lib/markets/logos";
+import { nativeSwapDetail } from "@/lib/markets/highlights";
 import { holdingRows, type HoldingRow } from "@/lib/markets/holdings";
 import { disclosureProvenance } from "@/lib/markets/disclosures";
 import { Pagination, usePagination } from "./pagination";
@@ -380,7 +381,8 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
     ? [10, 25, 50].map((target) => dexMilestone(m.cex, m.dex, target))
     : [];
   const near = data.nearActivity.data,
-    maya = data.venues.find((v) => v.id === "maya");
+    maya = data.venues.find((v) => v.id === "maya"),
+    thor = data.venues.find((v) => v.id === "thorchain");
   const chainVolume = (chain: string) => {
     const vs = data.venues.filter((v) => v.id.startsWith(`wrapped-${chain}-`));
     return vs.length ? vs.reduce((s, v) => s + v.volumeUsd, 0) : null;
@@ -423,10 +425,25 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
       name: "Maya",
       value: maya?.volumeUsd ?? null,
       label: "ZEC swaps · 24h",
-      detail: data.mayaHistory.data
-        ? `${usd(data.mayaHistory.data.volumeAllTimeUsd)} all-time${data.mayaHistory.stale ? " · saved" : ""}${data.mayaNetwork.data && !data.mayaNetwork.stale ? (data.mayaNetwork.data.paused ? " · trading paused" : "") : " · status unavailable"}`
-        : "Native ZEC liquidity",
+      detail: nativeSwapDetail(
+        data.mayaHistory,
+        data.mayaNetwork,
+        usd,
+        "Native ZEC liquidity",
+      ),
       href: "/zcg/investments",
+    },
+    {
+      name: "THORChain",
+      value: thor?.volumeUsd ?? null,
+      label: "ZEC swaps · 24h",
+      detail: nativeSwapDetail(
+        data.thorHistory,
+        data.thorNetwork,
+        usd,
+        "Native ZEC pool",
+      ),
+      href: "#trading",
     },
     {
       name: "NEAR Intents",
@@ -701,6 +718,10 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
               if (f.href === "#crosschain") {
                 setTokenQuery(f.token ?? f.name.toLowerCase());
                 tokenPagination.setPage(0);
+              }
+              if (f.href === "#trading") {
+                setVenueFilter("dex");
+                marketPagination.setPage(0);
               }
             }}
           >
@@ -1224,12 +1245,28 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
             <Out href="https://cipherscan.app/rich-list">CipherScan</Out>
           </div>
         </div>
-        {holderFilter === "dex" && data.mayaPoolZec !== null && (
-          <p className={styles.scopeNote}>
-            Maya pool depth: <strong>{number(data.mayaPoolZec)} ZEC</strong>.{" "}
-            <Link href="/zcg/investments">Maya pool &amp; ZCG position →</Link>
-          </p>
-        )}
+        {holderFilter === "dex" &&
+          (data.mayaPoolZec !== null || data.thorPoolZec !== null) && (
+            <p className={styles.scopeNote}>
+              {data.mayaPoolZec !== null && (
+                <>
+                  Maya pool depth:{" "}
+                  <strong>{number(data.mayaPoolZec)} ZEC</strong>.{" "}
+                </>
+              )}
+              {data.thorPoolZec !== null && (
+                <>
+                  THORChain pool depth:{" "}
+                  <strong>{number(data.thorPoolZec)} ZEC</strong>.{" "}
+                </>
+              )}
+              {data.mayaPoolZec !== null && (
+                <Link href="/zcg/investments">
+                  Maya pool &amp; ZCG position →
+                </Link>
+              )}
+            </p>
+          )}
       </section>
 
       <section aria-labelledby="funds">
@@ -1358,12 +1395,12 @@ export function MarketAnalysis({ initial }: { initial: MarketDashboard }) {
                 books and verified HitBTC-family execution aliases count once.
               </p>
               <p>
-                DEX includes registered ZEC tokens, native Maya swaps and Unit
-                UZEC/USDC spot on Hyperliquid. ZEC perpetual contracts are
-                derivatives and excluded from both sides. Pools are deduplicated
-                by network and address, including pools containing two ZEC
-                tokens. Solana is checked against DEX Screener and up to three
-                pages per token on GeckoTerminal.
+                DEX includes registered ZEC tokens, native Maya and THORChain
+                swaps and Unit UZEC/USDC spot on Hyperliquid. ZEC perpetual
+                contracts are derivatives and excluded from both sides. Pools
+                are deduplicated by network and address, including pools
+                containing two ZEC tokens. Solana is checked against DEX
+                Screener and up to three pages per token on GeckoTerminal.
               </p>
               <p>
                 NEAR Intents is a separate routing layer. Its ZEC volume stays

@@ -88,3 +88,4 @@ ZeroFi (Solana prop AMM) remains a neutral icon: no issuer-owned mark was confir
 Brand matching is anchored to the entity before the network suffix. In particular, HyperJump is distinct from Hyperliquid, and a DEX does not inherit its chain logo.
 
 - unit.png: https://hyperunit.xyz/brands/unit/apple-touch-icon.png — official Unit bridge site https://hyperunit.xyz/.
+- thorchain.png: https://cdn.sanity.io/images/355nlzcp/production/c973725813bf6fcd1c3a0a37adf3252677529ace-512x512.png?w=128&h=128&q=100&fm=png — site icon declared by https://thorchain.org/ (retrieved November 11, 2026).

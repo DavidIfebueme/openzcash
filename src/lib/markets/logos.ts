@@ -3,6 +3,7 @@ import exchangeLogos from "../../../public/logos/markets/exchanges.json";
 const brands = new Map<string, string>([
   ...Object.entries(exchangeLogos),
   ["maya", "/logos/maya.svg"],
+  ["thorchain", "thorchain.png"],
   ["omnibridge", "omnibridge.webp"],
   ["coinbase", "coinbase.png"],
   ["binance", "binance.svg"],

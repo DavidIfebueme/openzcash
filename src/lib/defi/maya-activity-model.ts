@@ -42,14 +42,18 @@ export type MayaPool = {
 };
 export type MayaHealth = { inSync: boolean; indexedAt: string | null };
 
-/** Pool availability does not describe chain halts; use MayaNode's flags. */
+/**
+ * Pool availability does not describe chain halts; use the node's own flags.
+ * `halted` is always published. MayaNode stopped sending the trading-pause
+ * fields for ZEC, while THORNode sends both, so they count only when present.
+ */
 export function parseMayaNetwork(raw: unknown) {
   const rows = z
     .array(
       z.object({
         chain: z.string(),
         halted: z.boolean(),
-        chain_trading_paused: z.boolean(),
+        chain_trading_paused: z.boolean().optional(),
         global_trading_paused: z.boolean().optional(),
       }),
     )
@@ -59,15 +63,20 @@ export function parseMayaNetwork(raw: unknown) {
   return {
     paused:
       zec.halted ||
-      zec.chain_trading_paused ||
+      zec.chain_trading_paused === true ||
       zec.global_trading_paused === true,
   };
 }
 
-export function mayaIndexCurrent(health: MayaHealth | null, now: number) {
-  if (!health?.inSync || !health.indexedAt) return false;
+/** Block age alone: the direct evidence that an index is following its chain. */
+export function midgardIndexRecent(health: MayaHealth | null, now: number) {
+  if (!health?.indexedAt) return false;
   const age = now - Date.parse(health.indexedAt);
   return age >= -60_000 && age <= 5 * 60_000;
+}
+
+export function mayaIndexCurrent(health: MayaHealth | null, now: number) {
+  return health?.inSync === true && midgardIndexRecent(health, now);
 }
 
 function swapTotals(input: z.infer<typeof swapSchema>): SwapTotals | null {
