@@ -10,5 +10,16 @@
 /src/lib/zcg/ @Michae2xl
 /data/ @Michae2xl
 
+# OpenZcash Treasury: the donation address, the viewing key, the QR code, the
+# screens and API that show them, and the worker and runtime that read the
+# wallet. Only the owner reviews changes here. This binds once the main branch
+# requires code-owner review; src/lib/openzcash-treasury/account.test.ts fails
+# on any change to the announced address, key or QR payload.
+/src/lib/openzcash-treasury/ @Michae2xl
+/src/app/openzcash-treasury/ @Michae2xl
+/src/app/api/openzcash-treasury/ @Michae2xl
+/scripts/sync-openzcash-treasury.ts @Michae2xl
+/scripts/treasury-runtime.ts @Michae2xl
+
 # Published agent skills.
 /skills/ @Michae2xl @vinibarbosabr
