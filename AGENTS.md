@@ -35,7 +35,7 @@ the decision.
 | `skills/` | Published agent skills (`zcg-copilot`, `coinholder-copilot`, `zechub-copilot`) |
 | `drizzle/` | Generated SQL migrations |
 | `docs/` | Methodology, design standards, evaluation records, service guides |
-| `data/` | Public coinholder vote snapshots with provenance |
+| `data/` | Public coinholder vote snapshots and the published treasury snapshot, with provenance |
 | `docker/`, `ops/`, `reports/` | Local engine containers; edge adapters; monthly report tooling |
 | `services/participate`, `services/private-chat` | Separately runnable services with their own deps, tests, and READMEs |
 
