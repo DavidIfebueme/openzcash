@@ -1,4 +1,10 @@
 version: 2
+
+# Every merge to main redeploys the site, so updates arrive in batches: one
+# pull request a week per folder for minor and patch releases, and one for
+# major releases, which are taken one by one after reading their changelogs.
+# Security updates are not grouped and are not affected by the ignore rules
+# that name an update type.
 updates:
   - package-ecosystem: github-actions
     directory: /
@@ -6,16 +12,35 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    groups:
+      actions:
+        patterns: ["*"]
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     labels:
       - dependencies
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      major:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["major"]
     ignore:
       # typescript-eslint, which eslint-config-next brings in, accepts
       # TypeScript below 6.1 only. Remove when its peer range includes 7.
       - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # The lint plugins eslint-config-next brings in (import, jsx-a11y,
+      # react) declare ESLint 9 at most. Remove when they accept 10.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      # The types follow the Node version in .nvmrc; raise both together.
+      - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
       # The 1.x SDK changes the default API version. Take it together with a
       # check of the Zarvis chat against the live API, not as a routine bump.
@@ -27,9 +52,26 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      major:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["major"]
     ignore:
-      # jsdom 30 changes how accessible names are computed: 29 component
-      # tests stop finding buttons and links by name. Take it with those tests.
+      # Same typescript-eslint, lint-plugin and Node-version limits as the root package.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # jsdom 30 and 31 change how accessible names are computed here: 29
+      # component tests stop finding buttons and links by name. The root
+      # package and the Private Chat service pass on 31. Take it with those tests.
       - dependency-name: jsdom
         update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
@@ -38,11 +80,20 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    groups:
+      minor-and-patch:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+      major:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["major"]
     ignore:
-      # Same typescript-eslint limit as the root package.
+      # Same typescript-eslint, lint-plugin and Node-version limits as the root package.
       - dependency-name: typescript
         update-types: ["version-update:semver-major"]
-      # The lint plugins eslint-config-next brings in (import, jsx-a11y,
-      # react) declare ESLint 9 at most. Remove when they accept 10.
       - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
