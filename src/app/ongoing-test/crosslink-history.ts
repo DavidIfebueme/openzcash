@@ -7,7 +7,7 @@ export const sourcesChecked = "2 Nov 2026";
 // Reference release the participation steps and hero CTA point at. Shielded
 // Labs ships weekly and only recognizes the current chain for rewards, so
 // this must track the repository's latest release.
-export const releaseTag = "v16";
+export const releaseTag = "v17";
 export const releaseNotes = `https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/${releaseTag}`;
 
 export const paidRounds = [
@@ -32,4 +32,5 @@ export const history = [
   { date: "13 Oct 2026", title: "v15 upgrade released", detail: "The release schedules activation at height 55296, expected on 15 October. It addresses a stalled-proposal edge case, finalizer rewards and power-of-ten bond amounts.", source: "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v15", kind: "Network" },
   { date: "15 Oct 2026", title: "Round 2 · 25 ZEC paid", detail: "Payment report: 19.954 ZEC for mining and staking across 17 participants; 5.046 ZEC in discretionary awards to eight contributors.", source: `${forum}/117`, kind: "Paid" },
   { date: "2 Nov 2026", title: "v16 · required update", detail: "Version 16 runs on the same network as v15: replace the binary and restart, keeping existing data. It fixes crashes from malformed staking transactions, BFT proposals and vote packets, forbids staking actions in coinbase transactions, and updates the sync checkpoint. Shielded Labs recognizes only the current chain for rewards, and versions stop running two weeks after they ship.", source: "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v16", kind: "Network" },
+  { date: "5 Nov 2026", title: "v17 · required update", detail: "Version 17 runs on the same chain and network as v16 until a network upgrade scheduled for block 165000: replace the binary and restart, keeping existing data. It turns on RPC cookie authentication by default, limits the lightwallet server port to localhost, fixes two node crashes and moves the sync checkpoint to PoW height 125202. If the versions diverge, Shielded Labs recognizes only the Version 17 chain for rewards.", source: "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v17", kind: "Network" },
 ] as const;

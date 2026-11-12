@@ -12,15 +12,37 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      # typescript-eslint, which eslint-config-next brings in, accepts
+      # TypeScript below 6.1 only. Remove when its peer range includes 7.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # The 1.x SDK changes the default API version. Take it together with a
+      # check of the Zarvis chat against the live API, not as a routine bump.
+      - dependency-name: "@anthropic-ai/sdk"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /services/participate
     schedule:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      # jsdom 30 changes how accessible names are computed: 29 component
+      # tests stop finding buttons and links by name. Take it with those tests.
+      - dependency-name: jsdom
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /services/private-chat
     schedule:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      # Same typescript-eslint limit as the root package.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      # The lint plugins eslint-config-next brings in (import, jsx-a11y,
+      # react) declare ESLint 9 at most. Remove when they accept 10.
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]

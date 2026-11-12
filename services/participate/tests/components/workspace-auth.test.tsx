@@ -99,7 +99,8 @@ it("requests a code, verifies it, and preserves the current proposal route", asy
   const destination = "/participate?view=discussion#comments"; window.history.replaceState({}, "", destination);
   const fetchMock = vi.fn().mockResolvedValueOnce(response(available)).mockResolvedValueOnce(response({ sent: true, retryAfter: 60 })).mockResolvedValueOnce(response({ redirectTo: destination }));
   vi.stubGlobal("fetch", fetchMock); await open(); send();
-  expect(await screen.findByLabelText("Verification code")).toHaveFocus();
+  // Focus moves in a passive effect, which React flushes in a task after the commit that findBy resolves on.
+  await screen.findByLabelText("Verification code"); await waitFor(() => expect(screen.getByLabelText("Verification code")).toHaveFocus());
   expect(screen.getByRole("status")).toHaveTextContent("member@example.test");
   expect(screen.getByRole("button", { name: /Resend in/ })).toBeDisabled();
   verify(); await waitFor(() => expect(navigation.navigateAfterSignIn).toHaveBeenCalledWith(destination, destination));
@@ -111,7 +112,7 @@ it("shows errors inline and never creates a fake successful sign-in", async () =
   const fetchMock = vi.fn().mockResolvedValueOnce(response(available)).mockResolvedValueOnce(response({ retryAfter: 60 })).mockResolvedValueOnce(response({ error: "EMAIL_CODE_INVALID" }, false));
   vi.stubGlobal("fetch", fetchMock); await open(); send(); await screen.findByLabelText("Verification code"); verify();
   expect(await screen.findByRole("alert")).toHaveTextContent("invalid or expired");
-  expect(screen.getByRole("alert")).toHaveFocus(); expect(navigation.navigateAfterSignIn).not.toHaveBeenCalled();
+  await waitFor(() => expect(screen.getByRole("alert")).toHaveFocus()); expect(navigation.navigateAfterSignIn).not.toHaveBeenCalled();
   expect(screen.getByLabelText("Verification code")).toHaveValue("");
 });
 it("keeps the demo available when email delivery is unconfigured", async () => {

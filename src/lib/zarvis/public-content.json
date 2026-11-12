@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "91c7c7a9cd85185d",
+  "sourceRevision": "006e2cc05c896801",
   "sourceFiles": 72,
   "documents": [
     {
@@ -2173,7 +2173,7 @@
       "id": "src/app/ongoing-test/crosslink-guide.tsx:0",
       "url": "https://openzcash.org/ongoing-test/crosslink",
       "title": "ongoing test · crosslink",
-      "text": "experiment\ntools\nrewards\nParticipate\nCommunity tools\nIncentives\nexternal\n(opens in a new tab)\nCrash After Clicking Edit Stake Button Due to Out-of-Bounds\nReliable height/sync status\n\"You are on an old version; please upgrade\"\nTest\nFollow the full cycle\nBuild\nFind a useful contribution\nOperate\nRun a finalizer\nInstall & back up\nDownload the build for your OS. Open the app and privately back up your test-wallet seed. Use cTAZ only. Shielded Labs ships weekly; only the current chain earns rewards, so upgrade within a week of each release.\nSync the network\nLet the node catch up. Compare a block’s height and hash with a same-network explorer. Check that finalized height advances too.\nGet test funds\nRequest cTAZ from the app’s faucet, or mine. Desktop CPU mining starts after sync by default.\nChoose a finalizer & stake\nCheck recent votes, then copy a finalizer’s identity. During a staking window:\nStake → Paste Identity → amount.\nChange your delegation\nOpen\nEdit Stake\n, select a bond and retarget it to another finalizer. Retargeting also works outside staking windows.\nUnstake & withdraw\nBegin unbonding in\n. Once the bond is withdrawable, withdraw during an allowed window.\nShare what you found\nRecord version, OS, time, transaction IDs and expected versus actual behavior. Recheck after restarting. Remove secrets before reporting.\nCheck the discussion"
+      "text": "experiment\ntools\nrewards\nParticipate\nCommunity tools\nIncentives\nexternal\n(opens in a new tab)\nCrash After Clicking Edit Stake Button Due to Out-of-Bounds\nFlyClient - (reliable height/sync status in PoW)\n\"You are on an old version; please upgrade\"\nTest\nFollow the full cycle\nBuild\nFind a useful contribution\nOperate\nRun a finalizer\nInstall & back up\nDownload the build for your OS. Open the app and privately back up your test-wallet seed. Use cTAZ only. Shielded Labs ships weekly; only the current chain earns rewards, so upgrade within a week of each release.\nSync the network\nLet the node catch up. Compare a block’s height and hash with a same-network explorer. Check that finalized height advances too.\nGet test funds\nRequest cTAZ from the app’s faucet, or mine. Desktop CPU mining starts after sync by default.\nChoose a finalizer & stake\nCheck recent votes, then copy a finalizer’s identity. During a staking window:\nStake → Paste Identity → amount.\nChange your delegation\nOpen\nEdit Stake\n, select a bond and retarget it to another finalizer. Retargeting also works outside staking windows.\nUnstake & withdraw\nBegin unbonding in\n. Once the bond is withdrawable, withdraw during an allowed window.\nShare what you found\nRecord version, OS, time, transaction IDs and expected versus actual behavior. Recheck after restarting. Remove secrets before reporting.\nCheck the discussion"
     },
     {
       "id": "src/app/ongoing-test/crosslink-guide.tsx:1",

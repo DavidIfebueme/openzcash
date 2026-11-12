@@ -49,12 +49,12 @@ function Source({ href, children, variant = "source", className = "" }: {
   </a>;
 }
 
-// Exact titles checked against the upstream GitHub API on 17 Oct 2026.
+// Exact upstream titles: `npm run check:crosslink` compares each one with the GitHub API.
 // This is a curated index, not an assignment board or live issue-status feed.
 // A closed listing stays as history; reopen the source before treating it as active.
 const referencedIssues = [
   { id: 255, title: "Crash After Clicking Edit Stake Button Due to Out-of-Bounds" },
-  { id: 231, title: "Reliable height/sync status" },
+  { id: 231, title: "FlyClient - (reliable height/sync status in PoW)" },
   { id: 219, title: '\"You are on an old version; please upgrade\"' },
 ];
 const participationPaths: { id: "test" | "build" | "operate"; title: string; detail: string; icon: OngoingTestIconName }[] = [
@@ -147,7 +147,8 @@ export function CrosslinkGuide({ initialTab = "Participate" }: { initialTab?: Ta
           {path === "test" ? <>
 
           <h3 id="guide-heading" className={styles.linkHint}>Testing checklist</h3>
-          <progress className={styles.progress} max={steps.length} value={done.length} aria-label="Checklist progress" />          <ol className={styles.steps}>{steps.map((step, index) => <li key={step.title} data-done={done.includes(index) || undefined} data-next={index === nextStep || undefined} data-expanded={openStep === index || undefined}>
+          <progress className={styles.progress} max={steps.length} value={done.length} aria-label="Checklist progress" />
+          <ol className={styles.steps}>{steps.map((step, index) => <li key={step.title} data-done={done.includes(index) || undefined} data-next={index === nextStep || undefined} data-expanded={openStep === index || undefined}>
             <div className={styles.stepHeader}>
               <label className={styles.check}><input type="checkbox" checked={done.includes(index)} onChange={() => setDone((old) => old.includes(index) ? old.filter((n) => n !== index) : [...old, index])} aria-label={`Complete step ${index + 1}: ${step.title}`} /><span aria-hidden="true">{done.includes(index) ? <Icon name="check" /> : String(index + 1).padStart(2,"0")}</span></label>
               <button type="button" className={styles.stepButton} aria-expanded={openStep === index} aria-controls={`step-${index}`} onClick={() => setOpenStep((current) => current === index ? null : index)}>{step.title}<ToggleMark /></button>

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Crosslink source checker. Verifies two things the guide can silently drift on:
+// Crosslink source checker. Verifies three things the guide can silently drift on:
 //
 //   1. Release drift: the release pinned in crosslink-history.ts must match
 //      the repository's latest GitHub release. Shielded Labs ships weekly and
@@ -7,6 +7,9 @@
 //      testers to a chain that cannot earn payouts.
 //   2. Link liveness + freshness: every external URL the guide renders must
 //      still resolve, and the sourcesChecked stamp must be within its window.
+//   3. Issue titles: every title in the guide's referencedIssues list must
+//      equal the upstream issue's current title, so the list carries no
+//      hand-kept "checked on" date that can go stale.
 //
 // Network access is read-only and limited to the curated origins (GitHub API,
 // the Crosslink forum, and the linked project sites). Nothing from those hosts
@@ -15,13 +18,13 @@
 //
 //   node scripts/check-crosslink-sources.mjs            # check, exit 1 on drift
 //   node scripts/check-crosslink-sources.mjs --report    # also write docs/audits/<date>-crosslink-sources.md
-//   node scripts/check-crosslink-sources.mjs --offline   # skip live URL fetches (freshness+drift still need GitHub)
+//   node scripts/check-crosslink-sources.mjs --offline   # skip live URL fetches (release and issue-title drift still need GitHub)
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CURATION_SOURCES, FORUM_TOPIC, REPO, describeUrl, extractUrls, releaseDrift, stampFreshness } from "./lib/crosslink-sources.mjs";
+import { CURATION_SOURCES, FORUM_TOPIC, REPO, describeUrl, extractUrls, issueTitleDrift, parseReferencedIssues, releaseDrift, stampFreshness } from "./lib/crosslink-sources.mjs";
 
 const run = promisify(execFile);
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -50,6 +53,15 @@ async function latestReleaseTag() {
   const tag = JSON.parse(stdout).tag_name;
   if (typeof tag !== "string" || !tag) throw new Error("GitHub returned no tag_name for the latest release");
   return tag;
+}
+
+async function upstreamIssueTitle(id) {
+  const { stdout } = await run("gh", [
+    "api", `repos/${REPO}/issues/${id}`,
+    "-H", "Accept: application/vnd.github+json",
+    "-H", "X-GitHub-Api-Version: 2022-11-28",
+  ], { maxBuffer: 8 * 1024 * 1024, timeout: 60_000 });
+  return JSON.parse(stdout).title;
 }
 
 /** Fetch one URL, tolerant of redirects, and classify the outcome. */
@@ -97,7 +109,32 @@ async function main() {
   notes.push(`freshness: ${freshness.reason}`);
   if (!freshness.ok) problems.push(`freshness: ${freshness.reason}`);
 
-  // 3. Live URL scan (skippable for offline/airgapped runs).
+  // 3. Referenced issue titles (authoritative: GitHub API).
+  const guideFile = sources.find((s) => s.file.endsWith("crosslink-guide.tsx"));
+  let issues = [];
+  let matchedTitles = 0;
+  try {
+    issues = parseReferencedIssues(guideFile.text);
+  } catch (error) {
+    problems.push(`issue titles: ${error.message}`);
+  }
+  for (const issue of issues) {
+    try {
+      const drift = issueTitleDrift(issue, await upstreamIssueTitle(issue.id));
+      if (drift.ok) {
+        matchedTitles += 1;
+      } else {
+        problems.push(`issue title drift: ${drift.reason}`);
+        notes.push(`issue titles: ${drift.reason}`);
+      }
+    } catch (error) {
+      problems.push(`issue #${issue.id} title check failed (is gh authenticated?): ${error.message}`);
+    }
+  }
+  const issueSummary = `${matchedTitles}/${issues.length} referenced issue titles match upstream`;
+  notes.push(`issue titles: ${issueSummary}`);
+
+  // 4. Live URL scan (skippable for offline/airgapped runs).
   const urls = extractUrls(sources, FORUM_TOPIC, tag);
   const results = [];
   if (!offline) {
@@ -143,6 +180,7 @@ async function main() {
       `| --- | --- |`,
       `| Pinned release | ${tag}${latest ? ` (upstream latest: ${latest})` : ""} |`,
       `| sourcesChecked stamp | ${stamp} — ${freshness.reason} |`,
+      `| Referenced issue titles | ${issueSummary} |`,
       `| Link scan | ${!offline ? `${results.length - results.filter((r) => !r.ok).length}/${results.length} resolved` : "skipped (--offline)"} |`,
       "",
       `## Problems`,

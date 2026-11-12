@@ -70,7 +70,10 @@ export function releaseDrift(pinned, latest) {
  * `${forum}` template literal. Forum post references (FORUM/NNN) are expanded
  * so the scan verifies the exact posts the guide links to.
  */
-export function extractUrls(sources, forumTopic = FORUM_TOPIC, releaseTag = "v16") {
+export function extractUrls(sources, forumTopic, releaseTag) {
+  // The tag has no default on purpose: the only authoritative value is the one
+  // exported from crosslink-history.ts, and a second copy here would go stale.
+  if (typeof releaseTag !== "string" || !releaseTag) throw new Error("extractUrls needs the releaseTag pinned in crosslink-history.ts");
   const urls = new Map(); // url -> [file:label]
   const push = (url, file, label) => {
     if (!urls.has(url)) urls.set(url, []);
@@ -96,6 +99,41 @@ export function extractUrls(sources, forumTopic = FORUM_TOPIC, releaseTag = "v16
     }
   }
   return [...urls.entries()].map(([url, references]) => ({ url, references })).sort((a, b) => a.url.localeCompare(b.url));
+}
+
+/** Decode one plain JavaScript string literal; only quote and backslash escapes are accepted. */
+function unquote(literal) {
+  return literal.slice(1, -1).replace(/\\(.)/gs, (_, char) => {
+    if (char === '"' || char === "'" || char === "\\") return char;
+    throw new Error(`unsupported escape \\${char} in a referencedIssues title`);
+  });
+}
+
+/**
+ * Read the guide's `referencedIssues` list (one `{ id, title }` entry per
+ * line) without importing application code. Anything that is not a plain
+ * entry throws: a list the checker cannot read must never pass as empty.
+ */
+export function parseReferencedIssues(text) {
+  const block = /^const referencedIssues = \[\n([\s\S]*?)^\];$/m.exec(String(text ?? ""))?.[1];
+  if (block === undefined) throw new Error("crosslink-guide.tsx is missing the referencedIssues list");
+  const issues = block.split("\n").map((line) => line.trim()).filter(Boolean).map((line) => {
+    const match = /^\{ id: (\d+), title: ("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*') \},?$/.exec(line);
+    if (!match) throw new Error(`cannot parse referencedIssues entry: ${line}`);
+    return { id: Number(match[1]), title: unquote(match[2]) };
+  });
+  if (!issues.length) throw new Error("referencedIssues is empty; remove the section or list an issue");
+  return issues;
+}
+
+/** Drift verdict between a title the guide shows and the upstream issue's title. */
+export function issueTitleDrift(issue, upstreamTitle) {
+  const upstream = typeof upstreamTitle === "string" ? upstreamTitle.trim() : "";
+  if (!upstream) return { ok: false, reason: `GitHub returned no title for issue #${issue.id}` };
+  if (upstream !== issue.title) {
+    return { ok: false, reason: `issue #${issue.id} is titled ${JSON.stringify(upstream)} upstream but the guide shows ${JSON.stringify(issue.title)}; update referencedIssues in crosslink-guide.tsx` };
+  }
+  return { ok: true, reason: `issue #${issue.id} title matches upstream` };
 }
 
 /** Classify a URL for reporting. Forum topic roots and post links differ. */
