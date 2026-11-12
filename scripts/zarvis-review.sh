@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Weekly Zarvis review for the maintainer: what visitors asked (topic labels only), how answers went, what they cost and what feedback said.
 # Reads the deploy log and the daily tables through the Railway CLI from the linked checkout; prints nothing but counts, labels and money.
-# Usage: scripts/zarvis-review.sh [days]   (default 7). Needs `railway` logged in and linked to the project; service name in ZARVIS_SERVICE (default zbo).
+# Usage: scripts/zarvis-review.sh [days]   (default 7). Needs `railway` logged in and linked to the project; set ZARVIS_SERVICE to the service name.
 set -euo pipefail
 days="${1:-7}"
-service="${ZARVIS_SERVICE:-zbo}"
+service="${ZARVIS_SERVICE:?Set ZARVIS_SERVICE to the Railway service name}"
 since="$(date -u -v-"${days}"d +%Y-%m-%d 2>/dev/null || date -u -d "${days} days ago" +%Y-%m-%d)"
 here="$(cd "$(dirname "$0")" && pwd)"
 echo "== Zarvis review: last ${days} days (since ${since} UTC) =="

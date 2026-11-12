@@ -231,7 +231,7 @@ Answer feedback sends only a signed one-hour ticket, a useful/needs-work vote an
 
 ## Weekly review (2026-10-08)
 
-`npm run zarvis:review` (or `scripts/zarvis-review.sh 14` for two weeks) prints, from the linked Railway checkout: the subject and language distribution of the week's questions (labels only, from `zarvis_topic_daily`; `scripts/zarvis-topics.py` reads the same labels from one deployment's log), the daily outcomes, cost and votes from `zarvis_metrics_daily`, and the needs-work reasons from `zarvis_feedback_reasons`. The loop is: frequent model-route topics become direct answers, needs-work reasons become evaluation cases, `npm run knowledge:sync` refreshes every corpus, and the paid checks (`eval-zarvis-live.py --extended`, `eval-zarvis-zips.py`) run against a preview before anything ships. No question text exists anywhere in this chain.
+`npm run zarvis:review` (or `scripts/zarvis-review.sh 14` for two weeks), run with `ZARVIS_SERVICE` set to the Railway service name, prints, from the linked Railway checkout: the subject and language distribution of the week's questions (labels only, from `zarvis_topic_daily`; `scripts/zarvis-topics.py` reads the same labels from one deployment's log), the daily outcomes, cost and votes from `zarvis_metrics_daily`, and the needs-work reasons from `zarvis_feedback_reasons`. The loop is: frequent model-route topics become direct answers, needs-work reasons become evaluation cases, `npm run knowledge:sync` refreshes every corpus, and the paid checks (`eval-zarvis-live.py --extended`, `eval-zarvis-zips.py`) run against a preview before anything ships. No question text exists anywhere in this chain.
 
 ## Repeatable evaluation
 
