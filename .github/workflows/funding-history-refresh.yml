@@ -2,8 +2,13 @@ name: Funding history refresh
 
 # /funding-history and Zarvis read src/data/funding/days.json, which is built
 # from external daily data. Once a week this appends the new complete days and
-# commits only that file to main. The generator refuses to rewrite published
-# days, so a source correction fails here and waits for human review.
+# pushes only that file to a new branch, chore/funding-history-<date>-<run>.
+# The main branch takes changes through pull requests only, so the new days go
+# live when someone opens that branch as a pull request and merges it; the
+# run's summary carries the link. Every run starts from main, so a later
+# branch includes the days of an earlier one that was never merged. The
+# generator refuses to rewrite published days, so a source correction fails
+# here and waits for human review.
 on:
   schedule:
     - cron: "17 5 * * 1" # Mondays 05:17 UTC
@@ -32,14 +37,19 @@ jobs:
       - run: npm run test:funding-days
       - name: Regenerate
         run: npx tsx scripts/gen-funding-history.ts
-      - name: Commit only the data file
+      - name: Push only the data file to a new branch
         run: |
           if git diff --quiet -- src/data/funding/days.json; then
             echo "No change"
             exit 0
           fi
+          branch="chore/funding-history-$(date -u +%Y-%m-%d)-${GITHUB_RUN_NUMBER}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
           git add src/data/funding/days.json
           git commit -m "chore(funding): refresh daily history"
-          git push origin HEAD:main
+          git push origin "$branch"
+          link="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/main...${branch}?expand=1"
+          echo "::notice title=Funding history::New days are on ${branch}. Open the pull request: ${link}"
+          echo "New funding days are waiting on \`${branch}\`. [Open the pull request](${link})." >> "$GITHUB_STEP_SUMMARY"
