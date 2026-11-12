@@ -54,7 +54,8 @@ it("offers an explicit passkey after email verification, using the same session 
   expect(navigation.navigateAfterSignIn).not.toHaveBeenCalled();
   expect(webauthn.startRegistration).not.toHaveBeenCalled();
   expect(screen.getByRole("heading", { name: "Add a passkey" })).toBeInTheDocument();
-  expect(screen.getByRole("button", { name: "Create passkey" })).toHaveFocus();
+  // Focus moves in a passive effect, which React flushes in a task after the commit that findByRole resolves on.
+  await waitFor(() => expect(screen.getByRole("button", { name: "Create passkey" })).toHaveFocus());
   webauthn.startRegistration.mockResolvedValueOnce({ id: "new-credential" });
   fetchMock.mockResolvedValueOnce(response({ options: { challenge: "challenge" } })).mockResolvedValueOnce(response({ passkey: savedKey }));
   submit("Create passkey");
