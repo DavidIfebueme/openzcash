@@ -1,10 +1,10 @@
-import { open, mkdir, unlink } from "node:fs/promises";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { TREASURY_ACCOUNT } from "../src/lib/openzcash-treasury/account";
 import { buildTreasurySnapshot } from "../src/lib/openzcash-treasury/ledger";
 import { readTreasuryFeed, treasurySnapshotPath, writeTreasuryFeed } from "../src/lib/openzcash-treasury/store";
+import { acquireTreasuryLock, TreasuryLockLostError, TREASURY_SYNC_TIMEOUT_MS } from "../src/lib/openzcash-treasury/sync-lock";
 import { getBlockTime } from "../src/lib/zcash/real/lwd/lwd-client";
 
 // This worker talks only to a dedicated local wallet engine. The public web API
@@ -77,18 +77,19 @@ const ledgerQuery = `query ($id: Int!) {
 }`;
 
 async function main() {
-  const lockPath = path.join(path.dirname(treasurySnapshotPath()), "sync.lock");
-  await mkdir(path.dirname(lockPath), { recursive: true });
-  const lock = await open(lockPath, "wx");
-  await lock.writeFile(`${process.pid}\n`);
+  // Refuses to start beside a running worker; recovers the lock a killed one left behind.
+  const lock = await acquireTreasuryLock(path.join(path.dirname(treasurySnapshotPath()), "sync.lock"));
   let lastGood = (await readTreasuryFeed()).snapshot;
   try {
     await writeTreasuryFeed("syncing", lastGood);
     const id = await prepareAccount();
     do {
       try {
+        // Heartbeat on each side of the long engine call. It fails once the lock is no longer ours.
+        await lock.refresh();
         await writeTreasuryFeed("syncing", lastGood);
-        const { synchronizeAccount } = z.object({ synchronizeAccount: z.number().int().positive() }).parse(await gql("mutation ($id: Int!) { synchronizeAccount(idAccount: $id, fast: false) }", { id }, 20 * 60_000));
+        const { synchronizeAccount } = z.object({ synchronizeAccount: z.number().int().positive() }).parse(await gql("mutation ($id: Int!) { synchronizeAccount(idAccount: $id, fast: false) }", { id }, TREASURY_SYNC_TIMEOUT_MS));
+        await lock.refresh();
         const raw = await gql(ledgerQuery, { id }, 120_000);
         const snapshot = buildTreasurySnapshot(raw, synchronizeAccount, new Date().toISOString());
         await writeTreasuryFeed("synced", snapshot);
@@ -96,6 +97,8 @@ async function main() {
         console.log(`Synced block ${snapshot.syncedHeight}; balance ${snapshot.balanceZatoshis} zatoshis; ${snapshot.transactions.length} confirmed transaction(s).`);
       } catch (error) {
         if (stop.signal.aborted) break;
+        // Report the failure only while the lock, and so the snapshot, is still this worker's.
+        await lock.refresh();
         await writeTreasuryFeed("error", lastGood);
         console.error(`Treasury sync failed (${error instanceof Error ? error.name : "Error"}); last verified snapshot retained.`);
         if (!watch) throw error;
@@ -103,11 +106,12 @@ async function main() {
       if (watch) await delay(30_000, undefined, { signal: stop.signal }).catch(() => {});
     } while (watch && !stop.signal.aborted);
   } catch (error) {
-    if (!stop.signal.aborted) await writeTreasuryFeed("error", lastGood);
+    // Without the lock the snapshot belongs to another worker: leave it as it is.
+    if (!stop.signal.aborted && !(error instanceof TreasuryLockLostError)) await writeTreasuryFeed("error", lastGood);
     throw error;
   } finally {
-    await lock.close();
-    await unlink(lockPath);
+    // The next start recovers a lock that could not be removed; the original error stays the one reported.
+    await lock.release().catch(() => console.error("Treasury lock could not be removed; the next start recovers it."));
   }
 }
 
