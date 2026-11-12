@@ -1,4 +1,5 @@
 import { pageMetadata } from "@/lib/seo/page-metadata";
+import Link from "next/link";
 import { CrosslinkGuide } from "../crosslink-guide";
 import styles from "../ongoing-test.module.css";
 
@@ -11,6 +12,7 @@ export default async function OngoingTestPage({ searchParams }: { searchParams: 
   const tab = (await searchParams).tab;
   const initialTab = tab === "incentives" ? "Incentives" : tab === "tools" ? "Community tools" : "Participate";
   return <div className={styles.page}>
+    <Link href="/opportunities" className={styles.returnLink}>← Back to opportunities</Link>
     <h1 className={styles.linkHint}>Crosslink test guide</h1>
     <CrosslinkGuide key={initialTab} initialTab={initialTab} />
   </div>;

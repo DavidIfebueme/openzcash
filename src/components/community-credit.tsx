@@ -2,6 +2,7 @@ import styles from "./community-credit.module.css";
 
 /** Credit the contribution to the interface, never the projects or evidence it displays. */
 export const SCREEN_CREDITS = {
+  "openzcash-treasury": { name: "OpenZcash", role: "Built by", production: "Community project" },
   "coinholder-verification": { name: "vaspholdings", role: "Page design by", production: "Built by OpenZcash" },
   "project-history": { name: "socrates1024", role: "Community contribution by", production: "Designed and built by OpenZcash" },
   "wallet-finder": { name: "@Foreveranka", role: "Requirements informed by", production: "Designed and built by OpenZcash", source: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/495" },

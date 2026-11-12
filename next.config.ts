@@ -58,6 +58,10 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The treasury worker supplies this runtime volume; do not ship build-time copies.
+  outputFileTracingExcludes: {
+    "/*": ["./.cache/openzcash-treasury/**/*"],
+  },
   images: {
     localPatterns: [
       { pathname: "/**", search: "" },

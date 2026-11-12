@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "b64feacb3498cd6e",
+  "sourceRevision": "91c7c7a9cd85185d",
   "sourceFiles": 72,
   "documents": [
     {
@@ -373,7 +373,7 @@
       "id": "src/app/ongoing-test/crosslink/page.tsx:0",
       "url": "https://openzcash.org/ongoing-test/crosslink",
       "title": "ongoing test · crosslink",
-      "text": "Crosslink · OpenZcash\nExplore Crosslink: a practical testing guide, community tools and incentive updates.\nCrosslink test guide"
+      "text": "Crosslink · OpenZcash\nExplore Crosslink: a practical testing guide, community tools and incentive updates.\n← Back to opportunities\nCrosslink test guide"
     },
     {
       "id": "src/app/zcash-network/page.tsx:0",
@@ -3968,6 +3968,18 @@
       "title": "Zcash Opportunities: quests, bounties, jobs and testing",
       "text": "OpenZcash Opportunities is an ecosystem directory. It links visitors to Gleyo quests and communities, public ZEC Bounties tasks, Yukon HashSmash challenges, Shielded Labs Crosslink testing and incentives, and official careers pages. OpenZcash does not run these programs or accept applications, submissions, payments or registrations. A read-only server import shows approved, public, unassigned, unexpired mainnet ZEC Bounties records, refreshed on access with a fifteen-minute cache. Source failures are marked; curated links remain available. The default listing order is mixed for each visit. Filters include type, platform, language and country; missing locale information is not inferred. The 29 matte-paper stock covers can be selected and downloaded. Prepare activity assembles a local brief using Gleyo or ZEC Bounties fields, offers text copying and cover download, and directs the user to publish on the chosen platform. It does not create an account, reserve funds or publish a bounty. Quests may offer XP without ZEC. HashSmash follows Yukon rules and has no additional OpenZcash monthly prize. Crosslink links to /ongoing-test/crosslink?tab=incentives. Job availability and application requirements must be confirmed with each employer. The earlier illustrative tasks and rewards were retired. Preparacao local de arte e texto, com cadastro e participacao somente na plataforma de origem.",
       "url": "https://openzcash.org/opportunities"
+    },
+    {
+      "id": "guide:openzcash-treasury",
+      "title": "OpenZcash Treasury · voluntary donations, public viewing key and contributions",
+      "text": "OpenZcash Treasury is the project's own community-supported treasury, separate from ZCG and Coinholder program funds. The owner-supplied mainnet donation address and public full viewing key are available with copy controls and a QR generated locally from the exact address. Amounts and recoverable text memos are public; donors should not include personal information in memos. A memo reading \"For Michae2xl: retroactive work\" designates a donation to Michae2xl for work already delivered; donations without that note go to maintenance and improvements. A separate local watch-only worker scans the account and publishes reconciled snapshots to a read-only GET API. The page refreshes every 15 seconds, showing confirmed balance, net incoming and outgoing movements, recoverable memos, sync block and UTC time. Outflows include network fees; internal pool transfers are netted. Missing data stays unavailable and older or failed updates are labeled. The dedicated Vizor account was created on 2026-11-10; the scan starts before that date. A local preview does not establish a public scanner deployment. MIT source release is planned without a grant; public release is in preparation. OpenZcash will not apply for a grant for itself, neither to ZCG nor to the Coinholder retroactive grants. Contributor incentives depend on available funds, with a published scope, budget and acceptance criteria. Read the open letter at /openzcash-treasury/letter, published in English. Opportunities leads to the Crosslink guide.",
+      "url": "https://openzcash.org/openzcash-treasury"
+    },
+    {
+      "id": "guide:openzcash-treasury-letter",
+      "title": "OpenZcash · open letter, open source, donations and a public treasury",
+      "text": "Open letter on the continuity of OpenZcash: it expresses pride in the pioneering work with Zarvis and the copilots, Zcash's funding history in Since block zero and the governance tools. OpenZcash will not apply for a grant for itself, neither to ZCG nor to the Coinholder retroactive grants. The commitment is to release the code under MIT, receive voluntary donations in a dedicated wallet and share its viewing key with the community. The address and public viewing key are on the Treasury page, with balance and history shown only once the scan has been synchronized and reconciled. The key cannot spend funds and may reveal amounts and memos. A donation whose public memo designates Michae2xl for work already delivered is treated as such; donations without that note go to maintenance and improvements. The letter is signed by Michae2xl. Publication of the code is still in preparation. Contributor incentives will depend on available resources, with scope, budget and acceptance criteria set beforehand. The letter is published in English and links back to OpenZcash Treasury.",
+      "url": "https://openzcash.org/openzcash-treasury/letter"
     }
   ]
 }

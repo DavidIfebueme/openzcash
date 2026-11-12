@@ -303,3 +303,13 @@
   .resourceRows > div { align-items:flex-start; flex-direction:column; gap:9px; }
   .taskFooter { align-items:flex-start; flex-direction:column; }
 }
+.returnLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

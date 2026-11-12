@@ -136,14 +136,17 @@ it("makes the finder the Wallets page directly under Ecosystem", () => {
   expect(placeOf("/wallets/find")?.detail).toBeUndefined();
 });
 
-it("keeps Crosslink under a project-specific route without a duplicate category destination", () => {
+it("keeps the bookmarked Crosslink guide under Opportunities and hides the old category", () => {
   const category = appOf("ongoing-test");
+  expect(category.hidden).toBe(true);
   expect(placeOf("/ongoing-test/crosslink")).toMatchObject({
-    app: { id: "ongoing-test" }, page: { label: "Crosslink" },
+    app: { id: "ecosystem" }, page: { label: "Opportunities" },
+    detail: { label: "Crosslink", parent: { href: "/opportunities" } },
   });
   expect(overviewEntry(category)).toBeNull();
   expect(paletteEntries(category)).toEqual([
     expect.objectContaining({ href: "/ongoing-test/crosslink", label: "Crosslink" }),
   ]);
-  expect(backOf("/ongoing-test/crosslink")).toEqual({ href: "/zcg", label: "ZCG" });
+  expect(backOf("/ongoing-test/crosslink")).toEqual({ href: "/opportunities", label: "Opportunities" });
+  expect(backOf("/openzcash-treasury/letter")).toEqual({ href: "/openzcash-treasury", label: "OpenZcash Treasury" });
 });

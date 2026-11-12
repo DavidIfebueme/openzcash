@@ -46,6 +46,7 @@ next-env.d.ts
 .zcg-data/
 .redesign-plan.json
 /.cache/ecosystem-github.json
+/.cache/openzcash-treasury/
 /src/data/ecosystem/*.tmp
 /public/.well-known/agent-skills/
 /public/.well-known/skills/

@@ -162,8 +162,9 @@ export const APPS: AppDef[] = [
   { id: "legal", label: "Privacy & Policy", href: "/legal", sub: "Rights, regulation & public debate", icon: "balance", pages: [{ href: "/legal", label: "Updates" }] },
   { id: "narratives", label: "Zcash Pitches & Narratives", href: "/narratives", sub: "Zcash pitches and explanations · EN / PT / ES", icon: "narratives", pages: [] },
   { id: "monthly", label: "Monthly", href: "/monthly", sub: "Ecosystem reports", logo: "/logos/marks/monthly.png", icon: "book", pages: [] },
-  { id: "ongoing-test", label: "Ongoing Test", href: "/ongoing-test", sub: "Hands-on ecosystem tests and incentives", icon: "experiment", navigationOnly: true, pages: [{ href: "/ongoing-test/crosslink", label: "Crosslink", brandLogo: "/logos/shielded-labs.png" }] },
+  { id: "ongoing-test", label: "Ongoing Test", href: "/ongoing-test", sub: "Hands-on ecosystem tests and incentives", icon: "experiment", hidden: true, navigationOnly: true, pages: [{ href: "/ongoing-test/crosslink", label: "Crosslink", brandLogo: "/logos/shielded-labs.png" }] },
   { id: "private-chat", label: "Private Chat", href: "/private-chat", sub: "Private conversations via Nym · Experimental pilot", icon: "private-chat", pages: [] },
+  { id: "openzcash-treasury", label: "OpenZcash Treasury", href: "/openzcash-treasury", sub: "Support the work · Follow the treasury", icon: "wallet", pages: [{ href: "/openzcash-treasury/letter", label: "An open letter", hidden: true, palette: true }] },
   { id: "lockbox", label: "Lockbox", href: "/lockbox", sub: "Live funding", logo: "/logos/marks/lockbox.png", icon: "shield", pages: [], hidden: true },
   { id: "arborist", parentId: "ecosystem", parentGroup: "pages", label: "Arborist Calls", href: "/arborist", sub: "Protocol call archive", logo: "/logos/arborist.png", icon: "sigma", pages: [] },
   { id: "communities", parentId: "ecosystem", parentGroup: "pages", label: "Communities", href: "/communities", sub: "Global groups · live", logo: "/logos/communities.png", icon: "users", pages: [] },
@@ -241,6 +242,7 @@ export function childAppsOf(app: AppDef, apps: AppDef[] = APPS): AppDef[] {
 
 /** Detail routes and the list page they belong to. */
 const DETAILS: Record<string, { parent: string; label: string }> = {
+  "/ongoing-test/crosslink": { parent: "/opportunities", label: "Crosslink" },
   "/zcg/grant": { parent: "/zcg/grants", label: "Grant detail" },
   "/zcg/recipient": { parent: "/zcg/recipients", label: "Recipient detail" },
 };

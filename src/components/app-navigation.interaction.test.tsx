@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { useState } from "react";
 import { cleanup, fireEvent, render, within } from "@testing-library/react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { APPS, placeOf } from "@/lib/design-routes";
 import { AppNavigation } from "./app-navigation";
 
@@ -55,21 +55,13 @@ describe("ZCG navigation", () => {
 });
 
 
-describe("Ongoing Test navigation", () => {
-  it("toggles the category without navigation and dismisses the drawer on a page selection", () => {
-    const onVisit = vi.fn();
-    const { container, getByRole, queryByRole } = render(<Navigation compact onVisit={onVisit} />);
+describe("community treasury navigation", () => {
+  it.each([false, true])("reaches Treasury and Opportunities without an Ongoing Test menu (compact: %s)", (compact) => {
+    const { getByRole, queryByRole } = render(<Navigation compact={compact} />);
+    expect(queryByRole("button", { name: "Expand Ongoing Test" })).toBeNull();
     expect(queryByRole("link", { name: "Crosslink" })).toBeNull();
-    fireEvent.click(getByRole("button", { name: "Expand Ongoing Test" }));
-    const crosslink = getByRole("link", { name: "Crosslink" });
-    expect(crosslink.getAttribute("href")).toBe("/ongoing-test/crosslink");
-    expect(crosslink.querySelector("img")?.getAttribute("src")).toBe("/logos/shielded-labs.png");
-    fireEvent.click(getByRole("button", { name: "Collapse Ongoing Test" }));
-    expect(queryByRole("link", { name: "Crosslink" })).toBeNull();
-    expect(onVisit).not.toHaveBeenCalled();
-    fireEvent.click(getByRole("button", { name: "Expand Ongoing Test" }));
-    fireEvent.click(getByRole("link", { name: "Crosslink" }));
-    expect(onVisit).toHaveBeenCalledOnce();
-    expect(container.querySelector("#nav-ongoing-test")).not.toBeNull();
+    expect(getByRole("link", { name: "OpenZcash Treasury" }).getAttribute("href")).toBe("/openzcash-treasury");
+    fireEvent.click(getByRole("button", { name: "Expand Ecosystem" }));
+    expect(getByRole("link", { name: /Opportunities/ }).getAttribute("href")).toBe("/opportunities");
   });
 });
