@@ -31,6 +31,8 @@ import path from "node:path";
 export const TREASURY_SYNC_TIMEOUT_MS = 20 * 60_000;
 /** A lock this old is abandoned even if its PID answers (the number was reused, or the worker is wedged). */
 export const TREASURY_LOCK_STALE_MS = TREASURY_SYNC_TIMEOUT_MS + 5 * 60_000;
+/** A recovery takes milliseconds. A guard this old was left by a worker killed in the middle of one. */
+export const TREASURY_RECOVERY_GUARD_STALE_MS = 60_000;
 
 export interface TreasuryLockHolder {
   /** Recorded PID, or null when the file holds no usable one. */
@@ -65,7 +67,14 @@ export interface TreasuryLock {
 }
 
 export class TreasuryLockHeldError extends Error {
-  constructor(holder: TreasuryLockHolder | null, now: number) {
+  constructor(holder: TreasuryLockHolder | "recovering" | null, now: number) {
+    if (holder === "recovering") {
+      super(
+        "Another treasury worker is recovering an abandoned lock; start again in a moment",
+      );
+      this.name = "TreasuryLockHeldError";
+      return;
+    }
     const where = holder?.host ? ` on ${holder.host}` : "";
     const who = holder?.pid
       ? `PID ${holder.pid}${where}`
@@ -144,10 +153,9 @@ async function readLock(lockPath: string): Promise<StoredLock | null> {
 }
 
 /**
- * Removes the lock only if it still holds `expected`. The rename is atomic, so
- * of several workers recovering one abandoned lock exactly one moves it. A lock
- * that visibly changed is not touched; one that changed in the instant between
- * the check and the rename is put back.
+ * Removes a lock file only if it still holds `expected`. A file that visibly
+ * changed is not touched; one that changed in the instant between the check and
+ * the rename is put back.
  */
 export async function removeLockIfUnchanged(
   lockPath: string,
@@ -167,7 +175,7 @@ export async function removeLockIfUnchanged(
     try {
       await copyFile(aside, lockPath, constants.COPYFILE_EXCL);
     } catch (error) {
-      // A third worker took the free slot meanwhile; the displaced one stops at its next heartbeat.
+      // Another worker took the free slot meanwhile; the displaced one stops at its next heartbeat.
       if (errorCode(error) !== "EEXIST") throw error;
     }
     return false;
@@ -190,11 +198,59 @@ async function createLock(
   try {
     await utimes(lockPath, new Date(now), new Date(now));
   } catch (error) {
-    // Gone for an instant: a worker recovering the previous lock moved this one
-    // aside before noticing it was new, and puts it back.
+    // Already gone: not held. The caller looks again.
     if (errorCode(error) !== "ENOENT") throw error;
+    return false;
   }
   return true;
+}
+
+/** Exclusive right to recover. False while another worker holds it. */
+async function takeRecoveryGuard(
+  guard: string,
+  content: string,
+  tag: string,
+  now: number,
+): Promise<boolean> {
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      await writeFile(guard, content, { flag: "wx", mode: 0o644 });
+      return true;
+    } catch (error) {
+      if (errorCode(error) !== "EEXIST") throw error;
+    }
+    const left = await readLock(guard);
+    if (!left) continue; // released between the two calls
+    if (Math.abs(now - left.heartbeatMs) <= TREASURY_RECOVERY_GUARD_STALE_MS)
+      return false;
+    await removeLockIfUnchanged(guard, left.content, tag);
+  }
+  return false;
+}
+
+/**
+ * Removes an abandoned lock, one worker at a time. Nothing a worker saw before
+ * it held the guard counts: it inspects the lock again under the guard, so a
+ * lock that another worker has just taken is never moved out of the way.
+ * Returns false when another worker is recovering.
+ */
+async function recoverAbandonedLock(
+  lockPath: string,
+  tag: string,
+  now: number,
+  isAbandoned: (holder: TreasuryLockHolder) => boolean,
+): Promise<boolean> {
+  const guard = `${lockPath}.recovery`;
+  const mine = `${tag}\n`;
+  if (!(await takeRecoveryGuard(guard, mine, tag, now))) return false;
+  try {
+    const holder = await readLock(lockPath);
+    if (holder && isAbandoned(holder))
+      await removeLockIfUnchanged(lockPath, holder.content, tag);
+    return true;
+  } finally {
+    await removeLockIfUnchanged(guard, mine, tag);
+  }
 }
 
 /**
@@ -223,23 +279,21 @@ export async function acquireTreasuryLock(
     },
   };
 
+  const isAbandoned = (holder: TreasuryLockHolder) =>
+    lockIsAbandoned(holder, { pid, host, now: now(), staleAfterMs, isAlive });
+
   await mkdir(path.dirname(lockPath), { recursive: true });
   let holder: StoredLock | null = null;
-  for (let attempt = 0; attempt < 3; attempt += 1) {
+  // Creating the file is the only way in, and it is exclusive. Each pass either
+  // takes the lock, finds it held, or clears an abandoned one and tries again.
+  for (let attempt = 0; attempt < 4; attempt += 1) {
     if (await createLock(lockPath, content, now())) return lock;
     holder = await readLock(lockPath);
     if (!holder) continue; // released between the two calls
-    if (
-      !lockIsAbandoned(holder, {
-        pid,
-        host,
-        now: now(),
-        staleAfterMs,
-        isAlive,
-      })
-    )
-      break;
-    await removeLockIfUnchanged(lockPath, holder.content, token);
+    if (holder.content === content) return lock;
+    if (!isAbandoned(holder)) break;
+    if (!(await recoverAbandonedLock(lockPath, token, now(), isAbandoned)))
+      throw new TreasuryLockHeldError("recovering", now());
   }
   throw new TreasuryLockHeldError(holder, now());
 }

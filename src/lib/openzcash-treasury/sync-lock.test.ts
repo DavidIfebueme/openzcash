@@ -20,6 +20,7 @@ import {
   TreasuryLockHeldError,
   TreasuryLockLostError,
   TREASURY_LOCK_STALE_MS,
+  TREASURY_RECOVERY_GUARD_STALE_MS,
   TREASURY_SYNC_TIMEOUT_MS,
   type TreasuryLockOptions,
 } from "./sync-lock";
@@ -354,7 +355,7 @@ describe("acquireTreasuryLock", () => {
     // The real clock throughout: a new lock's first timestamp comes from the filesystem.
     const lockPath = await location();
     const real = { now: Date.now };
-    for (let round = 0; round < 20; round += 1) {
+    for (let round = 0; round < 60; round += 1) {
       await leftover(
         lockPath,
         Date.now() - TREASURY_LOCK_STALE_MS - MINUTE,
@@ -365,23 +366,47 @@ describe("acquireTreasuryLock", () => {
           acquireTreasuryLock(lockPath, worker(pid, real)),
         ),
       );
-      const heartbeats = await Promise.allSettled(
-        starts.map((start) =>
-          start.status === "fulfilled"
-            ? start.value.refresh()
-            : Promise.reject(start.reason),
-        ),
+      // Exactly one may enter the protected work at all; surviving the next heartbeat is not enough.
+      const holders = starts.flatMap((start) =>
+        start.status === "fulfilled" ? [start.value] : [],
       );
-      expect(
-        heartbeats.filter((beat) => beat.status === "fulfilled"),
-      ).toHaveLength(1);
+      expect(holders).toHaveLength(1);
       for (const start of starts) {
         if (start.status === "rejected")
           expect(start.reason).toBeInstanceOf(TreasuryLockHeldError);
       }
+      await expect(holders[0].refresh()).resolves.toBeUndefined();
       expect(await readdir(path.dirname(lockPath))).toEqual(["sync.lock"]);
-      await unlink(lockPath);
+      await holders[0].release();
     }
+  });
+
+  it("refuses while another worker is recovering the abandoned lock, and touches neither file", async () => {
+    const lockPath = await location();
+    const guard = `${lockPath}.recovery`;
+    await leftover(lockPath, T0 - TREASURY_LOCK_STALE_MS - MINUTE, stored(400));
+    await leftover(guard, T0 - 5_000, "another-recovery\n");
+    const refused = await acquireTreasuryLock(lockPath, worker(500)).catch(
+      (error: unknown) => error,
+    );
+    expect(refused).toBeInstanceOf(TreasuryLockHeldError);
+    expect((refused as Error).message).toContain("recovering");
+    expect(await readFile(lockPath, "utf8")).toBe(stored(400));
+    expect(await readFile(guard, "utf8")).toBe("another-recovery\n");
+  });
+
+  it("clears the recovery guard of a worker killed in the middle of a recovery", async () => {
+    const lockPath = await location();
+    await leftover(lockPath, T0 - TREASURY_LOCK_STALE_MS - MINUTE, stored(400));
+    await leftover(
+      `${lockPath}.recovery`,
+      T0 - TREASURY_RECOVERY_GUARD_STALE_MS - 1_000,
+      "killed-recovery\n",
+    );
+    const lock = await acquireTreasuryLock(lockPath, worker(500));
+    expect(await firstLine(lockPath)).toBe("500");
+    expect(await readdir(path.dirname(lockPath))).toEqual(["sync.lock"]);
+    await lock.release();
   });
 
   it("checks real processes by default: a finished child is gone, the parent of this test is not", async () => {
