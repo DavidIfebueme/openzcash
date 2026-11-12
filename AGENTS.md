@@ -77,4 +77,8 @@ publication policy, or persisted snapshots.
   goes through zod and queries stay parameterized (Drizzle tagged templates).
 - Data shown on the site carries provenance; keep `sourceSheetGid` /
   `sourceRow` / `sourceUrl` style attribution intact when moving data.
+- The OpenZcash Treasury runtime (`scripts/treasury-runtime.ts`) is a separate
+  process started beside the site. The web application must not import it,
+  proxy the wallet engine or expose it over HTTP; the site only reads the
+  snapshot file. See [docs/openzcash-treasury.md](docs/openzcash-treasury.md).
 - Do not start agent work on `main`; branch first.

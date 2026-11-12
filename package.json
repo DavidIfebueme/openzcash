@@ -18,6 +18,7 @@
     "test:copilot": "node --test scripts/publish-copilot.test.mjs && python3 -B -m unittest discover -s skills/zcg-copilot/tests",
     "probe": "tsx scripts/probe-node.ts",
     "treasury:sync": "node --import tsx scripts/sync-openzcash-treasury.ts",
+    "treasury:runtime": "node --import tsx scripts/treasury-runtime.ts",
     "import-zcg": "node --conditions=react-server --import tsx scripts/import-zcg.ts",
     "sync-ecosystem": "node scripts/sync-ecosystem.mjs",
     "audit:ecosystem": "tsx scripts/audit-ecosystem.ts",
@@ -67,6 +68,7 @@
     "server-only": "^0.0.1",
     "tailwind-merge": "^3.6.0",
     "three": "^0.185.0",
+    "tsx": "^4.22.4",
     "zod": "^4.6.6"
   },
   "devDependencies": {
@@ -86,7 +88,6 @@
     "jsdom": "26.1.0",
     "simple-icons": "^16.32.0",
     "tailwindcss": "^4",
-    "tsx": "^4.22.4",
     "typescript": "^5",
     "vitest": "4.1.12"
   },

@@ -51,7 +51,38 @@ Memos come from the engine's decrypted external notes and outgoing outputs. Blan
 
 Coverage follows the account's shielded keys and the engine's stored transparent addresses; it is not an exhaustive search of all possible transparent child indexes. The published donation address is Orchard-only. Expense purposes and receipts can be added as separate records; the viewing key does not prove off-chain expense claims or the absence of other wallets.
 
-The scanner is a separate persistent service. Deploying only the Next.js UI does not deploy the scanner or its runtime database. Run the worker beside the engine and share the snapshot read-only with the web process. The current local preview is not evidence of a public deployment.
+The scanner is a separate process, never part of the web application: the site only reads the snapshot. It can run on any host beside the engine, sharing the snapshot read-only with the web process. For production the owner chose to run it inside the web service's own container, described in the next section. Until that runtime is enabled on the service, the public page reports the balance as not yet verified. A local preview is not evidence of a public deployment.
+
+## Production runtime (inside the web service)
+
+Decision, 2026-11-12: the owner chose to run the wallet engine and the worker in the portal's own Railway service, on a volume, instead of a dedicated service or the separate worker host. The code is in `scripts/treasury-runtime.ts` and `src/lib/openzcash-treasury/runtime.ts`. As of that date it has not been enabled in production.
+
+- The start command in `railway.toml` ends by replacing the shell with `npm run start`, so the site is the process the platform signals. Only when the service sets `OPENZCASH_TREASURY_RUNTIME=enabled` does it first start the runtime in the background; with any other value, or none, no runtime process exists and the service behaves as before. The site's start, health check and restart policy do not wait on the runtime, and a runtime that fails or exits does not stop the site. `src/lib/openzcash-treasury/start-command.test.ts` runs that exact line.
+- `OPENZCASH_TREASURY_SNAPSHOT_PATH` must be an absolute path on the service's volume, outside the application directory, for example `/data/openzcash-treasury/snapshot.json` with the volume mounted at `/data`. Its directory becomes the runtime directory: `snapshot.json`, `sync.lock`, `engine/` (database and Sapling parameters) and `bin/` (engine binary). The same variable tells the site where to read.
+- On start the runtime refuses to continue if something already listens on the engine port, which means another runtime is running in the container. It then removes the lock files and unfinished snapshot writes left by the previous container, starts the engine on loopback with the flags above, waits up to a minute for its port and starts the worker with `--watch`. Removing the leftovers is safe here and only here: a Railway volume is mounted by one deployment at a time, and no worker of the new container has started yet.
+- The engine and the worker are restarted whenever they exit, after a pause that doubles from one second to one minute and starts over after a minute of healthy running. A runtime that stops with `runtime stopped: …`, for example on a volume it cannot write, is not started again until the next deploy.
+- A container stop signals only the site's process; the runtime, the engine and the worker end with the container, without cleanup. That is why the leftovers are cleared at the next start. When the runtime itself receives `SIGTERM`, it stops both processes and the worker releases its lock.
+- Engine binary: the runtime downloads the `zkool_graphql` file that the ZKool project's release workflow attached to release `zkool-v6.36.0` (Linux x86_64, built with `graphql,bundled-sapling-params,ledger`) and runs it only when its size and SHA-256 match the values pinned in `TREASURY_ENGINE`. The digest is the one GitHub publishes for that asset. The file is installed read-only and its digest is checked again before every start of the engine. This is the upstream build, not the locally compiled baseline above. To run a binary you built yourself, put it on the volume and set `OPENZCASH_TREASURY_ENGINE_BIN` to its absolute path; then nothing is downloaded and nothing is checked.
+- The engine is a third-party program. When the runtime starts as root, it runs the engine as the unprivileged account 65534 (`nobody`), which owns only `engine/`: it cannot read the site's process, the service's variables or the snapshot. When the runtime is not root it cannot change accounts, says so in the log, and the engine runs as the site's user.
+- The engine and the worker are started with only `PATH`, the locale, time-zone and certificate variables, and the `OPENZCASH_TREASURY_*` settings. That keeps the service's database URL and provider keys out of their environment and logs; it is not a sandbox. The worker is this repository's code and runs as the site's user.
+- `OPENZCASH_TREASURY_ENGINE_URL`, when set, needs a port of its own: 1024 or higher and different from the site's `PORT`. Do not point the retired `ZKOOL_GRAPHQL_URL` at the treasury engine.
+- `tsx` is a production dependency because the runtime and the worker run from the TypeScript sources.
+
+Costs of this choice: a Railway service with a volume has a short downtime on every redeploy and cannot use replicas. The engine and the worker use the site's memory and processor; if the container runs out of memory the platform restarts the whole service, site included. The engine's unauthenticated GraphQL port, loopback only, is reachable by any code running inside the site's container. The engine holds only the public viewing key.
+
+Verified on 2026-11-12, on macOS, not as root, with the locally compiled engine: a first synchronization from an empty directory, recovery after the worker and the engine were each killed, a restart over the lock of a killed runtime, the refusal of a second runtime, and a stop on `SIGTERM`. Not yet verified: the pinned release binary on the Railway image, and running the engine under the unprivileged account there.
+
+### Enabling it
+
+Each step is the owner's to take.
+
+1. Deploy this code with no new variables. No runtime process is started and the site is unchanged.
+2. Attach a volume to the web service, mounted at `/data`. From this point every redeploy has a short downtime.
+3. Set `OPENZCASH_TREASURY_SNAPSHOT_PATH=/data/openzcash-treasury/snapshot.json` and `OPENZCASH_TREASURY_RUNTIME=enabled`, then redeploy.
+4. In the deploy log expect, in order, `[treasury] engine binary downloaded, digest verified`, `Listening on 127.0.0.1:18232`, `Verified public viewing key and donation address` and `Synced block …`. The engine's own `Listening on` line shows the address it bound; it must be `127.0.0.1`. `GET /api/openzcash-treasury` then answers with `"status":"synced"`.
+5. To turn it off, remove `OPENZCASH_TREASURY_RUNTIME` and redeploy. While the snapshot path stays set, the page keeps the last snapshot, labelled as the last known balance.
+
+If the log repeats `engine could not start` or `engine exited`, the site keeps running in its previous state. On a new image the likely causes are a missing system library, which the engine's own error line names, or a platform that does not let the runtime change accounts.
 
 Viewing-key terminology: [ZIP 316](https://zips.z.cash/zip-0316#terminology). Public viewing keys can expose transaction details and memos; they do not authorize spending.
 

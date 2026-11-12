@@ -170,6 +170,9 @@ pattern. New and substantially revised screens follow the
 - **No spend keys.** Public on-chain reads use a public lightwalletd. Existing
   reconciliation records remain in the database, but no new viewing-key scans
   can be started through the site.
+  The project's own treasury is the one account still scanned: an optional
+  process beside the site reads its publicly disclosed viewing key and is not
+  reachable over HTTP ([docs/openzcash-treasury.md](docs/openzcash-treasury.md)).
 - **Legacy admin retired.** Login, onboarding, management and administrative
   write routes return 404. Old sessions and invite links grant no access.
 - **Public data stays available.** The spreadsheet/GitHub importers and public
