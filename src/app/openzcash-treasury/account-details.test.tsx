@@ -38,20 +38,32 @@ it("copies the full viewing key rather than its abbreviated display", async () =
   expect(writeText.mock.calls[0][0]).not.toContain("…");
 });
 
-it("exposes a selectable read-only full key when clipboard access fails", async () => {
+it("shows the whole viewing key in its own frame, so it can be selected when the clipboard fails", async () => {
   writeText.mockRejectedValue(new Error("Clipboard denied"));
-  render(<AccountDetails qrCode={qrCode} />);
+  const { container } = render(<AccountDetails qrCode={qrCode} />);
+  const key = screen.getByText(TREASURY_ACCOUNT.viewingKey);
+  expect(key.tagName).toBe("CODE");
+  expect(container.textContent).not.toContain("…");
+  expect(container.querySelector("details")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: "Copy key" }));
   await waitFor(() => expect(screen.getByRole("status").textContent).toContain("Could not copy"));
-  const key = screen.getByRole("textbox", { name: "Public viewing key" }) as HTMLTextAreaElement;
-  expect(key.value).toBe(TREASURY_ACCOUNT.viewingKey);
-  expect(key.readOnly).toBe(true);
-  expect(key.closest("details")?.open).toBe(true);
   expect(screen.queryByText("Viewing key copied.")).toBeNull();
 });
 
-it("tells donors how to designate a donation in the memo and where the rest goes", () => {
+it("frames the address like the key and shows a larger QR code", () => {
   render(<AccountDetails qrCode={qrCode} />);
-  const note = screen.getByText(/write "For Michae2xl: retroactive work" in the memo/);
-  expect(note.textContent).toContain("Donations without that note go entirely to maintenance and improvements.");
+  const address = screen.getByText(TREASURY_ACCOUNT.address);
+  const key = screen.getByText(TREASURY_ACCOUNT.viewingKey);
+  expect(address.tagName).toBe("CODE");
+  expect(address.className).toBe(key.className);
+  expect(screen.getByAltText("QR code for the OpenZcash Zcash donation address").getAttribute("width")).toBe("200");
+});
+
+it("points to the open letter under the donation address instead of repeating the memo guidance", () => {
+  render(<AccountDetails qrCode={qrCode} />);
+  const letter = screen.getByRole("link", { name: /An open letter/ });
+  expect(letter.getAttribute("href")).toBe("/openzcash-treasury/letter");
+  expect(letter.textContent).toContain("how to designate");
+  expect(screen.queryByText(/retroactive work/)).toBeNull();
+  expect(screen.getByText("Amounts and memos are publicly viewable. Keep personal details out of memos.")).toBeTruthy();
 });
