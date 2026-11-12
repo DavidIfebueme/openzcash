@@ -19894,6 +19894,7 @@ var ArchiveChainError = class extends Error {
     this.code = code;
     this.name = "ArchiveChainError";
   }
+  code;
 };
 var height = external_exports.number().int().min(0).max(2147483646);
 var hash3 = digestSchema;

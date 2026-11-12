@@ -5,11 +5,20 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
 };
 var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -40252,11 +40261,11 @@ var import_reflect_metadata = __toESM(require_Reflect(), 1);
 var import_x509 = __toESM(require_x509_cjs(), 1);
 
 // node_modules/@simplewebauthn/server/esm/helpers/fetch.js
-function fetch2(url2) {
-  return _fetchInternals.stubThis(url2);
+function fetch2(...args) {
+  return _fetchInternals.stubThis(...args);
 }
 var _fetchInternals = {
-  stubThis: (url2) => globalThis.fetch(url2)
+  stubThis: (...args) => globalThis.fetch(...args)
 };
 
 // node_modules/@simplewebauthn/server/esm/helpers/isCertRevoked.js
@@ -41275,38 +41284,6 @@ HMUfpIBvFSDJ3gyICh3WZlXi/EjJKSZp4A==
 `;
 
 // node_modules/@simplewebauthn/server/esm/services/defaultRootCerts/android-key.js
-var Google_Hardware_Attestation_Root_1 = `-----BEGIN CERTIFICATE-----
-MIIFYDCCA0igAwIBAgIJAOj6GWMU0voYMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV
-BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTYwNTI2MTYyODUyWhcNMjYwNTI0MTYy
-ODUyWjAbMRkwFwYDVQQFExBmOTIwMDllODUzYjZiMDQ1MIICIjANBgkqhkiG9w0B
-AQEFAAOCAg8AMIICCgKCAgEAr7bHgiuxpwHsK7Qui8xUFmOr75gvMsd/dTEDDJdS
-Sxtf6An7xyqpRR90PL2abxM1dEqlXnf2tqw1Ne4Xwl5jlRfdnJLmN0pTy/4lj4/7
-tv0Sk3iiKkypnEUtR6WfMgH0QZfKHM1+di+y9TFRtv6y//0rb+T+W8a9nsNL/ggj
-nar86461qO0rOs2cXjp3kOG1FEJ5MVmFmBGtnrKpa73XpXyTqRxB/M0n1n/W9nGq
-C4FSYa04T6N5RIZGBN2z2MT5IKGbFlbC8UrW0DxW7AYImQQcHtGl/m00QLVWutHQ
-oVJYnFPlXTcHYvASLu+RhhsbDmxMgJJ0mcDpvsC4PjvB+TxywElgS70vE0XmLD+O
-JtvsBslHZvPBKCOdT0MS+tgSOIfga+z1Z1g7+DVagf7quvmag8jfPioyKvxnK/Eg
-sTUVi2ghzq8wm27ud/mIM7AY2qEORR8Go3TVB4HzWQgpZrt3i5MIlCaY504LzSRi
-igHCzAPlHws+W0rB5N+er5/2pJKnfBSDiCiFAVtCLOZ7gLiMm0jhO2B6tUXHI/+M
-RPjy02i59lINMRRev56GKtcd9qO/0kUJWdZTdA2XoS82ixPvZtXQpUpuL12ab+9E
-aDK8Z4RHJYYfCT3Q5vNAXaiWQ+8PTWm2QgBR/bkwSWc+NpUFgNPN9PvQi8WEg5Um
-AGMCAwEAAaOBpjCBozAdBgNVHQ4EFgQUNmHhAHyIBQlRi0RsR/8aTMnqTxIwHwYD
-VR0jBBgwFoAUNmHhAHyIBQlRi0RsR/8aTMnqTxIwDwYDVR0TAQH/BAUwAwEB/zAO
-BgNVHQ8BAf8EBAMCAYYwQAYDVR0fBDkwNzA1oDOgMYYvaHR0cHM6Ly9hbmRyb2lk
-Lmdvb2dsZWFwaXMuY29tL2F0dGVzdGF0aW9uL2NybC8wDQYJKoZIhvcNAQELBQAD
-ggIBACDIw41L3KlXG0aMiS//cqrG+EShHUGo8HNsw30W1kJtjn6UBwRM6jnmiwfB
-Pb8VA91chb2vssAtX2zbTvqBJ9+LBPGCdw/E53Rbf86qhxKaiAHOjpvAy5Y3m00m
-qC0w/Zwvju1twb4vhLaJ5NkUJYsUS7rmJKHHBnETLi8GFqiEsqTWpG/6ibYCv7rY
-DBJDcR9W62BW9jfIoBQcxUCUJouMPH25lLNcDc1ssqvC2v7iUgI9LeoM1sNovqPm
-QUiG9rHli1vXxzCyaMTjwftkJLkf6724DFhuKug2jITV0QkXvaJWF4nUaHOTNA4u
-JU9WDvZLI1j83A+/xnAJUucIv/zGJ1AMH2boHqF8CY16LpsYgBt6tKxxWH00XcyD
-CdW2KlBCeqbQPcsFmWyWugxdcekhYsAWyoSf818NUsZdBWBaR/OukXrNLfkQ79Iy
-ZohZbvabO/X+MVT3rriAoKc8oE2Uws6DF+60PV7/WIPjNvXySdqspImSN78mflxD
-qwLqRBYkA3I75qppLGG9rp7UCdRjxMl8ZDBld+7yvHVgt1cVzJx9xnyGCC23Uaic
-MDSXYrB4I4WHXPGjxhZuCuPBLTdOLU8YRvMYdEvYebWHMpvwGCF6bAx3JBpIeOQ1
-wDB5y0USicV3YgYGmi+NZfhA4URSh77Yd6uuJOJENRaNVTzk
------END CERTIFICATE-----
-`;
 var Google_Hardware_Attestation_Root_2 = `-----BEGIN CERTIFICATE-----
 MIIFHDCCAwSgAwIBAgIJANUP8luj8tazMA0GCSqGSIb3DQEBCwUAMBsxGTAXBgNV
 BAUTEGY5MjAwOWU4NTNiNmIwNDUwHhcNMTkxMTIyMjAzNzU4WhcNMzQxMTE4MjAz
@@ -41400,6 +41377,22 @@ n6yYD/yacNJBlwpddla8eaVMjsF6nBnIgQOf9zKSe06nSTqvgwUHosgOECZJZ1Eu
 zbH4yswbt02tKtKEFhx+v+OTge/06V+jGsqTWLsfrOCNLuA8H++z+pUENmpqnnHo
 vaI47gC+TNpkgYGkkBT6B/m/U01BuOBBTzhIlMEZq9qkDWuM2cA5kW5V3FJUcfHn
 w1IdYIg2Wxg7yHcQZemFQg==
+-----END CERTIFICATE-----
+`;
+var Google_Android_Key_Attestation_CA1 = `
+-----BEGIN CERTIFICATE-----
+MIICIjCCAaigAwIBAgIRAISp0Cl7DrWK5/8OgN52BgUwCgYIKoZIzj0EAwMwUjEc
+MBoGA1UEAwwTS2V5IEF0dGVzdGF0aW9uIENBMTEQMA4GA1UECwwHQW5kcm9pZDET
+MBEGA1UECgwKR29vZ2xlIExMQzELMAkGA1UEBhMCVVMwHhcNMjUwNzE3MjIzMjE4
+WhcNMzUwNzE1MjIzMjE4WjBSMRwwGgYDVQQDDBNLZXkgQXR0ZXN0YXRpb24gQ0Ex
+MRAwDgYDVQQLDAdBbmRyb2lkMRMwEQYDVQQKDApHb29nbGUgTExDMQswCQYDVQQG
+EwJVUzB2MBAGByqGSM49AgEGBSuBBAAiA2IABCPaI3FO3z5bBQo8cuiEas4HjqCt
+G/mLFfRT0MsIssPBEEU5Cfbt6sH5yOAxqEi5QagpU1yX4HwnGb7OtBYpDTB57uH5
+Eczm34A5FNijV3s0/f0UPl7zbJcTx6xwqMIRq6NCMEAwDwYDVR0TAQH/BAUwAwEB
+/zAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFFIyuyz7RkOb3NaBqQ5lZuA0QepA
+MAoGCCqGSM49BAMDA2gAMGUCMETfjPO/HwqReR2CS7p0ZWoD/LHs6hDi422opifH
+EUaYLxwGlT9SLdjkVpz0UUOR5wIxAIoGyxGKRHVTpqpGRFiJtQEOOTp/+s1GcxeY
+uR2zh/80lQyu9vAFCj6E4AXc+osmRg==
 -----END CERTIFICATE-----
 `;
 
@@ -41518,10 +41511,10 @@ var SettingsService = new BaseSettingsService();
 SettingsService.setRootCertificates({
   identifier: "android-key",
   certificates: [
-    Google_Hardware_Attestation_Root_1,
     Google_Hardware_Attestation_Root_2,
     Google_Hardware_Attestation_Root_3,
-    Google_Hardware_Attestation_Root_4
+    Google_Hardware_Attestation_Root_4,
+    Google_Android_Key_Attestation_CA1
   ]
 });
 SettingsService.setRootCertificates({
@@ -41559,8 +41552,22 @@ var InvalidBackupFlags = class extends Error {
   }
 };
 
+// node_modules/@simplewebauthn/server/esm/helpers/assertValidExpectedRPID.js
+function assertValidExpectedRPID(rpID) {
+  const asciiRPID = new URL(`https://${rpID}`).hostname;
+  if (asciiRPID !== rpID) {
+    throw new SimpleWebAuthnError({
+      message: `"${rpID}" is not a valid expected RP ID. Replace it with its ASCII punycode representation "${asciiRPID}" and try again`,
+      code: "BAD_ARGUMENT"
+    });
+  }
+}
+
 // node_modules/@simplewebauthn/server/esm/helpers/matchExpectedRPID.js
 async function matchExpectedRPID(rpIDHash, expectedRPIDs) {
+  for (const rpID of expectedRPIDs) {
+    assertValidExpectedRPID(rpID);
+  }
   try {
     const matchedRPID = await Promise.any(expectedRPIDs.map((expected) => {
       return new Promise((resolve, reject) => {
@@ -41577,21 +41584,207 @@ async function matchExpectedRPID(rpIDHash, expectedRPIDs) {
   } catch (err) {
     const _err = err;
     if (_err.name === "AggregateError") {
-      throw new UnexpectedRPIDHash();
+      throw new SimpleWebAuthnError({
+        message: "Unexpected RP ID hash",
+        code: "UNEXPECTED_RP_ID"
+      });
     }
     throw err;
   }
 }
-var UnexpectedRPIDHash = class extends Error {
-  constructor() {
-    const message = "Unexpected RP ID hash";
-    super(message);
-    this.name = "UnexpectedRPIDHash";
+
+// node_modules/@simplewebauthn/server/esm/services/helpers/serviceStateTracker.js
+var SERVICE_STATE;
+(function(SERVICE_STATE2) {
+  SERVICE_STATE2["DISABLED"] = "DISABLED";
+  SERVICE_STATE2["REFRESHING"] = "REFRESHING";
+  SERVICE_STATE2["READY"] = "READY";
+})(SERVICE_STATE || (SERVICE_STATE = {}));
+var ServiceStateTracker = class {
+  constructor(name, logger) {
+    Object.defineProperty(this, "name", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: name
+    });
+    Object.defineProperty(this, "logger", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: logger
+    });
+    Object.defineProperty(this, "state", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: SERVICE_STATE.DISABLED
+    });
+  }
+  /**
+   * Get the current state
+   */
+  get current() {
+    return this.state;
+  }
+  /**
+   * Set a new state and report it
+   */
+  set(next) {
+    if (this.state === next) {
+      return;
+    }
+    this.state = next;
+    this.logger.debug(`${this.name} is ${SERVICE_STATE[this.state]}`);
+  }
+  /**
+   * A helper method to pause execution until the service is ready
+   */
+  pauseUntilReady() {
+    if (this.state === SERVICE_STATE.READY) {
+      return Promise.resolve();
+    }
+    const readyPromise = new Promise((resolve, reject) => {
+      const totalTimeoutMS = 7e4;
+      const intervalMS = 100;
+      let iterations = totalTimeoutMS / intervalMS;
+      const intervalID = globalThis.setInterval(() => {
+        if (iterations < 1) {
+          clearInterval(intervalID);
+          reject(`State did not become ready in ${totalTimeoutMS / 1e3} seconds`);
+        } else if (this.state === SERVICE_STATE.READY) {
+          clearInterval(intervalID);
+          resolve();
+        }
+        iterations -= 1;
+      }, intervalMS);
+    });
+    return readyPromise;
   }
 };
 
-// node_modules/@simplewebauthn/server/esm/helpers/validateExtFIDOGenCEAAGUID.js
-var import_asn1_schema4 = __toESM(require_cjs2(), 1);
+// node_modules/@simplewebauthn/server/esm/services/helpers/mdsCache.js
+var NonRefreshingURL = "";
+var MDSCache = class {
+  constructor() {
+    Object.defineProperty(this, "serverCache", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: /* @__PURE__ */ new Map()
+    });
+    Object.defineProperty(this, "metadataCache", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: /* @__PURE__ */ new Map()
+    });
+  }
+  /**
+   * Set up a Metadata Service API for periodic refreshes
+   */
+  registerMDSServer(url2, no, nextUpdate) {
+    this.serverCache.set(url2, {
+      url: url2,
+      // Store the payload `no` (aka "serial number", "version number", etc...) to skip
+      // re-downloading metadata we already have the latest
+      no,
+      // When this MDS server should be checked for new data
+      nextUpdate
+    });
+  }
+  /**
+   * Add the provided metadata to the cache, keyed by its corresponding AAGUID
+   */
+  cacheMetadata(aaguid, metadata, url2) {
+    this.metadataCache.set(this.normalizeAAGUID(aaguid), { data: metadata, url: url2 });
+  }
+  /**
+   * Retrieve cached metadata by AAGUID
+   */
+  getMetadata(aaguid) {
+    if (!aaguid) {
+      return;
+    }
+    if (aaguid instanceof Uint8Array) {
+      aaguid = convertAAGUIDToString(aaguid);
+    }
+    return this.metadataCache.get(this.normalizeAAGUID(aaguid))?.data;
+  }
+  /**
+   * Return how many metadata entries have been cached
+   */
+  get count() {
+    return this.metadataCache.size;
+  }
+  /**
+   * Clear out caches
+   */
+  reset() {
+    this.serverCache = /* @__PURE__ */ new Map();
+    this.metadataCache = /* @__PURE__ */ new Map();
+  }
+  /**
+   * Remove cached Metadata Service data for a specific API server. If the URL indicates data that
+   * should not be refreshed, then simply exit.
+   */
+  clearMetadataByURL(url2) {
+    if (url2 === NonRefreshingURL) {
+      return;
+    }
+    for (const [aaguid, cached2] of this.metadataCache.entries()) {
+      if (cached2.url === url2) {
+        this.metadataCache.delete(this.normalizeAAGUID(aaguid));
+      }
+    }
+  }
+  /**
+   * Whether an MDS server has been registered for periodic refreshes
+   */
+  mdsServerIsRegistered(url2) {
+    return this.serverCache.has(url2);
+  }
+  /**
+   * Set the MDS server's nextUpdate
+   */
+  setMDSServerNextUpdate(url2, newNextUpdate) {
+    const server = this.serverCache.get(url2);
+    if (!server) {
+      throw new SimpleWebAuthnError({
+        message: `No MDS server has been registered for "${url2}". Register it with registerMDSServer() first`,
+        code: "BAD_ARGUMENT"
+      });
+    }
+    server.nextUpdate = newNextUpdate;
+    this.serverCache.set(url2, server);
+  }
+  /**
+   * Retrieve the version number of the MDS server's latest known data
+   */
+  getMDSServerDataVersion(url2) {
+    const server = this.serverCache.get(url2);
+    if (!server) {
+      throw new SimpleWebAuthnError({
+        message: `No MDS server has been registered for "${url2}". Register it with registerMDSServer() first`,
+        code: "BAD_ARGUMENT"
+      });
+    }
+    return server.no;
+  }
+  /**
+   * Return a list of MDS server URLs with nextUpdates earlier than the provided date
+   */
+  getStaleMDSServerURLs(date5) {
+    const staleURLs = this.serverCache.values().filter((mds) => mds.url !== NonRefreshingURL && date5 > mds.nextUpdate).map((mds) => mds.url);
+    return staleURLs.toArray();
+  }
+  /**
+   * Ensure that AAGUIDs are all lowercase before using them as cache keys
+   */
+  normalizeAAGUID(aaguid) {
+    return aaguid.toLowerCase();
+  }
+};
 
 // node_modules/@simplewebauthn/server/esm/helpers/logging.js
 var DefaultNoopLogger = {
@@ -41621,44 +41814,49 @@ function buildLoggerAllMethods(logger) {
   return toReturn;
 }
 
-// node_modules/@simplewebauthn/server/esm/services/metadataService.js
-var NonRefreshingMDS = {
-  url: "",
-  no: 0,
-  nextUpdate: /* @__PURE__ */ new Date(0)
-};
-var defaultURLMDS = "https://mds.fidoalliance.org/";
-var SERVICE_STATE;
-(function(SERVICE_STATE2) {
-  SERVICE_STATE2[SERVICE_STATE2["DISABLED"] = 0] = "DISABLED";
-  SERVICE_STATE2[SERVICE_STATE2["REFRESHING"] = 1] = "REFRESHING";
-  SERVICE_STATE2[SERVICE_STATE2["READY"] = 2] = "READY";
-})(SERVICE_STATE || (SERVICE_STATE = {}));
-var BaseMetadataService = class {
-  constructor() {
-    Object.defineProperty(this, "mdsCache", {
-      enumerable: true,
-      configurable: true,
-      writable: true,
-      value: {}
+// node_modules/@simplewebauthn/server/esm/services/helpers/getInitCacheMessage.js
+function getInitCacheMessage(serviceName, cacheCount, numLocalFiles, numServers) {
+  let message = `${serviceName} cached ${cacheCount} unique entries`;
+  if (cacheCount) {
+    const formatter = new Intl.ListFormat("en", {
+      style: "long",
+      type: "conjunction"
     });
-    Object.defineProperty(this, "statementCache", {
+    const sources = [];
+    if (numLocalFiles) {
+      sources.push(`${numLocalFiles} local file(s)`);
+    }
+    if (numServers) {
+      sources.push(`${numServers} metadata server(s)`);
+    }
+    message = `${message} from ${formatter.format(sources)}`;
+  }
+  return message;
+}
+
+// node_modules/@simplewebauthn/server/esm/services/helpers/baseMDSService.js
+var BaseMDSService = class {
+  /**
+   * @param serviceName Used in logs, e.g. `"MetadataService"`
+   */
+  constructor(serviceName) {
+    Object.defineProperty(this, "serviceName", {
       enumerable: true,
       configurable: true,
       writable: true,
-      value: {}
+      value: serviceName
+    });
+    Object.defineProperty(this, "metadataCache", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: new MDSCache()
     });
     Object.defineProperty(this, "state", {
       enumerable: true,
       configurable: true,
       writable: true,
-      value: SERVICE_STATE.DISABLED
-    });
-    Object.defineProperty(this, "verificationMode", {
-      enumerable: true,
-      configurable: true,
-      writable: true,
-      value: "strict"
+      value: void 0
     });
     Object.defineProperty(this, "logger", {
       enumerable: true,
@@ -41666,57 +41864,187 @@ var BaseMetadataService = class {
       writable: true,
       value: DefaultNoopLogger
     });
+    Object.defineProperty(this, "defaultRefreshDelayHours", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: 24
+    });
+    Object.defineProperty(this, "defaultRetryDelayHours", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: 3
+    });
+    Object.defineProperty(this, "downloadTimeoutMS", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: 1e4
+    });
+    Object.defineProperty(this, "serverRefreshes", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: {}
+    });
+    this.state = new ServiceStateTracker(serviceName, this.logger);
+  }
+  /**
+   * Reset the service and move it to the `REFRESHING` state. Call this at the start of
+   * `initialize()`.
+   */
+  beginInitialize(logger = DefaultNoopLogger) {
+    this.metadataCache.reset();
+    this.serverRefreshes = {};
+    this.logger = buildLoggerAllMethods(logger);
+    this.state = new ServiceStateTracker(this.serviceName, this.logger);
+    this.state.set(SERVICE_STATE.REFRESHING);
+  }
+  /**
+   * Download and cache from each server. A server is only registered for refreshes once data from
+   * it has been cached. One that can't be reached, or that doesn't respond with data, is skipped
+   * so it can't cause lookups of other metadata to fail.
+   *
+   * Returns the number of servers entries were cached from.
+   */
+  async initializeServers(mdsServers) {
+    let numServers = 0;
+    for (const url2 of mdsServers ?? []) {
+      try {
+        const entriesAdded = await this.downloadAndCache(url2, 0);
+        if (entriesAdded !== void 0) {
+          numServers += 1;
+          this.logger.debug(`Cached ${entriesAdded} metadata entries from "${url2}"`);
+        }
+      } catch (err) {
+        this.logger.error(`Could not download data from "${url2}":`, err);
+      }
+    }
+    return numServers;
+  }
+  /**
+   * Log how much was cached and report the service as ready. Call this at the end of
+   * `initialize()`.
+   */
+  finishInitialize(numLocalFiles, numServers) {
+    const cacheMessage = getInitCacheMessage(this.serviceName, this.metadataCache.count, numLocalFiles, numServers);
+    this.logger.info(cacheMessage);
+    this.state.set(SERVICE_STATE.READY);
+  }
+  /**
+   * Request data from a server, with a query param that can short-circuit the download if the
+   * latest version is already cached. `no` is the serial number of the last data cached from this
+   * server.
+   *
+   * Returns `undefined` if the server responded with anything other than data, in which case the
+   * next refresh will have been delayed.
+   *
+   * See https://fidoalliance.org/specs/mds/fido-metadata-service-v3.1-ps-20250521.html#sctn-mds-blob-proc-rules
+   */
+  async fetchFromServer(url2, no) {
+    const _url2 = new URL(url2);
+    _url2.searchParams.set("localCopySerial", String(no));
+    const resp = await fetch2(_url2.toString(), {
+      signal: AbortSignal.timeout(this.downloadTimeoutMS)
+    });
+    if (resp.status === 304) {
+      await resp.body?.cancel();
+      this.logger.info(`The MDS server at "${_url2.toString()}" reported nothing new to download (HTTP 304)`);
+      this.delayNextRefresh(url2, this.defaultRefreshDelayHours);
+      return;
+    }
+    if (resp.status === 429) {
+      await resp.body?.cancel();
+      this.logger.warn(`The MDS server at "${_url2.toString()}" rate-limited this request (HTTP 429)`);
+      this.delayNextRefresh(url2, this.defaultRetryDelayHours);
+      return;
+    }
+    if (!resp.ok) {
+      await resp.body?.cancel();
+      this.logger.warn(`The MDS server at "${_url2.toString()}" reported an unsuccessful request (HTTP ${resp.status})`);
+      this.delayNextRefresh(url2, this.defaultRetryDelayHours);
+      return;
+    }
+    return resp;
+  }
+  /**
+   * Refresh every server whose `nextUpdate` has passed
+   */
+  async refreshStaleServers() {
+    const now = /* @__PURE__ */ new Date();
+    const staleURLs = this.metadataCache.getStaleMDSServerURLs(now);
+    await Promise.all(staleURLs.map((url2) => this.refreshServer(url2)));
+  }
+  refreshServer(url2) {
+    const inFlight = this.serverRefreshes[url2];
+    if (inFlight) {
+      return inFlight;
+    }
+    this.state.set(SERVICE_STATE.REFRESHING);
+    const refresh = (async () => {
+      try {
+        const mdsNo = this.metadataCache.getMDSServerDataVersion(url2);
+        await this.downloadAndCache(url2, mdsNo);
+      } catch (err) {
+        this.logger.error(`Could not download data from "${url2}":`, err);
+        this.handleRefreshFailure(url2, err);
+      } finally {
+        delete this.serverRefreshes[url2];
+        if (Object.keys(this.serverRefreshes).length === 0) {
+          this.state.set(SERVICE_STATE.READY);
+        }
+      }
+    })();
+    this.serverRefreshes[url2] = refresh;
+    return refresh;
+  }
+  /**
+   * Delay the next refresh attempt of this server by the specified number of hours
+   */
+  delayNextRefresh(url2, numHours) {
+    if (!this.metadataCache.mdsServerIsRegistered(url2)) {
+      return;
+    }
+    this.logger.debug(`Delaying next refresh of "${url2}" by ${numHours} hours`);
+    const numHoursMS = 1e3 * 60 * 60 * numHours;
+    this.metadataCache.setMDSServerNextUpdate(url2, new Date(Date.now() + numHoursMS));
+  }
+};
+
+// node_modules/@simplewebauthn/server/esm/services/metadataService.js
+var defaultURLMDS = "https://mds.fidoalliance.org/";
+var BaseMetadataService = class extends BaseMDSService {
+  constructor() {
+    super("MetadataService");
+    Object.defineProperty(this, "verificationMode", {
+      enumerable: true,
+      configurable: true,
+      writable: true,
+      value: "strict"
+    });
   }
   async initialize(opts = {}) {
-    this.statementCache = {};
-    const { mdsServers = [defaultURLMDS], statements, verificationMode, logger = DefaultNoopLogger } = opts;
-    this.logger = buildLoggerAllMethods(logger);
-    this.setState(SERVICE_STATE.REFRESHING);
+    const { mdsServers = [defaultURLMDS], statements, verificationMode, logger } = opts;
+    this.beginInitialize(logger);
     if (statements?.length) {
       let statementsAdded = 0;
       statements.forEach((statement) => {
-        if (statement.aaguid) {
-          this.statementCache[statement.aaguid] = {
-            entry: {
-              metadataStatement: statement,
-              statusReports: [],
-              timeOfLastStatusChange: "1970-01-01"
-            },
-            url: NonRefreshingMDS.url
-          };
-          statementsAdded += 1;
-        }
+        statementsAdded += this.cacheMetadataBlobEntry(NonRefreshingURL, {
+          aaguid: statement.aaguid,
+          metadataStatement: statement,
+          statusReports: [],
+          timeOfLastStatusChange: "1970-01-01"
+        });
       });
-      this.logger.info(`Cached ${statementsAdded} local statements`);
+      this.logger.info(`Cached ${statementsAdded} total local metadata statements`);
     }
-    if (mdsServers?.length) {
-      const currentCacheCount = Object.keys(this.statementCache).length;
-      let numServers = mdsServers.length;
-      for (const url2 of mdsServers) {
-        try {
-          const cachedMDS = {
-            url: url2,
-            no: 0,
-            nextUpdate: /* @__PURE__ */ new Date(0)
-          };
-          const blob = await this.downloadBlob(cachedMDS);
-          await this.verifyBlob(blob, cachedMDS);
-        } catch (err) {
-          this.logger.error(`Could not download BLOB from ${url2}:`, err);
-          numServers -= 1;
-        }
-      }
-      const newCacheCount = Object.keys(this.statementCache).length;
-      const cacheDiff = newCacheCount - currentCacheCount;
-      this.logger.info(`Cached ${cacheDiff} statements from ${numServers} metadata server(s)`);
-    }
-    if (verificationMode) {
-      this.verificationMode = verificationMode;
-    }
-    this.setState(SERVICE_STATE.READY);
+    const numServers = await this.initializeServers(mdsServers);
+    this.verificationMode = verificationMode ?? "strict";
+    this.finishInitialize(statements?.length, numServers);
   }
   async getStatement(aaguid) {
-    if (this.state === SERVICE_STATE.DISABLED) {
+    if (this.state.current === SERVICE_STATE.DISABLED) {
       return;
     }
     if (!aaguid) {
@@ -41725,28 +42053,15 @@ var BaseMetadataService = class {
     if (aaguid instanceof Uint8Array) {
       aaguid = convertAAGUIDToString(aaguid);
     }
-    await this.pauseUntilReady();
-    const cachedStatement = this.statementCache[aaguid];
-    if (!cachedStatement) {
+    await this.state.pauseUntilReady();
+    await this.refreshStaleServers();
+    const entry = this.metadataCache.getMetadata(aaguid);
+    if (!entry) {
       if (this.verificationMode === "strict") {
         throw new Error(`No metadata statement found for aaguid "${aaguid}"`);
       }
       return;
     }
-    if (cachedStatement.url) {
-      const mds = this.mdsCache[cachedStatement.url];
-      const now = /* @__PURE__ */ new Date();
-      if (now > mds.nextUpdate) {
-        try {
-          this.setState(SERVICE_STATE.REFRESHING);
-          const blob = await this.downloadBlob(mds);
-          await this.verifyBlob(blob, mds);
-        } finally {
-          this.setState(SERVICE_STATE.READY);
-        }
-      }
-    }
-    const { entry } = cachedStatement;
     for (const report of entry.statusReports) {
       const { status } = report;
       if (status === "USER_VERIFICATION_BYPASS" || status === "ATTESTATION_KEY_COMPROMISE" || status === "USER_KEY_REMOTE_COMPROMISE" || status === "USER_KEY_PHYSICAL_COMPROMISE") {
@@ -41755,88 +42070,177 @@ var BaseMetadataService = class {
     }
     return entry.metadataStatement;
   }
-  /**
-   * Download and process the latest BLOB from MDS
-   */
-  async downloadBlob(cachedMDS) {
-    const { url: url2 } = cachedMDS;
-    const resp = await fetch2(url2);
-    const data = await resp.text();
-    return data;
+  async getProviderMetadata(aaguid) {
+    if (!aaguid) {
+      return;
+    }
+    const metadataStatement = await this.getStatement(aaguid);
+    if (!metadataStatement) {
+      return;
+    }
+    return {
+      friendlyNames: metadataStatement.friendlyNames,
+      icon: metadataStatement.icon,
+      iconDark: metadataStatement.iconDark,
+      providerLogoDark: metadataStatement.providerLogoDark,
+      providerLogoLight: metadataStatement.providerLogoLight
+    };
   }
   /**
-   * Verify and process the MDS metadata blob
+   * Download the latest BLOB from MDS, verify it, and cache its entries
    */
-  async verifyBlob(blob, cachedMDS) {
-    const { url: url2, no } = cachedMDS;
+  async downloadAndCache(url2, no) {
+    const resp = await this.fetchFromServer(url2, no);
+    if (!resp) {
+      return;
+    }
+    const blob = await resp.text();
+    return this.verifyBlob(blob, url2, no);
+  }
+  /**
+   * Refresh failures are rethrown so that lookups fail closed: until the refresh succeeds the
+   * server stays stale, every lookup tries again, and none of them are answered with statements
+   * from the BLOB that was previously cached.
+   */
+  handleRefreshFailure(_url2, err) {
+    throw err;
+  }
+  /**
+   * Verify and process the MDS metadata blob. Caches metadata and sets up refreshing when blobs
+   * grow stale. `no` is the serial number of the last BLOB cached from this server.
+   *
+   * Returns the number of FIDO2 metadata statements that were cached.
+   */
+  async verifyBlob(blob, url2, no) {
     const { payload, parsedNextUpdate } = await verifyMDSBlob(blob);
     if (payload.no <= no) {
       throw new Error(`Latest BLOB no. ${payload.no} is not greater than previous no. ${no}`);
     }
+    this.metadataCache.clearMetadataByURL(url2);
+    let totalEntries = 0;
     for (const entry of payload.entries) {
-      if (entry.aaguid) {
-        this.statementCache[entry.aaguid] = { entry, url: url2 };
-      }
+      totalEntries += this.cacheMetadataBlobEntry(url2, entry);
     }
-    if (url2) {
-      this.mdsCache[url2] = {
-        ...cachedMDS,
+    if (url2 !== NonRefreshingURL) {
+      this.metadataCache.registerMDSServer(
+        url2,
         // Store the payload `no` to make sure we're getting the next BLOB in the sequence
-        no: payload.no,
+        payload.no,
         // Remember when we need to refresh this blob
-        nextUpdate: parsedNextUpdate
-      };
+        parsedNextUpdate
+      );
     } else {
       if (parsedNextUpdate < /* @__PURE__ */ new Date()) {
         this.logger.warn(`\u26A0\uFE0F This MDS blob (serial: ${payload.no}) contains stale data as of ${parsedNextUpdate.toISOString()}. Please consider re-initializing MetadataService with a newer MDS blob.`);
       }
     }
+    return totalEntries;
   }
   /**
-   * A helper method to pause execution until the service is ready
+   * A central place to contain logic and side effects of caching a BLOB entry. Only caches FIDO2
+   * statements (i.e. ones with `aaguid` as UAF authenticators won't have one.) Returns `1` if the
+   * statement was cached, or `0` if it wasn't (so you can `count += cacheMetadataBlobEntry(...)`)
    */
-  pauseUntilReady() {
-    if (this.state === SERVICE_STATE.READY) {
-      return new Promise((resolve) => {
-        resolve();
-      });
+  cacheMetadataBlobEntry(url2, entry) {
+    if (!entry.aaguid) {
+      return 0;
     }
-    const readyPromise = new Promise((resolve, reject) => {
-      const totalTimeoutMS = 7e4;
-      const intervalMS = 100;
-      let iterations = totalTimeoutMS / intervalMS;
-      const intervalID = globalThis.setInterval(() => {
-        if (iterations < 1) {
-          clearInterval(intervalID);
-          reject(`State did not become ready in ${totalTimeoutMS / 1e3} seconds`);
-        } else if (this.state === SERVICE_STATE.READY) {
-          clearInterval(intervalID);
-          resolve();
-        }
-        iterations -= 1;
-      }, intervalMS);
-    });
-    return readyPromise;
-  }
-  /**
-   * Report service status on change
-   */
-  setState(newState) {
-    this.state = newState;
-    if (newState === SERVICE_STATE.DISABLED) {
-      this.logger.debug("MetadataService is DISABLED");
-    } else if (newState === SERVICE_STATE.REFRESHING) {
-      this.logger.debug("MetadataService is REFRESHING");
-    } else if (newState === SERVICE_STATE.READY) {
-      this.logger.debug("MetadataService is READY");
-    }
+    this.metadataCache.cacheMetadata(entry.aaguid, entry, url2);
+    return 1;
   }
 };
 var MetadataService = new BaseMetadataService();
 
+// node_modules/@simplewebauthn/server/esm/services/convenienceMetadataService.js
+var defaultURLConvenienceMDS = "https://c-mds.fidoalliance.org/";
+var BaseConvenienceMetadataService = class extends BaseMDSService {
+  constructor() {
+    super("ConvenienceMetadataService");
+  }
+  async initialize(opts = {}) {
+    const { mdsServers = [defaultURLConvenienceMDS], payloads, logger } = opts;
+    this.beginInitialize(logger);
+    if (payloads?.length) {
+      let entriesAdded = 0;
+      payloads.forEach((payload) => {
+        entriesAdded += this.cacheConvenienceMDS(NonRefreshingURL, payload);
+      });
+      this.logger.debug(`Cached ${entriesAdded} total local metadata entries`);
+    }
+    const numServers = await this.initializeServers(mdsServers);
+    this.finishInitialize(payloads?.length, numServers);
+  }
+  /**
+   * Download the convenience metadata, which is surprisingly just a JSON document, and cache it
+   */
+  async downloadAndCache(url2, no) {
+    const resp = await this.fetchFromServer(url2, no);
+    if (!resp) {
+      return;
+    }
+    const payload = await resp.json();
+    return this.cacheConvenienceMDS(url2, payload);
+  }
+  /**
+   * Refresh failures cause that server's refresh to be re-attempted at a later date
+   */
+  handleRefreshFailure(url2) {
+    this.delayNextRefresh(url2, this.defaultRetryDelayHours);
+  }
+  /**
+   * Cache the AAGUID-keyed entries in a Convenience MDS payload. Returns the number of entries
+   * cached (so you can `count += cacheConvenienceMDS(...)`)
+   */
+  cacheConvenienceMDS(url2, payload) {
+    let entriesAdded = 0;
+    this.metadataCache.clearMetadataByURL(url2);
+    Object.keys(payload).forEach((aaguid) => {
+      if (aaguid === "no") {
+        return;
+      }
+      this.metadataCache.cacheMetadata(aaguid, payload[aaguid], url2);
+      entriesAdded += 1;
+    });
+    this.metadataCache.registerMDSServer(
+      url2,
+      payload.no,
+      // Convenience MDS returns no nextUpdate, so pick a time in the future
+      new Date(Date.now() + 1e3 * 60 * 60 * this.defaultRefreshDelayHours)
+    );
+    return entriesAdded;
+  }
+  /**
+   * Get a collection of metadata about a credential manager, including localized name(s) and
+   * light and dark iconography when available. Returns `undefined` if no such metadata has been
+   * registered with a Convenience MDS.
+   */
+  async getProviderMetadata(aaguid) {
+    if (this.state.current === SERVICE_STATE.DISABLED) {
+      return;
+    }
+    await this.state.pauseUntilReady();
+    await this.refreshStaleServers();
+    const cachedMetadata = this.metadataCache.getMetadata(aaguid);
+    return cachedMetadata;
+  }
+};
+var ConvenienceMetadataService = new BaseConvenienceMetadataService();
+
+// node_modules/@simplewebauthn/server/esm/helpers/validateExtFIDOGenCEAAGUID.js
+var import_asn1_schema4 = __toESM(require_cjs2(), 1);
+
 // node_modules/@simplewebauthn/server/esm/registration/verifications/tpm/verifyAttestationTPM.js
 var import_asn1_schema5 = __toESM(require_cjs2(), 1);
 var import_asn1_x5093 = __toESM(require_cjs3(), 1);
+
+// node_modules/@simplewebauthn/server/esm/registration/verifications/tpm/constants.js
+var TPM_ECC_CURVE_COSE_CRV_MAP = {
+  TPM_ECC_NIST_P256: COSECRV.P256,
+  TPM_ECC_NIST_P384: COSECRV.P384,
+  TPM_ECC_NIST_P521: COSECRV.P521,
+  TPM_ECC_BN_P256: COSECRV.P256,
+  TPM_ECC_SM2_P256: COSECRV.P256
+};
 
 // node_modules/@simplewebauthn/server/esm/registration/verifications/verifyAttestationAndroidKey.js
 var import_asn1_schema6 = __toESM(require_cjs2(), 1);
@@ -41846,6 +42250,45 @@ var import_asn1_android = __toESM(require_cjs15(), 1);
 // node_modules/@simplewebauthn/server/esm/registration/verifications/verifyAttestationApple.js
 var import_asn1_schema7 = __toESM(require_cjs2(), 1);
 var import_asn1_x5095 = __toESM(require_cjs3(), 1);
+
+// node_modules/@simplewebauthn/server/esm/helpers/assertValidExpectedOrigin.js
+function assertValidExpectedOrigin(origin) {
+  if (!origin.startsWith("https://")) {
+    return;
+  }
+  if (origin.endsWith("/")) {
+    throw new SimpleWebAuthnError({
+      message: `"${origin}" is not a valid expected origin. Remove the trailing "/" and try again`,
+      code: "BAD_ARGUMENT"
+    });
+  }
+  const asciiOrigin = new URL(origin).origin;
+  if (asciiOrigin !== origin) {
+    throw new SimpleWebAuthnError({
+      message: `"${origin}" is not a valid expected origin. Replace it with its ASCII punycode representation "${asciiOrigin}" and try again`,
+      code: "BAD_ARGUMENT"
+    });
+  }
+}
+
+// node_modules/@simplewebauthn/server/esm/helpers/matchExpectedOrigin.js
+function matchExpectedOrigin(origin, expectedOrigin) {
+  let _expectedOrigins = [];
+  if (typeof expectedOrigin === "string") {
+    _expectedOrigins = [expectedOrigin];
+  } else {
+    _expectedOrigins = expectedOrigin;
+  }
+  for (const _origin of _expectedOrigins) {
+    assertValidExpectedOrigin(_origin);
+  }
+  if (!_expectedOrigins.includes(origin)) {
+    throw new SimpleWebAuthnError({
+      message: `Unexpected response origin "${origin}", expected one of: ${_expectedOrigins.join(", ")}`,
+      code: "UNEXPECTED_ORIGIN"
+    });
+  }
+}
 
 // node_modules/@simplewebauthn/server/esm/authentication/verifyAuthenticationResponse.js
 async function verifyAuthenticationResponse(options) {
@@ -41908,16 +42351,7 @@ async function verifyAuthenticationResponse(options) {
       throw new Error(`Unexpected top origin of "${topOrigin}" within a non-cross-origin authentication response. This error should be reported to the browser vendor as a WebAuthn specification violation with a link to https://w3c.github.io/webauthn/#dom-collectedclientdata-toporigin`);
     }
   }
-  if (Array.isArray(expectedOrigin)) {
-    if (!expectedOrigin.includes(origin)) {
-      const joinedExpectedOrigin = expectedOrigin.join(", ");
-      throw new Error(`Unexpected authentication response origin "${origin}", expected one of: ${joinedExpectedOrigin}`);
-    }
-  } else {
-    if (origin !== expectedOrigin) {
-      throw new Error(`Unexpected authentication response origin "${origin}", expected "${expectedOrigin}"`);
-    }
-  }
+  matchExpectedOrigin(origin, expectedOrigin);
   if (!isoBase64URL_exports.isBase64URL(assertionResponse.authenticatorData)) {
     throw new Error("Credential response authenticatorData was not a base64url string");
   }
@@ -42492,6 +42926,7 @@ var ArchiveChainError = class extends Error {
     this.code = code;
     this.name = "ArchiveChainError";
   }
+  code;
 };
 var height = external_exports.number().int().min(0).max(2147483646);
 var hash3 = digestSchema;
