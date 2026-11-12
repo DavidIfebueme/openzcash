@@ -1,6 +1,5 @@
 import Link from "next/link";
 import QRCode from "qrcode";
-import { IconBook } from "@/components/icons";
 import { CommunityCredit } from "@/components/community-credit";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 import { COMMUNITY_DISCUSSION, TREASURY_PATH, treasuryCopy } from "@/lib/openzcash-treasury/content";
@@ -46,11 +45,6 @@ export default async function OpenZcashTreasury() {
     </div>
 
     <div className={styles.nextSteps}>
-      <Link className={styles.letterCard} href={`${TREASURY_PATH}/letter`}>
-        <IconBook />
-        <div><span>{t.letter}</span><h2>{t.letterTeaser}</h2></div>
-        <span className={styles.arrow}><ArrowIcon /></span>
-      </Link>
       <section className={styles.join} aria-labelledby="join-title">
         <h2 id="join-title">{t.join}</h2>
         <div className={styles.joinActions}>
