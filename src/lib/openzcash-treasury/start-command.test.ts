@@ -39,14 +39,22 @@ const NODE_STANDIN = `#!/bin/sh
 echo "node $*" >> "$LOGF"
 case "$*" in
   *migrate.mjs*) [ "$SCEN" = migrate-fails ] && exit 3 ;;
-  *treasury-runtime.ts*) sleep 0.4; echo "runtime-still-running" >> "$LOGF" ;;
+  *treasury-runtime.ts*)
+    # Stays alive until the site has started, so the order never depends on how fast the machine is.
+    # If the command ran this in the foreground, the site would never start and this gives up.
+    tries=0
+    while [ ! -e "$LOGF.site-started" ] && [ "$tries" -lt 300 ]; do sleep 0.05; tries=$((tries + 1)); done
+    if [ -e "$LOGF.site-started" ]; then echo "runtime-saw-the-site-start" >> "$LOGF"; else echo "runtime-never-saw-the-site" >> "$LOGF"; fi ;;
 esac
 exit 0
 `;
 const NPM_STANDIN = `#!/bin/sh
 echo "npm $* pid=$$" >> "$LOGF"
+: > "$LOGF.site-started"
 exit 7
 `;
+// Each case starts several processes; a busy machine can take seconds to start one.
+const SLOW = 120_000;
 
 async function run(env: Record<string, string>) {
   const dir = await mkdtemp(path.join(os.tmpdir(), "start-command-test-"));
@@ -100,23 +108,27 @@ describe("the production start command", () => {
       ]);
       expect(result.code).toBe(7);
     }
-  });
+  }, SLOW);
 
   it("starts the runtime in the background, without holding the site back, when it is enabled", async () => {
     const result = await run({ OPENZCASH_TREASURY_RUNTIME: "enabled" });
     expect(result.code).toBe(7);
     await expect
-      .poll(async () => (await result.log()).at(-1), { timeout: 5_000 })
-      .toBe("runtime-still-running");
+      .poll(
+        async () =>
+          (await result.log()).filter((line) => line.startsWith("runtime-")),
+        { timeout: 90_000 },
+      )
+      .toEqual(["runtime-saw-the-site-start"]);
     const lines = await result.log();
     expect(lines.slice(0, 3)).toEqual(BEFORE_START);
     expect(lines).toContain("node --import tsx scripts/treasury-runtime.ts");
-    expect(lines).toContain(`npm run start pid=${result.pid}`);
-    // The site was already up, and gone, while the runtime was still going.
+    // The site started, as the shell's own process, while the runtime was still running.
+    expect(lines.indexOf(`npm run start pid=${result.pid}`)).toBeGreaterThan(2);
     expect(lines.indexOf(`npm run start pid=${result.pid}`)).toBeLessThan(
-      lines.indexOf("runtime-still-running"),
+      lines.indexOf("runtime-saw-the-site-start"),
     );
-  });
+  }, SLOW);
 
   it("starts nothing when a step before the site fails", async () => {
     const result = await run({
@@ -125,5 +137,5 @@ describe("the production start command", () => {
     });
     expect(result.code).toBe(3);
     expect(await result.log()).toEqual(BEFORE_START.slice(0, 2));
-  });
+  }, SLOW);
 });

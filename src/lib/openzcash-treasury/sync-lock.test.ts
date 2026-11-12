@@ -28,6 +28,8 @@ import {
 const MINUTE = 60_000;
 const T0 = Date.parse("2026-11-12T12:00:00.000Z");
 const HOST = "treasury-host";
+// For the tests that start processes or run many filesystem rounds: a busy machine can be many times slower.
+const SLOW = 120_000;
 const dirs: string[] = [];
 afterEach(async () => {
   await Promise.all(
@@ -379,7 +381,7 @@ describe("acquireTreasuryLock", () => {
       expect(await readdir(path.dirname(lockPath))).toEqual(["sync.lock"]);
       await holders[0].release();
     }
-  });
+  }, SLOW);
 
   it("refuses while another worker is recovering the abandoned lock, and touches neither file", async () => {
     const lockPath = await location();
@@ -425,7 +427,7 @@ describe("acquireTreasuryLock", () => {
     await expect(acquireTreasuryLock(lockPath)).rejects.toBeInstanceOf(
       TreasuryLockHeldError,
     );
-  });
+  }, SLOW);
 });
 
 describe("removeLockIfUnchanged", () => {
