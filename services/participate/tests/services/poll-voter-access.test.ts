@@ -82,7 +82,7 @@ describe("poll voter access service", () => {
       pollId: "poll_1",
       poll: { communityId: "community_1" },
       nick: "michae2xl",
-      email: "michaelguima@proton.me",
+      email: "voter@example.test",
       passwordHash: issuedUpdateArgs.data.passwordHash,
       status: "ACTIVE",
       expiresAt: new Date(Date.now() + 60_000)
@@ -122,7 +122,7 @@ describe("poll voter access service", () => {
       pollId: "poll_1",
       poll: { communityId: "community_1" },
       nick: "michae2xl",
-      email: "michaelguima@proton.me",
+      email: "voter@example.test",
       passwordHash: issuedUpdateArgs.data.passwordHash,
       status: "ACTIVE",
       expiresAt: new Date(Date.now() - 1_000)
@@ -141,7 +141,7 @@ describe("poll voter access service", () => {
       pollId: "poll_1",
       poll: { communityId: "community_1" },
       nick: "michae2xl",
-      email: "michaelguima@proton.me",
+      email: "voter@example.test",
       passwordHash: issuedUpdateArgs.data.passwordHash,
       status: "REVOKED",
       expiresAt: new Date(Date.now() + 60_000)
