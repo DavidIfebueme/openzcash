@@ -38,8 +38,12 @@ export function cycleDeadline(cycle: AnnouncedCycle = ACTIVE_CYCLE) {
   return new Intl.DateTimeFormat("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "UTC" }).format(new Date(cycle.submissionsClose)) + " UTC";
 }
 
-export function cyclePhase(cycle: AnnouncedCycle = ACTIVE_CYCLE, now = Date.now()): { label: string; step: number; beforeVoting: boolean } {
-  const phase = (label: string, step: number) => ({ label, step, beforeVoting: now < Date.parse(cycle.voteOpen) });
+/** `step` is the window that is open now (-1 between windows); `passed` counts the windows whose announced end is behind us. */
+export type CyclePhase = { label: string; step: number; passed: number; beforeVoting: boolean };
+
+export function cyclePhase(cycle: AnnouncedCycle = ACTIVE_CYCLE, now = Date.now()): CyclePhase {
+  const passed = cycleWindows(cycle).filter((w) => now > Date.parse(w.end)).length;
+  const phase = (label: string, step: number) => ({ label, step, passed, beforeVoting: now < Date.parse(cycle.voteOpen) });
   if (now < Date.parse(cycle.submissionsOpen)) return phase("Upcoming round", -1);
   if (now <= Date.parse(cycle.submissionsClose)) return phase("Accepting proposals", 0);
   if (now < Date.parse(cycle.reviewOpen)) return phase("Submissions closed", -1);
@@ -50,6 +54,21 @@ export function cyclePhase(cycle: AnnouncedCycle = ACTIVE_CYCLE, now = Date.now(
   }
   if (now <= Date.parse(cycle.voteClose)) return phase("Scheduled voting period", 2);
   return phase("Awaiting published results", -1);
+}
+
+function cycleDay(value: string) {
+  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(new Date(value));
+}
+
+/** One sentence on where the round stands. Between windows it names the one that closed and the next to open; after the vote it infers nothing. */
+export function cycleNote(cycle: AnnouncedCycle = ACTIVE_CYCLE, now = Date.now()) {
+  const { step, passed } = cyclePhase(cycle, now);
+  if (step === 0) return "Submissions are open for the next coinholder vote.";
+  if (step === 1) return "Community review is underway before the vote.";
+  if (step === 2) return "The scheduled voting window is here. Follow FPF for voting instructions.";
+  if (passed === 1) return `Submissions are closed. Community review opens ${cycleDay(cycle.reviewOpen)}.`;
+  if (passed === 2) return `Community review is closed. Voting is scheduled to open ${cycleDay(cycle.voteOpen)}.`;
+  return "Follow the announced schedule and published updates for this round.";
 }
 
 /** Historical links always carry an id, so a new default cycle cannot change their meaning. */

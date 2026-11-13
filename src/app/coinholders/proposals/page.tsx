@@ -1,7 +1,7 @@
 import { pageMetadata } from "@/lib/seo/page-metadata";
 import { readQ4 } from "@/lib/coinholder/q4-server";
 import { Q4, READY_FOR_VOTE_LABEL, q4Phase, q4Summary, q4Timestamp, q4Totals, q4Usd } from "@/lib/coinholder/q4";
-import { CycleBrand, CycleCard, CycleTimeline } from "../cycle-view";
+import { CycleCard, CycleIntro, CycleScene, CycleTimeline } from "../cycle-view";
 import { SourceRefresh } from "@/components/source-refresh";
 import { Proposals } from "./proposals";
 import { SourceStatus } from "./source-status";
@@ -28,7 +28,8 @@ export default async function ProposalsPage() {
 
       <CycleCard labelledBy="current-round">
         <div className={styles.roundHead}>
-          <CycleBrand id="current-round" />
+          <CycleIntro id="current-round" />
+          <CycleScene />
           <dl className={styles.metrics}>
             <div>
               <dt>Proposals</dt>
