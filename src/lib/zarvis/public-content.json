@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "b5ac9a28ac651f44",
+  "sourceRevision": "7e9726a337518f54",
   "sourceFiles": 73,
   "documents": [
     {
@@ -277,13 +277,7 @@
       "id": "src/app/nsm/page.tsx:0",
       "url": "https://openzcash.org/nsm",
       "title": "nsm",
-      "text": "NSM · sustainability balance · OpenZcash\nNSM\nnumeric\nZIP\n↗\nBlock subsidy\nZCG · 8%\nLockbox · 12%\nMiner · 80%\nTransaction fees\nMiner\nBlock time\nBlocks a day\nZCG and Lockbox end\nNSM reissuance\nNSM · sustainability balance\nThe Network Sustainability Mechanism takes ZEC out of circulation and returns it later through block subsidies. Since NU7, 60% of every block's transaction fees goes in. It is a balance kept by consensus: no address, no key, no committee.\nHow it works\nIn · 60% of the fees\nSince NU7\nEach block removes 6/10 of its transaction fees from circulation, rounded down. The miner keeps the rest. Active from block\n, mined November 6, 2026.\nHeld · by consensus\nNo key\nNot a wallet and not a value pool: nodes track the amount, it is left out of issued supply, and nothing can spend it. It started at\nZEC, the subsidy and fees that coinbase transactions left unclaimed before NU6.\nOut · through the subsidy\nBlock\nFrom that block on, every block adds 1375 / 10¹⁰ of the balance to its scheduled subsidy, rounded up: about half the balance each halving period.\n·\nNot deployed:\n, a transaction field for voluntary removals, is a draft and was left out of NU7.\n, issuance smoothing, was replaced by ZIP 237, which keeps the halvings.\nEach block, before and after NU7\nSame shares, a third per block, three times as often\nZEC per block\nBefore NU7\nPer day\nSchedule\nSource:\nZIP 214 ↗\nLockbox"
-    },
-    {
-      "id": "src/app/nsm/page.tsx:1",
-      "url": "https://openzcash.org/nsm",
-      "title": "nsm",
-      "text": "Funding history\n· No viewing keys"
+      "text": "NSM · sustainability balance · OpenZcash\nNSM\nnumeric\nZIP\n↗\nBlock subsidy\nZCG · 8%\nLockbox · 12%\nMiner · 80%\nTransaction fees\nMiner\nBlock time\nBlocks a day\nZCG and Lockbox end\nNSM reissuance\nNSM · sustainability balance\nThe Network Sustainability Mechanism takes ZEC out of circulation and returns it later through block subsidies. Since NU7, 60% of every block's transaction fees goes in. The balance is kept by consensus and followed here block by block.\nHow it works\nIn · 60% of the fees\nSince NU7\nEach block removes 6/10 of its transaction fees from circulation, rounded down. The miner keeps the rest. Active from block\n, mined November 6, 2026.\nHeld · by consensus\nConsensus state\nNodes track the amount as part of consensus and leave it out of issued supply. It started at\nZEC, the subsidy and fees that coinbase transactions left unclaimed before NU6.\nOut · through the subsidy\nBlock\nFrom that block on, every block adds 1375 / 10¹⁰ of the balance to its scheduled subsidy, rounded up: about half the balance each halving period.\n·\nNot deployed:\n, a transaction field for voluntary removals, is a draft and was left out of NU7.\n, issuance smoothing, was replaced by ZIP 237, which keeps the halvings.\nEach block, before and after NU7\nSame shares, a third per block, three times as often\nZEC per block\nBefore NU7\nPer day\nSchedule\nSource:\nZIP 214 ↗\nLockbox\nFunding history\n· No viewing keys"
     },
     {
       "id": "src/app/zf/page.tsx:0",

@@ -1,6 +1,6 @@
 # NSM balance
 
-`/nsm` shows the Network Sustainability Mechanism as NU7 deployed it on mainnet (block 3,543,405, 2026-11-06): the ZEC consensus holds out of circulation, what feeds it and when it starts coming back. The same balance is the third pool of the treasury bar at the bottom of every page, beside ZCG operating and Lockbox · Coinholder. It is not a wallet: no address, key or committee controls it.
+`/nsm` shows the Network Sustainability Mechanism as NU7 deployed it on mainnet (block 3,543,405, 2026-11-06): the ZEC consensus holds out of circulation, what feeds it and when it starts coming back. The same balance is the third pool of the treasury bar at the bottom of every page, beside ZCG operating and Lockbox · Coinholder. The balance is kept by consensus.
 
 ## Rules
 

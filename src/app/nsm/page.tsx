@@ -171,7 +171,7 @@ export default async function NsmPage() {
     <>
       <PageHeader
         title="NSM · sustainability balance"
-        subtitle="The Network Sustainability Mechanism takes ZEC out of circulation and returns it later through block subsidies. Since NU7, 60% of every block's transaction fees goes in. It is a balance kept by consensus: no address, no key, no committee."
+        subtitle="The Network Sustainability Mechanism takes ZEC out of circulation and returns it later through block subsidies. Since NU7, 60% of every block's transaction fees goes in. The balance is kept by consensus and followed here block by block."
       />
 
       <NsmLiveFeed
@@ -204,11 +204,11 @@ export default async function NsmPage() {
             <p className="text-sm font-semibold text-stone-900">
               Held · by consensus
             </p>
-            <Badge tone="zinc">No key</Badge>
+            <Badge tone="zinc">Consensus state</Badge>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-stone-600">
-            Not a wallet and not a value pool: nodes track the amount, it is
-            left out of issued supply, and nothing can spend it. It started at{" "}
+            Nodes track the amount as part of consensus and leave it out of
+            issued supply. It started at{" "}
             {zec(NSM.initialBalanceZat / ZAT_PER_ZEC)} ZEC, the subsidy and fees
             that coinbase transactions left unclaimed before NU6.
           </p>

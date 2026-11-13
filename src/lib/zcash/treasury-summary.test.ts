@@ -295,6 +295,13 @@ describe("getTreasurySummary · the NSM balance beside the treasuries", () => {
     expect(t?.height).toBe("3,569,402");
   });
 
+  it("keeps two decimals when the second one is zero, like the pool beside it", async () => {
+    nsm.mockResolvedValue({ ...reading, balanceZat: 37_780_123_456 });
+    expect((await getTreasurySummary())?.nsm?.zec).toBe("377.80");
+    nsm.mockResolvedValue({ ...reading, balanceZat: 37_800_000_000 });
+    expect((await getTreasurySummary())?.nsm?.zec).toBe("378");
+  });
+
   it("says so in the tooltip when the node's reading is stale", async () => {
     nsm.mockResolvedValue({ ...reading, stale: true });
     const t = await getTreasurySummary();

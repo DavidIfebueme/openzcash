@@ -11,7 +11,7 @@ import { cached } from "@/lib/cache/memo";
  * The pools the shell's treasury bar shows, valued at the live price: the two
  * the ZCG spreadsheet tracks (the operating Coinbase balance and the ZIP-1016
  * Lockbox / Coinholder pool) and the NSM value balance consensus holds out of
- * circulation since NU7 (ZIP 237), which no key controls. One cached
+ * circulation since NU7 (ZIP 237). One cached
  * projection, so every page shows the same figures.
  */
 export type TreasuryPool = {
@@ -133,12 +133,17 @@ export function sheetFreshnessNote(
 }
 
 /**
- * A pool's ZEC as the bar shows it: at most two decimals. Since NU7 the
- * Lockbox accrues 0.06249999 ZEC a block, so the full figure has eight; that
- * one stays in the tooltip (`exact`).
+ * A pool's ZEC as the bar shows it: two decimals, or none for a whole number
+ * of ZEC, so neighbouring pools read alike. Since NU7 the Lockbox accrues
+ * 0.06249999 ZEC a block, so the full figure has eight decimals; that one
+ * stays in the tooltip (`exact`).
  */
+const ZAT_PER_ZEC = 100_000_000n;
 const barZec = (zat: bigint): string =>
-  (Number(zat) / 1e8).toLocaleString("en-US", { maximumFractionDigits: 2 });
+  (Number(zat) / 1e8).toLocaleString("en-US", {
+    minimumFractionDigits: zat % ZAT_PER_ZEC === 0n ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
 
 /** The NSM balance as a pool of the bar: ZEC to the cent, the rest in the tooltip. */
 function nsmPool(
