@@ -15,7 +15,7 @@ import { getNetworkEconomics } from "./economics";
 import { projectHalving } from "./halving";
 
 const API_URL = "https://api.zcashinfo.com/api/v1";
-const SOURCE = {
+export const NETWORK_SOURCE = {
   name: "Zcash Info",
   url: "https://zcashinfo.com/",
   docsUrl: "https://api.zcashinfo.com/docs",
@@ -23,6 +23,7 @@ const SOURCE = {
 const RANGES: Record<NetworkPeriod, string> = { day: "24h", week: "1w", month: "1m" };
 const ZATS_PER_ZEC = 100_000_000;
 const RETRY_MS = 10_000;
+const DASHBOARD_TTL_MS = 30_000;
 
 const amount = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const positive = z.number().finite().positive();
@@ -38,6 +39,9 @@ const blockSchema = z.object({
   transaction_fees_zatoshis: amount.nullable().optional(),
   total_minted_zatoshis: amount.nullable().optional(),
   miner_subsidy_zatoshis: amount.nullable().optional(),
+  // Since NU7 (ZIP 235): the fees the miner keeps and the share that leaves circulation.
+  miner_fee_share_zatoshis: amount.nullable().optional(),
+  nsm_fee_contribution_zatoshis: amount.nullable().optional(),
   status: z.string().nullable().optional(),
 });
 
@@ -50,6 +54,8 @@ const dashboardSchema = z.object({
     target_block_spacing_secs: positive,
     work_per_difficulty: positive,
     nu7_activation_height: amount.nullable().optional(),
+    // The NSM value balance in consensus (ZIP 237), reported from NU7.
+    nsm_value_balance_zat: amount.nullable().optional(),
   }),
   pools: z.object({
     total_supply_zatoshis: amount,
@@ -119,8 +125,14 @@ async function resource<T>(path: string, ttlMs: number, schema: z.ZodType<T>): P
   return request;
 }
 
-type Dashboard = z.infer<typeof dashboardSchema>;
-type ApiBlock = z.infer<typeof blockSchema>;
+export type Dashboard = z.infer<typeof dashboardSchema>;
+export type ApiBlock = z.infer<typeof blockSchema>;
+export type DashboardReading = NetworkFreshness & { data: Dashboard };
+
+/** The node dashboard through the shared 30-second cache, or null when it has never loaded. */
+export function getDashboardReading(): Promise<DashboardReading | null> {
+  return resource("/dashboard", DASHBOARD_TTL_MS, dashboardSchema);
+}
 
 function emission(info: Dashboard["info"], latest: ApiBlock): NetworkEmission {
   const blockSubsidyZec = latest.total_minted_zatoshis == null
@@ -215,7 +227,7 @@ export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise
   const [activity, economics, dashboard, blocks, mining, mempool] = await Promise.all([
     getNetworkActivity(period),
     getNetworkEconomics(),
-    resource("/dashboard", 30_000, dashboardSchema),
+    resource("/dashboard", DASHBOARD_TTL_MS, dashboardSchema),
     resource("/blocks?limit=100", 30_000, blocksSchema),
     resource(`/mining/pools?interval=${range}`, 60_000, miningSchema),
     resource("/mempool", 30_000, mempoolSchema),
@@ -253,7 +265,7 @@ export async function getNetworkSnapshot(period: NetworkPeriod = "day"): Promise
     : available.every((section) => section.stale) ? "stale"
     : unavailableSections.length > 0 || available.some((section) => section.stale) ? "partial" : "live";
   return {
-    period, source: SOURCE, status,
+    period, source: NETWORK_SOURCE, status,
     fetchedAt: core?.fetchedAt ?? available.map((section) => section.fetchedAt).sort().at(-1) ?? null,
     stale: !!core?.stale || status === "stale",
     core, activity, ...economics, mining: miningSection, mempool: mempoolSection, unavailableSections,

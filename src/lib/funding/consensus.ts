@@ -6,8 +6,14 @@
  * Sources: Zcash protocol specification §7.8 (block subsidy, Founders' Reward,
  * funding streams); ZIP 207 (funding streams); ZIP 214 (the 2020 Dev Fund);
  * ZIP 1015 and ZIP 2001 (NU6 allocation and the in-protocol lockbox); the NU6.1
- * lockbox disbursement. Each rule is checked against real coinbase
+ * lockbox disbursement; ZIP 218 and ZIP 214 revision 3 (NU7: 25-second blocks,
+ * a third of the subsidy per block, the streams extended to the third halving
+ * on the new schedule). Each rule is checked against real coinbase
  * transactions and pool balances in consensus.test.ts.
+ *
+ * The subsidy here is the scheduled one. From NSM_REISSUANCE_HEIGHT (see
+ * nsm.ts) consensus adds a reissued amount that depends on the NSM balance,
+ * not on the height alone; no stream defined today is still active by then.
  *
  * Amounts are zatoshis held in `number`: the largest total here (21M ZEC,
  * 2.1e15 zat) is far below Number.MAX_SAFE_INTEGER (9.0e15), so integer
@@ -23,6 +29,12 @@ const SLOW_START_RATE = MAX_BLOCK_SUBSIDY / SLOW_START_INTERVAL; // 62,500 zat
 const PRE_BLOSSOM_HALVING_INTERVAL = 840_000;
 const POST_BLOSSOM_HALVING_INTERVAL = 1_680_000;
 const BLOSSOM_POW_TARGET_SPACING_RATIO = 2;
+/** ZIP 218: 75-second blocks become 25-second blocks. */
+const NU7_POW_TARGET_SPACING_RATIO = 3;
+const POST_NU7_HALVING_INTERVAL =
+  POST_BLOSSOM_HALVING_INTERVAL * NU7_POW_TARGET_SPACING_RATIO; // 5,040,000
+const PRE_BLOSSOM_TARGET_SPACING_SECONDS = 150;
+const SECONDS_PER_DAY = 86_400;
 
 /** Mainnet heights where the allocation rules change. */
 export const HEIGHTS = {
@@ -34,9 +46,24 @@ export const HEIGHTS = {
   nu6: 2_726_400,
   /** The lockbox accrued so far is disbursed; the 8% / 12% split continues. */
   nu61: 3_146_400,
-  /** Third halving: the end of every stream defined by the ZIPs in force. */
-  thirdHalving: 4_406_400,
+  /**
+   * 25-second blocks (ZIP 218): a third of the subsidy per block, three times
+   * the blocks, the same issuance per day. The 8% / 12% split continues.
+   */
+  nu7: 3_543_405,
+  /**
+   * Third halving: the end of every stream defined by the ZIPs in force. It
+   * was 4,406,400 on the 75-second schedule; NU7 stretches the blocks left to
+   * it by three (ZIP 214 revision 3): 3,543,405 + 3 × 862,995.
+   */
+  thirdHalving: 6_132_390,
 } as const;
+
+/**
+ * Where the third halving stood on the 75-second schedule: the end height
+ * ZIP 214 revision 2 gave both streams, before NU7 stretched it.
+ */
+export const PRE_NU7_THIRD_HALVING = 4_406_400;
 
 /**
  * The one-time lockbox disbursement in the NU6.1 activation block: ten equal
@@ -80,7 +107,16 @@ function assertHeight(height: number): void {
   }
 }
 
-/** Halving(height), protocol specification §7.8. */
+/**
+ * Progress through the halving schedule at the end of the 75-second era, in
+ * post-Blossom blocks: (Blossom − shift) / pre + (height − Blossom) / post,
+ * kept in integers because each interval is a whole multiple of the last.
+ */
+const postBlossomProgress = (height: number) =>
+  (HEIGHTS.blossom - SLOW_START_SHIFT) * BLOSSOM_POW_TARGET_SPACING_RATIO +
+  (height - HEIGHTS.blossom);
+
+/** Halving(height), protocol specification §7.8 as amended by ZIP 218. */
 export function halving(height: number): number {
   assertHeight(height);
   if (height < SLOW_START_SHIFT) return 0;
@@ -89,22 +125,69 @@ export function halving(height: number): number {
       (height - SLOW_START_SHIFT) / PRE_BLOSSOM_HALVING_INTERVAL,
     );
   }
-  // (Blossom − shift) / pre + (height − Blossom) / post, kept in integers
-  // because the post-Blossom interval is exactly twice the pre-Blossom one.
+  if (height < HEIGHTS.nu7) {
+    return Math.floor(
+      postBlossomProgress(height) / POST_BLOSSOM_HALVING_INTERVAL,
+    );
+  }
+  // The progress made by NU7 carries over; each later block counts a third.
   const scaled =
-    (HEIGHTS.blossom - SLOW_START_SHIFT) * BLOSSOM_POW_TARGET_SPACING_RATIO +
-    (height - HEIGHTS.blossom);
-  return Math.floor(scaled / POST_BLOSSOM_HALVING_INTERVAL);
+    postBlossomProgress(HEIGHTS.nu7) * NU7_POW_TARGET_SPACING_RATIO +
+    (height - HEIGHTS.nu7);
+  return Math.floor(scaled / POST_NU7_HALVING_INTERVAL);
 }
 
-/** BlockSubsidy(height) in zatoshis, protocol specification §7.8. */
+/** How many times shorter the target spacing is than at launch. */
+function spacingRatio(height: number): number {
+  if (height < HEIGHTS.blossom) return 1;
+  if (height < HEIGHTS.nu7) return BLOSSOM_POW_TARGET_SPACING_RATIO;
+  return BLOSSOM_POW_TARGET_SPACING_RATIO * NU7_POW_TARGET_SPACING_RATIO;
+}
+
+/** PoWTargetSpacing(height) in seconds: 150, then 75 (Blossom), then 25 (NU7). */
+export function targetSpacingSeconds(height: number): number {
+  assertHeight(height);
+  return PRE_BLOSSOM_TARGET_SPACING_SECONDS / spacingRatio(height);
+}
+
+/** Blocks in a day at the target spacing: 576, then 1,152, then 3,456. */
+export function blocksPerDay(height: number): number {
+  return SECONDS_PER_DAY / targetSpacingSeconds(height);
+}
+
+/**
+ * Seconds the blocks after `fromHeight`, up to and including `toHeight`, take
+ * at the target spacing. The spacing is that of each arriving block, so the
+ * NU7 activation block itself is a 25-second block.
+ */
+export function targetSecondsBetween(
+  fromHeight: number,
+  toHeight: number,
+): number {
+  assertHeight(fromHeight);
+  assertHeight(toHeight);
+  let seconds = 0;
+  let start = fromHeight + 1;
+  for (const boundary of [HEIGHTS.blossom, HEIGHTS.nu7, Infinity]) {
+    const end = Math.min(toHeight, boundary - 1);
+    if (end < start) continue;
+    seconds += (end - start + 1) * targetSpacingSeconds(start);
+    start = end + 1;
+  }
+  return seconds;
+}
+
+/**
+ * The scheduled BlockSubsidy(height) in zatoshis, protocol specification §7.8
+ * as amended by ZIP 218. NSM reissuance (ZIP 237) is not included.
+ */
 export function blockSubsidy(height: number): number {
   assertHeight(height);
   if (height < SLOW_START_SHIFT) return SLOW_START_RATE * height;
   if (height < SLOW_START_INTERVAL) return SLOW_START_RATE * (height + 1);
-  const spacing =
-    height < HEIGHTS.blossom ? 1 : BLOSSOM_POW_TARGET_SPACING_RATIO;
-  return Math.floor(MAX_BLOCK_SUBSIDY / (spacing * 2 ** halving(height)));
+  return Math.floor(
+    MAX_BLOCK_SUBSIDY / (spacingRatio(height) * 2 ** halving(height)),
+  );
 }
 
 /** floor(subsidy · numerator / denominator), ZIP 207. */
@@ -142,13 +225,22 @@ export function allocationAt(height: number): Allocation {
 
 /** Heights where the per-block allocation can change, in ascending order. */
 function breakpoints(): number[] {
-  const halvings: number[] = [HEIGHTS.canopy, HEIGHTS.nu6, HEIGHTS.thirdHalving];
-  let next = HEIGHTS.thirdHalving + POST_BLOSSOM_HALVING_INTERVAL;
+  const later: number[] = [];
+  let next = HEIGHTS.thirdHalving + POST_NU7_HALVING_INTERVAL;
   // Enough halvings to cover any height a caller could reasonably ask for.
-  for (let i = 0; i < 40; i++, next += POST_BLOSSOM_HALVING_INTERVAL) {
-    halvings.push(next);
+  for (let i = 0; i < 40; i++, next += POST_NU7_HALVING_INTERVAL) {
+    later.push(next);
   }
-  return [SLOW_START_SHIFT, SLOW_START_INTERVAL, HEIGHTS.blossom, ...halvings];
+  return [
+    SLOW_START_SHIFT,
+    SLOW_START_INTERVAL,
+    HEIGHTS.blossom,
+    HEIGHTS.canopy,
+    HEIGHTS.nu6,
+    HEIGHTS.nu7,
+    HEIGHTS.thirdHalving,
+    ...later,
+  ];
 }
 const BREAKPOINTS = breakpoints();
 

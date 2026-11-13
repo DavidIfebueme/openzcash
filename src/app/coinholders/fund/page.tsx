@@ -354,7 +354,7 @@ export default async function FundPage() {
           {lock?.snap?.capturedAt
             ? ` of ${day(new Date(lock.snap.capturedAt))}`
             : ""}{" "}
-          plus 0.1875 ZEC a block since.</> : "Balance unavailable. Check the Coinholder sheet for the latest record."}
+          plus {o.perBlockZec} ZEC a block since.</> : "Balance unavailable. Check the Coinholder sheet for the latest record."}
         </span>
         <Link href="/lockbox">Live lockbox feed →</Link>
       </p>

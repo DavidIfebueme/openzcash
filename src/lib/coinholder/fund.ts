@@ -1,7 +1,8 @@
+import { targetSecondsBetween } from "@/lib/funding/consensus";
 import {
-  BLOCKS_PER_DAY,
-  LOCKBOX_ZEC_PER_BLOCK,
   THIRD_HALVING_HEIGHT,
+  blockRewardsAt,
+  lockboxAccruedZec,
   lockboxZecAt,
 } from "@/lib/zcash/lockbox";
 import type { Round } from "./types";
@@ -9,7 +10,11 @@ import type { Round } from "./types";
 /** NU6.1: the ZIP 1015 lockbox was paid into the Coinholder-Controlled Fund at this height (ZIP 271). */
 export const NU6_1_HEIGHT = 3_146_400;
 
-/** Fund arithmetic from the protocol schedule; every input is a height, a ZEC balance or a USD price. */
+/**
+ * Fund arithmetic from the protocol schedule; every input is a height, a ZEC
+ * balance or a USD price. Rates are those of the block at `height`, and every
+ * sum changes rate at NU7 (25-second blocks, a third of the stream each).
+ */
 export function fundOutlook(input: {
   balanceZec: number;
   height: number;
@@ -18,25 +23,24 @@ export function fundOutlook(input: {
   now: Date;
 }) {
   const { balanceZec, height, priceUsd, approvedUsd, now } = input;
-  const perDay = LOCKBOX_ZEC_PER_BLOCK * BLOCKS_PER_DAY;
+  const rewards = blockRewardsAt(height);
+  const perDay = rewards.lockboxZec * rewards.blocksPerDay;
   const blocksLeft = Math.max(0, THIRD_HALVING_HEIGHT - height);
-  const streamLeftZec = blocksLeft * LOCKBOX_ZEC_PER_BLOCK;
-  const streamTotalZec =
-    (THIRD_HALVING_HEIGHT - NU6_1_HEIGHT) * LOCKBOX_ZEC_PER_BLOCK;
-  const streamDoneShare = Math.min(
-    1,
-    Math.max(
-      0,
-      (height - NU6_1_HEIGHT) / (THIRD_HALVING_HEIGHT - NU6_1_HEIGHT),
-    ),
+  // The stream pays from the NU6.1 block to the last block before the halving.
+  const streamLeftZec = lockboxAccruedZec(height, THIRD_HALVING_HEIGHT);
+  const streamTotalZec = lockboxAccruedZec(
+    NU6_1_HEIGHT - 1,
+    THIRD_HALVING_HEIGHT,
   );
+  const streamDoneShare =
+    lockboxAccruedZec(NU6_1_HEIGHT - 1, height) / streamTotalZec;
   const halvingEta = new Date(
-    now.getTime() + (blocksLeft / BLOCKS_PER_DAY) * 86_400_000,
+    now.getTime() + targetSecondsBetween(height, THIRD_HALVING_HEIGHT) * 1_000,
   );
   const approvedZec = priceUsd ? approvedUsd / priceUsd : null;
   return {
     seedZec: lockboxZecAt(NU6_1_HEIGHT),
-    perBlockZec: LOCKBOX_ZEC_PER_BLOCK,
+    perBlockZec: rewards.lockboxZec,
     perDayZec: perDay,
     perMonthZec: perDay * 30,
     blocksLeft,

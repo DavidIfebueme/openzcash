@@ -10,11 +10,13 @@ import {
 } from "vitest";
 
 vi.mock("server-only", () => ({}));
-const { snapshot, lockbox, price } = vi.hoisted(() => ({
+const { snapshot, lockbox, price, nsm } = vi.hoisted(() => ({
   snapshot: vi.fn(),
   lockbox: vi.fn(),
   price: vi.fn(),
+  nsm: vi.fn(),
 }));
+vi.mock("@/lib/network/nsm", () => ({ getNsmSnapshot: nsm }));
 vi.mock("@/lib/zcg/snapshots-repo", () => ({ latestSnapshot: snapshot }));
 vi.mock("@/lib/zcash/lockbox-live", () => ({ currentLockboxZec: lockbox }));
 vi.mock("@/lib/pricing/live-price", async (importOriginal) => ({
@@ -28,6 +30,7 @@ vi.mock("@/lib/cache/memo", () => ({
 
 import {
   getTreasurySummary,
+  NSM_WAIT_MS,
   SHEET_STALE_AFTER_MS,
   sheetFreshnessNote,
 } from "./treasury-summary";
@@ -192,6 +195,7 @@ describe("getTreasurySummary · ZCG operating freshness", () => {
     snapshot.mockReset().mockResolvedValue(operating);
     lockbox.mockReset().mockResolvedValue(lock);
     price.mockReset().mockResolvedValue(140_804);
+    nsm.mockReset().mockResolvedValue(null);
   });
   afterEach(() => {
     vi.useRealTimers();
@@ -246,5 +250,90 @@ describe("getTreasurySummary · ZCG operating freshness", () => {
     vi.setSystemTime(new Date("2026-09-30T12:00:00Z"));
     const t = await getTreasurySummary();
     expect(t?.lockbox?.asOf).toBeUndefined();
+  });
+
+  it("shows the lockbox to two decimals and keeps every zatoshi in the tooltip", async () => {
+    // 0.06249999 ZEC a block since NU7 leaves eight decimals in the total.
+    lockbox.mockResolvedValue({ ...lock, zat: 14_692_749_496_374n });
+    vi.setSystemTime(new Date("2026-09-30T12:00:00Z"));
+    const t = await getTreasurySummary();
+    expect(t?.lockbox?.zec).toBe("146,927.49");
+    expect(t?.lockbox?.exact).toContain("146,927.49496374 ZEC");
+  });
+});
+
+describe("getTreasurySummary · the NSM balance beside the treasuries", () => {
+  // The node's reading at height 3,569,402 (Zcash Info, 2026-11-13).
+  const reading = {
+    stale: false,
+    height: 3_569_402,
+    balanceZat: 37_773_210_016,
+  };
+
+  beforeEach(() => {
+    snapshot.mockReset().mockResolvedValue(null);
+    lockbox.mockReset().mockResolvedValue(null);
+    price.mockReset().mockResolvedValue(93_835);
+    nsm.mockReset().mockResolvedValue(reading);
+  });
+
+  it("values the balance consensus holds at the live price and links to its page", async () => {
+    const t = await getTreasurySummary();
+    expect(t?.nsm).toEqual({
+      name: "NSM · Sustainability",
+      tag: "ZIP 237 · in consensus",
+      href: "/nsm",
+      zec: "377.73",
+      usd: "$354.4K",
+      exact:
+        "377.73210016 ZEC ≈ $354,444.92\nOut of circulation by consensus · block 3,569,402",
+    });
+  });
+
+  it("takes the bar's block from the node when no other pool gives one", async () => {
+    const t = await getTreasurySummary();
+    expect(t?.height).toBe("3,569,402");
+  });
+
+  it("says so in the tooltip when the node's reading is stale", async () => {
+    nsm.mockResolvedValue({ ...reading, stale: true });
+    const t = await getTreasurySummary();
+    expect(t?.nsm?.exact).toContain("last reading, the source is not current");
+  });
+
+  it("leaves the pool out, not at zero, when the balance is unavailable", async () => {
+    nsm.mockResolvedValue(null);
+    expect((await getTreasurySummary())?.nsm).toBeNull();
+    nsm.mockRejectedValue(new Error("feed down"));
+    expect((await getTreasurySummary())?.nsm).toBeNull();
+  });
+
+  it("does not hold the other pools back when the node feed is slow", async () => {
+    vi.useFakeTimers();
+    try {
+      lockbox.mockResolvedValue({
+        zat: 14_692_749_496_374n,
+        height: 3_569_402,
+        baselineHeight: 3_565_794,
+        snap: null,
+      });
+      nsm.mockReturnValue(new Promise(() => {}));
+      const pending = getTreasurySummary();
+      await vi.advanceTimersByTimeAsync(NSM_WAIT_MS);
+      const t = await pending;
+      expect(t?.nsm).toBeNull();
+      expect(t?.lockbox?.zec).toBe("146,927.49");
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("shows ZEC without a dollar figure when no price is available", async () => {
+    price.mockResolvedValue(null);
+    const t = await getTreasurySummary();
+    expect(t?.nsm).toMatchObject({ zec: "377.73", usd: null });
+    expect(t?.nsm?.exact).toBe(
+      "377.73210016 ZEC\nOut of circulation by consensus · block 3,569,402",
+    );
   });
 });

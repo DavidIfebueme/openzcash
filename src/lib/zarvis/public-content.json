@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "sourceRevision": "006e2cc05c896801",
-  "sourceFiles": 72,
+  "sourceRevision": "b5ac9a28ac651f44",
+  "sourceFiles": 73,
   "documents": [
     {
       "id": "src/app/zcg/page.tsx:0",
@@ -19,7 +19,7 @@
       "id": "src/app/zcg/methodology/page.tsx:1",
       "url": "https://openzcash.org/zcg/methodology",
       "title": "zcg · methodology",
-      "text": "The Lockbox / ZIP-1016 ZEC balance: the latest spreadsheet Lockbox snapshot plus protocol-deterministic accrual (0.1875 ZEC per block, ZIP-1015) up to the live chain tip, which lightwalletd supplies read-only. No viewing-key scans run. Market prices, grant approvals and milestone delivery are not facts supplied by the chain.\nCoinGecko, CoinPaprika, Coinbase\nThe current ZEC/USD market price from CoinGecko, or from CoinPaprika and then Coinbase when CoinGecko is unavailable, cached for approximately ten minutes; every quote names its provider and quote time. If all three are unavailable, the last cached price or the spreadsheet's recorded rate may be used. This price is not read from the Zcash chain.\nHow we compute this\nWhere the data comes from\n:\nRule 1 · Source precedence\nWhen sources disagree, the disagreement is published rather than blended, and each figure names the source that wins for it:\nGrant payments, budgets and recipient totals\n: the official spreadsheet is the primary ledger. OpenZcash mirrors it; it does not correct it.\nProposal status\n: a committee decision visible on GitHub is shown until the spreadsheet records the same verdict; once the spreadsheet's verdict is publication-eligible, it takes priority.\nApplication text and requested amounts\n: the GitHub issue is first-hand.\nThird-party grant lists"
+      "text": "The Lockbox / ZIP-1016 ZEC balance: the latest spreadsheet Lockbox snapshot plus protocol-deterministic accrual (0.06249999 ZEC per block since NU7 and 0.1875 ZEC before it, ZIP-1015 and ZIP-218) up to the live chain tip, which lightwalletd supplies read-only. No viewing-key scans run. Market prices, grant approvals and milestone delivery are not facts supplied by the chain.\nCoinGecko, CoinPaprika, Coinbase\nThe current ZEC/USD market price from CoinGecko, or from CoinPaprika and then Coinbase when CoinGecko is unavailable, cached for approximately ten minutes; every quote names its provider and quote time. If all three are unavailable, the last cached price or the spreadsheet's recorded rate may be used. This price is not read from the Zcash chain.\nHow we compute this\nWhere the data comes from\n:\nRule 1 · Source precedence\nWhen sources disagree, the disagreement is published rather than blended, and each figure names the source that wins for it:\nGrant payments, budgets and recipient totals\n: the official spreadsheet is the primary ledger. OpenZcash mirrors it; it does not correct it.\nProposal status\n: a committee decision visible on GitHub is shown until the spreadsheet records the same verdict; once the spreadsheet's verdict is publication-eligible, it takes priority.\nApplication text and requested amounts\n: the GitHub issue is first-hand.\nThird-party grant lists"
     },
     {
       "id": "src/app/zcg/methodology/page.tsx:2",
@@ -199,7 +199,7 @@
       "id": "src/app/coinholders/fund/page.tsx:1",
       "url": "https://openzcash.org/coinholders/fund",
       "title": "coinholders · fund",
-      "text": "12% of each block\nZEC until block\nCustody\n2-of-3 multisig\nHeld by the key-holders, bound to ZIP 1016. It may be left at rest.\nOut\nPaid in ZEC by the key-holders; FPF runs applications and reporting.\nHow money leaves the fund\nZIP 1016 ↗\nZIP 271 ↗\nCoinholder sheet ↗\nMultisig ↗\nBalance: the Coinholder sheet\nplus 0.1875 ZEC a block since.\nLive lockbox feed →"
+      "text": "12% of each block\nZEC until block\nCustody\n2-of-3 multisig\nHeld by the key-holders, bound to ZIP 1016. It may be left at rest.\nOut\nPaid in ZEC by the key-holders; FPF runs applications and reporting.\nHow money leaves the fund\nZIP 1016 ↗\nZIP 271 ↗\nCoinholder sheet ↗\nMultisig ↗\nBalance: the Coinholder sheet\nplus\nZEC a block since.\nLive lockbox feed →"
     },
     {
       "id": "src/app/coinholders/verify/page.tsx:0",
@@ -223,13 +223,13 @@
       "id": "src/app/funding-history/page.tsx:1",
       "url": "https://openzcash.org/funding-history",
       "title": "funding history",
-      "text": "Blossom: 75-second blocks. The per-block subsidy halves; daily issuance does not.\nFirst halving. The Founders' Reward ends and the Dev Fund starts: 7% ECC, 5% ZF, 8% Major Grants.\nNU6, second halving. 8% to Zcash Community Grants, 12% accrues in the in-protocol lockbox.\nBlock\nest. 2028\nThird halving at block\n: every stream in the ZIPs in force today ends there, unless a new upgrade changes it.\nHow this is checked\nThe rules are code; these real blocks and balances pin them down. The same checks run in the test suite.\n. The coinbase matches the rules.\nlive\nThe node reports\nin the lockbox at block\n; the rules give\n.\nValue pools ↗\nData as JSON or CSV\nConsensus rules from the Zcash protocol specification and ZIPs 207, 214, 1015 and 2001. A day runs from its first block to the block before the next day's first block. USD at receipt uses the Bitfinex ZEC/USD daily close; the genesis day has no close, so its\ncarry no dollar value. Series through\n, generated"
+      "text": "Blossom: 75-second blocks. The per-block subsidy halves; daily issuance does not.\nFirst halving. The Founders' Reward ends and the Dev Fund starts: 7% ECC, 5% ZF, 8% Major Grants.\nNU6, second halving. 8% to Zcash Community Grants, 12% accrues in the in-protocol lockbox.\nNU7: 25-second blocks. Each block carries a third of the subsidy, three times as often; the 8% and 12% streams continue, and 60% of transaction fees starts leaving circulation into the NSM balance.\nBlock\nest. 2028\nThird halving at block\n: every stream in the ZIPs in force today ends there, unless a new upgrade changes it.\nHow this is checked\nThe rules are code; these real blocks and balances pin them down. The same checks run in the test suite.\n. The coinbase matches the rules.\nlive\nThe node reports\nin the lockbox at block\n; the rules give\n.\nValue pools ↗\nData as JSON or CSV\nConsensus rules from the Zcash protocol specification and ZIPs 207, 214, 1015 and 2001. A day runs from its first block to the block before the next day's first block. USD at receipt uses the Bitfinex ZEC/USD daily close; the genesis day has no close, so its\ncarry no dollar value. Series through\n, generated"
     },
     {
       "id": "src/app/governance/page.tsx:0",
       "url": "https://openzcash.org/governance",
       "title": "governance",
-      "text": "Zcash governance · OpenZcash\nDecisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.\nnumeric\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nNetwork upgrades\nCoinholder polls\nStill being decided\nNU7, Crosslink and NSM\nLargest poll\nZcash governance\nNetwork upgrades, coinholder polls and open protocol decisions.\nZIP process and coinholders\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nProtocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked."
+      "text": "Zcash governance · OpenZcash\nDecisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.\nnumeric\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nNetwork upgrades\nCoinholder polls\nStill being decided\nCrosslink and the NSM's ZIP 233\nLargest poll\nZcash governance\nNetwork upgrades, coinholder polls and open protocol decisions.\nZIP process and coinholders\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nProtocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked."
     },
     {
       "id": "src/app/zec-observatory/page.tsx:0",
@@ -271,7 +271,19 @@
       "id": "src/app/lockbox/page.tsx:0",
       "url": "https://openzcash.org/lockbox",
       "title": "lockbox",
-      "text": "Lockbox · live funding · OpenZcash\nReal-time view of the Zcash deferred Dev Fund. Every block mined adds 0.1875 ZEC (12% of the block subsidy) to the in-protocol Lockbox.\nLockbox\nLockbox · live funding\nReal-time view of the Zcash deferred Dev Fund. Every block mined adds 0.1875 ZEC (12% of the block subsidy) to the in-protocol Lockbox. This is the protocol funding stream read straight from the chain tip, not viewing-key data."
+      "text": "Lockbox · live funding · OpenZcash\nLockbox\nLockbox · live funding"
+    },
+    {
+      "id": "src/app/nsm/page.tsx:0",
+      "url": "https://openzcash.org/nsm",
+      "title": "nsm",
+      "text": "NSM · sustainability balance · OpenZcash\nNSM\nnumeric\nZIP\n↗\nBlock subsidy\nZCG · 8%\nLockbox · 12%\nMiner · 80%\nTransaction fees\nMiner\nBlock time\nBlocks a day\nZCG and Lockbox end\nNSM reissuance\nNSM · sustainability balance\nThe Network Sustainability Mechanism takes ZEC out of circulation and returns it later through block subsidies. Since NU7, 60% of every block's transaction fees goes in. It is a balance kept by consensus: no address, no key, no committee.\nHow it works\nIn · 60% of the fees\nSince NU7\nEach block removes 6/10 of its transaction fees from circulation, rounded down. The miner keeps the rest. Active from block\n, mined November 6, 2026.\nHeld · by consensus\nNo key\nNot a wallet and not a value pool: nodes track the amount, it is left out of issued supply, and nothing can spend it. It started at\nZEC, the subsidy and fees that coinbase transactions left unclaimed before NU6.\nOut · through the subsidy\nBlock\nFrom that block on, every block adds 1375 / 10¹⁰ of the balance to its scheduled subsidy, rounded up: about half the balance each halving period.\n·\nNot deployed:\n, a transaction field for voluntary removals, is a draft and was left out of NU7.\n, issuance smoothing, was replaced by ZIP 237, which keeps the halvings.\nEach block, before and after NU7\nSame shares, a third per block, three times as often\nZEC per block\nBefore NU7\nPer day\nSchedule\nSource:\nZIP 214 ↗\nLockbox"
+    },
+    {
+      "id": "src/app/nsm/page.tsx:1",
+      "url": "https://openzcash.org/nsm",
+      "title": "nsm",
+      "text": "Funding history\n· No viewing keys"
     },
     {
       "id": "src/app/zf/page.tsx:0",
@@ -289,7 +301,7 @@
       "id": "src/app/shielded-labs/page.tsx:0",
       "url": "https://openzcash.org/shielded-labs",
       "title": "shielded labs",
-      "text": "Shielded Labs · OpenZcash\nDonation-funded and never paid from the Dev Fund or block rewards, Shielded Labs drives Crosslink (hybrid Proof-of-Stake) and the Network Sustainability Mechanism.\nBurning\nIssuance Smoothing\nFee Burning\nLatest from Shielded Labs\nShielded Labs\nshieldedlabs.net\nRoadmap & milestones\nGitHub · ShieldedLabs\nNSM overview\nFunding\nFocus\nEfforts\nProjects\nCrosslink\nHybrid Proof-of-Work + Proof-of-Stake with BFT finality\nGives Zcash the combined security of PoW and PoS and lets people get paid to hold ZEC. PoW and BFT finality are integrated; staking & tokenomics are in development, with hardening and productionization (final ZIPs + audits) slated for 2026.\nMilestone 4\nNetwork Sustainability Mechanism (NSM)\nThree proposed changes to ZEC supply economics.\nOverview ↗\nRoadmap\nmilestones ↗\nGitHub\nShieldedLabs ↗\nLoading the latest posts..."
+      "text": "Shielded Labs · OpenZcash\nDonation-funded and never paid from the Dev Fund or block rewards, Shielded Labs drives Crosslink (hybrid Proof-of-Stake) and the Network Sustainability Mechanism.\n60% of fees\nReissuance that keeps the halvings\nVoluntary removals\nLatest from Shielded Labs\nShielded Labs\nshieldedlabs.net\nRoadmap & milestones\nGitHub · ShieldedLabs\nNSM overview\nFunding\nFocus\nEfforts\nProjects\nCrosslink\nHybrid Proof-of-Work + Proof-of-Stake with BFT finality\nGives Zcash the combined security of PoW and PoS and lets people get paid to hold ZEC. PoW and BFT finality are integrated; staking & tokenomics are in development, with hardening and productionization (final ZIPs + audits) slated for 2026.\nMilestone 4\nNetwork Sustainability Mechanism (NSM)\nChanges to ZEC supply economics: two active since NU7, one still a draft.\nLive NSM balance\n·\nOverview ↗\nRoadmap\nmilestones ↗\nGitHub\nShieldedLabs ↗\nLoading the latest posts..."
     },
     {
       "id": "src/app/zakura/page.tsx:0",

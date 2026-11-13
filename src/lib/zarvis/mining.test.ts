@@ -6,7 +6,43 @@ const fixture = () => ({
   info: { best_block: 3_500_000, chain_tip: 3_500_000, status: "synced" },
   recent_blocks: Array.from({ length: 20 }, (_, i) => ({ height: 3_500_000 - i, time: now / 1000 - i * 75, difficulty: 300_000_000 + i * 100_000, status: "PENDING" })),
 });
+/** After NU7: 25-second blocks and the difficulty the node reported on 2026-11-13. */
+const nu7Now = Date.UTC(2026, 10, 13, 16, 30);
+const nu7Fixture = () => ({
+  info: { best_block: 3_569_411, chain_tip: 3_569_411, status: "synced", target_block_spacing_secs: 25, work_per_difficulty: 8192 },
+  recent_blocks: Array.from({ length: 20 }, (_, i) => ({ height: 3_569_411 - i, time: nu7Now / 1000 - i * 25, difficulty: 88_000_000 + i * 100_000, status: "PENDING" })),
+});
 afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
+describe("The estimate on each side of NU7", () => {
+  it("divides by the 25-second target spacing once blocks are 25 seconds apart", () => {
+    const data = miningSnapshot(nu7Fixture(), nu7Now);
+    expect(data.targetSpacingSeconds).toBe(25);
+    expect(data.solrate).toBeCloseTo(88_950_000 * 8192 / 25, 4);
+    // About 29 GSol/s; dividing by 75 would report a third of the network.
+    expect(data.solrate / 1e9).toBeGreaterThan(29);
+  });
+  it("keeps dividing by 75 for a sample taken before NU7", () => {
+    expect(miningSnapshot(fixture(), now).targetSpacingSeconds).toBe(75);
+  });
+  it("states the divisor it used in every language", () => {
+    vi.useFakeTimers(); vi.setSystemTime(nu7Now);
+    const content = JSON.stringify({ data: miningSnapshot(nu7Fixture(), nu7Now) });
+    expect(miningAnswer(content, "en")).toContain("average difficulty × 8192 ÷ 25, following ZcashInfo's methodology");
+    expect(miningAnswer(content, "pt")).toContain("dificuldade média × 8192 ÷ 25, conforme a metodologia do ZcashInfo");
+    expect(miningAnswer(content, "es")).toContain("dificultad promedio × 8192 ÷ 25, según la metodología de ZcashInfo");
+    expect(miningAnswer(content, "en")).not.toContain("÷ 75");
+  });
+  it("refuses a sample whose source reports a spacing the consensus rules do not", () => {
+    const data = nu7Fixture();
+    data.info.target_block_spacing_secs = 75;
+    expect(() => miningSnapshot(data, nu7Now)).toThrow("MINING_SPACING_MISMATCH");
+  });
+  it("refuses a sample whose source reports another work factor", () => {
+    const data = nu7Fixture();
+    data.info.work_per_difficulty = 4096;
+    expect(() => miningSnapshot(data, nu7Now)).toThrow("MINING_SPACING_MISMATCH");
+  });
+});
 describe("Dated public mining estimates", () => {
   it("calculates the publisher's 20-block estimate with the actual sampled range", () => {
     const data = miningSnapshot(fixture(), now);

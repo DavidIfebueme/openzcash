@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatPaidZec, payoutSummary, type PayoutEntry } from "./fund";
+import {
+  NU6_1_HEIGHT,
+  formatPaidZec,
+  fundOutlook,
+  payoutSummary,
+  type PayoutEntry,
+} from "./fund";
 import { PAYOUTS } from "./program";
 import { ROUNDS } from "./rounds";
 
@@ -125,5 +131,68 @@ describe("/api/zcg/coinholder/round · payouts", () => {
       zec: 7320.535,
       zecUsd: 1146.09,
     });
+  });
+});
+
+describe("fundOutlook · the 12% stream on each side of NU7", () => {
+  const now = new Date("2026-11-13T16:20:00Z");
+  const at = (height: number) =>
+    fundOutlook({
+      balanceZec: 147_000,
+      height,
+      priceUsd: 900,
+      approvedUsd: 0,
+      now,
+    });
+
+  it("quotes the 75-second rate before NU7", () => {
+    const o = at(3_500_000);
+    expect(o.perBlockZec).toBe(0.1875);
+    expect(o.perDayZec).toBe(216);
+    expect(o.perMonthZec).toBe(6_480);
+  });
+
+  it("quotes a third per block, three times as often, from NU7", () => {
+    const o = at(3_569_378);
+    expect(o.perBlockZec).toBe(0.06249999);
+    expect(o.perDayZec).toBeCloseTo(215.99996544, 8);
+    expect(o.perMonthZec).toBeCloseTo(6_479.9989632, 6);
+  });
+
+  it("counts what is left to the third halving at block 6,132,390", () => {
+    const o = at(3_569_378);
+    expect(o.blocksLeft).toBe(6_132_390 - 3_569_378);
+    // 2,563,011 paying blocks remain after 3,569,378, the halving block excluded.
+    expect(o.streamLeftZec).toBe(160_188.16186989);
+    expect(o.streamTotalZec).toBe(236_249.97411015);
+  });
+
+  it("measures progress in ZEC received, so faster blocks do not inflate it", () => {
+    const o = at(3_569_378);
+    // Equal to the node's lockbox pool at that height over the whole stream.
+    expect(o.streamDoneShare).toBeCloseTo(
+      76_061.81224026 / 236_249.97411015,
+      12,
+    );
+    expect(at(NU6_1_HEIGHT - 1).streamDoneShare).toBe(0);
+    expect(at(6_132_390).streamDoneShare).toBe(1);
+    expect(at(7_000_000).streamDoneShare).toBe(1);
+  });
+
+  it("estimates the halving date at 25 seconds a block after NU7", () => {
+    const o = at(3_569_378);
+    const seconds = (6_132_390 - 3_569_378) * 25;
+    expect(o.halvingEta.getTime()).toBe(now.getTime() + seconds * 1_000);
+    expect(o.halvingEta.toISOString().slice(0, 7)).toBe("2028-11");
+  });
+
+  it("gives the same halving date from a pre-NU7 height", () => {
+    const before = at(3_543_404);
+    const seconds = (6_132_390 - 3_543_404) * 25;
+    expect(before.halvingEta.getTime()).toBe(now.getTime() + seconds * 1_000);
+  });
+
+  it("keeps the NU6.1 seed at the 75-second rate", () => {
+    expect(at(3_569_378).seedZec).toBe(78_750);
   });
 });

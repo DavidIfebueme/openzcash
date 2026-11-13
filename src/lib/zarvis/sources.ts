@@ -56,12 +56,12 @@ export const KNOWLEDGE: KnowledgeNote[] = [
   {
     id: "issuance", title: "Zcash protocol specification", url: "https://zips.z.cash/protocol/protocol.pdf",
     keywords: "mining miner halving supply issuance inflation mineracao oferta emissao 21 million",
-    text: "The nominal maximum supply is 21 million ZEC. Five percent of that maximum is 1,050,000 ZEC. A percentage of circulating supply has a different, changing denominator. After Blossom, the target block spacing is 75 seconds and halving intervals span 1,680,000 blocks. Halving dates are estimates based on block progress, not fixed calendar deadlines. Block subsidy excludes transaction fees. Use a fresh chain/supply reading for present-day amounts.", reviewedOn,
+    text: "The nominal maximum supply is 21 million ZEC. Five percent of that maximum is 1,050,000 ZEC. A percentage of circulating supply has a different, changing denominator. Since NU7 (block 3,543,405, November 2026) the target block spacing is 25 seconds and halving intervals span 5,040,000 blocks; before it, after Blossom, they were 75 seconds and 1,680,000 blocks. Halving dates are estimates based on block progress, not fixed calendar deadlines. Block subsidy excludes transaction fees. Use a fresh chain/supply reading for present-day amounts.", reviewedOn: "2026-11-13",
   },
   {
     id: "funding", title: "ZIP 214: development funding rules", url: "https://zips.z.cash/zip-0214",
     keywords: "dev fund development lockbox funding zcg mining reward fundo subsidio alocacao",
-    text: "Funding rules have changed across upgrades. OpenZcash's current consensus model uses 8% of block subsidy for ZCG and 12% for the Lockbox in the NU6/NU6.1 era, ending at height 4,406,400. Continued funding after that is a scenario, not guaranteed policy. A 20% allocation leaves 80% of subsidy for miners; removing it would increase miners' subsidy from 80 to 100, a 25% relative increase, not a 20% increase. Verify activation/status against current sources: a ZIP page marked Proposed is not itself proof of activation. Transaction fees are separate.", reviewedOn,
+    text: "Funding rules have changed across upgrades. OpenZcash's current consensus model uses 8% of block subsidy for ZCG and 12% for the Lockbox in the NU6/NU6.1 era, continuing under ZIP 214 revision 3 until the third halving at block 6,132,390 (exclusive). Continued funding after that is a scenario, not guaranteed policy. A 20% allocation leaves 80% of subsidy for miners; removing it would increase miners' subsidy from 80 to 100, a 25% relative increase, not a 20% increase. Verify activation/status against current sources: a ZIP page marked Proposed is not itself proof of activation. Transaction fees are separate.", reviewedOn: "2026-11-13",
   },
   {
     id: "ledger", title: "OpenZcash sources and methodology", url: "https://openzcash.org/zcg/methodology",
@@ -76,7 +76,7 @@ export const KNOWLEDGE: KnowledgeNote[] = [
   {
     id: "mining-solrate", title: "ZcashInfo: estimated solrate and mining windows", url: "https://zcashinfo.com/learn/solrate/",
     keywords: "hashrate solrate hashrates mining mineracao dificuldade difficulty current atual network rede estimativa janela window zcashinfo",
-    text: "ZcashInfo estimates post-Blossom network solrate as difficulty × 8192 / 75, in solutions per second (Sol/s). Its dashboard uses a 20-block average, while charts use other windows. This is inferred mining power, not a count of machines. Pool solrate is estimated as attributed block share multiplied by the network solrate for the same period. Short windows have statistical variance; unknown attribution and missing blocks affect interpretation. Compare measurements only with their source time, block range or averaging window and Sol/s units. These reviewed notes contain no live hashrate or pool shares.", reviewedOn: "2026-09-28",
+    text: "ZcashInfo estimates network solrate as difficulty × 8192 / the target block spacing in seconds, in solutions per second (Sol/s): the divisor is 25 since NU7 (block 3,543,405, November 2026) and was 75 from Blossom until then. Its dashboard uses a 20-block average, while charts use other windows. This is inferred mining power, not a count of machines. Pool solrate is estimated as attributed block share multiplied by the network solrate for the same period. Short windows have statistical variance; unknown attribution and missing blocks affect interpretation. Compare measurements only with their source time, block range or averaging window and Sol/s units. These reviewed notes contain no live hashrate or pool shares.", reviewedOn: "2026-11-13",
   },
   {
     id: "mining-pools", title: "ZcashInfo: mining pool attribution", url: "https://zcashinfo.com/learn/pool-attribution/",

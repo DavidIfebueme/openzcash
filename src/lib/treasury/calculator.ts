@@ -1,3 +1,5 @@
+import { HEIGHTS, blockSubsidy, blocksPerDay, targetSecondsBetween } from "@/lib/funding/consensus";
+
 export const MAX_ZEC_SUPPLY = 21_000_000;
 export const CYPHERPUNK_MINED_ZEC = 3_023.13;
 // Company dashboard, checked 2026-09-23; latest ZEC entry: 2026-08-31.
@@ -6,15 +8,16 @@ export const CYPHERPUNK_DOCUMENTED_BASE_ZEC = 326_417.51;
 export const NETWORK_SNAPSHOT_HEIGHT = 3_492_985;
 export const NETWORK_SNAPSHOT_DATE = "2026-09-23";
 
-const SECOND_HALVING_HEIGHT = 2_726_400;
+const SECOND_HALVING_HEIGHT = HEIGHTS.nu6;
 // A representative block in the disclosed Aug 2026 reward era, not a claim
 // about the observation's exact block height. Keep independent of live tips.
 export const CYPHERPUNK_MINING_REFERENCE_HEIGHT = SECOND_HALVING_HEIGHT;
-const THIRD_HALVING_HEIGHT = 4_406_400;
-const HALVING_BLOCKS = 1_680_000;
-const BLOCKS_PER_DAY = 1_152; // 75-second target, ZIP 208.
+const THIRD_HALVING_HEIGHT = HEIGHTS.thirdHalving;
+// Halving interval since NU7 (ZIP 218): 5,040,000 blocks of 25 seconds.
+const HALVING_BLOCKS = 5_040_000;
+const SECONDS_PER_DAY = 86_400;
 const DAYS_PER_YEAR = 365.25;
-const SECOND_ERA_SUBSIDY_ZAT = 156_250_000;
+const MAX_ERAS = 28;
 const ZATS_PER_ZEC = 100_000_000;
 
 export type SupplyBasis = "circulating" | "maximum";
@@ -70,26 +73,35 @@ export type TreasuryScenario = {
 
 type RewardEra = { days: number; issuancePerDay: number; minerFraction: number };
 
+/** The first halving after `block`: the third halving, then every 5,040,000 blocks. */
+function halvingEnd(block: number): number {
+  if (block < THIRD_HALVING_HEIGHT) return THIRD_HALVING_HEIGHT;
+  return THIRD_HALVING_HEIGHT + (Math.floor((block - THIRD_HALVING_HEIGHT) / HALVING_BLOCKS) + 1) * HALVING_BLOCKS;
+}
+
 /**
- * Current discrete-halving schedule (ZIP 208 / protocol section 7.8).
- * ZIP 214's existing funding streams expire at the third halving. With no
+ * Current discrete-halving schedule (protocol section 7.8 as amended by ZIP 218).
+ * Each era runs to the next halving; its length is the wall-clock time of its
+ * blocks at each block's target spacing, so a start before NU7 (block
+ * 3,543,405) runs through the change from 75 to 25 seconds. Issuance per day
+ * is the subsidy of the era's first block times the blocks a day at its spacing.
+ * ZIP 214 revision 3 funding streams expire at the third halving. With no
  * renewal assumed, miners receive 100% of the subsidy thereafter. Future
  * upgrades (including proposed ZIP 234) are not treated as activated.
  */
 function rewardEras(height: number, allocationPercent = 20, continueFunding = false): RewardEra[] {
   const eras: RewardEra[] = [];
   let nextBlock = height + 1;
-  let era = Math.floor((nextBlock - SECOND_HALVING_HEIGHT) / HALVING_BLOCKS);
-  for (; era < 28; era++) {
-    const subsidyZat = Math.floor(SECOND_ERA_SUBSIDY_ZAT / 2 ** era);
+  for (let count = 0; count < MAX_ERAS; count++) {
+    const subsidyZat = blockSubsidy(nextBlock);
     if (subsidyZat === 0) break;
-    const nextHalving = SECOND_HALVING_HEIGHT + (era + 1) * HALVING_BLOCKS;
+    const end = halvingEnd(nextBlock);
     eras.push({
-      days: (nextHalving - nextBlock) / BLOCKS_PER_DAY,
-      issuancePerDay: (subsidyZat / ZATS_PER_ZEC) * BLOCKS_PER_DAY,
+      days: targetSecondsBetween(nextBlock - 1, end - 1) / SECONDS_PER_DAY,
+      issuancePerDay: (subsidyZat / ZATS_PER_ZEC) * blocksPerDay(nextBlock),
       minerFraction: nextBlock < THIRD_HALVING_HEIGHT || continueFunding ? 1 - allocationPercent / 100 : 1,
     });
-    nextBlock = nextHalving;
+    nextBlock = end;
   }
   return eras;
 }

@@ -14,7 +14,7 @@ export const routes = [
   "/zcg/stipends", "/zcg/investments", "/zcg/fpf", "/coinholders", "/coinholders/proposals", "/coinholders/results", "/coinholders/activity",
   "/coinholders/fund", "/coinholders/verify", "/zcg/treasury-calculator", "/funding-history", "/governance",
   "/zec-observatory", "/ecosystem", "/wallets/find", "/development", "/news",
-  "/monthly", "/lockbox", "/zf", "/zodl", "/shielded-labs", "/zakura", "/tachyon",
+  "/monthly", "/lockbox", "/nsm", "/zf", "/zodl", "/shielded-labs", "/zakura", "/tachyon",
   "/zechub", "/arborist", "/communities", "/ceremony", "/ceremony/people", "/ceremony/road",
   "/ceremony/record", "/ceremony/ten-years", "/ceremony/watch",
   "/narratives", "/ongoing-test/crosslink", "/zcash-network", "/legal",

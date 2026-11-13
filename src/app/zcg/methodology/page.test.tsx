@@ -20,7 +20,9 @@ describe("methodology page copy", () => {
   });
 
   it("discloses the Lockbox snapshot-plus-accrual model", () => {
-    expect(html).toContain("0.1875 ZEC per block");
+    expect(html).toContain(
+      "0.06249999 ZEC per block since NU7 and 0.1875 ZEC before it",
+    );
     expect(html).toContain("snapshot");
   });
 

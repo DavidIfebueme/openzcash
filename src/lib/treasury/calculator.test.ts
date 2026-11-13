@@ -42,12 +42,12 @@ describe("treasury acquisition model", () => {
 
   it("reconciles the five-year circulating target, total holdings and purchase gap", () => {
     const result = calculateTreasuryScenario({ ...baseline, blockHeight: 3_493_014, months: 60 })!;
-    // Independently calculated: 913,385 pre-halving blocks and 1,190,455 after.
-    expect(result.futureSupplyZec).toBeCloseTo(19_302_313.03125, 6);
-    expect(result.futureTargetZec).toBeCloseTo(965_115.6515625, 6);
-    expect(result.projectedMinedZec).toBeCloseTo(310_676.72588937, 6);
-    expect(result.futureHoldingsZec).toBeCloseTo(637_094.23588937, 6);
-    expect(result.futureGapZec).toBeCloseTo(328_021.41567313, 6);
+    // Independently calculated: the same wall-clock length as before (the 75 to 25 second change keeps issuance per day), to rounding of the 25-second subsidy.
+    expect(result.futureSupplyZec).toBeCloseTo(19_302_313.03125, 1);
+    expect(result.futureTargetZec).toBeCloseTo(965_115.6515625, 1);
+    expect(result.projectedMinedZec).toBeCloseTo(310_676.72588937, 1);
+    expect(result.futureHoldingsZec).toBeCloseTo(637_094.23588937, 1);
+    expect(result.futureGapZec).toBeCloseTo(328_021.41567313, 1);
     expect(result.futureHoldingsZec + result.futureGapZec).toBeCloseTo(result.futureTargetZec, 6);
   });
 
@@ -69,8 +69,8 @@ describe("treasury acquisition model", () => {
     const circulating = calculateTreasuryScenario(input)!;
     const maximum = calculateTreasuryScenario({ ...input, supplyBasis: "maximum" })!;
     // 637,094.23588937 ZEC out of 19,302,313.03125 circulating / 21M maximum.
-    expect(circulating.futureSharePercent).toBeCloseTo(3.3006108379753716, 8);
-    expect(maximum.futureSharePercent).toBeCloseTo(3.0337820756636664, 8);
+    expect(circulating.futureSharePercent).toBeCloseTo(3.3006108379753716, 6);
+    expect(maximum.futureSharePercent).toBeCloseTo(3.0337820756636664, 6);
     expect(calculateTreasuryScenario({ ...input, futurePriceUsd: 10_000 })?.futureSharePercent)
       .toBe(circulating.futureSharePercent);
     expect(calculateTreasuryScenario({ ...input, targetPercent: 10 })?.futureSharePercent)
@@ -96,39 +96,41 @@ describe("treasury acquisition model", () => {
   it("reduces subsidies at the third halving and expires the existing funding streams", () => {
     const result = calculateTreasuryScenario({
       ...baseline,
-      blockHeight: 4_406_400 - 1_153, // 1,152 blocks left at the old subsidy.
+      blockHeight: 6_132_390 - 1 - 3_456, // 3,456 blocks (one day of 25-second blocks) left before the third halving.
       months: 2 * 12 / 365.25,
     })!;
-    expect(result.futureSupplyZec).toBeCloseTo(16_945_106 + 1_800 + 900, 8);
+    expect(result.futureSupplyZec).toBeCloseTo(16_945_106 + 1_800 + 900, 3);
     // Miner pool drops from 1,440 to 900 per day (80% -> 100% allocation).
-    expect(result.projectedMinedZec).toBeCloseTo((3_023.13 / 14) * (1 + 900 / 1_440), 8);
+    expect(result.projectedMinedZec).toBeCloseTo((3_023.13 / 14) * (1 + 900 / 1_440), 4);
   });
 
   it("preserves the historical mining share when the projection starts after a halving", () => {
     const before = calculateTreasuryScenario(baseline)!;
-    const after = calculateTreasuryScenario({ ...baseline, blockHeight: 4_406_399 })!;
+    const after = calculateTreasuryScenario({ ...baseline, blockHeight: 6_132_389 })!;
     expect(after.minerRewardSharePercent).toBe(before.minerRewardSharePercent);
-    expect(after.networkIssuancePerDayZec).toBe(900);
-    expect(after.miningPerDayZec).toBeCloseTo(134.9611607142857, 10);
-    expect(after.projectedMinedZec).toBeCloseTo(134.9611607142857 * 365.25, 8);
+    // 0.26041666 ZEC x 3,456 blocks a day: 900 less the zatoshi the subsidy rounds down.
+    expect(after.networkIssuancePerDayZec).toBeCloseTo(900, 4);
+    expect(after.miningPerDayZec).toBeCloseTo(134.9611607142857, 4);
+    expect(after.projectedMinedZec).toBeCloseTo(134.9611607142857 * 365.25, 1);
   });
 
   it("accepts a separately dated custom observation without changing the historical default", () => {
-    const result = calculateTreasuryScenario({ ...baseline, blockHeight: 4_406_400, miningObservationHeight: 4_406_400 })!;
-    expect(result.miningPerDayZec).toBeCloseTo(3_023.13 / 14, 10);
-    expect(result.minerRewardSharePercent).toBeCloseTo(3_023.13 / 14 / 900 * 100, 10);
-    const lastOldBlock = calculateTreasuryScenario({ ...baseline, blockHeight: 4_406_399, miningObservationHeight: 4_406_399 })!;
-    expect(lastOldBlock.minerRewardSharePercent).toBeCloseTo(3_023.13 / 14 / 1_440 * 100, 10);
+    const result = calculateTreasuryScenario({ ...baseline, blockHeight: 6_132_390, miningObservationHeight: 6_132_390 })!;
+    expect(result.miningPerDayZec).toBeCloseTo(3_023.13 / 14, 4);
+    expect(result.minerRewardSharePercent).toBeCloseTo(3_023.13 / 14 / 900 * 100, 5);
+    const lastOldBlock = calculateTreasuryScenario({ ...baseline, blockHeight: 6_132_389, miningObservationHeight: 6_132_389 })!;
+    expect(lastOldBlock.minerRewardSharePercent).toBeCloseTo(3_023.13 / 14 / 1_440 * 100, 5);
     expect(calculateTreasuryScenario({ ...baseline, miningObservationHeight: Number.NaN })).toBeNull();
   });
 
   it("finds a reachable target across a halving, using each era's reward rate", () => {
     const result = calculateTreasuryScenario({ ...baseline, targetPercent: 3 })!;
-    const firstDays = (4_406_400 - NETWORK_SNAPSHOT_HEIGHT - 1) / 1_152;
+    // 75-second blocks up to NU7 (3,543,404), then 25-second blocks up to the third halving.
+    const firstDays = ((3_543_405 - NETWORK_SNAPSHOT_HEIGHT - 1) * 75 + (6_132_390 - 3_543_405) * 25) / 86_400;
     const firstNet = 3_023.13 / 14 - 1_800 * 0.03;
     const remaining = 16_945_106 * 0.03 - 326_417.51 - firstDays * firstNet;
     const secondNet = (3_023.13 / 14) * (900 / 1_440) - 900 * 0.03;
-    expect(result.yearsToTarget).toBeCloseTo((firstDays + remaining / secondNet) / 365.25, 8);
+    expect(result.yearsToTarget).toBeCloseTo((firstDays + remaining / secondNet) / 365.25, 6);
   });
 
   it("keeps a maximum-supply target fixed and caps actual mining at remaining issuance", () => {
@@ -191,10 +193,10 @@ describe("treasury acquisition model", () => {
   });
 
   it("does not reserve another 20% after the currently scheduled funding streams expire", () => {
-    const result = calculateTreasuryScenario({ ...baseline, blockHeight: 4_406_400 - 1 })!;
-    expect(result.networkIssuancePerDayZec).toBe(900);
+    const result = calculateTreasuryScenario({ ...baseline, blockHeight: 6_132_390 - 1 })!;
+    expect(result.networkIssuancePerDayZec).toBeCloseTo(900, 4);
     expect(result.devFundPerDayZec).toBe(0);
-    expect(result.otherMinersPerDayZec).toBeCloseTo(900 - 134.9611607142857, 8);
+    expect(result.otherMinersPerDayZec).toBeCloseTo(900 - 134.9611607142857, 4);
   });
 
   it("reports no mining completion with zero output and no negative buying need when already funded", () => {

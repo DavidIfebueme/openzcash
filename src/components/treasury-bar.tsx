@@ -2,16 +2,17 @@ import { getTreasurySummary } from "@/lib/zcash/treasury-summary";
 import { TreasuryPool } from "./treasury-pool";
 
 /**
- * The two treasuries, pinned to the bottom of every shell page; each pool
- * links to its own page on wide screens and is plain figures in the phone's
- * Treasury sheet (see TreasuryPool). Server component streamed into the client shell
+ * The treasuries, pinned to the bottom of every shell page: ZCG's operating
+ * balance, the Lockbox / Coinholder pool and the NSM balance consensus holds
+ * out of circulation. Each pool links to its own page on wide screens and is
+ * plain figures in the phone's Treasury sheet (see TreasuryPool). Server component streamed into the client shell
  * through a Suspense boundary, so a slow price or chain source never delays
  * the page itself.
  */
 export async function TreasuryBar() {
   const t = await getTreasurySummary();
-  if (!t || (!t.operating && !t.lockbox)) return null;
-  const pools = [t.operating, t.lockbox].filter(
+  if (!t || (!t.operating && !t.lockbox && !t.nsm)) return null;
+  const pools = [t.operating, t.lockbox, t.nsm].filter(
     (p): p is NonNullable<typeof p> => p !== null,
   );
   return (
@@ -46,10 +47,12 @@ export async function TreasuryBar() {
             <span className="rd-treasury-zec tnum">
               {p.zec} <small>ZEC</small>
             </span>
-            <span className="rd-treasury-usd tnum">
-              ≈ {p.usd}
-              {p.sub ? ` · ${p.sub}` : ""}
-            </span>
+            {p.usd ? (
+              <span className="rd-treasury-usd tnum">
+                ≈ {p.usd}
+                {p.sub ? ` · ${p.sub}` : ""}
+              </span>
+            ) : null}
           </TreasuryPool>
         ))}
       </div>

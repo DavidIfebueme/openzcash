@@ -5,7 +5,7 @@ import { compile, publicText, publicSections, routes } from "./build-zarvis-know
 test("only explicitly allowed public pages are compiled", () => {
   for (const route of routes) assert.doesNotMatch(route, /\/(?:admin|viewing-keys|invites|login|projects)(?:\/|$)/);
   const index = compile();
-  assert.equal(index.sourceFiles, 72);
+  assert.equal(index.sourceFiles, 73);
   assert.ok(index.documents.length > 40);
   assert.deepEqual(index, JSON.parse(fs.readFileSync(new URL("../src/lib/zarvis/public-content.json", import.meta.url), "utf8")));
 });

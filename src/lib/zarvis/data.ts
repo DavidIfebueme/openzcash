@@ -5,7 +5,7 @@ import { boundedRead } from "./timeout";
 import type { ZarvisSource } from "./types";
 import type { Catalog } from "@/lib/ecosystem/types";
 import { valueReportedDevFund, type DevFundReportedData } from "@/lib/treasury/dev-fund";
-import { BLOCK_SUBSIDY_ZEC, LOCKBOX_ZEC_PER_BLOCK, MINER_ZEC_PER_BLOCK, THIRD_HALVING_HEIGHT, ZCG_ZEC_PER_BLOCK } from "@/lib/zcash/lockbox";
+import { BLOCKS_PER_DAY, BLOCK_SUBSIDY_ZEC, LOCKBOX_ZEC_PER_BLOCK, MINER_ZEC_PER_BLOCK, NU7_HEIGHT, THIRD_HALVING_HEIGHT, ZCG_ZEC_PER_BLOCK, blockRewardsAt } from "@/lib/zcash/lockbox";
 
 export const lookupSchema = z.object({
   topic: z.enum(["mining", "price", "treasuries", "markets", "grants", "recipients", "disbursements", "proposals", "decisions", "coinholder", "zechub", "ecosystem", "wallets", "communities", "arborist", "news", "forum", "zechub_dao", "funding_history", "price_history", "chain", "site", "meetings", "elections", "totals", "schedule", "investments", "governance", "monthly", "crosslink"]),
@@ -159,11 +159,18 @@ export function derivedTreasuryFacts(funds: DevFundReportedData, price: { cents:
     note: "Site arithmetic at the market quote: each pool's ZEC × price rounded to cents, like the footer; gross value adds ZCG cash. Not spendable cash and not one pool. Shares of supply use the quoted circulating supply.",
   };
 }
-const percent = (zec: number) => Math.round(zec / BLOCK_SUBSIDY_ZEC * 100);
+const percent = (zec: number, subsidy: number) => Math.round(zec / subsidy * 100);
+const beforeNu7 = blockRewardsAt(NU7_HEIGHT - 1);
 export const BLOCK_SUBSIDY_ALLOCATION = {
+  sinceBlock: NU7_HEIGHT, targetBlockSpacingSeconds: blockRewardsAt(NU7_HEIGHT).targetSpacingSeconds, blocksPerDay: BLOCKS_PER_DAY,
   blockSubsidyZec: BLOCK_SUBSIDY_ZEC, zcgPerBlockZec: ZCG_ZEC_PER_BLOCK, lockboxPerBlockZec: LOCKBOX_ZEC_PER_BLOCK, minerPerBlockZec: MINER_ZEC_PER_BLOCK,
-  zcgPercent: percent(ZCG_ZEC_PER_BLOCK), lockboxPercent: percent(LOCKBOX_ZEC_PER_BLOCK), devFundPercent: percent(ZCG_ZEC_PER_BLOCK + LOCKBOX_ZEC_PER_BLOCK), minerPercent: percent(MINER_ZEC_PER_BLOCK),
-  untilBlock: THIRD_HALVING_HEIGHT, note: "ZIP 1015 block-subsidy split in force through the third halving: protocol rules, not balances.",
+  zcgPercent: percent(ZCG_ZEC_PER_BLOCK, BLOCK_SUBSIDY_ZEC), lockboxPercent: percent(LOCKBOX_ZEC_PER_BLOCK, BLOCK_SUBSIDY_ZEC), devFundPercent: percent(ZCG_ZEC_PER_BLOCK + LOCKBOX_ZEC_PER_BLOCK, BLOCK_SUBSIDY_ZEC), minerPercent: percent(MINER_ZEC_PER_BLOCK, BLOCK_SUBSIDY_ZEC),
+  untilBlock: THIRD_HALVING_HEIGHT,
+  beforeNu7: {
+    untilBlock: NU7_HEIGHT - 1, targetBlockSpacingSeconds: beforeNu7.targetSpacingSeconds, blocksPerDay: beforeNu7.blocksPerDay,
+    blockSubsidyZec: beforeNu7.subsidyZec, zcgPerBlockZec: beforeNu7.zcgZec, lockboxPerBlockZec: beforeNu7.lockboxZec, minerPerBlockZec: beforeNu7.minerZec,
+  },
+  note: "Block-subsidy split in force since NU7 (ZIP 218 cut the target spacing from 75 to 25 seconds and the per-block subsidy to a third; ZIP 214 revision 3 keeps the streams through the third halving at block 6,132,390). The percentages (8% ZCG, 12% Lockbox, 80% miners) did not change; beforeNu7 holds the per-block figures up to block 3,543,404. Protocol rules, not balances.",
 };
 
 async function readPublicData(topic: z.infer<typeof lookupSchema>["topic"], query: string, signal: AbortSignal): Promise<unknown> {

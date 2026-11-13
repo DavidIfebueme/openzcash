@@ -422,7 +422,7 @@
     var(--band);
   color: var(--ink);
 }
-/* The two pools sit centred in the bar; block and link keep the right edge. */
+/* The pools sit centred in the bar; block and price keep the right edge. */
 .rd-treasury-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -498,6 +498,24 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   justify-self: end;
   color: var(--dim);
   white-space: nowrap;
+}
+/* Three pools and the block line do not fit one row beside the sidebar on a
+   small laptop: the block line drops under the pools, and nothing is hidden. */
+@media (min-width: 961px) and (max-width: 1160px) {
+  .rd-treasury-inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    row-gap: 6px;
+    padding: 9px 24px 10px;
+  }
+  .rd-treasury-pools {
+    grid-column: 1;
+    gap: 28px;
+  }
+  .rd-treasury-meta {
+    grid-column: 1;
+    justify-self: center;
+  }
 }
 
 /* ---------- Primitives: heading, stats strip, cards, tables, inputs ---------- */
@@ -653,8 +671,8 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 .rd-content .border-stone-200,
 .rd-content .border-stone-200\/80,
 .rd-content .border-stone-300,
-.rd-content .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
-.rd-content .divide-stone-200 > :not([hidden]) ~ :not([hidden]) {
+.rd-content .divide-stone-100 > :not([hidden]),
+.rd-content .divide-stone-200 > :not([hidden]) {
   border-color: var(--line);
 }
 .rd-content .bg-white {

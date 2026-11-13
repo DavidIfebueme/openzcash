@@ -59,7 +59,7 @@ describe("New public-data topics through the tool boundary", () => {
   });
   it("reports chain height, halving estimate and pools with their own times, and nulls when feeds fail", async () => {
     const { data } = await read("chain");
-    expect(data.tip).toMatchObject({ height: 3_500_000 }); expect(data.halving).toMatchObject({ nextHeight: 4_406_400, blocksRemaining: 906_400 });
+    expect(data.tip).toMatchObject({ height: 3_500_000 }); expect(data.halving).toMatchObject({ nextHeight: 6_132_390, blocksRemaining: 2_632_390 });
     expect(data.supply).toMatchObject({ shieldedZec: 4_800_000, atHeight: 3_499_990, fetchedAt: "2026-09-28T09:58:00.000Z" }); expect(data.circulating).toMatchObject({ zec: 16_945_106 });
     mocks.tip.mockRejectedValue(new Error("lwd down")); mocks.supply.mockRejectedValue(new Error("explorer down")); mocks.circulating.mockResolvedValue(null);
     const failed = (await read("chain")).data;

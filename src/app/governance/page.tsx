@@ -118,7 +118,7 @@ export default async function GovernancePage() {
     {
       label: "Still being decided",
       value: String(PENDING_TOPICS.length),
-      detail: "NU7, Crosslink and NSM",
+      detail: "Crosslink and the NSM's ZIP 233",
     },
     {
       label: "Largest poll",

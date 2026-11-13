@@ -166,6 +166,7 @@ export const APPS: AppDef[] = [
   { id: "private-chat", label: "Private Chat", href: "/private-chat", sub: "Private conversations via Nym · Experimental pilot", icon: "private-chat", pages: [] },
   { id: "openzcash-treasury", label: "OpenZcash Treasury", href: "/openzcash-treasury", sub: "Support the work · Follow the treasury", icon: "wallet", pages: [{ href: "/openzcash-treasury/letter", label: "An open letter", hidden: true, palette: true }] },
   { id: "lockbox", label: "Lockbox", href: "/lockbox", sub: "Live funding", logo: "/logos/marks/lockbox.png", icon: "shield", pages: [], hidden: true },
+  { id: "nsm", label: "NSM", href: "/nsm", sub: "Sustainability balance", icon: "balance", pages: [], hidden: true },
   { id: "arborist", parentId: "ecosystem", parentGroup: "pages", label: "Arborist Calls", href: "/arborist", sub: "Protocol call archive", logo: "/logos/arborist.png", icon: "sigma", pages: [] },
   { id: "communities", parentId: "ecosystem", parentGroup: "pages", label: "Communities", href: "/communities", sub: "Global groups · live", logo: "/logos/communities.png", icon: "users", pages: [] },
   {
