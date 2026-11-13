@@ -56,7 +56,25 @@
 .transactionIdentity .directionIcon { margin-top: 1px; }
 .transactionDirection { font-weight: 550; }
 .transactionIdentity code { display: block; font-size: 10px; line-height: 18px; color: var(--muted); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.transactionIdentity a:hover code { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+.txLink { position: relative; display: block; margin-top: 3px; }
+.txLink code { margin-top: 0; }
+.txTrigger { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; min-height: 24px; padding: 0; border: 0; border-radius: 4px; background: none; color: var(--muted); font: inherit; cursor: pointer; }
+.txTrigger svg { width: 11px; height: 11px; flex-shrink: 0; }
+.txTrigger:hover, .txTrigger[aria-expanded="true"] { color: var(--accent-ink); }
+.txTrigger:hover code, .txTrigger[aria-expanded="true"] code { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; }
+.txTrigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.txTrigger:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.txMenu { position: absolute; left: 0; top: calc(100% + 6px); z-index: 30; width: 272px; max-width: calc(100vw - 56px); padding: 6px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--surface); box-shadow: 0 14px 34px #0000001f; }
+.txMenu > p { margin: 0; padding: 6px 8px 8px; color: var(--muted); font-size: 11px; line-height: 16px; }
+.txMenu a { display: flex; align-items: center; gap: 10px; min-height: 54px; padding: 8px; border: 1px solid transparent; border-radius: 7px; color: var(--ink); text-decoration: none; }
+.txMenu a:hover, .txMenu a:focus-visible { border-color: var(--line-strong); background: var(--accent-soft); outline: none; }
+.txMenuLogo { display: grid; place-items: center; width: 32px; height: 32px; flex-shrink: 0; }
+.txMenuLogo img { width: 28px; height: 28px; object-fit: contain; border-radius: 6px; }
+.txMenuIdentity { display: flex; flex: 1; flex-direction: column; gap: 1px; min-width: 0; }
+.txMenuIdentity strong { font-size: 13px; line-height: 18px; font-weight: 600; }
+.txMenuIdentity small { color: var(--muted); font-size: 11px; line-height: 16px; }
+.txMenu a > svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--muted); }
+.txMenu a:hover > svg, .txMenu a:focus-visible > svg { color: var(--accent-ink); }
 .transactionValue { text-align: right; }
 .transactionValue time { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 18px; }
 .transactionAmount { display: flex; justify-content: flex-end; align-items: baseline; flex-wrap: wrap; gap: 0 5px; font-size: 15px; line-height: 20px; font-weight: 550; font-variant-numeric: tabular-nums; }
@@ -202,5 +220,6 @@
 }
 @media (prefers-reduced-motion: no-preference) {
   .primary { transition: filter .15s ease; }
+  .txTrigger svg { transition: transform .15s ease; }
   .disclosure summary > span { transition: transform .15s ease; }
 }

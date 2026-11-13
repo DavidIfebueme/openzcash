@@ -1,4 +1,10 @@
-/** Public mainnet explorers. Keep destinations and brand assets together. */
+/**
+ * Public mainnet explorers. Keep destinations and brand assets together.
+ *
+ * `transactionUrl` is the address of an explorer's transaction page, without
+ * the id. It is set only after opening a real transaction there; an explorer
+ * without it is left out of transaction menus rather than guessed.
+ */
 export const NETWORK_EXPLORERS = [
   {
     id: "zecblock",
@@ -6,6 +12,7 @@ export const NETWORK_EXPLORERS = [
     domain: "zecblock.com",
     url: "https://zecblock.com/",
     logo: "/logos/explorers/zecblock.svg",
+    transactionUrl: "https://zecblock.com/tx/",
   },
   {
     id: "shieldedscan",
@@ -20,6 +27,7 @@ export const NETWORK_EXPLORERS = [
     domain: "zcashinfo.com",
     url: "https://zcashinfo.com/",
     logo: "/logos/explorers/zcashinfo.svg",
+    transactionUrl: "https://zcashinfo.com/tx/",
   },
   {
     id: "zscan",
@@ -29,3 +37,15 @@ export const NETWORK_EXPLORERS = [
     logo: "/logos/explorers/zscan.png",
   },
 ] as const;
+
+const TRANSACTION_ID = /^[0-9a-f]{64}$/;
+
+/** The listed explorers that can show `txid`, each with the address of that transaction there. */
+export function transactionExplorers(txid: string) {
+  if (!TRANSACTION_ID.test(txid)) return [];
+  return NETWORK_EXPLORERS.flatMap((explorer) =>
+    "transactionUrl" in explorer
+      ? [{ ...explorer, href: `${explorer.transactionUrl}${txid}` }]
+      : [],
+  );
+}

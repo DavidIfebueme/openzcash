@@ -4,6 +4,7 @@ import { useState } from "react";
 import { treasuryCopy } from "@/lib/openzcash-treasury/content";
 import type { TreasuryTransaction } from "@/lib/openzcash-treasury/ledger";
 import { displayMemo, memoPreview } from "@/lib/openzcash-treasury/memo";
+import { TransactionLink } from "./transaction-link";
 import { ActivityIcon, IncomingIcon, OutgoingIcon } from "./treasury-icons";
 import styles from "./treasury.module.css";
 
@@ -48,7 +49,7 @@ export function TreasuryTransactions({ transactions }: { transactions: readonly 
               <span className={styles.directionIcon} data-direction={tx.direction}>{tx.direction === "incoming" ? <IncomingIcon /> : tx.direction === "outgoing" ? <OutgoingIcon /> : <ActivityIcon />}</span>
               <div>
                 <span className={styles.transactionDirection}>{tx.direction === "incoming" ? t.incoming : tx.direction === "outgoing" ? t.outgoing : t.internal}</span>
-                <a href={`https://mainnet.zcashexplorer.app/transactions/${tx.txid}`} target="_blank" rel="noopener noreferrer"><code title={tx.txid}>{tx.txid.slice(0, 6)}…{tx.txid.slice(-4)}</code></a>
+                <TransactionLink txid={tx.txid} />
                 {tx.memos.length > 0 && <details className={styles.transactionMemo}>
                   <summary>
                     <span className={styles.memoLabel}>{t.memo}{tx.memos.length > 1 ? ` (${tx.memos.length})` : ""}<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true"><path d="m4 6 4 4 4-4" /></svg></span>
