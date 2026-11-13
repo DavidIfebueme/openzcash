@@ -43,7 +43,7 @@ export const treasuryCopy = {
   copyKey: "Copy key",
   keyCopied: "Viewing key copied.",
   copyFailed: "Could not copy. Select and copy the full text manually.",
-  scanNote: "Created in Vizor on 10 Nov 2026. The scanner starts before that date.",
+  scanNote: "Account created on 10 Nov 2026. The scanner starts before that date.",
   scope: "The key cannot authorize spending. Synchronization covers this account's confirmed activity; expense records add context to outgoing payments.",
   transparency: "How transparency works",
   transactions: "Transactions",
