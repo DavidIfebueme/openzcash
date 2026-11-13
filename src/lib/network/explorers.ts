@@ -2,8 +2,12 @@
  * Public mainnet explorers. Keep destinations and brand assets together.
  *
  * `transactionUrl` is the address of an explorer's transaction page, without
- * the id. It is set only after opening a real transaction there; an explorer
- * without it is left out of transaction menus rather than guessed.
+ * the id. State on 2026-11-13: ZecBlock and Zcash Info were checked by
+ * opening a real transaction. ShieldedScan could not be opened (its site put
+ * a bot check in front of the page); the path is the one third-party code
+ * uses for its testnet host. ZScan could not be opened either (its host
+ * answered "application not found" that day); the path is the conventional
+ * one and has to be confirmed once the site is back.
  */
 export const NETWORK_EXPLORERS = [
   {
@@ -20,6 +24,7 @@ export const NETWORK_EXPLORERS = [
     domain: "shieldedscan.xyz",
     url: "https://shieldedscan.xyz/",
     logo: "/logos/explorers/shieldedscan.png",
+    transactionUrl: "https://shieldedscan.xyz/tx/",
   },
   {
     id: "zcashinfo",
@@ -35,6 +40,7 @@ export const NETWORK_EXPLORERS = [
     domain: "zscan.cash",
     url: "https://zscan.cash/",
     logo: "/logos/explorers/zscan.png",
+    transactionUrl: "https://zscan.cash/tx/",
   },
 ] as const;
 

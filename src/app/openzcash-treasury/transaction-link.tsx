@@ -9,7 +9,7 @@ import styles from "./treasury.module.css";
 /**
  * A transaction id that opens a menu of block explorers, so the reader chooses
  * where to look the transaction up. The choices are the explorers of the
- * Zcash Network page whose transaction page was checked.
+ * Zcash Network page.
  */
 export function TransactionLink({ txid }: { txid: string }) {
   const t = treasuryCopy;
@@ -96,7 +96,6 @@ export function TransactionLink({ txid }: { txid: string }) {
           className={styles.txMenu}
           onKeyDown={onMenuKeyDown}
         >
-          <p aria-hidden="true">{t.chooseExplorer}</p>
           {explorers.map((explorer, index) => (
             <a
               key={explorer.id}
@@ -108,15 +107,11 @@ export function TransactionLink({ txid }: { txid: string }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${explorer.name}, ${explorer.domain}, ${t.opensInNewTab}`}
+              title={explorer.domain}
               onClick={() => setOpen(false)}
             >
-              <span className={styles.txMenuLogo}>
-                <Image src={explorer.logo} alt="" width={28} height={28} />
-              </span>
-              <span className={styles.txMenuIdentity}>
-                <strong>{explorer.name}</strong>
-                <small>{explorer.domain}</small>
-              </span>
+              <Image src={explorer.logo} alt="" width={18} height={18} />
+              <span>{explorer.name}</span>
               <svg
                 viewBox="0 0 16 16"
                 fill="none"

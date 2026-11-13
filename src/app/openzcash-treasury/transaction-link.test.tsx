@@ -20,7 +20,7 @@ it("shows the short id and opens nothing until the reader asks", () => {
   expect(screen.queryAllByRole("link")).toEqual([]);
 });
 
-it("lets the reader choose the explorer, each one opening this transaction in a new tab", () => {
+it("lets the reader choose among the listed explorers, each one opening this transaction in a new tab", () => {
   render(<TransactionLink txid={TXID} />);
   fireEvent.click(trigger());
   expect(trigger().getAttribute("aria-expanded")).toBe("true");
@@ -29,17 +29,30 @@ it("lets the reader choose the explorer, each one opening this transaction in a 
   expect(menu.contains(items[0])).toBe(true);
   expect(
     items.map((item) => [
+      item.textContent,
       item.getAttribute("aria-label"),
       item.getAttribute("href"),
     ]),
   ).toEqual([
     [
+      "ZecBlock",
       "ZecBlock, zecblock.com, opens in a new tab",
       `https://zecblock.com/tx/${TXID}`,
     ],
     [
+      "ShieldedScan",
+      "ShieldedScan, shieldedscan.xyz, opens in a new tab",
+      `https://shieldedscan.xyz/tx/${TXID}`,
+    ],
+    [
+      "Zcash Info",
       "Zcash Info, zcashinfo.com, opens in a new tab",
       `https://zcashinfo.com/tx/${TXID}`,
+    ],
+    [
+      "ZScan",
+      "ZScan, zscan.cash, opens in a new tab",
+      `https://zscan.cash/tx/${TXID}`,
     ],
   ]);
   for (const item of items) {
@@ -53,17 +66,21 @@ it("lets the reader choose the explorer, each one opening this transaction in a 
 it("moves through the choices with the arrow keys and wraps around", () => {
   render(<TransactionLink txid={TXID} />);
   fireEvent.click(trigger());
-  const [first, second] = screen.getAllByRole("menuitem");
+  const items = screen.getAllByRole("menuitem");
+  const [first, second] = items;
+  const last = items[items.length - 1];
   fireEvent.keyDown(first, { key: "ArrowDown" });
   expect(document.activeElement).toBe(second);
-  fireEvent.keyDown(second, { key: "ArrowDown" });
+  fireEvent.keyDown(second, { key: "ArrowUp" });
   expect(document.activeElement).toBe(first);
   fireEvent.keyDown(first, { key: "ArrowUp" });
-  expect(document.activeElement).toBe(second);
-  fireEvent.keyDown(second, { key: "Home" });
+  expect(document.activeElement).toBe(last);
+  fireEvent.keyDown(last, { key: "ArrowDown" });
   expect(document.activeElement).toBe(first);
   fireEvent.keyDown(first, { key: "End" });
-  expect(document.activeElement).toBe(second);
+  expect(document.activeElement).toBe(last);
+  fireEvent.keyDown(last, { key: "Home" });
+  expect(document.activeElement).toBe(first);
 });
 
 it("closes on Escape and gives the focus back to the id", () => {

@@ -4,11 +4,13 @@ import { NETWORK_EXPLORERS, transactionExplorers } from "./explorers";
 const TXID = "3ad07a5e214b44da6c6fb6a5f4018ce1f18ed84e09ade768596f29c238993281";
 
 describe("transaction pages of the listed explorers", () => {
-  it("links a transaction on each explorer whose transaction page was checked", () => {
+  it("links a transaction on each of the listed explorers, in the order of the list", () => {
     const links = transactionExplorers(TXID);
     expect(links.map(({ id, href }) => [id, href])).toEqual([
       ["zecblock", `https://zecblock.com/tx/${TXID}`],
+      ["shieldedscan", `https://shieldedscan.xyz/tx/${TXID}`],
       ["zcashinfo", `https://zcashinfo.com/tx/${TXID}`],
+      ["zscan", `https://zscan.cash/tx/${TXID}`],
     ]);
     // Name, domain and logo come from the same list the Zcash Network page shows.
     for (const link of links) {
@@ -31,7 +33,7 @@ describe("transaction pages of the listed explorers", () => {
       expect(url.hostname).toBe(explorer.domain);
       expect(explorer.transactionUrl.endsWith("/")).toBe(true);
     }
-    expect(checked).toBeGreaterThan(0);
+    expect(checked).toBe(NETWORK_EXPLORERS.length);
   });
 
   it("builds no link for anything that is not a transaction id", () => {
