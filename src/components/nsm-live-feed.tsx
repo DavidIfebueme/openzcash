@@ -137,8 +137,14 @@ export function NsmLiveFeed({
   }
 
   const live = reachable && !snapshot.stale;
-  // An empty block adds nothing; a block whose split is unknown stays listed.
-  const paying = blocks.filter((b) => b.nsmZat === null || b.nsmZat > 0);
+  // An empty block adds nothing and is left out. A block whose split the feed
+  // did not report stays listed, but is never counted as a contribution.
+  const added = blocks.filter((b) => b.nsmZat !== null && b.nsmZat > 0);
+  const unreported = blocks.filter((b) => b.nsmZat === null);
+  const listed = blocks.filter((b) => b.nsmZat === null || b.nsmZat > 0);
+  const tally = `${added.length} of the last ${blocks.length} blocks added to the balance${
+    unreported.length > 0 ? ` · ${unreported.length} not reported` : ""
+  }`;
 
   return (
     <>
@@ -203,16 +209,13 @@ export function NsmLiveFeed({
           Transaction fees into the NSM
         </h2>
         {blocks.length > 0 ? (
-          <p className="text-xs text-stone-600 tnum">
-            {paying.length} of the last {blocks.length} blocks added to the
-            balance
-          </p>
+          <p className="text-xs text-stone-600 tnum">{tally}</p>
         ) : null}
       </div>
       <Card className="p-0">
-        {paying.length > 0 ? (
+        {listed.length > 0 ? (
           <div className="divide-y divide-stone-200 px-5">
-            {paying.map((b) => (
+            {listed.map((b) => (
               <FeeRow key={b.height} block={b} now={now} />
             ))}
           </div>
