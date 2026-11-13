@@ -74,6 +74,13 @@ updates:
       # package and the Private Chat service pass on 31. Take it with those tests.
       - dependency-name: jsdom
         update-types: ["version-update:semver-major"]
+      # Prisma 7 moves the generated client out of node_modules, requires a
+      # driver adapter and takes the database URL out of the schema. It needs
+      # a migration of its own; remove these two rules when that work starts.
+      - dependency-name: prisma
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@prisma/client"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: npm
     directory: /services/private-chat
     schedule:
