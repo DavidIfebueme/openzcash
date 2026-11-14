@@ -4,7 +4,14 @@ import {
   DecisionHomes,
 } from "@/components/governance/decision-homes";
 import { DecisionsTable } from "@/components/governance/decisions-table";
+import { GovernanceViews } from "@/components/governance/governance-views";
+import { HowItWorks } from "@/components/governance/how-it-works";
+import { OpenDecisionView } from "@/components/governance/open-decision";
 import { PollComparison } from "@/components/governance/poll-comparison";
+import {
+  GovernanceTerms,
+  WhoDoesWhat,
+} from "@/components/governance/who-does-what";
 import { getArboristCalls, type ArboristCall } from "@/lib/arborist/notes";
 import { dateOfHeight } from "@/lib/funding/history";
 import {
@@ -12,6 +19,7 @@ import {
   sortDecisions,
   type RecordPoll,
 } from "@/lib/governance/decisions";
+import { OPEN_DECISION, todayUtc } from "@/lib/governance/open-decisions";
 import {
   PENDING_TOPICS,
   UPGRADES,
@@ -28,7 +36,7 @@ export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: "Zcash governance · OpenZcash",
   description:
-    "Decisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.",
+    "How a change becomes a Zcash rule, what is being decided now, and the record: every network upgrade and how it was decided, and the coinholder polls on protocol and funding.",
   path: "/governance",
 });
 
@@ -43,8 +51,6 @@ const shortDate = (iso: string | null) =>
         timeZone: "UTC",
       })
     : "·";
-const compactZec = (n: number) =>
-  `${new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(n)} ZEC`;
 
 function callsAbout(calls: ArboristCall[], topics: RegExp[]) {
   return calls.filter((c) => matchesTopic(c.agenda.join(" · "), topics));
@@ -96,66 +102,26 @@ export default async function GovernancePage() {
     ...u,
     date: dateOfHeight(u.height) ?? "",
   })).filter((u) => u.date);
-  const latest = upgrades.at(-1);
   const polls = sortDecisions(pollDecisions(POLLS, "network"));
-  const decided = polls.filter((p) => p.outcome === "Decided").length;
-  const advisory = polls.length - decided;
-  const largest = POLLS.filter((p) => p.scope === "network" && p.totalZec)
-    .sort((a, b) => (b.totalZec ?? 0) - (a.totalZec ?? 0))
-    .at(0);
 
-  const metrics = [
-    {
-      label: "Network upgrades",
-      value: String(upgrades.length),
-      detail: latest ? `latest ${shortDate(latest.date)}` : "·",
-    },
-    {
-      label: "Coinholder polls",
-      value: String(polls.length),
-      detail: `${decided} decided · ${advisory} advisory or informal`,
-    },
-    {
-      label: "Still being decided",
-      value: String(PENDING_TOPICS.length),
-      detail: "Crosslink and the NSM's ZIP 233",
-    },
-    {
-      label: "Largest poll",
-      value: largest?.totalZec ? compactZec(largest.totalZec) : "·",
-      detail: largest?.name ?? "·",
-    },
-  ];
-
-  return (
-    <div className={pageStyles.page}>
-      <header className={pageStyles.heading}>
-        <div>
-          <h1>Zcash governance</h1>
-          <p>Network upgrades, coinholder polls and open protocol decisions.</p>
-        </div>
-        <div className={pageStyles.decision}>
-          <DecidedBy
-            who="ZIP process and coinholders"
-            how="each row names its process"
-          />
-        </div>
-      </header>
-
-      <dl className={pageStyles.metrics} aria-label="Governance summary">
-        {metrics.map((metric) => (
-          <div key={metric.label}>
-            <dt>{metric.label}</dt>
-            <dd>
-              <strong>{metric.value}</strong>
-              <span>{metric.detail}</span>
-            </dd>
-          </div>
-        ))}
-      </dl>
-
+  const pollsPanel = (
+    <>
       <PollComparison />
+      <SectionHeading
+        title="Coinholder polls"
+        count={polls.length}
+        description="Coin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund."
+      />
+      <DecisionsTable
+        rows={polls}
+        csvName="zcash-network-polls.csv"
+        hide={["process"]}
+      />
+    </>
+  );
 
+  const upgradesPanel = (
+    <>
       <SectionHeading
         title="Network upgrades"
         description="Every activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it."
@@ -192,9 +158,25 @@ export default async function GovernancePage() {
 
       <SectionHeading
         title="Still being decided"
-        description="Protocol work that Arborist call agendas keep returning to, not yet activated on mainnet."
+        description="The decision open now, and protocol work that Arborist call agendas keep returning to, not yet activated on mainnet."
       />
       <ol className={styles.timeline}>
+        <li>
+          <time dateTime={OPEN_DECISION.opens}>{OPEN_DECISION.window}</time>
+          <span>
+            <strong>{OPEN_DECISION.title}</strong>
+            <span className={styles.muted}> · {OPEN_DECISION.round}</span>
+          </span>
+          <span className={styles.links}>
+            <a
+              href={OPEN_DECISION.source.href}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {OPEN_DECISION.source.label} ↗
+            </a>
+          </span>
+        </li>
         {PENDING_TOPICS.map((t) => {
           const about = callsAbout(byNewest, t.topics);
           return (
@@ -229,26 +211,56 @@ export default async function GovernancePage() {
           );
         })}
       </ol>
+    </>
+  );
 
-      <SectionHeading
-        title="Coinholder polls"
-        count={polls.length}
-        description="Coin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund."
-      />
-      <DecisionsTable
-        rows={polls}
-        csvName="zcash-network-polls.csv"
-        hide={["process"]}
-      />
+  return (
+    <div className={pageStyles.page}>
+      <header className={pageStyles.heading}>
+        <div>
+          <h1>Zcash governance</h1>
+          <p>How Zcash decides, what is open now, and the record so far.</p>
+        </div>
+        <div className={pageStyles.decision}>
+          <DecidedBy
+            who="ZIP process and coinholders"
+            how="each row names its process"
+          />
+        </div>
+      </header>
 
-      <DecisionHomes current="network" />
+      <GovernanceViews
+        live="now"
+        counts={{ polls: polls.length, upgrades: upgrades.length }}
+        panels={{
+          how: <HowItWorks decision={OPEN_DECISION} />,
+          now: (
+            <OpenDecisionView
+              decision={OPEN_DECISION}
+              today={todayUtc()}
+              earlierPolls={polls.length}
+            />
+          ),
+          polls: pollsPanel,
+          upgrades: upgradesPanel,
+          who: (
+            <>
+              <WhoDoesWhat />
+              <DecisionHomes current="network" />
+              <GovernanceTerms />
+            </>
+          ),
+        }}
+      />
 
       <SourceNote>
         Upgrade heights from a Zebra node; the process behind each upgrade from
         its ZIPs and the community forum. Polls from their published results;
         tests of the voting tools are left out. Arborist links use the call
         agendas only, so a call that discussed a topic without naming it on the
-        agenda is not linked.
+        agenda is not linked. The open decision follows the organizers&apos;
+        timeline on the Zcash Community Forum, read on{" "}
+        {shortDate(OPEN_DECISION.reviewedAt)}; the steps follow ZIP 0.
       </SourceNote>
     </div>
   );

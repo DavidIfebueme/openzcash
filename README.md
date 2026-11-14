@@ -69,7 +69,7 @@ with their own dependencies, tests and setup guides. See
 | [Monthly](https://openzcash.org/monthly) | A monthly Zcash reading magazine, as PDF. |
 | [Ceremony](https://openzcash.org/ceremony) | The Zcash Ceremony archive and ten-year retrospective. |
 | [Funding history](https://openzcash.org/funding-history) | Protocol funding allocations over time; allocations are distinct from recipient spending. |
-| [Governance](https://openzcash.org/governance) | Governance panels, compared side by side. |
+| [Governance](https://openzcash.org/governance) | How a change becomes a Zcash rule, the decision open now, governance panels compared side by side, and every upgrade and poll on record. |
 
 ## Public API
 

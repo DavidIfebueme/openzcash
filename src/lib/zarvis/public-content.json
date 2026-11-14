@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "6bc5521fb424acd0",
+  "sourceRevision": "2f227b48797f2623",
   "sourceFiles": 73,
   "documents": [
     {
@@ -229,7 +229,7 @@
       "id": "src/app/governance/page.tsx:0",
       "url": "https://openzcash.org/governance",
       "title": "governance",
-      "text": "Zcash governance · OpenZcash\nDecisions that bind the whole Zcash network: every network upgrade and how it was decided, coinholder polls on protocol and funding, and what is still open.\nnumeric\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nNetwork upgrades\nCoinholder polls\nStill being decided\nCrosslink and the NSM's ZIP 233\nLargest poll\nZcash governance\nNetwork upgrades, coinholder polls and open protocol decisions.\nZIP process and coinholders\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nProtocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked."
+      "text": "Zcash governance · OpenZcash\nHow a change becomes a Zcash rule, what is being decided now, and the record: every network upgrade and how it was decided, and the coinholder polls on protocol and funding.\nnumeric\nAgendas unavailable\nNo agenda mention\n·\n↗\n+\nmore\nCoinholder polls\nCoin-weighted polls on the protocol and the funding model. Polls about the coinholder fund's grants live with the fund.\nNetwork upgrades\nEvery activated upgrade with its block, the process that decided it, its ZIP and the Arborist calls whose agenda named it.\nBlock\nStill being decided\nThe decision open now, and protocol work that Arborist call agendas keep returning to, not yet activated on mainnet.\n.\nZcash governance\nHow Zcash decides, what is open now, and the record so far.\nZIP process and coinholders\nUpgrade heights from a Zebra node; the process behind each upgrade from its ZIPs and the community forum. Polls from their published results; tests of the voting tools are left out. Arborist links use the call agendas only, so a call that discussed a topic without naming it on the agenda is not linked. The open decision follows the organizers' timeline on the Zcash Community Forum, read on\n; the steps follow ZIP 0."
     },
     {
       "id": "src/app/zec-observatory/page.tsx:0",
