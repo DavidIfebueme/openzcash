@@ -1,10 +1,10 @@
 # CODEOWNERS: review ownership for sensitive paths. Default owners cover
 # everything not listed explicitly.
 
-* @Michae2xl @vinibarbosabr
+* @Michae2xl
 
 # Workflow and supply-chain changes need explicit owner review.
-/.github/ @Michae2xl @vinibarbosabr
+/.github/ @Michae2xl
 
 # Data pipeline and published datasets.
 /src/lib/zcg/ @Michae2xl
@@ -22,4 +22,4 @@
 /scripts/treasury-runtime.ts @Michae2xl
 
 # Published agent skills.
-/skills/ @Michae2xl @vinibarbosabr
+/skills/ @Michae2xl
