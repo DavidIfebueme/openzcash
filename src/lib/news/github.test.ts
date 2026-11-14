@@ -128,7 +128,7 @@ describe("GitHub News source recovery", () => {
     ["unexpected response", () => Promise.resolve(response({ message: "private-error" }))],
     ["unexpected response", () => Promise.resolve(response([{ ...release, html_url: "private-not-a-url" }]))],
   ])("logs a failed read as %s with its repository and nothing from the response", async (reason, failure) => {
-    vi.stubEnv("GITHUB_TOKEN", "test-read-token-sentinel");
+    vi.stubEnv("GITHUB_TOKEN", "");
     const reader = createGitHubNewsReader({ ttlMs: 0, fetcher: vi.fn<typeof fetch>().mockResolvedValueOnce(response()).mockImplementation(failure) });
     await reader.read(repository);
     expect(console.error).not.toHaveBeenCalled();
@@ -137,6 +137,40 @@ describe("GitHub News source recovery", () => {
     await reader.read("zingolabs/zaino");
     expect(console.error).toHaveBeenLastCalledWith(`[news] GitHub zingolabs/zaino refresh failed (${reason}); no previous response`);
     expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toMatch(/private|sentinel/);
+  });
+  it.each([401, 403])("reads the public source without the credential when GitHub answers %i to it", async status => {
+    vi.stubEnv("GITHUB_TOKEN", "test-read-token-sentinel");
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response({ message: "private-error" }, status)).mockResolvedValueOnce(response());
+    const reader = createGitHubNewsReader({ ttlMs: 0, fetcher });
+    expect(await reader.read(repository)).toHaveLength(1);
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls[0][1]?.headers).toHaveProperty("authorization", "Bearer test-read-token-sentinel");
+    expect(fetcher.mock.calls[1][0]).toBe(`https://api.github.com/repos/${repository}/releases?per_page=5`);
+    expect(fetcher.mock.calls[1][1]).toMatchObject({ cache: "no-store", redirect: "error" });
+    expect(fetcher.mock.calls[1][1]?.headers).not.toHaveProperty("authorization");
+    expect(reader.health()[0]).toMatchObject({ status: "live", failures: 0 });
+    expect(console.error).toHaveBeenCalledExactlyOnceWith(`[news] GitHub ${repository} refused the configured credential (HTTP ${status}); reading without it`);
+    expect(JSON.stringify(vi.mocked(console.error).mock.calls)).not.toMatch(/private|sentinel/);
+  });
+  it("repeats a refused read once only, and never a read that carried no credential", async () => {
+    const refused = () => Promise.resolve(response({ message: "private-error" }, 403));
+    vi.stubEnv("GITHUB_TOKEN", "test-read-token-sentinel");
+    const withCredential = vi.fn<typeof fetch>().mockImplementation(refused);
+    const reader = createGitHubNewsReader({ ttlMs: 3_600_000, fetcher: withCredential });
+    expect(await reader.read(repository)).toEqual([]);
+    expect(withCredential).toHaveBeenCalledTimes(2);
+    expect(reader.health()[0]).toMatchObject({ status: "unavailable", failures: 1 });
+    expect(console.error).toHaveBeenLastCalledWith(`[news] GitHub ${repository} refresh failed (HTTP 403); no previous response`);
+    vi.stubEnv("GITHUB_TOKEN", "");
+    const anonymous = vi.fn<typeof fetch>().mockImplementation(refused);
+    await createGitHubNewsReader({ ttlMs: 3_600_000, fetcher: anonymous }).read(repository);
+    expect(anonymous).toHaveBeenCalledTimes(1);
+    for (const status of [404, 429, 500]) {
+      vi.stubEnv("GITHUB_TOKEN", "test-read-token-sentinel");
+      const other = vi.fn<typeof fetch>().mockImplementation(() => Promise.resolve(response({}, status)));
+      await createGitHubNewsReader({ ttlMs: 3_600_000, fetcher: other }).read(repository);
+      expect(other).toHaveBeenCalledTimes(1);
+    }
   });
   it("shares an overlapping read and releases it after completion", async () => {
     let finish!: (r: Response) => void;

@@ -66,6 +66,18 @@ export function createGitHubNewsReader({ fetcher = fetch, now = Date.now, ttlMs 
 }: Dependencies = {}) {
   /** A failed read is repeated sooner than the schedule; the wait doubles, up to the schedule, while it keeps failing. */
   const spacing = (failures: number) => failures ? Math.min(ttlMs, retryMs * 2 ** (failures - 1)) : ttlMs;
+  /** GitHub can refuse a credential for one organization while its releases stay public: such a read is repeated once as any visitor's. */
+  async function fetchReleases(repository: string): Promise<Response> {
+    const { authorization, ...anonymous } = ghHeaders();
+    const send = (headers: Record<string, string>) => fetcher(`https://api.github.com/repos/${repository}/releases?per_page=${RELEASES_PER_REPOSITORY}`, {
+      headers, signal: AbortSignal.timeout(7_000), cache: "no-store", redirect: "error",
+    });
+    const response = await send(authorization ? { ...anonymous, authorization } : anonymous);
+    if (!authorization || (response.status !== 401 && response.status !== 403)) return response;
+    void response.body?.cancel().catch(() => {});
+    console.error(`[news] GitHub ${repository} refused the configured credential (HTTP ${response.status}); reading without it`);
+    return send(anonymous);
+  }
   function health(): NewsGitHubHealth[] {
     return NEWS_GITHUB_REPOSITORIES.map(repository => ({ ...(store.entries.get(repository)?.health ?? {
       repository, status: "unchecked" as const, fetchedAt: null, lastSuccessAt: null, failures: 0,
@@ -79,9 +91,7 @@ export function createGitHubNewsReader({ fetcher = fetch, now = Date.now, ttlMs 
     if (pending) return pending;
     const request = (async () => {
       try {
-        const response = await fetcher(`https://api.github.com/repos/${repository}/releases?per_page=${RELEASES_PER_REPOSITORY}`, {
-          headers: ghHeaders(), signal: AbortSignal.timeout(7_000), cache: "no-store", redirect: "error",
-        });
+        const response = await fetchReleases(repository);
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const items = releases(await response.json(), repository);
         const fetchedAt = new Date(now()).toISOString();
