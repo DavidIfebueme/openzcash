@@ -1,6 +1,7 @@
 /** Real Nym integration: Mac and non-production Railway Linux, one client each.
  * Run only after staging the identical source and npm dependencies on the remote
  * temporary path. Synthetic invitation tokens remain in child pipes, never logs.
+ * Usage: <remote-root> <railway-project> <railway-service> <railway-environment>.
  */
 import assert from "node:assert/strict";
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
@@ -8,8 +9,11 @@ import { createHash, randomBytes } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 
 type Reply = { id: number; ok?: boolean; ready?: boolean; token?: string; error?: string; state?: object; counters?: object };
-const remoteRoot = process.argv[2];
+const [remoteRoot, railwayProject, railwayService, railwayEnvironment] = process.argv.slice(2);
 assert.ok(remoteRoot && /^\/tmp\/openzcash-nym-crosshost-[a-z0-9-]+$/.test(remoteRoot));
+// The operator names the Railway target on the command line; none is assumed.
+assert.ok(railwayProject && railwayService && railwayEnvironment, "usage: <remote-root> <railway-project> <railway-service> <railway-environment>");
+assert.ok(!/^\s*prod/i.test(railwayEnvironment), "the remote role runs only in a non-production environment");
 const startedAt = new Date().toISOString();
 const sources: Record<string, string> = {};
 for (const file of [
@@ -26,7 +30,7 @@ const report: {
   checks: { name: string; durationMs: number }[]; clients?: object;
 } = {
   startedAt, success: false,
-  topology: "Mac local network and Railway redesign non-production Linux network; two independent Nym WASM clients; isolated Node 26.5.0 on Linux",
+  topology: `Mac local network and Railway ${railwayEnvironment} non-production Linux network; two independent Nym WASM clients; isolated Node 26.5.0 on Linux`,
   sdk: "@nymproject/nym-client-wasm@1.4.1, @matrix-org/matrix-sdk-crypto-wasm@18.9.0",
   sources, checks: [],
 };
@@ -89,7 +93,7 @@ class Role {
   stop() { this.child.stdin.end(); if (!this.exited) this.child.kill("SIGTERM"); }
 }
 
-const remote = new Role("Linux", "railway", ["ssh", "-p", "5476eada-862a-47bd-9166-49be9933d33c", "-s", "zbo", "-e", "redesign", "--", "sh", "-lc", `cd ${remoteRoot} && LD_LIBRARY_PATH=${remoteRoot}/syslib/usr/lib/x86_64-linux-gnu ${remoteRoot}/node_modules/node/bin/node --import tsx scripts/private-chat-cross-network-role.mts 'Synthetic Bob'`]);
+const remote = new Role("Linux", "railway", ["ssh", "-p", railwayProject, "-s", railwayService, "-e", railwayEnvironment, "--", "sh", "-lc", `cd ${remoteRoot} && LD_LIBRARY_PATH=${remoteRoot}/syslib/usr/lib/x86_64-linux-gnu ${remoteRoot}/node_modules/node/bin/node --import tsx scripts/private-chat-cross-network-role.mts 'Synthetic Bob'`]);
 const local = new Role("Mac", process.execPath, ["--import", "tsx", "scripts/private-chat-cross-network-role.mts", "Synthetic Alice"]);
 async function step(name: string, action: () => Promise<void>) {
   const time = Date.now();

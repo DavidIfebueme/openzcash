@@ -44,7 +44,7 @@ const SOURCES: { name: string; what: string }[] = [
   },
   {
     name: "On-chain (lightwalletd)",
-    what: "The Lockbox / ZIP-1016 ZEC balance: the latest spreadsheet Lockbox snapshot plus protocol-deterministic accrual (0.1875 ZEC per block, ZIP-1015) up to the live chain tip, which lightwalletd supplies read-only. No viewing-key scans run. Market prices, grant approvals and milestone delivery are not facts supplied by the chain.",
+    what: "The Lockbox / ZIP-1016 ZEC balance: the latest spreadsheet Lockbox snapshot plus protocol-deterministic accrual (0.06249999 ZEC per block since NU7 and 0.1875 ZEC before it, ZIP-1015 and ZIP-218) up to the live chain tip, which lightwalletd supplies read-only. No viewing-key scans run. Market prices, grant approvals and milestone delivery are not facts supplied by the chain.",
   },
   {
     name: "CoinGecko, CoinPaprika, Coinbase",

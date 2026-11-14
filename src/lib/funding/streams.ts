@@ -49,7 +49,7 @@ export const ERAS: Record<
     from: "2024-11-23",
     to: null,
     summary:
-      "8% to Zcash Community Grants and 12% into the in-protocol lockbox, until the third halving.",
+      "8% to Zcash Community Grants and 12% into the in-protocol lockbox, until the third halving. Since NU7 the blocks are 25 seconds apart and each carries a third of the amount.",
   },
 };
 
@@ -140,6 +140,8 @@ export const STREAMS: StreamInfo[] = [
     rules: [
       ZIP(1015, "Block subsidy allocation for non-direct development funding"),
       ZIP(1016, "Community and coinholder funding model"),
+      ZIP(218, "25-second block target spacing"),
+      ZIP(2008, "Update to the FS_FPF_ZCG_H3 address list"),
     ],
     addresses: ["t3cFfPt1Bcvgez9ZbMBFWeZsskxTkPzGCow"],
     destinations: [
@@ -160,6 +162,7 @@ export const STREAMS: StreamInfo[] = [
       ZIP(2001, "Lockbox funding streams"),
       ZIP(271, "Deferred dev fund lockbox disbursement"),
       ZIP(1016, "Community and coinholder funding model"),
+      ZIP(218, "25-second block target spacing"),
     ],
     addresses: [LOCKBOX_DISBURSEMENT.address],
     destinations: [
@@ -188,5 +191,9 @@ export const CHECKED_BLOCKS: { height: number; what: string }[] = [
   {
     height: HEIGHTS.nu61,
     what: "NU6.1: ten outputs of 7,875 ZEC disburse the lockbox",
+  },
+  {
+    height: HEIGHTS.nu7,
+    what: "NU7: 0.04166666 ZEC to ZCG, 0.06249999 ZEC into the lockbox, a third of the 75-second amounts rounded down",
   },
 ];

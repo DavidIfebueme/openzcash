@@ -1,8 +1,9 @@
-# Railway deploy config for the Zcash Back Office (ZBO).
+# Railway deploy config for the OpenZcash portal.
 #
-# Pure Next.js app (Railpack builds it: npm install -> npm run build -> the
-# start command below). Public data comes from external sources and the
-# database.
+# Next.js app (Railpack builds it: npm install -> npm run build -> the start
+# command below). Public data comes from external sources and the database.
+# One optional companion runs in the same container: the OpenZcash Treasury
+# runtime, off unless the service enables it.
 #
 # Node runtime: Railpack installs the exact version in package.json
 # engines.node, so bumping that field is how the runtime gets security fixes.
@@ -23,7 +24,15 @@ builder = "RAILPACK"
 # `next start` honors $PORT. Migrations run from inside Railway's network — the
 # Postgres host is only reachable on the private network. Healthcheck hits a
 # DB-free page so app-boot is what's measured, not data readiness.
-startCommand = "node scripts/assert-redesign.mjs && node scripts/migrate.mjs && node scripts/seed-governance.mjs && npm run start"
+#
+# The last step replaces the shell with `npm run start` (`exec`), so the site is
+# the process the platform signals, with or without the treasury runtime. Only
+# when the service sets OPENZCASH_TREASURY_RUNTIME=enabled does it first start
+# that runtime in the background: the wallet engine and the treasury worker, on
+# the service's volume (see docs/openzcash-treasury.md). The site's start,
+# health check and restart policy do not wait on the runtime.
+# src/lib/openzcash-treasury/start-command.test.ts runs this exact line.
+startCommand = 'node scripts/assert-redesign.mjs && node scripts/migrate.mjs && node scripts/seed-governance.mjs && { if [ "$OPENZCASH_TREASURY_RUNTIME" = enabled ]; then node --import tsx scripts/treasury-runtime.ts & fi; exec npm run start; }'
 healthcheckPath = "/api"
 healthcheckTimeout = 120
 restartPolicyType = "ON_FAILURE"

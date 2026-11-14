@@ -1,4 +1,4 @@
-/** Ícones SVG inline (stroke = currentColor). Leves, sem dependência externa. */
+/** Inline SVG icons (stroke = currentColor). Lightweight, no external dependency. */
 
 import type { ReactNode } from "react";
 

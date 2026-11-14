@@ -91,9 +91,9 @@ export const COINHOLDER_FUND = {
   ] satisfies Link[],
 };
 
-export const NU7_FUNDING_PROPOSAL: Link = {
-  label: "zcash/zips pull request #1370",
-  href: "https://github.com/zcash/zips/pull/1370",
+export const NU7_FUNDING_RULES: Link = {
+  label: "ZIP 214 · revision 3, deployed with NU7",
+  href: "https://zips.z.cash/zip-0214",
 };
 
 export const KEYHOLDER_DRAFT: Link = {

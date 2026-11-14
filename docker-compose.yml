@@ -1,13 +1,13 @@
-# Infra de backend para rodar o ZEC Back-office 100% LOCAL (sem o Raspberry Pi):
-#   - zkool: engine de wallet (zkool_graphql) conectada a um lightwalletd público (zec.rocks)
-#   - db:    Postgres da aplicação (OPCIONAL — só sobe com `--profile db`; se você já tem
-#            Postgres local, ignore e aponte o DATABASE_URL para ele)
+# Local backend infrastructure for running the retired wallet engine fully LOCAL:
+#   - zkool: wallet engine (zkool_graphql) connected to a public lightwalletd (zec.rocks)
+#   - db:    application Postgres (OPTIONAL - only starts with `--profile db`; if you
+#            already have local Postgres, ignore this and point DATABASE_URL at it)
 #
-# Uso:
-#   docker compose up -d zkool                 # só a engine zkool (recomendado se já tem Postgres)
-#   docker compose --profile db up -d          # engine + Postgres containerizado
+# Usage:
+#   docker compose up -d zkool                 # engine only (recommended if you have Postgres)
+#   docker compose --profile db up -d          # engine + containerized Postgres
 #
-# O app Next.js roda fora do compose (`npm run dev`) apontando para:
+# The Next.js app runs outside compose (`npm run dev`) pointing at:
 #   ZCASH_GATEWAY=zkool
 #   ZKOOL_GRAPHQL_URL=http://localhost:8000/graphql
 
@@ -23,14 +23,14 @@ services:
     volumes:
       - zkool-data:/data
     restart: unless-stopped
-    # Para testnet, descomente (usa lwd de testnet):
+    # For testnet, uncomment (uses the testnet lightwalletd):
     # command: ["-d", "/data/zkool.db", "-l", "https://lwd.testnet.zcash-infra.com:9067", "-p", "8000"]
 
   db:
     image: postgres:16
-    profiles: ["db"] # opcional — `docker compose --profile db up`
+    profiles: ["db"] # optional - `docker compose --profile db up`
     environment:
-      POSTGRES_DB: zec_backoffice
+      POSTGRES_DB: openzcash
       POSTGRES_USER: zec
       POSTGRES_PASSWORD: zec
     ports:

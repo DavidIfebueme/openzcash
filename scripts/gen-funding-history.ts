@@ -5,6 +5,9 @@
  *
  *   npx tsx scripts/gen-funding-history.ts
  *
+ * Published days are append-only; pass --allow-rewrite after reviewing a real
+ * correction from a source.
+ *
  * Inputs, one row per complete UTC day since genesis:
  * - the first block height stamped that day (Blockchair daily aggregate). A day
  *   covers heights from its first block to the block before the next day's
@@ -12,9 +15,10 @@
  * - the ZEC/USD daily close (Bitfinex tZECUSD 1D candles, UTC). Genesis day
  *   (2016-10-28) has no candle and keeps a null price.
  */
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { z } from "zod";
+import { historyRewrite } from "./lib/funding-days-guard.mjs";
 
 const HEIGHTS_URL =
   "https://api.blockchair.com/zcash/blocks?a=date,min(id),max(id),count()&s=date(asc)&limit=10000";
@@ -55,6 +59,16 @@ async function getJson(url: string): Promise<unknown> {
   });
   if (!res.ok) throw new Error(`${url} answered ${res.status}`);
   return res.json();
+}
+
+async function publishedRows(): Promise<unknown[][]> {
+  try {
+    const doc = JSON.parse(await readFile(OUT, "utf8")) as { rows: unknown[][] };
+    return doc.rows;
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code === "ENOENT") return [];
+    throw e;
+  }
 }
 
 const dayOf = (ms: number) => new Date(ms).toISOString().slice(0, 10);
@@ -101,6 +115,11 @@ async function main() {
   const missingPrice = rows.filter(([, , , c]) => c === null).map(([d]) => d);
   if (missingPrice.some((d) => d !== "2016-10-28")) {
     throw new Error(`No daily close for: ${missingPrice.join(", ")}`);
+  }
+
+  const rewrite = historyRewrite(await publishedRows(), rows);
+  if (rewrite && !process.argv.includes("--allow-rewrite")) {
+    throw new Error(`Refusing to rewrite history: ${rewrite}`);
   }
 
   const last = rows[rows.length - 1];

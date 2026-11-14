@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { runCollectorCycle } from "@/lib/services/poll-reconcile";
 
@@ -14,7 +15,10 @@ function isAuthorizedInternalRequest(request: Request) {
     throw new Error("ZCAP_INTERNAL_SECRET is required");
   }
 
-  return request.headers.get("x-zcap-internal-secret") === secret;
+  const provided = request.headers.get("x-zcap-internal-secret") ?? "";
+  const a = Buffer.from(provided, "utf8");
+  const b = Buffer.from(secret, "utf8");
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 export async function POST(request: Request) {

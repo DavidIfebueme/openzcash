@@ -1,6 +1,8 @@
 import "server-only";
 import { z } from "zod";
 import { cachedFeed, type Feed } from "./cache";
+import { html, json } from "./http";
+import { DIRECT_EXCHANGES, readDirectExchange } from "./exchanges-direct";
 import { PUBLIC_ADDRESS_ATTRIBUTIONS } from "./attributions";
 import {
   GRAYSCALE_ISSUER_URL,
@@ -45,46 +47,31 @@ import {
   parseMayaHealth,
   parseMayaNetwork,
   mayaIndexCurrent,
+  midgardIndexRecent,
   parseMayaPool,
   parseSwapSummary,
 } from "@/lib/defi/maya-activity-model";
+import {
+  THOR_ALL_TIME_URL,
+  THOR_MIDGARD,
+  THOR_NODE,
+  parseThorAllTime,
+  parseThorPoolDepth,
+  parseThorWindow,
+  thorVenue,
+  thorWindowUrl,
+} from "./thorchain";
 
 export const CIPHER = "https://api.mainnet.cipherscan.app";
 export const NEAR_VOLUME =
   "https://explorer.near-intents.org/?toTokenId=nep141%3Azec.omft.near";
 const PAPRIKA = "https://api.coinpaprika.com/v1";
 const MAYA = "https://midgard.mayachain.info/v2";
-const THOR = "https://gateway.liquify.com/chain/thorchain_midgard/v2";
 const numeric = z
   .union([z.number(), z.string().regex(/^\d+(?:\.\d+)?$/)])
   .transform(Number)
   .pipe(z.number().finite().nonnegative());
 const iso = () => new Date().toISOString();
-
-async function request(url: string, init?: RequestInit, timeoutMs = 12_000) {
-  const res = await fetch(url, {
-    ...init,
-    headers: {
-      accept: "application/json,text/html",
-      "User-Agent": "OpenZcash/1.0 (+https://openzcash.org)",
-      ...init?.headers,
-    },
-    signal: AbortSignal.timeout(timeoutMs),
-    cache: "no-store",
-  });
-  if (!res.ok) throw new Error("Public source unavailable");
-  return res;
-}
-async function json(
-  url: string,
-  init?: RequestInit,
-  timeoutMs?: number,
-): Promise<unknown> {
-  return (await request(url, init, timeoutMs)).json();
-}
-async function html(url: string): Promise<string> {
-  return (await request(url)).text();
-}
 
 // Spread indexer requests across SSR/API bundles in the same server process.
 // Fail a saturated queue rather than extending the page's wait indefinitely.
@@ -112,6 +99,11 @@ const markets = cachedFeed(async () => {
   ]);
   if (!e.data || e.stale) throw new Error("Venue classification unavailable");
   return parseMarkets(m, e.data, Date.now());
+});
+// Exchanges the aggregator does not list for ZEC, each read from its own API.
+const directExchanges = DIRECT_EXCHANGES.map((exchange) => {
+  const read = cachedFeed(() => readDirectExchange(exchange, json));
+  return async () => ({ exchange, feed: await read() });
 });
 const supply = cachedFeed(async () =>
   parseSupply(await json(`${CIPHER}/api/blockchain-info`)),
@@ -364,29 +356,34 @@ const maya = cachedFeed(async () => {
   return { venue, zec: p.zec, status: p.status };
 });
 const thor = cachedFeed(async () => {
-  const pools = z
-    .array(z.object({ asset: z.string(), assetDepth: numeric }))
-    .parse(await json(`${THOR}/pools`));
-  const pool = pools.find((p) => p.asset === "ZEC.ZEC");
-  if (!pool) return { venue: null, listed: false, zec: null };
+  const zec = parseThorPoolDepth(await json(`${THOR_MIDGARD}/pools`));
+  if (zec === null) return { venue: null, listed: false, zec: null };
   const to = Math.floor(Date.now() / 1000);
   const from = to - 86400;
-  const url = `${THOR}/history/swaps?pool=ZEC.ZEC&from=${from}&to=${to}`;
-  const s = parseSwapSummary(await json(url));
-  if (!s || Math.abs(s.to - to) > 120 || Math.abs(s.from - from) > 120)
-    throw new Error("THORChain window unavailable");
-  const venue: Venue = {
-    id: "thorchain",
-    name: "THORChain",
-    kind: "dex",
-    volumeUsd: s.volumeUsd,
-    pairs: 1,
-    asOf: new Date(s.to * 1000).toISOString(),
-    source: url,
-    note: "Direct ZEC pool volume; counted once at protocol level.",
+  const url = thorWindowUrl(from, to);
+  const [raw, healthRaw] = await Promise.all([
+    json(url),
+    json(`${THOR_MIDGARD}/health`),
+  ]);
+  // The public gateway reports inSync=false while indexing the current block,
+  // so the indexed block's age is the freshness evidence here.
+  if (!midgardIndexRecent(parseMayaHealth(healthRaw), Date.now()))
+    throw new Error("THORChain index not current");
+  return {
+    venue: thorVenue(parseThorWindow(raw, from, to), url),
+    listed: true,
+    zec,
   };
-  return { venue, listed: true, zec: pool.assetDepth / 1e8 };
 });
+const thorHistory = cachedFeed(async () =>
+  parseThorAllTime(await json(THOR_ALL_TIME_URL), Date.now()),
+);
+const THOR_NETWORK = `${THOR_NODE}/inbound_addresses`;
+const HALT_NOTE =
+  "ZEC inbound halt and trading-pause flags. Pool status alone does not confirm trading is active.";
+const thorNetwork = cachedFeed(async () =>
+  parseMayaNetwork(await json(THOR_NETWORK)),
+);
 const rhea = cachedFeed(async () => {
   const raw = await json(
     "https://api.geckoterminal.com/api/v2/networks/near/pools/refv1-6065",
@@ -488,6 +485,9 @@ async function collectMarketDashboard() {
     ka,
     legacy,
     mn,
+    thh,
+    tn,
+    direct,
   ] = await Promise.all([
     markets(),
     supply(),
@@ -513,11 +513,14 @@ async function collectMarketDashboard() {
     kamino(),
     legacySolana(),
     mayaNetwork(),
+    thorHistory(),
+    thorNetwork(),
+    Promise.all(directExchanges.map((read) => read())),
   ]);
   // A failed or stale volume source stays visible in coverage but cannot
   // silently enter a rolling-day comparison alongside fresh numbers.
   const tracked = m.data && !m.stale ? [...m.data.venues] : [];
-  for (const feed of [n, hy])
+  for (const feed of [n, hy, ...direct.map((d) => d.feed)])
     if (feed.data && !feed.stale) tracked.push(feed.data);
   if (ma.data && !ma.stale) tracked.push(ma.data.venue);
   if (th.data?.venue && !th.stale) tracked.push(th.data.venue);
@@ -530,10 +533,15 @@ async function collectMarketDashboard() {
   tracked.push(...wrappedMarkets.venues);
   const { venues, metrics } = spotBenchmark(tracked);
   venues.sort((a, b) => b.volumeUsd - a.volumeUsd);
+  // Every feed that enters the comparison, the direct exchanges included.
+  const volumeFeeds = [
+    ...[m, hy, ma, th, rh],
+    ...direct.map((d) => d.feed),
+    ...wrapped.map((u) => u.feed),
+  ];
   const volumeComplete =
-    ![m, hy, ma, th, rh, ...wrapped.map((u) => u.feed)].some(
-      (f) => f.stale || !f.data,
-    ) && !wrapped.some((w) => w.feed.data?.partial);
+    !volumeFeeds.some((f) => f.stale || !f.data) &&
+    !wrapped.some((w) => w.feed.data?.partial);
   // Newest dated Grayscale figure (a live issuer read, the saved issuer
   // disclosure, or a newer SEC filing), with a Sources note that says what
   // actually happened to the issuer read. Each keeps its own date and origin.
@@ -541,6 +549,7 @@ async function collectMarketDashboard() {
     gray,
     grayFiling,
   );
+  const thorUnlisted = th.data !== null && !th.data.listed && !th.stale;
   const sourceStatuses: SourceStatus[] = [
     status(
       "renZEC · legacy Solana mint",
@@ -553,6 +562,9 @@ async function collectMarketDashboard() {
       `${PAPRIKA}/coins/zec-zcash/markets`,
       m,
       "All returned ZEC markets examined; classification from the exchange registry.",
+    ),
+    ...direct.map(({ exchange, feed }) =>
+      status(exchange.name, exchange.endpoint, feed, exchange.coverage),
     ),
     {
       ...status(
@@ -597,12 +609,7 @@ async function collectMarketDashboard() {
       ma,
       "Exact rolling 24-hour window; synchronized Midgard with a block less than five minutes old required.",
     ),
-    status(
-      "Maya network status",
-      MAYA_NETWORK,
-      mn,
-      "ZEC inbound halt and trading-pause flags. Pool status alone does not confirm trading is active.",
-    ),
+    status("Maya network status", MAYA_NETWORK, mn, HALT_NOTE),
     ...wrapped.map(({ asset, feed }) => ({
       ...status(
         `${asset.issuer} ${asset.symbol} · ${asset.chainName}`,
@@ -620,19 +627,19 @@ async function collectMarketDashboard() {
           }
         : {}),
     })),
-    {
-      ...status(
+    ...[
+      status(
         "THORChain",
-        `${THOR}/pools`,
+        `${THOR_MIDGARD}/pools`,
         th,
         th.data?.listed
-          ? "Native ZEC pool."
+          ? "Native ZEC pool. Exact rolling 24-hour window; an indexed block less than five minutes old required."
           : "No ZEC pool in the returned pool registry. Not recorded as an API failure or invented trading volume.",
       ),
-      ...(th.data && !th.data.listed && !th.stale
-        ? { status: "not-listed" as const }
-        : {}),
-    },
+      status("THORChain network status", THOR_NETWORK, tn, HALT_NOTE),
+    ].map((source) =>
+      thorUnlisted ? { ...source, status: "not-listed" as const } : source,
+    ),
     status(
       "Rhea Finance",
       "https://www.geckoterminal.com/near/pools/refv1-6065",
@@ -728,6 +735,8 @@ async function collectMarketDashboard() {
     rheaActivity: rh,
     mayaPoolZec: ma.data?.zec ?? null,
     thorPoolZec: th.data?.zec ?? null,
+    thorHistory: thh,
+    thorNetwork: tn,
   };
 }
 // Sources with a dated fallback do not make the snapshot partial.
@@ -741,8 +750,8 @@ const dashboardSnapshot = cachedFeed(
         (source.status === "unavailable" || source.status === "saved") &&
         !DATED_FALLBACK_SOURCES.has(source.name),
     ) || data.wrapped.some((w) => (w.feed.data?.failedSources ?? 0) > 0),
-  // v4: the Grayscale note follows the issuer read, not only the winning origin.
-  { key: "zec-observatory:dashboard:v4", staleWhileRevalidate: true },
+  // v5: the snapshot carries THORChain's lifetime volume and network status.
+  { key: "zec-observatory:dashboard:v5", staleWhileRevalidate: true },
 );
 
 /** One atomic, dated snapshot for server rendering and the refresh endpoint. */

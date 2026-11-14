@@ -1,8 +1,8 @@
-import { HEIGHTS, blockSubsidy, halving } from "@/lib/funding/consensus";
+import { HEIGHTS, blockSubsidy, halving, targetSecondsBetween } from "@/lib/funding/consensus";
 
-export const TARGET_SPACING_SECONDS = 75;
-const HALVING_INTERVAL = 1_680_000;
-/** The first halving height above `height`: Canopy, NU6, the third halving, then every 1,680,000 blocks. */
+/** Halving interval since NU7 (ZIP 218): 5,040,000 blocks of 25 seconds. */
+const HALVING_INTERVAL = 5_040_000;
+/** The first halving height above `height`: Canopy, NU6, the third halving (6,132,390), then every 5,040,000 blocks. */
 export function nextHalvingHeight(height: number): number {
   const fixed = [HEIGHTS.canopy, HEIGHTS.nu6, HEIGHTS.thirdHalving];
   const known = fixed.find((h) => h > height);
@@ -43,6 +43,8 @@ export function chainContext(reading: ChainReading, now = Date.now()) {
       : null;
   const next = height ? nextHalvingHeight(height) : null;
   const remaining = height && next ? next - height : null;
+  // Target seconds per arriving block, so a pre-NU7 tip crosses the 75 s to 25 s change correctly.
+  const remainingSeconds = height && next ? targetSecondsBetween(height, next) : null;
   const s = reading.supply;
   return {
     tip: height
@@ -57,20 +59,20 @@ export function chainContext(reading: ChainReading, now = Date.now()) {
       ? undefined
       : "Current block height unavailable right now; do not estimate one.",
     halving:
-      height && next && remaining !== null
+      height && next && remaining !== null && remainingSeconds !== null
         ? {
             nextHeight: next,
             blocksRemaining: remaining,
             estimatedAt: new Date(
-              now + remaining * TARGET_SPACING_SECONDS * 1000,
+              now + remainingSeconds * 1000,
             ).toISOString(),
             estimatedDaysRemaining:
-              Math.round(((remaining * TARGET_SPACING_SECONDS) / 86_400) * 10) /
+              Math.round((remainingSeconds / 86_400) * 10) /
               10,
             halvingsSoFar: halving(height),
             subsidyZecPerBlock: zec(blockSubsidy(height)),
             subsidyAfterNextZecPerBlock: zec(blockSubsidy(next)),
-            basis: `Estimate from the tip height at ${TARGET_SPACING_SECONDS}-second target spacing; real block times vary, so the date is not fixed. The third halving (4,406,400) also ends the ZIP 1015 ZCG/Lockbox streams.`,
+            basis: "Estimate from the tip height at the target block spacing (25 seconds since NU7, ZIP 218); real block times vary, so the date is not fixed. The third halving at block 6,132,390 also ends the ZCG and Lockbox streams (ZIP 214 revision 3).",
           }
         : null,
     halvingNote: height

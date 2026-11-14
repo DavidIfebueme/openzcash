@@ -1,6 +1,7 @@
 import "server-only";
 import { z } from "zod";
 import { locale, pick, type DirectLanguage } from "./language";
+import { targetSpacingSeconds } from "@/lib/funding/consensus";
 
 export const MINING_SOURCE = "https://api.zcashinfo.com/api/v1/mining/overview";
 const METHOD = "https://zcashinfo.com/learn/solrate/";
@@ -8,12 +9,16 @@ const MAX_AGE_MS = 15 * 60_000;
 const MAX_BYTES = 2 * 1024 * 1024;
 const positive = z.number().finite().positive();
 const block = z.object({ height: z.number().int().min(653_600), time: positive, difficulty: positive, status: z.string().nullish() });
+/** Solutions of work per unit of difficulty in the publisher's formula. */
+const WORK_PER_DIFFICULTY = 8192;
 const overview = z.object({
-  info: z.object({ best_block: z.number().int(), chain_tip: z.number().int(), status: z.string() }),
+  info: z.object({ best_block: z.number().int(), chain_tip: z.number().int(), status: z.string(), target_block_spacing_secs: positive.nullish(), work_per_difficulty: positive.nullish() }),
   recent_blocks: z.array(block).length(20),
 });
 export const miningSnapshotSchema = z.object({
   solrate: positive, unit: z.literal("Sol/s"), blockCount: z.literal(20),
+  /** The divisor of the estimate: 75 from Blossom, 25 since NU7 (ZIP 218). */
+  targetSpacingSeconds: z.union([z.literal(75), z.literal(25)]),
   fromHeight: z.number().int().positive(), toHeight: z.number().int().positive(),
   observedFrom: z.iso.datetime(), observedTo: z.iso.datetime(), retrievedAt: z.iso.datetime(),
   stale: z.boolean(),
@@ -21,7 +26,11 @@ export const miningSnapshotSchema = z.object({
 export type MiningSnapshot = z.infer<typeof miningSnapshotSchema>;
 let cached: MiningSnapshot | undefined;
 
-/** Match the publisher's post-Blossom formula, with source heights and times intact. */
+/**
+ * Match the publisher's formula, difficulty × 8192 ÷ target block spacing, with
+ * source heights and times intact. The spacing comes from the consensus rules
+ * at the sampled height; a source that reports another one is not used.
+ */
 export function miningSnapshot(value: unknown, now = Date.now()): MiningSnapshot {
   const data = overview.parse(value);
   const blocks = [...data.recent_blocks].sort((a, b) => a.height - b.height);
@@ -32,8 +41,11 @@ export function miningSnapshot(value: unknown, now = Date.now()): MiningSnapshot
   const from = Math.min(...times), to = Math.max(...times);
   if (from < Date.UTC(2019, 11, 11) || to > now + 120_000) throw new Error("MINING_INVALID_TIME");
   const difficulty = blocks.reduce((sum, b) => sum + b.difficulty, 0) / blocks.length;
+  const spacing = targetSpacingSeconds(blocks.at(-1)!.height);
+  const { target_block_spacing_secs: reportedSpacing, work_per_difficulty: reportedWork } = data.info;
+  if ((reportedSpacing != null && reportedSpacing !== spacing) || (reportedWork != null && reportedWork !== WORK_PER_DIFFICULTY)) throw new Error("MINING_SPACING_MISMATCH");
   return miningSnapshotSchema.parse({
-    solrate: difficulty * 8192 / 75, unit: "Sol/s", blockCount: 20,
+    solrate: difficulty * WORK_PER_DIFFICULTY / spacing, unit: "Sol/s", blockCount: 20, targetSpacingSeconds: spacing,
     fromHeight: blocks[0].height, toHeight: blocks.at(-1)!.height,
     observedFrom: new Date(from).toISOString(), observedTo: new Date(to).toISOString(),
     retrievedAt: new Date(now).toISOString(), stale: now - to > MAX_AGE_MS,
@@ -77,9 +89,9 @@ export function miningAnswer(content: string, lang: DirectLanguage): string {
   const number = new Intl.NumberFormat(locale(lang), { maximumFractionDigits: 2 }).format(data.solrate / 1e9);
   const date = (value: string) => new Intl.DateTimeFormat(locale(lang), { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" }).format(new Date(value)) + " UTC";
   const text = pick(lang, {
-    en: `${stale ? "Last available reference (outdated):" : "Estimated Zcash network hashrate:"} **${number} GSol/s**. Average difficulty over **20 blocks**, from ${data.fromHeight} to ${data.toHeight}, timestamped between ${date(data.observedFrom)} and ${date(data.observedTo)}. Retrieved ${date(data.retrievedAt)}.\n\n${stale ? "I could not verify a current reading. " : ""}Estimate: average difficulty × 8192 ÷ 75, following ZcashInfo's methodology. It is not a machine count or a 24-hour average.`,
-    pt: `${stale ? "Última referência disponível (desatualizada):" : "Hashrate estimado da rede Zcash:"} **${number} GSol/s**. Média da dificuldade de **20 blocos**, de ${data.fromHeight} a ${data.toHeight}, com horários entre ${date(data.observedFrom)} e ${date(data.observedTo)}. Consultado em ${date(data.retrievedAt)}.\n\n${stale ? "Não consegui confirmar uma leitura atual. " : ""}Estimativa: dificuldade média × 8192 ÷ 75, conforme a metodologia do ZcashInfo. Não é contagem de máquinas nem uma média das últimas 24 horas.`,
-    es: `${stale ? "Última referencia disponible (desactualizada):" : "Hashrate estimado de la red Zcash:"} **${number} GSol/s**. Dificultad promedio de **20 bloques**, del ${data.fromHeight} al ${data.toHeight}, con marcas de tiempo entre ${date(data.observedFrom)} y ${date(data.observedTo)}. Consultado el ${date(data.retrievedAt)}.\n\n${stale ? "No pude confirmar una lectura actual. " : ""}Estimación: dificultad promedio × 8192 ÷ 75, según la metodología de ZcashInfo. No es un conteo de máquinas ni un promedio de 24 horas.`,
+    en: `${stale ? "Last available reference (outdated):" : "Estimated Zcash network hashrate:"} **${number} GSol/s**. Average difficulty over **20 blocks**, from ${data.fromHeight} to ${data.toHeight}, timestamped between ${date(data.observedFrom)} and ${date(data.observedTo)}. Retrieved ${date(data.retrievedAt)}.\n\n${stale ? "I could not verify a current reading. " : ""}Estimate: average difficulty × 8192 ÷ ${data.targetSpacingSeconds}, following ZcashInfo's methodology. It is not a machine count or a 24-hour average.`,
+    pt: `${stale ? "Última referência disponível (desatualizada):" : "Hashrate estimado da rede Zcash:"} **${number} GSol/s**. Média da dificuldade de **20 blocos**, de ${data.fromHeight} a ${data.toHeight}, com horários entre ${date(data.observedFrom)} e ${date(data.observedTo)}. Consultado em ${date(data.retrievedAt)}.\n\n${stale ? "Não consegui confirmar uma leitura atual. " : ""}Estimativa: dificuldade média × 8192 ÷ ${data.targetSpacingSeconds}, conforme a metodologia do ZcashInfo. Não é contagem de máquinas nem uma média das últimas 24 horas.`,
+    es: `${stale ? "Última referencia disponible (desactualizada):" : "Hashrate estimado de la red Zcash:"} **${number} GSol/s**. Dificultad promedio de **20 bloques**, del ${data.fromHeight} al ${data.toHeight}, con marcas de tiempo entre ${date(data.observedFrom)} y ${date(data.observedTo)}. Consultado el ${date(data.retrievedAt)}.\n\n${stale ? "No pude confirmar una lectura actual. " : ""}Estimación: dificultad promedio × 8192 ÷ ${data.targetSpacingSeconds}, según la metodología de ZcashInfo. No es un conteo de máquinas ni un promedio de 24 horas.`,
   });
   return `${text}\n\n[ZcashInfo · API](${MINING_SOURCE}) · [${pick(lang, { en: "Methodology", pt: "Metodologia", es: "Metodología" })}](${METHOD})`;
 }

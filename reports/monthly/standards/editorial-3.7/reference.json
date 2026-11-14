@@ -9,5 +9,5 @@
   "publicationGuide": "reports/monthly/PUBLISHING.md",
   "pdfRenderer": "reports/monthly/render_pdf.py",
   "validator": "reports/monthly/validate_issue.py",
-  "note": "Paths are relative to the repository. This approved partial issue is a design reference only. Every new month requires fresh research, period-specific data and a new editorial and visual review. Private evidence stays in the issue workspace. Codex manages the recurring schedule separately."
+  "note": "Paths are relative to the repository. This approved partial issue is a design reference only. Every new month requires fresh research, period-specific data and a new editorial and visual review. Private evidence stays in the issue workspace. The recurring schedule is managed separately."
 }

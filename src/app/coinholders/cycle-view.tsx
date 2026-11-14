@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { ACTIVE_CYCLE, cycleDateRange, cycleDeadline, cycleHref, cyclePhase, cycleWindows } from "@/lib/coinholder/cycles";
+import { ACTIVE_CYCLE, cycleDateRange, cycleDeadline, cycleHref, cycleNote, cyclePhase, cycleWindows } from "@/lib/coinholder/cycles";
 import base from "./coinholders.module.css";
 import styles from "./cycle-view.module.css";
 
@@ -25,6 +25,21 @@ export function CycleBrand({ id }: { id: string }) {
   </div>;
 }
 
+/** The round's mascot, a zebra at a ballot box: it carries a ballot while submissions are open, casts it during the vote and stands by the box in between. Decorative: the sentence beside it says where the round stands. */
+export function CycleScene({ now }: { now?: number }) {
+  const { step } = cyclePhase(ACTIVE_CYCLE, now);
+  const pose = step === 0 ? "carry" : step === 2 ? "cast" : "stand";
+  return <span className={styles.scene} data-pose={pose} aria-hidden />;
+}
+
+/** Round name and status, with the sentence on where the round stands. */
+export function CycleIntro({ id, note }: { id: string; note?: string }) {
+  return <div className={styles.intro}>
+    <CycleBrand id={id} />
+    <p>{note ?? cycleNote()}</p>
+  </div>;
+}
+
 export function CycleTab({ view, current }: { view: "results" | "activity" | "verify"; current: string }) {
   return <Link href={cycleHref(view)} scroll={false} className={base.tab} aria-current={current === ACTIVE_CYCLE.id ? "page" : undefined}>
     {ACTIVE_CYCLE.label}<span className={styles.tabDot} aria-hidden /><span className="sr-only"> · In progress</span>
@@ -33,13 +48,16 @@ export function CycleTab({ view, current }: { view: "results" | "activity" | "ve
 
 export function CycleTimeline({ outcome = false, now }: { outcome?: boolean; now?: number }) {
   const phase = cyclePhase(ACTIVE_CYCLE, now);
-  const stages = cycleWindows().map((w) => ({ ...w, dates: cycleDateRange(w.start, w.end) }));
+  const windows = cycleWindows();
+  const stages = windows.map((w) => ({ ...w, dates: cycleDateRange(w.start, w.end) }));
   if (outcome) stages.push({ label: "Results", start: "", end: "", dates: "Awaiting publication" });
+  // Between windows nothing is open, so the stepper points at the one that opens next. Results are never inferred.
+  const next = phase.step === -1 && phase.passed < windows.length ? phase.passed : -1;
   return <>
     <ol className={styles.timeline} data-outcome={outcome || undefined} aria-label={`${ACTIVE_CYCLE.label} schedule`}>
-      {stages.map((stage, i) => <li key={stage.label} data-active={phase.step === i || undefined} aria-current={phase.step === i ? "step" : undefined}>
-        <span className={styles.track} aria-hidden><span className={styles.step}>{String(i + 1).padStart(2, "0")}</span></span>
-        <div className={styles.stageText}><span className={styles.stageLabel}><span className={styles.stageName}>{stage.label}</span>{phase.step === i ? <span className={styles.now}>Now</span> : null}</span><strong>{stage.dates}</strong></div>
+      {stages.map((stage, i) => <li key={stage.label} data-passed={i < phase.passed || undefined} data-active={phase.step === i || undefined} data-next={next === i || undefined} aria-current={phase.step === i ? "step" : undefined}>
+        <span className={styles.track} aria-hidden><span className={styles.step}>{i < phase.passed ? <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.4l2.3 2.3 4.7-5.2" /></svg> : String(i + 1).padStart(2, "0")}</span></span>
+        <div className={styles.stageText}><span className={styles.stageLabel}><span className={styles.stageName}>{stage.label}{i < phase.passed ? <span className="sr-only"> · closed</span> : next === i ? <span className="sr-only"> · next</span> : null}</span>{phase.step === i ? <span className={styles.now}>Now</span> : next === i ? <span className={styles.now} aria-hidden>Next</span> : null}</span><strong>{stage.dates}</strong></div>
       </li>)}
     </ol>
     <div className={styles.calendarNote}>
@@ -82,17 +100,10 @@ export function PendingCycle({ view, now }: { view: keyof typeof PENDING_COPY; n
 }
 
 export function CurrentCycle({ fund = false }: { fund?: boolean }) {
-  const phase = cyclePhase();
-  const text = phase.step === 0 ? "Submissions are open for the next coinholder vote."
-    : phase.step === 1 ? "Community review is underway before the vote."
-    : phase.step === 2 ? "The scheduled voting window is here. Follow FPF for voting instructions."
-    : "Follow the announced schedule and published updates for this round.";
   return <CycleCard labelledBy="active-cycle-title">
     <div className={styles.compactHead}>
-      <div>
-        <CycleBrand id="active-cycle-title" />
-        <p>{fund ? "Funding awaits the vote. Current requests are not approved commitments." : text}</p>
-      </div>
+      <CycleIntro id="active-cycle-title" note={fund ? "Funding awaits the vote. Current requests are not approved commitments." : undefined} />
+      <CycleScene />
       <div className={styles.links}><Link href={ACTIVE_CYCLE.href}>View proposals <span aria-hidden>→</span></Link><Link href={cycleHref("results")}>Follow the round <span aria-hidden>→</span></Link></div>
     </div>
     <CycleTimeline />

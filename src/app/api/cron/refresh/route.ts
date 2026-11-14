@@ -63,9 +63,12 @@ export async function GET(req: Request) {
       },
       { status: r.ok ? 200 : 502 },
     );
-  } catch (e) {
+  } catch {
+    // Fixed code only: the caught message can echo sheet layout internals,
+    // URLs or database wording, and this route is reachable by any caller
+    // holding the secret. The server log keeps the underlying error.
     return Response.json(
-      { ok: false, error: e instanceof Error ? e.message : String(e) },
+      { ok: false, error: "ZCG_REFRESH_FAILED" },
       { status: 500 },
     );
   }

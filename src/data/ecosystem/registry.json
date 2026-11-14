@@ -7627,7 +7627,6 @@
       "description": "Open-source infrastructure and tooling for organizations operating Zcash services, including exchanges and wallet providers.",
       "website": "https://shieldedlabs.net/zero/",
       "repositories": [
-        "ShieldedLabs/zero",
         "ShieldedLabs/zero-zb"
       ],
       "funding": {
@@ -7648,8 +7647,8 @@
           "url": "https://shieldedlabs.net/zero/"
         },
         {
-          "title": "ShieldedLabs/zero",
-          "url": "https://github.com/ShieldedLabs/zero"
+          "title": "ShieldedLabs/zero-zb",
+          "url": "https://github.com/ShieldedLabs/zero-zb"
         },
         {
           "title": "ShieldedLabs",

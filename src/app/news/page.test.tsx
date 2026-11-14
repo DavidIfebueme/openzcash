@@ -2,6 +2,7 @@ import { isValidElement, type ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import type { NewsItem } from "@/lib/news/feed";
+import type { NewsGitHubHealth } from "@/lib/news/github";
 import { NEWS_SOURCES, newsView, hasSource, type NewsSearchParams } from "@/lib/news/view";
 
 const now = Date.parse("2026-10-05T07:00:00Z");
@@ -16,9 +17,12 @@ const items: NewsItem[] = [
   { id: "application:1", source: "application", kind: "Grant application", title: "Wallet application", url: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/1", ts: "2026-10-04T00:00:00Z" },
 ];
 
-vi.mock("@/lib/news/feed", () => ({
+const github = vi.hoisted(() => ({ health: [] as NewsGitHubHealth[] }));
+vi.mock("server-only", () => ({}));
+vi.mock("@/lib/news/feed", async () => ({
   getNews: async () => items, nowMs: () => now, newsFetchedAt: () => now,
-  githubNewsHealth: () => [], newsUnavailableSources: () => [],
+  githubNewsHealth: () => github.health, newsUnavailableSources: () => [],
+  githubNewsBehind: (await vi.importActual<typeof import("@/lib/news/github")>("@/lib/news/github")).githubNewsBehind,
 }));
 vi.mock("@/components/source-refresh", () => ({ SourceRefresh: () => null }));
 import NewsPage from "./page";
@@ -76,6 +80,18 @@ describe("News filters and rendered record identity", () => {
     const html = renderToStaticMarkup(await page({ q: "a & b" }));
     expect(html).toContain('/news?source=github&amp;q=a%20%26%20b');
     expect(rows(await page({ q: "no results", source: "github" }))).toHaveLength(0);
+  });
+
+  it("says GitHub updates are incomplete only once a repository's retry has also failed", async () => {
+    const zebra = (failures: number): NewsGitHubHealth => ({ repository: "ZcashFoundation/zebra", status: "cached", failures, fetchedAt: "2026-10-05T06:55:00.000Z", lastSuccessAt: "2026-10-05T05:55:00.000Z" });
+    const zallet: NewsGitHubHealth = { repository: "zcash/zallet", status: "live", failures: 0, fetchedAt: "2026-10-05T06:55:00.000Z", lastSuccessAt: "2026-10-05T06:55:00.000Z" };
+    try {
+      github.health = [zebra(1), zallet];
+      expect(renderToStaticMarkup(await page())).not.toContain("GitHub updates are incomplete");
+      github.health = [zebra(2), zallet];
+      expect(renderToStaticMarkup(await page())).toContain("GitHub updates are incomplete: 1 of 2 repositories");
+      expect(renderToStaticMarkup(await page({ source: "sheet" }))).not.toContain("GitHub updates are incomplete");
+    } finally { github.health = []; }
   });
 
   it("handles repeated URL parameters and resets unknown sources to All sources", async () => {

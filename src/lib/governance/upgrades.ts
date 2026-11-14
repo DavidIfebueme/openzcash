@@ -3,7 +3,9 @@ import type { SourceLink } from "./decisions";
 /**
  * Mainnet protocol changes: the network upgrades the node reports
  * (getblockchaininfo `upgrades`, read through CipherScan's Zebra-backed API on
- * 2026-09-24) plus the June 2026 Orchard soft fork, which has no upgrade entry.
+ * 2026-09-24) plus the June 2026 Orchard soft fork, which has no upgrade entry,
+ * and NU7, whose activation block was read through the Zcash Info block API on
+ * 2026-11-13 (ZIP 259 lists the ZIPs it deployed).
  * `decidedBy` summarises how each change was adopted, per the research record
  * in src/data/governance/record.json; `topics` find the Arborist calls whose
  * agenda named it.
@@ -115,6 +117,14 @@ export const UPGRADES: UpgradeDef[] = [
     zips: [258, 229, 2005, 2006],
     topics: [/\bnu\s?6\.3\b/i, /\bironwood\b/i],
   },
+  {
+    name: "nu7",
+    label: "NU7 · 25-second blocks and the NSM",
+    height: 3_543_405,
+    decidedBy: "2026 coinholder vote on scope, then ZIP 259",
+    zips: [259, 218, 235, 237, 207, 214, 2003, 2008],
+    topics: [/\bnu\s?7\b/i],
+  },
 ];
 
 /** Protocol work still being decided, shown apart from activated changes. */
@@ -124,25 +134,13 @@ export const PENDING_TOPICS: {
   topics: RegExp[];
   sources: SourceLink[];
 }[] = [
-  {
-    label: "NU7 · scope set by coinholder vote",
-    status:
-      "Coinholder vote closed Sep 14, 2026; ZIP 259 is a draft and activation heights are not set",
-    topics: [/\bnu\s?7\b/i, /\bzsas?\b/i, /shielded assets/i],
-    sources: [
-      zipLink(259),
-      {
-        label: "Vote results",
-        href: "https://forum.zcashcommunity.com/t/nu7-coinholder-vote/56912/42",
-      },
-    ],
-  },
   { label: "Crosslink", status: null, topics: [/\bcrosslink\b/i], sources: [] },
   {
-    label: "Network Sustainability Mechanism",
-    status: null,
+    label: "Network Sustainability Mechanism · voluntary removals",
+    status:
+      "NU7 activated the fee removal (ZIP 235) and the reissuance (ZIP 237); ZIP 233, the field for voluntary removals, is a draft and was not deployed",
     topics: [/\bnsm\b/i, /sustainability mechanism/i],
-    sources: [],
+    sources: [zipLink(233), zipLink(259)],
   },
 ];
 

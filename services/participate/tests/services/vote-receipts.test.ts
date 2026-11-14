@@ -80,7 +80,7 @@ describe("deliverConfirmedVoteReceiptEmailsForPoll", () => {
       assignment: {
         pollVoterAccess: {
           nick: "michae2xl",
-          email: "michaelguima@proton.me"
+          email: "voter@example.test"
         },
         user: null
       }
@@ -97,7 +97,7 @@ describe("deliverConfirmedVoteReceiptEmailsForPoll", () => {
       failed: 0
     });
     expect(sendVoteReceiptEmailMock).toHaveBeenCalledWith({
-      to: "michaelguima@proton.me",
+      to: "voter@example.test",
       subject: "Vote receipt · Which path should we approve?",
       voterNick: "michae2xl",
       pollQuestion: "Which path should we approve?",
@@ -172,7 +172,7 @@ describe("deliverConfirmedVoteReceiptEmailsForPoll", () => {
       assignment: {
         pollVoterAccess: {
           nick: "michae2xl",
-          email: "michaelguima@proton.me"
+          email: "voter@example.test"
         },
         user: null
       }

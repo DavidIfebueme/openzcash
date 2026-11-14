@@ -55,11 +55,13 @@ the public free pilot and committee practice are separate modes.
 ```sh
 npm run typecheck
 npm run lint
-npm test
+npm test                # vitest + node suites + error fallback + ecosystem sync
 npm run test:copilot
-npm run test:ecosystem-sync
 npm run build
 ```
+
+The full gate in one line is documented in [Contributing](CONTRIBUTING.md#tests);
+`npm test` includes the ecosystem-sync suite.
 
 Run the equivalent checks inside each included service. PostgreSQL suites are
 opt-in and use disposable databases; see [Contributing](../CONTRIBUTING.md) and

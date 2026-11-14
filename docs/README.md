@@ -14,6 +14,7 @@ attribution and operational boundaries.
 - [Isolated committee practice](../services/participate/docs/committee-practice.md)
 - [Private Chat setup and privacy boundaries](../services/private-chat/README.md)
 - [Coinholder rounds](coinholder-program.md) and [proposal topics](coinholder-topics.md)
+- [Ongoing Test maintenance](ongoing-test-maintenance.md)
 - [Zarvis](zarvis.md)
 - [Ecosystem data](ECOSYSTEM.md)
 

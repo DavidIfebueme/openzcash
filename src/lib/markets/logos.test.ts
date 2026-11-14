@@ -31,6 +31,21 @@ describe("market brand identity", () => {
     expect(marketLogo("Unit · Hyperliquid bridge")).toBe("/logos/markets/unit.png");
   });
 
+  it("identifies THORChain in the highlight card and the market list", () => {
+    expect(marketLogo("THORChain")).toBe("/logos/markets/thorchain.png");
+    expect(marketLogo("Thor Exchange")).toBeNull();
+  });
+
+  it("identifies the exchanges read from their own API", () => {
+    expect(marketLogo("Bitget")).toBe("/logos/markets/bitget.png");
+    expect(marketLogo("BingX")).toBe("/logos/markets/bingx.png");
+    expect(marketLogo("Bitstamp")).toBe("/logos/markets/bitstamp.png");
+    expect(marketLogo("Bitstamp by Robinhood")).toBe(
+      "/logos/markets/bitstamp.png",
+    );
+    expect(marketLogo("Bitgetx")).toBeNull();
+  });
+
   it("preserves known aliases and custody labels", () => {
     expect(marketLogo("Grayscale Zcash Trust")).toBe(
       marketLogo("Grayscale · The Zcash ETF"),

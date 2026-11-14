@@ -29,7 +29,7 @@ Fixed public endpoints only, no redirected fetches or forwarded credentials, 7-s
 - Read-only health: `GET /api/legal/status`, public safe timestamps/counts only.
 - Manual recovery: `POST /api/cron/legal` with the existing `CRON_SECRET` Bearer token. There is no URL/day/force override and no public write endpoint.
 - Pause: `DISABLE_AUTO_REFRESH=true` disables timer and authenticated manual collection, including local financial preview environments.
-- A Codex heartbeat checks production health daily at 09:15 São Paulo. It waits quietly while this feature is unpublished and never merges or deploys. The server is the collector; the heartbeat is a health check and bounded recovery only.
+- An automated health check probes production daily at 09:15 São Paulo. It waits quietly while this feature is unpublished and never merges or deploys. The server is the collector; the health check is bounded recovery only.
 
 The daily server schedule becomes active **after the feature and migration are deployed**. A local preview alone does not activate production collection.
 

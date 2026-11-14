@@ -43,7 +43,7 @@ export function EcosystemOverview({ catalog }: { catalog: Catalog }) {
   const areas = countWorkAreas(histories).sort((a, b) => b.count - a.count || a.area.localeCompare(b.area));
   const maxCategory = Math.max(1, ...areas.map(item => item.count));
   return <div className={styles.page}>
-    <header className={styles.hero}><div><h1>Ecosystem insights</h1><p>Activity, releases and evidence across the projects we track.</p></div><Link className={styles.primary} href={catalogHref()}>Browse projects <span aria-hidden="true">↗</span></Link></header>
+    <header className={styles.hero}><div><h1>Ecosystem insights</h1><p>Activity, releases and evidence across the projects we track.</p></div><div className={styles.heroActions}><Link className={styles.opportunitiesLink} href="/opportunities"><span aria-hidden="true">🎯</span> Opportunities <small>Beta</small><span aria-hidden="true">↗</span></Link><Link className={styles.primary} href={catalogHref()}>Browse projects <span aria-hidden="true">↗</span></Link></div></header>
     <div className={styles.freshness}><span>Code snapshot <b>{displayDate(overview.snapshotAt)}</b></span><span>Registry baseline <b>{displayDate(overview.registryCheckedAt)}</b></span><a href="#overview-sources">Coverage & sources ↓</a></div>
     <RepositoryFreshness snapshotAt={overview.snapshotAt} asOf={new Date().toISOString()}/>
     <div className={styles.topGrid}>

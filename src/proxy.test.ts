@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createSession, verifySession, SESSION_COOKIE } from "@/lib/auth/session";
 import { isRetiredPath, proxy } from "./proxy";
 
 const retired = [
@@ -28,12 +27,9 @@ const retired = [
 ];
 
 describe("retired admin routes", () => {
-  it.each(retired)("returns 404 despite an old valid session: %s", async (path) => {
-    const secret = "test-only-session-secret";
-    const session = await createSession(secret);
-    expect(await verifySession(session, secret)).toBe(true);
+  it.each(retired)("returns 404 despite a forged session cookie: %s", async (path) => {
     const request = new NextRequest(new URL(path, "https://openzcash.org"), {
-      headers: { cookie: `${SESSION_COOKIE}=${session}` },
+      headers: { cookie: "zec_session=1.2" },
     });
     const response = proxy(request);
     expect(response.status).toBe(404);

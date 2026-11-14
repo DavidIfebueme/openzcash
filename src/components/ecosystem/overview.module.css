@@ -5,6 +5,10 @@
 .hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
 .hero h1 { font-size: clamp(30px,3.2vw,42px); letter-spacing: -.035em; line-height: 1.15; font-weight: 650; }
 .hero p { color: var(--muted); font-size: 14px; margin-top: 10px; }
+.heroActions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.opportunitiesLink { display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 44px; padding: 10px 14px; border-radius: 7px; background: var(--accent-soft); color: var(--ink); font-size: 13px; font-weight: 550; }
+.opportunitiesLink:hover { background: var(--accent-muted); }
+.opportunitiesLink small { font-size: 10px; font-weight: 400; color: var(--muted); }
 .primary { display: inline-flex; align-items: center; justify-content: center; gap: 22px; min-height: 44px; padding: 11px 16px; border: 1px solid var(--accent-muted); border-radius: 7px; color: var(--accent-ink); font-weight: 550; font-size: 13px; white-space: nowrap; background: var(--surface); }
 .primary:hover { background: var(--accent-soft); }
 .freshness { display: flex; align-items: center; gap: 10px 24px; flex-wrap: wrap; margin: 22px 0 24px; padding-top: 15px; border-top: 1px solid var(--line); color: var(--muted); font-size: 11px; }

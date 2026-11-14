@@ -566,16 +566,16 @@ html:has(.rd-sheet[open]) {
     outline: 2px solid var(--accent);
     outline-offset: -4px;
   }
-  /* Readable app names and generous touch rows, including nested pages. */
+  /* Compact labels, with at least 44px for every touch destination. */
   .rd-side-nav {
-    padding: 8px 12px 16px;
+    padding: 6px 12px 12px;
     overscroll-behavior: contain;
   }
   .rd-side-item {
-    min-height: 48px;
-    padding: 8px 12px;
+    min-height: 44px;
+    padding: 6px 10px;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.4;
     white-space: normal;
   }
@@ -584,8 +584,8 @@ html:has(.rd-sheet[open]) {
     overflow-wrap: anywhere;
   }
   .rd-side-page {
-    min-height: 48px;
-    font-size: 16px;
+    min-height: 44px;
+    font-size: 14px;
   }
   /* Line icons take the logo's box, so every app name starts on one edge. */
   .rd-side-app-row .rd-side-icon,
@@ -604,22 +604,25 @@ html:has(.rd-sheet[open]) {
     border-radius: 10px;
   }
   .rd-side-org-heading {
-    min-height: 48px;
-    font-size: 16px;
-    padding-inline: 12px;
+    min-height: 44px;
+    font-size: 14px;
+    padding-inline: 10px;
   }
   .rd-side-app[data-nested] > .rd-side-app-row > .rd-side-item {
-    min-height: 48px;
-    font-size: 16px;
+    min-height: 44px;
+    font-size: 14px;
+  }
+  .rd-side-app[data-test-category] .rd-side-page {
+    min-height: 44px;
   }
   .rd-side-org-list .rd-side-app .rd-side-logo { width: 24px; height: 24px; }
   .rd-side-foot {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 2px 6px;
-    padding: 8px 12px 10px;
+    padding: 4px 12px;
     border-top: 1px solid var(--line);
-    font-size: 16px;
+    font-size: 12px;
   }
   .rd-side-foot a {
     display: inline-flex;

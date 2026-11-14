@@ -2,29 +2,15 @@ import { randomInt } from "node:crypto";
 import { Suspense, type ReactNode } from "react";
 import { connection } from "next/server";
 import { OpportunitiesLayout } from "@/components/opportunities/frame";
-import {
-  sampleOpportunities,
-  sampleCampaigns,
-} from "@/components/opportunities/model";
+import { getCatalog } from "@/components/opportunities/catalog.server";
 import { randomOrder } from "@/components/opportunities/order";
 import "@/components/opportunities/opportunities.css";
-
-export default async function Layout({ children }: { children: ReactNode }) {
+async function CatalogLayout({ children }: { children: ReactNode }) {
   await connection();
-  const random = () => randomInt(0x100000000) / 0x100000000;
-  const order = randomOrder(
-    sampleOpportunities.map((o) => o.id),
-    random,
-  );
-  const campaigns = randomOrder(
-    sampleCampaigns.map((c) => c.id),
-    random,
-  );
-  return (
-    <Suspense fallback={null}>
-      <OpportunitiesLayout initialOrder={order} campaignOrder={campaigns}>
-        {children}
-      </OpportunitiesLayout>
-    </Suspense>
-  );
+  const catalog = await getCatalog();
+  const items = randomOrder(catalog.items, () => randomInt(0x100000000) / 0x100000000);
+  return <OpportunitiesLayout catalog={{ ...catalog, items }}>{children}</OpportunitiesLayout>;
+}
+export default function Layout({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<div className="opportunities-beta"><div className="op-page" role="status">Loading opportunities…</div></div>}><CatalogLayout>{children}</CatalogLayout></Suspense>;
 }

@@ -83,7 +83,7 @@ describe("public notification feed", () => {
     expect(atom).toContain("Decision: Rejected.");
     expect(atom).toContain("Turnout 83% (15/18 voted).");
     expect(rss).toContain("https://vote.example.com/polls");
-    expect(`${atom}\n${rss}`).not.toMatch(/michaelguima|alice@example|signalUsername/i);
+    expect(`${atom}\n${rss}`).not.toMatch(/voter@example|alice@example|signalUsername/i);
   });
 
   it.each(["CLOSED", "ARCHIVED"])("does not publish a final result solely because a poll is %s", async (status) => {

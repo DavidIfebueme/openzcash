@@ -1,0 +1,8 @@
+contact_links:
+  - name: Security reports
+    url: https://github.com/Michae2xl/openzcash/security/advisories/new
+    about: Report vulnerabilities privately; see SECURITY.md for scope and expectations.
+  - name: Questions about the data or the site
+    url: https://forum.zcashcommunity.com/
+    about: Open questions in the Zcash Community Forum; this repository has no Discussions.
+blank_issues_enabled: false

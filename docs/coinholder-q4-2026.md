@@ -99,3 +99,21 @@ The round cards share the existing Zcash brand mark, a concise in-progress
 status, and a connected timeline. The timeline stacks vertically on narrow
 screens; decorative graphics are separate from the text and dates. Scheduled
 phases never turn into an inferred final result.
+
+The timeline follows the announced windows. A window whose announced end has
+passed shows a check mark, the open window is marked **Now**, and between two
+windows the one that opens next is marked **Next**. The Results stage of the
+pending views is never marked from the calendar. `cycleNote()` gives the one
+sentence under the round name: between windows it names the one that closed
+and the date the next opens ("Submissions are closed. Community review opens
+Nov 16."); after the scheduled vote it falls back to the neutral line.
+
+Proposals, Program overview and The fund show the round's illustration beside
+that sentence: a zebra at a ballot box. It carries a ballot while submissions
+are open, drops it in the box during the scheduled voting window and stands
+beside the box the rest of the time. The drawing was generated for OpenZcash
+with an image model and reduced to flat alpha masks in
+`public/illustrations/zebra-*.png`, one for the ink and one for the ballot per
+pose, which the stylesheet fills with the theme's ink and accent colours, so
+the same files serve the light and dark themes. It is decorative and hidden
+from assistive technology; the sentence beside it says where the round stands.

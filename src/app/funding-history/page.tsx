@@ -302,6 +302,10 @@ export default async function FundingHistoryPage() {
               text: `NU6.1. Everything the lockbox held, ${formatZec(zat(LOCKBOX_DISBURSEMENT.zat))}, leaves in ten coinbase outputs; the lockbox starts again from zero.`,
               extra: <Mono value={LOCKBOX_DISBURSEMENT.address} />,
             },
+            {
+              h: HEIGHTS.nu7,
+              text: "NU7: 25-second blocks. Each block carries a third of the subsidy, three times as often; the 8% and 12% streams continue, and 60% of transaction fees starts leaving circulation into the NSM balance.",
+            },
           ].map((e) => (
             <li key={e.h}>
               <time>{dayOf(e.h)}</time>

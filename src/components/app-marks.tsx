@@ -110,6 +110,9 @@ export function AppMark({ app, size = 18 }: { app: AppDef; size?: number }) {
 }
 
 export function PageMark({ mark, href }: { mark?: string; href: string }) {
+  if (href === "/opportunities") {
+    return <span className="rd-side-opportunities-mark" aria-hidden="true">🎯</span>;
+  }
   if (mark) {
     return (
       // eslint-disable-next-line @next/next/no-img-element

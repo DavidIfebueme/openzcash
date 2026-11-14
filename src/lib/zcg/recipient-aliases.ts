@@ -24,6 +24,12 @@ export const RECIPIENT_ALIASES: Record<string, string[]> = {
   robustfengbin: ["@robustfengbin"],
   // Committee stipend row vs the grant row for the same LLC.
   "PGP for Crypto, LLC": ["pgp for crypto (paul brigner)"],
+  // One applicant, four ledger names. Kenbak opened every public application:
+  // ZCG #179 (grantee column "CipherScan"), ZCG #255 (organisation "Atmosphere
+  // Labs"), Coinholder #30 ("Atmosphere Labs (Kenbak)", the sheet's own link
+  // between the two) and Coinholder #47 ("Kenbak", the same CipherScan
+  // project continued under the applicant's name).
+  Kenbak: ["atmosphere labs (kenbak)", "atmosphere labs", "cipherscan"],
 };
 
 /** alias (lowercased) → canonical display name. */
@@ -40,6 +46,23 @@ export function canonicalRecipient(name: string): string {
 /** True when this row's name is an alias folded into another recipient. */
 export function isAliasName(name: string): boolean {
   return ALIAS_TO_CANONICAL.has(name.trim().toLowerCase());
+}
+
+/**
+ * Every distinct spelling the ledger uses for one recipient, canonical name
+ * first. A merged page shows them so a reader can see which sheet names were
+ * folded together instead of taking the merge on trust.
+ */
+export function recordedRecipientNames(
+  rawNames: readonly (string | null | undefined)[],
+): string[] {
+  const names = [
+    ...new Set(rawNames.map((n) => n?.trim() ?? "").filter(Boolean)),
+  ];
+  return [
+    ...names.filter((n) => !isAliasName(n)),
+    ...names.filter((n) => isAliasName(n)),
+  ];
 }
 
 /** All normalized ledger keys that belong to one curated recipient entity. */

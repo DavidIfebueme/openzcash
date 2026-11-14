@@ -7,6 +7,7 @@ import {
   getNews,
   newsFetchedAt,
   githubNewsHealth,
+  githubNewsBehind,
   newsUnavailableSources,
   nowMs,
   type NewsItem,
@@ -69,9 +70,7 @@ export default async function NewsPage({
   const now = nowMs();
   const { source, query, shown, counts, totalCount, newCount } = newsView(items, params, now);
   const githubHealth = githubNewsHealth();
-  const githubUnavailable = githubHealth.filter((source) =>
-    source.status === "cached" || source.status === "unavailable",
-  );
+  const githubUnavailable = githubNewsBehind(githubHealth);
   const showGithubWarning = githubUnavailable.length > 0 && (!source || source === "github");
   const unavailable = newsUnavailableSources();
   const latest = items[0]?.ts ?? "";
@@ -219,6 +218,7 @@ export default async function NewsPage({
         <summary>Sources &amp; updates</summary>
         <div>
           <p>Forum and proposals refresh every 5 minutes, releases hourly, and spreadsheet records every 6 hours.</p>
+          <p>Spreadsheet payments are dated by when the ledger recorded them when that is known, otherwise by their paid date; each title shows the paid date.</p>
           <p>{fetchedAgo ? `Feed checked ${fetchedAgo}. ` : ""}This feed covers the last seven days. Older entries remain on their source pages.</p>
         </div>
       </details>

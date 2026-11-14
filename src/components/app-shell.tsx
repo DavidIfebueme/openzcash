@@ -240,7 +240,7 @@ export function AppShell({
           </button>
           <Link href="/zcg" className="rd-brand" aria-label="OpenZcash home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logos/marks/openzcash.png" width="68" height="68" alt="" />
+            <img src="/logos/marks/openzcash.png" width="40" height="40" alt="" />
             <span className="rd-brand-text">
               <strong>OpenZcash</strong>
             </span>

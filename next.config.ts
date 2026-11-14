@@ -58,6 +58,17 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  // The treasury worker supplies this runtime volume; do not ship build-time copies.
+  outputFileTracingExcludes: {
+    "/*": ["./.cache/openzcash-treasury/**/*"],
+  },
+  images: {
+    localPatterns: [
+      { pathname: "/**", search: "" },
+      // Revised paper artwork must bypass previously optimized image caches.
+      { pathname: "/opportunities/art/*.png", search: "?v=20261103-paper-3" },
+    ],
+  },
   // Don't advertise the framework/version in responses.
   poweredByHeader: false,
   async rewrites() {
@@ -173,10 +184,6 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/zcash-emblem.png",
-        headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
-      },
-      {
-        source: "/zbo-emblem.png",
         headers: [{ key: "Cache-Control", value: "public, max-age=86400" }],
       },
     ];

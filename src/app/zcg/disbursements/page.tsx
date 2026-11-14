@@ -41,7 +41,7 @@ const SHEETS: { id?: string; label: string }[] = [
   { id: "monthly", label: "Monthly" },
 ];
 
-export default async function DesembolsosPage({
+export default async function DisbursementsPage({
   searchParams,
 }: {
   searchParams: Promise<{
@@ -256,7 +256,7 @@ export default async function DesembolsosPage({
         the ZCG public sheet;{" "}
         <span className="text-amber-700">admin entry</span> /{" "}
         <span className="text-amber-700">admin-edited</span> = added or
-        corrected in this back-office
+        corrected by maintainers
       </p>
 
       <SourceNote>

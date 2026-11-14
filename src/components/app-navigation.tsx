@@ -51,7 +51,7 @@ export function AppNavigation({ apps, place, counts, openApps, compact, onToggle
     const groupId = `${app.id}:organizations`;
     const groupOpen = openApps[groupId] ?? containsCurrentOrganization;
     return (
-      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined} data-test-category={isTestCategory || undefined} data-separated={app.id === "ongoing-test" || isPrivateChat || undefined}>
+      <div key={app.id} className="rd-side-app" data-open={open} data-nested={nested || undefined} data-test-category={isTestCategory || undefined} data-separated={app.id === "openzcash-treasury" || isPrivateChat || undefined}>
         <div className="rd-side-app-row">
           {isTestCategory ? <button
             type="button"

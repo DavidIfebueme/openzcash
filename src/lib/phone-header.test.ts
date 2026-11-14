@@ -122,12 +122,11 @@ describe("phoneHeaderOf", () => {
     }
   });
 
-  it("keeps Ongoing Test as an unlinked category above Crosslink", () => {
+  it("returns from Crosslink to Opportunities in the phone header", () => {
     const header = phoneHeaderOf(placeOf("/ongoing-test/crosslink"));
-    expect(header?.over).not.toHaveProperty("href");
     expect(header).toMatchObject({
       title: "Crosslink",
-      over: { label: "Ongoing Test" },
+      over: { label: "Opportunities", href: "/opportunities" },
     });
   });
 

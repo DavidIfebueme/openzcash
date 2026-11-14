@@ -2,17 +2,22 @@ import { fromMarkdown } from "mdast-util-from-markdown";
 import type { Nodes } from "mdast";
 import type { Evidence } from "./local";
 import { locale, pick, type DirectLanguage } from "./language";
-import { BLOCK_SUBSIDY_ZEC, LOCKBOX_START_HEIGHT, LOCKBOX_ZEC_PER_BLOCK, MINER_ZEC_PER_BLOCK, THIRD_HALVING_HEIGHT, ZCG_ZEC_PER_BLOCK } from "@/lib/zcash/lockbox";
+import { LOCKBOX_START_HEIGHT, NU7_HEIGHT, THIRD_HALVING_HEIGHT, blockRewardsAt } from "@/lib/zcash/lockbox";
 
 export type NumericFact = { value: number; unit: "USD" | "ZEC" | "%" };
 type GuardDocument = { text: string };
 /** Consensus constants the reviewed notes state: the guard only checks currency, ZEC and percent claims, so heights, seconds and block counts are listed for completeness but never flagged. */
+const rewardFacts = (height: number): NumericFact[] => {
+  const r = blockRewardsAt(height);
+  return [r.subsidyZec, r.zcgZec, r.lockboxZec, r.minerZec].map((value) => ({ unit: "ZEC" as const, value }));
+};
+/** Per-block figures before NU7 (still true history) and since NU7 (ZIP 218: a third of each). */
 export const PROTOCOL_FACTS: NumericFact[] = [
   { unit: "ZEC", value: 21_000_000 }, { unit: "ZEC", value: 1_050_000 }, { unit: "%", value: 5 },
-  { unit: "ZEC", value: BLOCK_SUBSIDY_ZEC }, { unit: "ZEC", value: ZCG_ZEC_PER_BLOCK }, { unit: "ZEC", value: LOCKBOX_ZEC_PER_BLOCK }, { unit: "ZEC", value: MINER_ZEC_PER_BLOCK },
+  ...rewardFacts(NU7_HEIGHT - 1), ...rewardFacts(NU7_HEIGHT),
   { unit: "%", value: 8 }, { unit: "%", value: 12 }, { unit: "%", value: 20 }, { unit: "%", value: 80 }, { unit: "%", value: 25 }, { unit: "%", value: 100 },
 ];
-export const PROTOCOL_CONSTANTS = { maxSupplyZec: 21_000_000, fivePercentOfMaxSupplyZec: 1_050_000, targetBlockSpacingSeconds: 75, halvingIntervalBlocks: 1_680_000, lockboxStartHeight: LOCKBOX_START_HEIGHT, thirdHalvingHeight: THIRD_HALVING_HEIGHT };
+export const PROTOCOL_CONSTANTS = { maxSupplyZec: 21_000_000, fivePercentOfMaxSupplyZec: 1_050_000, targetBlockSpacingSeconds: 25, halvingIntervalBlocks: 5_040_000, nu7Height: NU7_HEIGHT, lockboxStartHeight: LOCKBOX_START_HEIGHT, thirdHalvingHeight: THIRD_HALVING_HEIGHT };
 /** Typed figures from tool evidence, the protocol constants and every unit-bearing number in the reviewed documents selected for the answer. Deliberately narrow: numeric/unit support, not semantic entailment of every sentence. */
 export function numericFacts(evidence: Evidence[], documents: GuardDocument[] = []): NumericFact[] {
   const facts: NumericFact[] = [...PROTOCOL_FACTS];

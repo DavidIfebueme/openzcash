@@ -16,7 +16,7 @@ import {
   FOUNDERS_SPLIT_2016,
   KEYHOLDER_DRAFT,
   MAX_SUPPLY_ZEC,
-  NU7_FUNDING_PROPOSAL,
+  NU7_FUNDING_RULES,
   OPEN_QUESTIONS,
 } from "@/lib/funding/destinations";
 import {
@@ -211,15 +211,15 @@ function nu6Era(
         text: "Coinholders vote on each grant and the key-holders sign the payouts. The Foundation and Shielded Labs vetoed the Q4 2025 grant to Bootstrap (ECC).",
       },
       {
-        label: "Next",
-        text: "A draft for NU7 keeps the 8% and 12% streams to the third halving with 25-second blocks.",
+        label: "NU7",
+        text: "Since November 2026 blocks are 25 seconds apart. The 8% and 12% streams continue, a third per block, to the third halving at block 6,132,390.",
       },
       { label: "Still open", text: OPEN_QUESTIONS.nu6 },
     ],
     sources: [
       ...COINHOLDER_FUND.sources,
       KEYHOLDER_DRAFT,
-      NU7_FUNDING_PROPOSAL,
+      NU7_FUNDING_RULES,
     ],
   };
 }

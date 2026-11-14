@@ -394,7 +394,7 @@ describe("Zarvis local-first orchestration", () => {
   it("lets the selected reviewed notes vouch for protocol constants beside treasury evidence", async () => {
     const note = KNOWLEDGE.find((n) => n.id === "issuance")!;
     mocks.prepare.mockResolvedValue({ query: "What does ZCG hold?", documents: [{ id: note.id, title: note.title, url: note.url, text: `${note.keywords}\n${note.text}`, kind: "reference" }], evidence: treasuries(), external: false });
-    const text = "ZCG's 88,435 ZEC are 0.52% of circulating supply against a 21 million ZEC cap; 5% of the cap is 1,050,000 ZEC, and ZCG receives 8% of each 1.5625 ZEC subsidy.";
+    const text = "ZCG's 88,435 ZEC are 0.52% of circulating supply against a 21 million ZEC cap; 5% of the cap is 1,050,000 ZEC, and ZCG receives 8% of each 0.52083333 ZEC subsidy since NU7 (1.5625 ZEC before it).";
     mocks.create.mockResolvedValueOnce(events([answer(text)]));
     const emitted: ZarvisEvent[] = [];
     const metrics = await generateAnswer(question, new AbortController().signal, (e) => emitted.push(e));

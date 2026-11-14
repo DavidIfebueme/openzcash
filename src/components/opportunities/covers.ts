@@ -5,6 +5,8 @@ export type StockCover = {
   keywords: string[];
 };
 export const stockCovers: StockCover[] = [
+  { id: "nu7", name: "NU7 · Zcash network upgrade", topic: "Infrastructure", keywords: ["nu7", "upgrade"] },
+  { id: "zechub", name: "ZecHub · Learn & contribute", topic: "Education", keywords: ["zechub", "wiki", "glossary", "education"] },
   {
     id: "wallet",
     name: "Zcash payments",
@@ -129,19 +131,15 @@ export const stockCovers: StockCover[] = [
   },
 ];
 export const coverTopics = [...new Set(stockCovers.map((c) => c.topic))];
-export const isUploadCover = (value: unknown): value is string =>
-  typeof value === "string" &&
-  /^upload:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-    value,
-  );
 export const isCover = (value: unknown): value is string =>
-  typeof value === "string" &&
-  (isUploadCover(value) || stockCovers.some((c) => c.id === value));
+  typeof value === "string" && stockCovers.some((c) => c.id === value);
 export function suggestedCover(category: string, title = ""): string {
   const words = title.toLowerCase().split(/[^a-z0-9]+/);
   const specific = stockCovers
     .filter((c) =>
       [
+        "nu7",
+        "zechub",
         "zebra",
         "zakura",
         "zodl",
@@ -198,13 +196,11 @@ export const resolveCover = (
   title = "",
 ) => (isCover(value) ? value : suggestedCover(category, title));
 export const coverLabel = (value: string) =>
-  isUploadCover(value)
-    ? "Your image"
-    : stockCovers.find((c) => c.id === value)?.name || "Build with Zcash";
+  stockCovers.find((c) => c.id === value)?.name || "Build with Zcash";
 export const stockCoverUrl = (value: string) =>
   "/opportunities/art/" +
   (stockCovers.some((c) => c.id === value) ? value : "code") +
-  ".png";
+  ".png?v=20261103-paper-3";
 export function filterCovers(query: string, topic = "All") {
   const q = query.trim().toLowerCase();
   return stockCovers.filter(
@@ -212,15 +208,4 @@ export function filterCovers(query: string, topic = "All") {
       (topic === "All" || c.topic === topic) &&
       [c.name, c.topic, ...c.keywords].join(" ").toLowerCase().includes(q),
   );
-}
-export const MAX_COVER_BYTES = 5 * 1024 * 1024;
-export function uploadError(file: {
-  type: string;
-  size: number;
-}): string | null {
-  if (!["image/png", "image/jpeg", "image/webp"].includes(file.type))
-    return "Choose a PNG, JPG or WebP image.";
-  if (file.size === 0) return "This file is empty. Choose another image.";
-  if (file.size > MAX_COVER_BYTES) return "Choose an image smaller than 5 MB.";
-  return null;
 }

@@ -1,0 +1,38 @@
+name: Crosslink source freshness
+
+# Non-blocking companion to CI: verifies the Crosslink guide's curated
+# sources. Shielded Labs ships weekly and only recognizes the current chain
+# for rewards, so a stale release pin or dead forum link quietly misleads
+# testers. This workflow reports drift without gating merges; promote the
+# release-drift check to a required status check once it has proven stable.
+on:
+  schedule:
+    - cron: "23 4 * * 1" # Mondays 04:23 UTC, before the European day starts
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: crosslink-freshness
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Release drift, freshness stamp and link scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24.22.1
+      # Pure-helper tests run without an install; the live check itself is
+      # dependency-free and uses gh for authenticated GitHub API reads.
+      - run: npm run test:crosslink-sources
+      - name: Check Crosslink sources
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # 429/403/503 from CDN-fronted community sites are recorded as
+        # soft warnings; only real drift, staleness or dead links fail.
+        run: npm run check:crosslink

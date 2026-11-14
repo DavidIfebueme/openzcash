@@ -35,6 +35,19 @@ describe("Q4 entry and source failure", () => {
     const detail = renderToStaticMarkup(await Detail({ params: Promise.resolve({ number: "70" }) }));
     expect(detail).toContain("This submission could not be checked");
   });
+  it("offers the form only while submissions are open, then says they are closed", async () => {
+    reader.readQ4.mockResolvedValue({ status: "current", fetchedAt: "2026-10-30T12:00:00Z", proposals: [] });
+    const clock = vi.spyOn(Date, "now").mockReturnValue(Date.parse(Q4.submissionsOpen));
+    const open = renderToStaticMarkup(await Page());
+    expect(open).toContain("Submit proposal");
+    expect(open).toContain("Submissions are open for the next coinholder vote.");
+    clock.mockReturnValue(Date.parse(Q4.submissionsClose) + 1);
+    const closed = renderToStaticMarkup(await Page());
+    expect(closed).not.toContain("Submit proposal");
+    expect(closed).toContain("Submissions are closed. Community review opens Nov 16.");
+    expect(closed).toContain('data-pose="stand"');
+    clock.mockRestore();
+  });
   it("distinguishes a checked empty list from source failure", async () => {
     reader.readQ4.mockResolvedValue({ status: "current", fetchedAt: "2026-10-30T12:00:00Z", proposals: [] });
     expect(renderToStaticMarkup(await Page())).toContain("No proposals yet");

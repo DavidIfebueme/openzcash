@@ -56,10 +56,17 @@ export function zarvisConfig() {
   const provider: Provider = validProvider ? requestedProvider : "openai";
   const webSearch = process.env.ZARVIS_WEB_SEARCH !== "false";
   const primary = providerConfig(provider, process.env.ZARVIS_MODEL, webSearch);
+  const hmacSecret =
+    process.env.ZARVIS_HMAC_SECRET?.trim() || primary.apiKey;
+  if (hmacSecret === primary.apiKey && process.env.NODE_ENV === "production") {
+    console.warn(
+      "ZARVIS_HMAC_SECRET is unset; falling back to the provider API key for HMAC. Set a dedicated secret in production.",
+    );
+  }
   return {
     ...primary,
-    // Keys abuse counters and feedback tickets. A dedicated secret keeps the provider key out of HMAC inputs; the key remains the fallback so nothing breaks unset.
-    hmacSecret: process.env.ZARVIS_HMAC_SECRET?.trim() || primary.apiKey,
+    // Keys abuse counters and feedback tickets. A dedicated secret keeps the provider key out of HMAC inputs; the key remains the fallback so nothing breaks unset, with a one-time warning in production.
+    hmacSecret,
     enabled: process.env.ZARVIS_ENABLED === "true" && Boolean(validProvider && primary.apiKey && process.env.DATABASE_URL),
     fallback: fallbackConfig(provider, webSearch),
     unlimitedLocalTesting: unlimitedLocalTesting(),

@@ -33,6 +33,10 @@
 .track::after { content: ''; position: absolute; left: calc(50% + 18px); width: calc(100% + var(--timeline-gap) - 36px); top: 9px; height: 1px; background: var(--line-strong); }
 .timeline li:last-child .track::after { display: none; }
 .step { display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid var(--line-strong); border-radius: 50%; background: var(--surface); color: var(--muted); font-size: 10px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.step svg { width: 10px; height: 10px; }
+.timeline li[data-passed] .step { border-color: color-mix(in srgb, var(--accent-ink) 55%, var(--line)); background: color-mix(in srgb, var(--accent-ink) 10%, var(--surface)); color: var(--accent-ink); }
+.timeline li[data-passed] .track::after { background: color-mix(in srgb, var(--accent-ink) 55%, var(--line-strong)); }
+.timeline li[data-next] .step { border-color: var(--accent-ink); color: var(--accent-ink); }
 .timeline li[data-active] .step { border-color: var(--accent-ink); background: var(--accent-ink); color: var(--surface); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-ink) 10%, transparent); }
 .stageText { display: grid; gap: 3px; text-align: center; }
 .stageLabel { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 8px; color: var(--ink); font-size: 13px; font-weight: 500; line-height: 1.5; }
@@ -43,8 +47,18 @@
 .calendarNote a, .links a { color: var(--accent-ink); }
 .calendarNote a:hover, .links a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .compactHead { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 16px 20px; }
-.compactHead > div:first-child { min-width: 0; }
-.compactHead p { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.intro { flex: 1 1 auto; min-width: 0; }
+.intro p { margin: 8px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+/* Two flat layers cut from the same drawing: the zebra in the page's ink, the ballot in the accent. */
+.scene { position: relative; flex: 0 0 auto; height: 92px; aspect-ratio: 361 / 276; color: var(--ink); }
+.scene::before, .scene::after { content: ''; position: absolute; inset: 0; mask: center / contain no-repeat; -webkit-mask: center / contain no-repeat; }
+.scene::before { background: currentColor; mask-image: url("/illustrations/zebra-stand-ink.png"); -webkit-mask-image: url("/illustrations/zebra-stand-ink.png"); }
+.scene::after { display: none; background: var(--accent); }
+.scene[data-pose="carry"]::before { mask-image: url("/illustrations/zebra-carry-ink.png"); -webkit-mask-image: url("/illustrations/zebra-carry-ink.png"); }
+.scene[data-pose="carry"]::after { mask-image: url("/illustrations/zebra-carry-ballot.png"); -webkit-mask-image: url("/illustrations/zebra-carry-ballot.png"); }
+.scene[data-pose="cast"]::before { mask-image: url("/illustrations/zebra-cast-ink.png"); -webkit-mask-image: url("/illustrations/zebra-cast-ink.png"); }
+.scene[data-pose="cast"]::after { mask-image: url("/illustrations/zebra-cast-ballot.png"); -webkit-mask-image: url("/illustrations/zebra-cast-ballot.png"); }
+.scene[data-pose="carry"]::after, .scene[data-pose="cast"]::after { display: block; }
 .links { display: grid; justify-items: end; gap: 2px; flex-shrink: 0; font-size: 13px; }
 .links a { padding: 4px 0; }
 @container coinholders (max-width: 760px) {
@@ -86,5 +100,7 @@
   .now { display: none; }
   .calendarNote { padding: 7px 16px; font-size: 11px; }
   .compactHead { display: block; padding: 16px; }
+  .scene { position: absolute; top: 14px; right: 16px; height: 56px; }
+  .intro .brand { min-height: 58px; padding-right: 84px; }
   .links { display: flex; justify-content: space-between; gap: 16px; margin-top: 8px; }
 }

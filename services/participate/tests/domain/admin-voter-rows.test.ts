@@ -11,7 +11,7 @@ describe("buildAdminVoterRows", () => {
         {
           id: "access_1",
           nick: "michae2xl",
-          email: "michaelguima@proton.me",
+          email: "voter@example.test",
           invites: [{ status: "SENT" }],
           assignments: [{ ticket: { status: "VOTED" } }]
         }
@@ -30,7 +30,7 @@ describe("buildAdminVoterRows", () => {
         {
           id: "access_1",
           nick: "michae2xl",
-          email: "michaelguima@proton.me",
+          email: "voter@example.test",
           invites: [{ status: "SENT" }],
           assignments: [{ ticket: { status: "VOTED" } }]
         }

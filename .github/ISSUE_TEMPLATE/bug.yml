@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in the portal, API, skills, or services behaves incorrectly.
+labels: [bug]
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Portal page
+        - Public API (/api/...)
+        - Zarvis assistant
+        - Agent skill (zcg-copilot, coinholder-copilot, zechub-copilot)
+        - Participate service
+        - Private Chat service
+        - Documentation
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw. Include URLs of the affected pages or endpoints.
+      placeholder: |
+        1. Open https://openzcash.org/...
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Public source that disagrees (if the issue is about a figure)
+      description: For data issues: link the ZCG spreadsheet row, forum post, or on-chain record that contradicts what the site shows.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, locale/language, and time observed.

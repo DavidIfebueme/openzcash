@@ -51,7 +51,7 @@ python build_viewer.py --issue-dir /absolute/issue --viewer-dir /absolute/previe
 
 Automatic checks catch specific known failure modes. They do not establish completeness of all public ecosystem activity, validate the truth of an unread source, or replace semantic and visual review. Source outages and unavailable month-end balances must remain explicit in the issue.
 
-One monthly task produces one unified English PDF. The authorized recurring publication workflow is documented in [PUBLISHING.md](PUBLISHING.md); Codex manages its schedule separately from the website.
+One monthly task produces one unified English PDF. The authorized recurring publication workflow is documented in [PUBLISHING.md](PUBLISHING.md); the recurring schedule is managed separately from the website.
 
 ## Website library
 

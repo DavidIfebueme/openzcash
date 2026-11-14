@@ -99,8 +99,9 @@
 
 /* ---------- Shell layout: sidebar + body ---------- */
 .rd-shell {
+  --sidebar-width: 228px;
   display: grid;
-  grid-template-columns: 252px minmax(0, 1fr);
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   min-height: 100vh;
 }
 .rd-side {
@@ -156,7 +157,7 @@
   overflow: auto;
   /* Scrolls, but draws no track: the sidebar shows no lines at all. */
   scrollbar-width: none;
-  padding: 4px 12px 12px;
+  padding: 8px 10px 12px;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -167,12 +168,12 @@
 .rd-side-item {
   display: flex;
   align-items: center;
-  gap: 10px;
-  min-height: 36px;
-  padding: 5px 10px;
+  gap: 8px;
+  min-height: 32px;
+  padding: 5px 8px;
   border-radius: 8px;
   color: var(--side-ink);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -220,16 +221,17 @@
 .rd-side-foot {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 12px 14px 14px;
-  font-size: 14px;
+  gap: 0;
+  padding: 8px 10px;
+  border-top: 1px solid var(--line);
+  font-size: 12px;
   font-weight: 500;
 }
 .rd-side-foot a {
   display: block;
   padding: 6px 8px;
   border-radius: 8px;
-  color: var(--side-ink);
+  color: var(--side-dim);
 }
 .rd-side-foot a:hover {
   color: var(--side-ink);
@@ -254,7 +256,7 @@
   align-items: center;
   gap: 12px;
   height: 56px;
-  padding: 0 32px;
+  padding: 0 24px;
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--line);
@@ -279,6 +281,7 @@
   border-color: var(--line-strong);
 }
 .rd-topbar .rd-breadcrumb {
+  min-width: 0;
   margin: 0;
   gap: 6px;
   font-size: 12.5px;
@@ -287,14 +290,17 @@
 }
 .rd-topbar .rd-breadcrumb > span:last-child {
   color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .rd-search {
   display: flex;
   align-items: center;
   gap: 8px;
-  width: min(380px, 100%);
+  width: min(340px, 100%);
+  min-width: 120px;
   height: 34px;
-  margin-left: 12px;
+  margin-left: 4px;
   padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -319,6 +325,7 @@
   padding: 1px 5px;
 }
 .rd-topbar-actions {
+  flex-shrink: 0;
   margin-left: auto;
   display: flex;
   align-items: center;
@@ -415,7 +422,7 @@
     var(--band);
   color: var(--ink);
 }
-/* The two pools sit centred in the bar; block and link keep the right edge. */
+/* The pools sit centred in the bar; block and price keep the right edge. */
 .rd-treasury-inner {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -491,6 +498,24 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   justify-self: end;
   color: var(--dim);
   white-space: nowrap;
+}
+/* Three pools and the block line do not fit one row beside the sidebar on a
+   small laptop: the block line drops under the pools, and nothing is hidden. */
+@media (min-width: 961px) and (max-width: 1160px) {
+  .rd-treasury-inner {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    row-gap: 6px;
+    padding: 9px 24px 10px;
+  }
+  .rd-treasury-pools {
+    grid-column: 1;
+    gap: 28px;
+  }
+  .rd-treasury-meta {
+    grid-column: 1;
+    justify-self: center;
+  }
 }
 
 /* ---------- Primitives: heading, stats strip, cards, tables, inputs ---------- */
@@ -646,8 +671,8 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 .rd-content .border-stone-200,
 .rd-content .border-stone-200\/80,
 .rd-content .border-stone-300,
-.rd-content .divide-stone-100 > :not([hidden]) ~ :not([hidden]),
-.rd-content .divide-stone-200 > :not([hidden]) ~ :not([hidden]) {
+.rd-content .divide-stone-100 > :not([hidden]),
+.rd-content .divide-stone-200 > :not([hidden]) {
   border-color: var(--line);
 }
 .rd-content .bg-white {
@@ -1079,6 +1104,16 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   flex-shrink: 0;
   color: var(--side-dim);
 }
+.rd-side-opportunities-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  font-size: 17px;
+  line-height: 1;
+}
 .rd-side-item:hover .rd-side-icon,
 .rd-side-item[aria-current="page"] .rd-side-icon {
   color: var(--side-ink);
@@ -1097,8 +1132,8 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   flex-direction: column;
 }
 .rd-side-app[data-separated] {
-  margin-top: 12px;
-  padding-top: 8px;
+  margin-top: 6px;
+  padding-top: 6px;
   border-top: 1px solid var(--line);
 }
 .rd-side-app-row {
@@ -1109,11 +1144,13 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 .rd-side-app-row > .rd-side-item {
   flex: 1;
   min-width: 0;
+  gap: 6px;
+  padding-inline: 6px;
 }
 /* A long app name wraps to a second line instead of losing its end. */
 .rd-side-app-row > .rd-side-item[data-long] {
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding-top: 5px;
+  padding-bottom: 5px;
   white-space: normal;
 }
 .rd-side-app-row > .rd-side-item[data-long] .rd-side-label {
@@ -1128,8 +1165,8 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 }
 /* App marks sit bare on the sidebar: no tile behind them in either theme. */
 .rd-side-logo {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
   flex-shrink: 0;
   border-radius: 5px;
   object-fit: contain;
@@ -1139,6 +1176,7 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   filter: invert(1);
 }
 .rd-side-toggle {
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1162,17 +1200,20 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   display: flex;
   flex-direction: column;
   gap: 1px;
-  margin: 2px 0 6px 12px;
-  padding-left: 10px;
+  margin: 2px 0 4px 16px;
+  padding-left: 7px;
+  border-left: 1px solid var(--line);
 }
 .rd-side-page {
-  min-height: 32px;
+  min-height: 30px;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 /* A distinct, readable disclosure within the Ecosystem hierarchy. */
 .rd-side-org-group {
-  margin-bottom: 7px;
-  padding-bottom: 7px;
+  margin-bottom: 4px;
+  padding-bottom: 4px;
   border-bottom: 1px solid var(--line);
 }
 .rd-side-org-heading {
@@ -1180,14 +1221,14 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   align-items: center;
   gap: 9px;
   width: 100%;
-  min-height: 38px;
-  padding: 7px 10px;
+  min-height: 32px;
+  padding: 5px 8px;
   border: 0;
   border-radius: 7px;
   background: var(--accent-soft);
   color: var(--side-ink);
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 550;
   cursor: pointer;
   text-align: left;
 }
@@ -1476,18 +1517,20 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   opacity: 1;
 }
 
-/* ---------- Sidebar banner: the brand centred on a gold band that follows the theme ---------- */
+/* ---------- Compact brand row, aligned with the top bar ---------- */
 .rd-side-banner {
   position: relative;
   display: flex;
-  flex-direction: column;
+  flex-shrink: 0;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  min-height: 150px;
-  padding: 24px 16px 18px;
+  justify-content: flex-start;
+  min-height: 56px;
+  padding: 0 18px;
+  border-bottom: 1px solid var(--line);
   background:
-    radial-gradient(240px 120px at 50% 0%, var(--band-glow), transparent 70%),
-    var(--band);
+    radial-gradient(180px 90px at 0% 0%, var(--band-glow), transparent 80%),
+    var(--side-bg);
 }
 .rd-side-banner::after {
   content: "";
@@ -1504,27 +1547,27 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   position: relative;
   z-index: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  min-height: 44px;
   color: var(--side-ink);
-  text-align: center;
+  text-align: left;
 }
 .rd-side-banner .rd-brand img {
-  width: 68px;
-  height: 68px;
+  width: 40px;
+  height: 40px;
   border-radius: 0;
   background: transparent;
-  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.28));
 }
 .rd-brand-text {
   display: flex;
   flex-direction: column;
 }
 .rd-brand-text strong {
-  font-size: 18px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
   line-height: 1.1;
 }
 .rd-side-banner .rd-side-close {

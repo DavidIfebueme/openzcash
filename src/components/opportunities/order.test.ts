@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { randomOrder } from "./order";
-import { sampleOpportunities } from "./model";
+import { curatedItems } from "./catalog";
 
 describe("unbiased opportunity order", () => {
   it("gives every item each position equally across all possible draws", () => {
@@ -24,7 +24,7 @@ describe("unbiased opportunity order", () => {
   });
 
   it("mixes the complete catalog without changing or dropping any records", () => {
-    const ids = sampleOpportunities.map((o) => o.id);
+    const ids = curatedItems.map((o) => o.id);
     const original = [...ids];
     const result = randomOrder(ids, () => 0);
     expect(ids).toEqual(original);

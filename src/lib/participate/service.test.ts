@@ -25,7 +25,7 @@ describe("participation service reads", () => {
     expect(hasParticipantSession("participate_email_login=tok")).toBe(false);
   });
   it("returns typed data, upstream error codes and transport failures", async () => {
-    const origin = "http://participate.railway.internal:3000";
+    const origin = "http://upstream.railway.internal:3000";
     const ok = await upstreamJson<{ board: { proposals: unknown[] } }>(
       "/api/x",
       {
@@ -83,7 +83,7 @@ describe("participation service reads", () => {
   it("sends the session cookie and never follows redirects off the private origin", async () => {
     const fetcher = vi.fn(async () => json(200, { session: null }));
     await upstreamJson("/api/auth/session", {
-      origin: "http://participate.railway.internal:3000",
+      origin: "http://upstream.railway.internal:3000",
       cookie: "zcap_session=abc",
       fetcher,
     });
@@ -92,7 +92,7 @@ describe("participation service reads", () => {
       RequestInit,
     ];
     expect(url).toBe(
-      "http://participate.railway.internal:3000/api/auth/session",
+      "http://upstream.railway.internal:3000/api/auth/session",
     );
     expect(init.redirect).toBe("manual");
     expect((init.headers as Record<string, string>).cookie).toBe(

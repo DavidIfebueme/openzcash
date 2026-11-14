@@ -1,11 +1,11 @@
-# zkool_graphql — engine de wallet Zcash (watch-only por UFVK) via GraphQL.
-# Fonte: github.com/hhanh00/zkool2 (licença MIT). Compila do source e roda um
-# binário slim que conecta a um lightwalletd público (sem full node próprio).
+# zkool_graphql - Zcash watch-only wallet engine (UFVK) exposed via GraphQL.
+# Source: github.com/hhanh00/zkool2 (MIT license). Builds from source and runs a
+# slim binary that connects to a public lightwalletd (no own full node).
 #
-# ⚠️ A 1ª build é PESADA (~15-20 min, baixa os crates Zcash e compila em release).
-# Para reprodutibilidade, fixe ZKOOL_REF numa tag/commit (ex.: --build-arg ZKOOL_REF=v6.21.0).
+# NOTE: the first build is HEAVY (~15-20 min; downloads the Zcash crates and compiles in release).
+# For reproducibility, pin ZKOOL_REF to a tag/commit (e.g. --build-arg ZKOOL_REF=v6.21.0).
 
-# ── build: compila o zkool_graphql ──
+# -- build: compile zkool_graphql --
 FROM rust:1-bookworm AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
       git clang cmake pkg-config libssl-dev protobuf-compiler \
@@ -16,7 +16,7 @@ RUN git clone https://github.com/hhanh00/zkool2.git . && git checkout "${ZKOOL_R
 WORKDIR /src/rust
 RUN cargo build --release --bin zkool_graphql
 
-# ── runtime: imagem slim só com o binário ──
+# -- runtime: slim image with only the binary --
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libssl3 ca-certificates \
@@ -24,6 +24,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY --from=build /src/rust/target/release/zkool_graphql /usr/local/bin/zkool_graphql
 WORKDIR /data
 EXPOSE 8000
-# DB SQLite em volume, lwd público mainnet, GraphQL em :8000 (endpoint /graphql).
+# SQLite DB on a volume, public mainnet lightwalletd, GraphQL on :8000 (endpoint /graphql).
 ENTRYPOINT ["zkool_graphql"]
 CMD ["-d", "/data/zkool.db", "-l", "https://zec.rocks", "-p", "8000"]

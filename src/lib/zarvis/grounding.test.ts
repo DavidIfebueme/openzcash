@@ -19,7 +19,7 @@ describe("Derived treasury facts", () => {
     const d = derivedTreasuryFacts(funds, price, supply);
     expect(d).toMatchObject({ zcgValueUsd: 140859268, zcgTotalUsd: 149676218, lockboxValueUsd: 229894856.73, combinedZec: 232768.7875, combinedZecValueUsd: 370754124.73, zcgShareOfCombinedPercent: 37.99, lockboxShareOfCombinedPercent: 62.01, lockboxShareOfGrossValuePercent: 60.57, zcgShareOfSupplyPercent: 0.52, combinedShareOfSupplyPercent: 1.37 });
     expect(d.combinedGrossValueUsd).toBe(valueReportedDevFund(funds, 1592.8));
-    expect(BLOCK_SUBSIDY_ALLOCATION).toMatchObject({ zcgPercent: 8, lockboxPercent: 12, devFundPercent: 20, minerPercent: 80, lockboxPerBlockZec: 0.1875 });
+    expect(BLOCK_SUBSIDY_ALLOCATION).toMatchObject({ zcgPercent: 8, lockboxPercent: 12, devFundPercent: 20, minerPercent: 80, lockboxPerBlockZec: 0.06249999, zcgPerBlockZec: 0.04166666, blockSubsidyZec: 0.52083333, sinceBlock: 3_543_405, targetBlockSpacingSeconds: 25, blocksPerDay: 3456, untilBlock: 6_132_390, beforeNu7: { untilBlock: 3_543_404, targetBlockSpacingSeconds: 75, blocksPerDay: 1152, blockSubsidyZec: 1.5625, zcgPerBlockZec: 0.125, lockboxPerBlockZec: 0.1875, minerPerBlockZec: 1.25 } });
   });
   it("never turns a missing price, supply or pool into zero", () => {
     const noPrice = derivedTreasuryFacts(funds, null, supply);
@@ -31,8 +31,15 @@ describe("Derived treasury facts", () => {
   });
   it("maps every derived key to the unit the guard expects, on top of the protocol constants", () => {
     const units = numericFacts([{ content: JSON.stringify({ data: { derived: derivedTreasuryFacts(funds, price, supply), allocation: BLOCK_SUBSIDY_ALLOCATION } }) }]).slice(PROTOCOL_FACTS.length).map((f) => f.unit);
-    expect(units.filter((u) => u === "USD")).toHaveLength(5); expect(units.filter((u) => u === "ZEC")).toHaveLength(5); expect(units.filter((u) => u === "%")).toHaveLength(11);
+    expect(units.filter((u) => u === "USD")).toHaveLength(5); expect(units.filter((u) => u === "ZEC")).toHaveLength(9); expect(units.filter((u) => u === "%")).toHaveLength(11);
     expect(numericFacts([])).toEqual(PROTOCOL_FACTS);
+  });
+});
+
+describe("Protocol facts", () => {
+  it("support the per-block figures of both eras, derived from the schedule", () => {
+    const zec = PROTOCOL_FACTS.filter((f) => f.unit === "ZEC").map((f) => f.value);
+    for (const value of [1.5625, 0.125, 0.1875, 1.25, 0.52083333, 0.04166666, 0.06249999, 0.41666668]) expect(zec).toContain(value);
   });
 });
 
@@ -40,7 +47,7 @@ describe("Treasury arithmetic in model answers", () => {
   const evidence = treasuriesEvidence();
   it.each([
     "$140.9 million", "$140,859,268", "about $229.9 million", "$149.7 million", "$371 million", "$379.6 million", "232,769 ZEC", "232.8K ZEC",
-    "62%", "38%", "60.6%", "1.37%", "0.52%", "8%", "12%", "20%", "80%", "0.1875 ZEC", "1.5625 ZEC", "0.125 ZEC", "0,125 ZEC", "1.25 ZEC", "1 ZEC = $1,592.80",
+    "62%", "38%", "60.6%", "1.37%", "0.52%", "8%", "12%", "20%", "80%", "0.1875 ZEC", "1.5625 ZEC", "0.125 ZEC", "0,125 ZEC", "1.25 ZEC", "0.06249999 ZEC", "0.52083333 ZEC", "0.04166666 ZEC", "0.41666668 ZEC", "1 ZEC = $1,592.80",
   ])("supports the site's own derived figure: %s", (text) => expect(unsupportedAmounts(text, evidence)).toEqual([]));
   it.each(["$500 million", "150,000 ZEC", "99%", "R$ 140,9 milhões", "$10 million", "$999 billion", "0.3 ZEC per block", "0.135 ZEC"])("still rejects figures that are not the site's arithmetic: %s", (text) => expect(unsupportedAmounts(text, evidence)).not.toEqual([]));
   it.each([
@@ -78,7 +85,7 @@ describe("Ledger figures in model answers", () => {
 describe("Reviewed knowledge in the guard", () => {
   const evidence = treasuriesEvidence();
   const notes = KNOWLEDGE.filter((note) => ["issuance", "funding", "calculator"].includes(note.id)).map((note) => ({ text: `${note.keywords}\n${note.text}` }));
-  it.each(["21 million ZEC", "1,050,000 ZEC", "5% of 21 million ZEC", "8% and 12%", "20% leaves 80%", "a 25% relative increase", "0.125 ZEC per block", "0.1875 ZEC", "1.25 ZEC", "1.5625 ZEC", "75 seconds", "1,680,000 blocks", "height 4,406,400"])("never flags a protocol constant, with or without notes: %s", (text) => {
+  it.each(["21 million ZEC", "1,050,000 ZEC", "5% of 21 million ZEC", "8% and 12%", "20% leaves 80%", "a 25% relative increase", "0.125 ZEC per block", "0.1875 ZEC", "1.25 ZEC", "1.5625 ZEC", "0.52083333 ZEC", "0.04166666 ZEC", "0.06249999 ZEC", "0.41666668 ZEC", "75 seconds", "25 seconds", "1,680,000 blocks", "5,040,000 blocks", "height 6,132,390"])("never flags a protocol constant, with or without notes: %s", (text) => {
     expect(unsupportedAmounts(text, evidence)).toEqual([]); expect(unsupportedAmounts(text, [])).toEqual([]);
   });
   it("accepts a figure only because the selected reviewed note states it", () => {

@@ -7,3 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+# Private Chat — agent guidance
+
+Separately runnable Next.js service on its own origin (Nym connectivity, no application database). Read its [README](README.md) first, including the trust-boundary section. Gate from `services/private-chat`: `npm run typecheck && npm run lint && npm test && npm run build`. Keep changes inside this directory; the root portal has its own package and gate.

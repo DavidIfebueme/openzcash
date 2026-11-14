@@ -35,12 +35,31 @@ describe("Chain facts", () => {
   it("knows the protocol halving heights", () => {
     expect(nextHalvingHeight(1_000_000)).toBe(1_046_400);
     expect(nextHalvingHeight(2_726_399)).toBe(2_726_400);
-    expect(nextHalvingHeight(2_726_400)).toBe(4_406_400);
-    expect(nextHalvingHeight(3_500_000)).toBe(4_406_400);
-    expect(nextHalvingHeight(4_406_400)).toBe(6_086_400);
-    expect(nextHalvingHeight(6_086_401)).toBe(7_766_400);
+    expect(nextHalvingHeight(2_726_400)).toBe(6_132_390);
+    expect(nextHalvingHeight(3_500_000)).toBe(6_132_390);
+    expect(nextHalvingHeight(6_132_389)).toBe(6_132_390);
+    expect(nextHalvingHeight(6_132_390)).toBe(11_172_390);
+    expect(nextHalvingHeight(11_172_390)).toBe(16_212_390);
   });
-  it("carries a time or height on every figure and estimates the halving from the tip at 75-second spacing", () => {
+  it("estimates a pre-NU7 tip across the spacing change and a post-NU7 tip at 25 seconds", () => {
+    const base = { readAt: "2026-11-13T10:00:00.000Z", supply: null, circulating: null };
+    const pre = chainContext({ ...base, height: 3_500_000 }, now);
+    // 43,404 blocks at 75 s up to block 3,543,404, then 2,588,986 blocks at 25 s.
+    const preSeconds = 43_404 * 75 + 2_588_986 * 25;
+    expect(pre.halving?.estimatedAt).toBe(new Date(now + preSeconds * 1000).toISOString());
+    const post = chainContext({ ...base, height: 4_000_000 }, now);
+    expect(post.halving).toMatchObject({
+      nextHeight: 6_132_390,
+      blocksRemaining: 2_132_390,
+      subsidyZecPerBlock: 0.52083333,
+      subsidyAfterNextZecPerBlock: 0.26041666,
+    });
+    expect(post.halving?.estimatedAt).toBe(new Date(now + 2_132_390 * 25_000).toISOString());
+    expect(post.halving?.basis).toContain("25 seconds");
+    expect(post.halving?.basis).toContain("6,132,390");
+    expect(post.halving?.basis).not.toMatch(/75-second|4,406,400/);
+  });
+  it("carries a time or height on every figure and estimates the halving from a pre-NU7 tip", () => {
     const data = chainContext(
       {
         height: 3_500_000,
@@ -55,15 +74,15 @@ describe("Chain facts", () => {
       readAt: "2026-09-28T10:00:00.000Z",
     });
     expect(data.halving).toMatchObject({
-      nextHeight: 4_406_400,
-      blocksRemaining: 906_400,
+      nextHeight: 6_132_390,
+      blocksRemaining: 2_632_390,
       estimatedDaysRemaining: 786.8,
       halvingsSoFar: 2,
       subsidyZecPerBlock: 1.5625,
-      subsidyAfterNextZecPerBlock: 0.78125,
+      subsidyAfterNextZecPerBlock: 0.26041666,
     });
     expect(data.halving?.estimatedAt).toBe(
-      new Date(now + 906_400 * 75_000).toISOString(),
+      new Date(now + (43_404 * 75 + 2_588_986 * 25) * 1000).toISOString(),
     );
     expect(data.supply).toMatchObject({
       chainSupplyZec: 16_950_000,
@@ -101,7 +120,7 @@ describe("Chain facts", () => {
     expect(data.halvingNote).toContain("cannot be estimated");
     expect(data.supplyNote).toContain("unavailable");
     expect(data.circulatingNote).toContain("unavailable");
-    expect(JSON.stringify(data)).not.toMatch(/NaN|4406400/);
+    expect(JSON.stringify(data)).not.toMatch(/NaN|4406400|4,406,400/);
   });
 });
 

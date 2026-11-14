@@ -5,7 +5,7 @@ import { participationRewrites, participationUpstream } from "./upstream";
 describe("same-origin Participate API routing", () => {
   it.each([
     "http://127.0.0.1:4411",
-    "http://participate.railway.internal:3000",
+    "http://upstream.railway.internal:3000",
     "https://private-service.example",
   ])("accepts a configured server origin: %s", (origin) => {
     expect(participationUpstream(origin)).toBe(origin);
@@ -27,7 +27,7 @@ describe("same-origin Participate API routing", () => {
     expect(participationRewrites(origin)).toEqual([]);
   });
   const rules = participationRewrites(
-    "http://participate.railway.internal:3000",
+    "http://upstream.railway.internal:3000",
   );
   const matches = (path: string) =>
     rules.filter((rule) => getPathMatch(rule.source)(path));
@@ -92,7 +92,7 @@ describe("same-origin Participate API routing", () => {
   );
   it("mounts the committee demo actions only in a demo build", () => {
     const demo = participationRewrites(
-      "http://participate-demo.railway.internal:3000",
+      "http://upstream-demo.railway.internal:3000",
       { demo: true },
     );
     const demoMatches = demo.filter((rule) =>
@@ -102,7 +102,7 @@ describe("same-origin Participate API routing", () => {
       {
         source: "/api/participate/demo",
         destination:
-          "http://participate-demo.railway.internal:3000/api/participate/demo",
+          "http://upstream-demo.railway.internal:3000/api/participate/demo",
       },
     ]);
     expect(demo).toHaveLength(rules.length + 1);

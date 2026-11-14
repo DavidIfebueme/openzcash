@@ -1,180 +1,119 @@
 // @vitest-environment jsdom
 import type { AnchorHTMLAttributes, ImgHTMLAttributes } from "react";
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  within,
-} from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { OpportunitiesLayout } from "./frame";
 import { OpportunitiesRoutes } from "./routes";
-import { sampleCampaigns, sampleOpportunities } from "./model";
-
-const navigation = vi.hoisted(() => ({
-  path: "/opportunities",
-  search: "",
-  push: vi.fn(),
-  replace: vi.fn(),
-}));
-vi.mock("next/navigation", () => ({
-  usePathname: () => navigation.path,
-  useSearchParams: () => new URLSearchParams(navigation.search),
-  useRouter: () => ({ push: navigation.push, replace: navigation.replace }),
-}));
-vi.mock("next/link", () => ({
-  default: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props} />,
-}));
-vi.mock("next/image", () => ({
-  default: ({
-    unoptimized: _unoptimized,
-    ...props
-  }: ImgHTMLAttributes<HTMLImageElement> & { unoptimized?: boolean }) => {
-    void _unoptimized;
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} alt={props.alt ?? ""} />;
-  },
-}));
-
-const order = sampleOpportunities.map((o) => o.id).reverse();
-function Beta() {
-  return (
-    <OpportunitiesLayout
-      initialOrder={order}
-      campaignOrder={sampleCampaigns.map((c) => c.id)}
-    >
-      <OpportunitiesRoutes />
-    </OpportunitiesLayout>
-  );
-}
-
+import { Editor } from "./editor";
+import { curatedItems, type Catalog } from "./catalog";
+const navigation = vi.hoisted(() => ({ path: "/opportunities", search: "", refresh: vi.fn() }));
+vi.mock("next/navigation", () => ({ usePathname: () => navigation.path, useSearchParams: () => new URLSearchParams(navigation.search), useRouter: () => navigation }));
+vi.mock("next/link", () => ({ default: (props: AnchorHTMLAttributes<HTMLAnchorElement>) => <a {...props} /> }));
+vi.mock("next/image", () => ({ default: ({ unoptimized: _u, ...props }: ImgHTMLAttributes<HTMLImageElement> & { unoptimized?: boolean }) => { void _u; return <img {...props} alt={props.alt ?? ""} />; } })); // eslint-disable-line @next/next/no-img-element
+const items = [...curatedItems].reverse();
+function Directory() { return <OpportunitiesLayout catalog={{ items, sources: [{ id: "zec-bounties", status: "available", checkedAt: "2026-11-03" }] }}><OpportunitiesRoutes /></OpportunitiesLayout>; }
 beforeEach(() => {
-  navigation.path = "/opportunities";
-  navigation.search = "";
-  localStorage.clear();
-  vi.spyOn(window, "scrollTo").mockImplementation(() => {});
-  HTMLDialogElement.prototype.showModal = function () {
-    this.setAttribute("open", "");
-  };
-  HTMLDialogElement.prototype.close = function () {
-    this.removeAttribute("open");
-  };
+  navigation.path = "/opportunities"; navigation.search = "";
+  navigation.refresh.mockClear();
+  HTMLDialogElement.prototype.showModal = function () { this.setAttribute("open", ""); };
+  HTMLDialogElement.prototype.close = function () { this.removeAttribute("open"); };
 });
-afterEach(() => {
-  cleanup();
-  vi.restoreAllMocks();
+afterEach(() => { cleanup(); vi.restoreAllMocks(); vi.useRealTimers(); });
+it("shows jobs and programs with no local account, application or publication controls", () => {
+  render(<Directory />);
+  expect(screen.getByRole("button", { name: "Jobs" })).toBeTruthy();
+  expect(screen.queryByText("My work")).toBeNull();
+  expect(screen.queryByRole("button", { name: /sign in|apply for|submit entry|publish/i })).toBeNull();
+  expect(screen.getByRole("link", { name: "Prepare activity" }).getAttribute("href")).toBe("/opportunities/prepare");
 });
-
-it("keeps randomized order when filtering and returning from a detail", () => {
-  const view = render(<Beta />);
-  const links = () =>
-    Array.from(view.container.querySelectorAll(".op-card h2 a")).map((a) =>
-      a.getAttribute("href")?.split("/").pop(),
-    );
-  expect(links()).toEqual(order);
-  navigation.search = "type=Task";
-  view.rerender(<Beta />);
-  expect(links()).toEqual(
-    order.filter(
-      (id) => sampleOpportunities.find((o) => o.id === id)?.type === "Task",
-    ),
-  );
-  navigation.path = "/opportunities/tasks/" + order[0];
-  view.rerender(<Beta />);
-  navigation.path = "/opportunities";
-  navigation.search = "";
-  view.rerender(<Beta />);
-  expect(links()).toEqual(order);
+it("preserves the initial mixed order and filter return path through details", () => {
+  const view = render(<Directory />);
+  const titles = () => Array.from(view.container.querySelectorAll(".directory-card h2")).map((x) => x.textContent);
+  expect(titles()).toEqual(items.map((x) => x.title));
+  navigation.search = "type=Job"; view.rerender(<Directory />);
+  expect(titles()).toEqual(items.filter((x) => x.kind === "Job").map((x) => x.title));
+  navigation.path = "/opportunities/tasks/shielded-labs-cryptographer"; view.rerender(<Directory />);
+  expect(screen.getByRole("link", { name: "Back to opportunities" }).getAttribute("href")).toBe("/opportunities?type=Job");
+  expect(screen.getByRole("link", { name: "View role at Shielded Labs" }).getAttribute("href")).toBe("https://shieldedlabs.net/jobs/");
+  expect(screen.getByRole("link", { name: "Read the guide" }).getAttribute("href")).toBe("https://shieldedlabs.net/jobs/");
+  navigation.path = "/opportunities"; navigation.search = ""; view.rerender(<Directory />);
+  expect(titles()).toEqual(items.map((x) => x.title));
 });
-
-it("allows choosing stock art but cannot advance, upload or publish, even with a draft query", () => {
-  navigation.path = "/opportunities/new";
-  navigation.search = "draft=legacy&step=3";
-  localStorage.setItem(
-    "oz-opportunities:drafts",
-    JSON.stringify([{ id: "legacy", step: 3, title: "Legacy draft" }]),
-  );
-  const writes = vi.spyOn(Storage.prototype, "setItem");
-  const view = render(<Beta />);
-  fireEvent.change(screen.getByRole("textbox", { name: "Title" }), {
-    target: { value: "Try another wallet" },
-  });
+it("directs Crosslink to incentives and HashSmash to Yukon without a local reward", () => {
+  navigation.path = "/opportunities/tasks/crosslink-incentives";
+  const view = render(<Directory />);
+  expect(screen.getByRole("link", { name: "View Crosslink incentives" }).getAttribute("href")).toBe("/ongoing-test/crosslink?tab=incentives");
+  navigation.path = "/opportunities/tasks/hashsmash"; view.rerender(<Directory />);
+  expect(screen.getByRole("link", { name: "Participate on Yukon" }).getAttribute("href")).toBe("https://www.yukon.org/hashsmash");
+  expect(screen.queryByText(/first place|example reward|november/i)).toBeNull();
+});
+it("provides all stock images as downloads, with searchable artwork", () => {
+  navigation.path = "/opportunities/art"; render(<Directory />);
+  expect(screen.getAllByRole("link", { name: /^Download / })).toHaveLength(29);
+  fireEvent.change(screen.getByRole("textbox", { name: "Search artwork" }), { target: { value: "yukon" } });
+  expect(screen.getAllByRole("link", { name: /^Download / })).toHaveLength(1);
+  expect(screen.getByRole("link", { name: "Download HashSmash · Yukon" }).hasAttribute("download")).toBe(true);
+});
+it("uses fresh page data instead of records retained by the shared layout", () => {
+  const initial: Catalog = { items, sources: [] };
+  const removed = items[0];
+  const fresh: Catalog = { items: items.slice(1).reverse(), sources: [] };
+  const view = render(<OpportunitiesLayout catalog={initial}><OpportunitiesRoutes catalog={initial} /></OpportunitiesLayout>);
+  view.rerender(<OpportunitiesLayout catalog={initial}><OpportunitiesRoutes catalog={fresh} /></OpportunitiesLayout>);
+  expect(Array.from(view.container.querySelectorAll(".directory-card h2")).map((x) => x.textContent)).toEqual(items.slice(1).map((x) => x.title));
+  expect(screen.queryByRole("link", { name: "View " + removed.title })).toBeNull();
+  navigation.path = "/opportunities/tasks/" + removed.id;
+  view.rerender(<OpportunitiesLayout catalog={initial}><OpportunitiesRoutes catalog={fresh} /></OpportunitiesLayout>);
+  expect(screen.getByText("This opportunity is no longer listed")).toBeTruthy();
+  expect(screen.queryByRole("link", { name: removed.actionLabel })).toBeNull();
+});
+it("refreshes visible listings periodically and on focus, but leaves preparation alone", () => {
+  vi.useFakeTimers();
+  const visibility = vi.spyOn(document, "visibilityState", "get").mockReturnValue("visible");
+  const view = render(<Directory />);
+  act(() => { vi.advanceTimersByTime(60_000); });
+  expect(navigation.refresh).toHaveBeenCalledTimes(1);
+  visibility.mockReturnValue("hidden");
+  act(() => { vi.advanceTimersByTime(60_000); });
+  expect(navigation.refresh).toHaveBeenCalledTimes(1);
+  visibility.mockReturnValue("visible");
+  fireEvent.focus(window);
+  expect(navigation.refresh).toHaveBeenCalledTimes(2);
+  navigation.path = "/opportunities/prepare"; view.rerender(<Directory />);
+  fireEvent.focus(window);
+  act(() => { vi.advanceTimersByTime(60_000); });
+  expect(navigation.refresh).toHaveBeenCalledTimes(2);
+});
+it("preserves an in-progress brief when refreshed layout data arrives", () => {
+  navigation.path = "/opportunities/prepare"; navigation.search = "provider=gleyo";
+  const initial: Catalog = { items, sources: [] };
+  const view = render(<OpportunitiesLayout catalog={initial}><OpportunitiesRoutes catalog={initial} /></OpportunitiesLayout>);
+  fireEvent.change(screen.getByLabelText("Title"), { target: { value: "My unfinished quest" } });
+  const fresh = { ...initial, items: [...items].reverse() };
+  view.rerender(<OpportunitiesLayout catalog={fresh}><OpportunitiesRoutes catalog={fresh} /></OpportunitiesLayout>);
+  expect((screen.getByLabelText("Title") as HTMLInputElement).value).toBe("My unfinished quest");
+});
+it("prepares a quest with artwork and copies a brief without account creation or a network submission", async () => {
+  const writeText = vi.fn().mockResolvedValue(undefined);
+  Object.defineProperty(navigator, "clipboard", { configurable: true, value: { writeText } });
+  const fetch = vi.fn(); vi.stubGlobal("fetch", fetch);
+  render(<Editor initialProvider="gleyo" />);
+  fireEvent.change(screen.getByLabelText("Title"), { target: { value: "Try a private wallet" } });
+  fireEvent.change(screen.getByLabelText(/Description/), { target: { value: "Explore a wallet and share a useful onboarding report." } });
+  fireEvent.change(screen.getByLabelText(/Tasks · up to 5/), { target: { value: "Read the guide\nWrite a short report" } });
+  fireEvent.change(screen.getByLabelText("XP (optional)"), { target: { value: "100" } });
   fireEvent.click(screen.getByRole("button", { name: "Change cover" }));
   const dialog = screen.getByRole("dialog", { name: "Choose a cover" });
-  expect(
-    within(dialog).getAllByRole("button", { name: /^Choose / }),
-  ).toHaveLength(27);
-  fireEvent.click(
-    within(dialog).getByRole("button", { name: "Choose Zingo!" }),
-  );
-  expect(
-    view.container.querySelector(".cover-current strong")?.textContent,
-  ).toBe("Zingo!");
-  expect(
-    (screen.getByRole("button", { name: "Upload image" }) as HTMLButtonElement)
-      .disabled,
-  ).toBe(true);
-  expect(
-    (screen.getByRole("button", { name: /Continue/ }) as HTMLButtonElement)
-      .disabled,
-  ).toBe(true);
-  for (const button of within(
-    screen.getByRole("list", { name: "Creation progress" }),
-  )
-    .getAllByRole("button")
-    .slice(1)) {
-    expect((button as HTMLButtonElement).disabled).toBe(true);
-    fireEvent.click(button);
-  }
-  expect(screen.getByRole("heading", { name: "Basics" })).toBeTruthy();
-  expect(view.container.querySelector('input[type="file"]')).toBeNull();
-  expect(
-    screen.queryByRole("button", {
-      name: /Publish in preview|Sign in to publish/,
-    }),
-  ).toBeNull();
-  expect(
-    writes.mock.calls.every(
-      ([key]) => key === "oz-opportunities-beta:bookmarks",
-    ),
-  ).toBe(true);
+  expect(within(dialog).getAllByRole("button", { name: /^Choose / })).toHaveLength(29);
+  fireEvent.click(within(dialog).getByRole("button", { name: "Choose Zingo!" }));
+  fireEvent.click(screen.getByRole("button", { name: "Review & take to platform" }));
+  fireEvent.click(screen.getByRole("button", { name: "Copy brief" }));
+  await waitFor(() => expect(writeText).toHaveBeenCalledTimes(1));
+  expect(writeText.mock.calls[0][0]).toContain("XP: 100");
+  expect(writeText.mock.calls[0][0]).toContain("/opportunities/art/zingo.png");
+  expect(writeText.mock.calls[0][0]).not.toContain("ZEC reward pool:");
+  expect(screen.getByRole("link", { name: "Continue to Gleyo" }).getAttribute("href")).toBe("https://gleyo.app/");
+  expect(screen.getByRole("link", { name: "Download cover" }).hasAttribute("download")).toBe(true);
+  expect(fetch).not.toHaveBeenCalled();
+  vi.unstubAllGlobals();
 });
-
-it.each(["Task", "Contest"])(
-  "keeps %s participation locked while details remain readable",
-  (type) => {
-    const item = sampleOpportunities.find((o) => o.type === type)!;
-    navigation.path = "/opportunities/tasks/" + item.id;
-    const view = render(<Beta />);
-    const action = screen.getByRole("button", {
-      name: type === "Task" ? "Applications soon" : "Submissions soon",
-    }) as HTMLButtonElement;
-    expect(action.disabled).toBe(true);
-    fireEvent.click(action);
-    expect(view.container.querySelector("#contribution-form")).toBeNull();
-    expect(
-      screen.getByRole("heading", { name: "Acceptance criteria" }),
-    ).toBeTruthy();
-  },
-);
-
-it.each(["campaigns", "communities"])(
-  "keeps %s creation locked when a form is submitted directly",
-  (kind) => {
-    navigation.path = "/opportunities/" + kind + "/new";
-    const writes = vi.spyOn(Storage.prototype, "setItem");
-    const view = render(<Beta />);
-    expect(
-      (screen.getByRole("button", { name: "Coming soon" }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(true);
-    fireEvent.submit(view.container.querySelector("form")!);
-    expect(screen.queryByRole("heading", { name: /Review your/ })).toBeNull();
-    expect(
-      writes.mock.calls.every(
-        ([key]) => key === "oz-opportunities-beta:bookmarks",
-      ),
-    ).toBe(true);
-  },
-);

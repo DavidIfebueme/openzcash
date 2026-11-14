@@ -5,7 +5,7 @@ import {
   coverLabel,
   filterCovers,
   resolveCover,
-  isUploadCover,
+  stockCoverUrl,
 } from "./covers";
 import { Dialog } from "./frame";
 import { Illustration, Icon } from "./visuals";
@@ -31,11 +31,7 @@ export function CoverPicker({
       <div className="cover-field-heading">
         <span>Cover</span>
         <small>
-          {!value
-            ? "Suggested"
-            : isUploadCover(value)
-              ? "Uploaded"
-              : "Selected"}
+          {!value ? "Suggested" : "Selected"}
         </small>
       </div>
       <div className="cover-current">
@@ -54,15 +50,9 @@ export function CoverPicker({
               <Icon name="grid" size={15} />
               Change cover
             </button>
-            <button
-              type="button"
-              className="op-text"
-              disabled
-              title="Uploads are coming soon"
-            >
-              <Icon name="lock" size={15} />
-              Upload image
-            </button>
+            <a className="op-text" href={stockCoverUrl(selected)} download>
+              <Icon name="arrowdown" size={15} /> Download cover
+            </a>
           </div>
           {value && (
             <button
@@ -76,7 +66,7 @@ export function CoverPicker({
         </div>
       </div>
       <small className="cover-file-hint">
-        Choose any stock cover. Custom uploads are coming soon.
+        Download the cover and add it where the platform supports images.
       </small>
       <Dialog
         open={open}
@@ -102,7 +92,7 @@ export function CoverPicker({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
           >
-            <option>All</option>
+            <option value="All">All topics</option>
             {coverTopics.map((t) => (
               <option key={t}>{t}</option>
             ))}

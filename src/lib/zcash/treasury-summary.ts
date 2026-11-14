@@ -1,16 +1,18 @@
 import "server-only";
 import { latestSnapshot } from "@/lib/zcg/snapshots-repo";
 import { currentLockboxZec } from "@/lib/zcash/lockbox-live";
+import { getNsmSnapshot } from "@/lib/network/nsm";
 import { currentZecUsdCents, zatToUsdCents } from "@/lib/pricing/live-price";
 import { formatUsdCents } from "@/lib/zcg/format";
 import { formatZec } from "@/lib/zcash/units";
 import { cached } from "@/lib/cache/memo";
 
 /**
- * The two pools the ZCG spreadsheet tracks, valued at the live price: the
- * operating (Coinbase) balance and the ZIP-1016 Lockbox / Coinholder pool.
- * One cached projection feeds the home page cards and the shell's treasury
- * bar, so both always show the same figures.
+ * The pools the shell's treasury bar shows, valued at the live price: the two
+ * the ZCG spreadsheet tracks (the operating Coinbase balance and the ZIP-1016
+ * Lockbox / Coinholder pool) and the NSM value balance consensus holds out of
+ * circulation since NU7 (ZIP 237). One cached
+ * projection, so every page shows the same figures.
  */
 export type TreasuryPool = {
   name: string;
@@ -18,8 +20,8 @@ export type TreasuryPool = {
   href: string;
   /** Formatted ZEC balance, no symbol. */
   zec: string;
-  /** Formatted USD valuation (compact). */
-  usd: string;
+  /** Formatted USD valuation (compact); null when no price is available. */
+  usd: string | null;
   /** Extra line, e.g. USD cash held alongside the ZEC. */
   sub?: string;
   /** The same figures unabridged, for the bar's tooltip. */
@@ -46,6 +48,8 @@ export type FreshnessNote = {
 export type TreasurySummary = {
   operating: TreasuryPool | null;
   lockbox: TreasuryPool | null;
+  /** The NSM value balance; null (never zero) when the node feed has none. */
+  nsm: TreasuryPool | null;
   /** Chain height the figures refer to, formatted with separators. */
   height: string | null;
   /** ZEC/USD price used for the valuation, formatted. */
@@ -53,6 +57,30 @@ export type TreasurySummary = {
 };
 
 const TTL_MS = 60_000;
+
+/**
+ * How long the bar waits for the node feed before showing the other pools
+ * without the NSM. The feed's own timeout is longer; a cold or slow read must
+ * not hold back figures that never needed it.
+ */
+export const NSM_WAIT_MS = 2_500;
+
+/** The promise's value, or null once `ms` have passed or it has failed. */
+function within<T>(ms: number, promise: Promise<T>): Promise<T | null> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(null), ms);
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      () => {
+        clearTimeout(timer);
+        resolve(null);
+      },
+    );
+  });
+}
 
 /**
  * The import runs every 6 h, so a sheet figure older than two days means ZCG
@@ -104,15 +132,55 @@ export function sheetFreshnessNote(
   };
 }
 
+/**
+ * A pool's ZEC as the bar shows it: two decimals, or none for a whole number
+ * of ZEC, so neighbouring pools read alike. Since NU7 the Lockbox accrues
+ * 0.06249999 ZEC a block, so the full figure has eight decimals; that one
+ * stays in the tooltip (`exact`).
+ */
+const ZAT_PER_ZEC = 100_000_000n;
+const barZec = (zat: bigint): string =>
+  (Number(zat) / 1e8).toLocaleString("en-US", {
+    minimumFractionDigits: zat % ZAT_PER_ZEC === 0n ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+
+/** The NSM balance as a pool of the bar: ZEC to the cent, the rest in the tooltip. */
+function nsmPool(
+  reading: { balanceZat: number; height: number; stale: boolean },
+  priceCents: bigint | number | null,
+): TreasuryPool {
+  const zat = BigInt(reading.balanceZat);
+  const usdCents =
+    priceCents != null ? zatToUsdCents(zat, priceCents) : null;
+  const block = `block ${reading.height.toLocaleString("en-US")}`;
+  return {
+    name: "NSM · Sustainability",
+    tag: "ZIP 237 · in consensus",
+    href: "/nsm",
+    zec: barZec(zat),
+    usd: usdCents != null ? formatUsdCents(usdCents, { compact: true }) : null,
+    exact: `${formatZec(zat, { symbol: false })} ZEC${
+      usdCents != null ? ` ≈ ${formatUsdCents(usdCents)}` : ""
+    }\nOut of circulation by consensus · ${block}${
+      reading.stale ? " · last reading, the source is not current" : ""
+    }`,
+  };
+}
+
 async function compute(): Promise<TreasurySummary> {
-  const [op, lock, liveCents] = await Promise.all([
+  const [op, lock, liveCents, nsm] = await Promise.all([
     latestSnapshot("zcg_operating").catch(() => null),
     currentLockboxZec().catch(() => null),
     currentZecUsdCents().catch(() => null),
+    within(NSM_WAIT_MS, getNsmSnapshot()),
   ]);
 
   const height =
-    lock?.height ?? (op?.blockHeight != null ? Number(op.blockHeight) : null);
+    lock?.height ??
+    (op?.blockHeight != null ? Number(op.blockHeight) : null) ??
+    nsm?.height ??
+    null;
   // Live market price preferred; fall back to the spreadsheet's recorded price.
   const priceCents =
     liveCents ?? op?.zecusdPriceCents ?? lock?.snap?.zecusdPriceCents ?? null;
@@ -159,11 +227,12 @@ async function compute(): Promise<TreasurySummary> {
           name: "Lockbox · Coinholder",
           tag: "ZIP-1016 pool · live",
           href: "/lockbox",
-          zec: formatZec(lock.zat, { symbol: false }),
+          zec: barZec(lock.zat),
           usd: formatUsdCents(lockUsdCents, { compact: true }),
           exact: `${formatZec(lock.zat, { symbol: false })} ZEC ≈ ${formatUsdCents(lockUsdCents)}`,
         }
       : null,
+    nsm: nsm ? nsmPool(nsm, priceCents) : null,
     height: height != null ? Number(height).toLocaleString("en-US") : null,
     price: priceCents != null ? formatUsdCents(priceCents) : null,
   };

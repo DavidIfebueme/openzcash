@@ -1,4 +1,15 @@
 const forum = "https://forum.zcashcommunity.com/t/crosslink-incentivized-feature-net/55210";
+
+// Single source of truth for the guide's freshness stamp, imported by the
+// footer and checked by scripts/check-crosslink-sources.mjs. Update it only
+// after re-verifying every curated link against its original source.
+export const sourcesChecked = "2 Nov 2026";
+// Reference release the participation steps and hero CTA point at. Shielded
+// Labs ships weekly and only recognizes the current chain for rewards, so
+// this must track the repository's latest release.
+export const releaseTag = "v17";
+export const releaseNotes = `https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/${releaseTag}`;
+
 export const paidRounds = [
   { round: 1, total: 25, earned: 11.2, discretionary: 13.8, reported: "27 Jun 2026", recipients: 22, claim: "17 Jun 2026 · 23:59 UTC", source: `${forum}/49`, claimSource: `${forum}/47`, note: "Unclaimed proportional rewards were reassigned to community contributors and active testers. Payments were reported as distributed during that week." },
   { round: 2, total: 25, earned: 19.954, discretionary: 5.046, reported: "15 Oct 2026", recipients: 17, claim: "4 Oct 2026 · 23:59 UTC", source: `${forum}/117`, claimSource: `${forum}/94`, note: "Eight contributors received discretionary awards. The claim announcement specified snapshot height 660,000. Recipient groups may overlap." },
@@ -7,7 +18,7 @@ export const reportedPaid = paidRounds.reduce((total, round) => total + round.to
 export const history = [
   { date: "2 Apr 2026", title: "The incentive program opens", allocatedZec: 500, detail: "500 ZEC allocated to the program; 25 ZEC earmarked for the first season. Rewards are based on cTAZ earned through mining and staking, excluding faucet balances and the funding wallet.", source: `${forum}/1`, kind: "Program" },
   { date: "15 Apr 2026", title: "Feature net launches", detail: "The first public network and desktop release open community testing.", source: `${forum}/19`, kind: "Network" },
-  { date: "23–27 Apr 2026", title: "Early network upgrades", detail: "The v3 upgrade includes restoring the wallet seed, followed by v4. These instructions belong to the early network, not the current v15 guide.", source: `${forum}/31`, kind: "Network" },
+  { date: "23–27 Apr 2026", title: "Early network upgrades", detail: "The v3 upgrade includes restoring the wallet seed, followed by v4. These instructions belong to the early network, not the current release guide.", source: `${forum}/31`, kind: "Network" },
   { date: "12 May 2026", title: "Finality stalls", detail: "Participants report stalled BFT finality. Chain divergence and recovery become a focus of testing and community diagnostics.", source: `${forum}/38`, kind: "Network" },
   { date: "29 May 2026", title: "Testing moves to continuous iterations", detail: "Scheduled seasonal resets give way to upgrades on the running network, with resets only when needed. A rolling six-week reward cadence is proposed; allocations and claim windows are announced separately.", source: `${forum}/39`, kind: "Program" },
   { date: "10 Jun 2026", title: "Workshop & cTAZ walkthrough", detail: "A community workshop and explorer walkthrough help participants inspect network health and activity. The recording was shared on 12 June.", source: `${forum}/46`, kind: "Community" },
@@ -20,4 +31,6 @@ export const history = [
   { date: "8 Oct 2026", title: "0scan Crosslink Tracker", detail: "A new community tracker adds finalizer voting power, stake history and funding-flow views.", source: `${forum}/114`, kind: "Community" },
   { date: "13 Oct 2026", title: "v15 upgrade released", detail: "The release schedules activation at height 55296, expected on 15 October. It addresses a stalled-proposal edge case, finalizer rewards and power-of-ten bond amounts.", source: "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v15", kind: "Network" },
   { date: "15 Oct 2026", title: "Round 2 · 25 ZEC paid", detail: "Payment report: 19.954 ZEC for mining and staking across 17 participants; 5.046 ZEC in discretionary awards to eight contributors.", source: `${forum}/117`, kind: "Paid" },
+  { date: "2 Nov 2026", title: "v16 · required update", detail: "Version 16 runs on the same network as v15: replace the binary and restart, keeping existing data. It fixes crashes from malformed staking transactions, BFT proposals and vote packets, forbids staking actions in coinbase transactions, and updates the sync checkpoint. Shielded Labs recognizes only the current chain for rewards, and versions stop running two weeks after they ship.", source: "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v16", kind: "Network" },
+  { date: "5 Nov 2026", title: "v17 · required update", detail: "Version 17 runs on the same chain and network as v16 until a network upgrade scheduled for block 165000: replace the binary and restart, keeping existing data. It turns on RPC cookie authentication by default, limits the lightwallet server port to localhost, fixes two node crashes and moves the sync checkpoint to PoW height 125202. If the versions diverge, Shielded Labs recognizes only the Version 17 chain for rewards.", source: "https://github.com/ShieldedLabs/crosslink_monolith/releases/tag/v17", kind: "Network" },
 ] as const;

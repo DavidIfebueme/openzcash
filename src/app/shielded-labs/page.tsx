@@ -7,6 +7,7 @@ import { Suspense } from "react";
 import { OrgUpdates } from "@/components/org-updates";
 import { getShieldedLabsUpdates } from "@/lib/org-updates/forum";
 import { pageMetadata } from "@/lib/seo/page-metadata";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
@@ -24,25 +25,26 @@ const GITHUB = "https://github.com/ShieldedLabs";
 
 type Zip = { id: string; title: string; desc: string; url: string };
 
-// The Network Sustainability Mechanism — three ZEC supply-economics ZIPs.
+// The Network Sustainability Mechanism as NU7 left it (ZIP 259): two ZIPs
+// active, one still a draft. ZIP 234 (issuance smoothing) was replaced by 237.
 const ZIPS: Zip[] = [
   {
-    id: "ZIP 233",
-    title: "Burning",
-    desc: "A protocol mechanism to permanently remove ZEC from circulation, via voluntary contributions or protocol fees.",
-    url: "https://zips.z.cash/zip-0233",
-  },
-  {
-    id: "ZIP 234",
-    title: "Issuance Smoothing",
-    desc: "An issuance smoothing curve that reissues burned ZEC over time instead of relying only on the four-year halving, stabilizing miner revenue.",
-    url: "https://zips.z.cash/zip-0234",
-  },
-  {
     id: "ZIP 235",
-    title: "Fee Burning",
-    desc: "Burns 60% of transaction fees to add deflationary pressure during periods of high network usage.",
+    title: "60% of fees",
+    desc: "Removes 60% of every block's transaction fees from circulation; miners keep the rest. Active since NU7, November 2026.",
     url: "https://zips.z.cash/zip-0235",
+  },
+  {
+    id: "ZIP 237",
+    title: "Reissuance that keeps the halvings",
+    desc: "Holds the removed ZEC as a balance in consensus and returns it through block subsidies from block 8,939,664. Activated with NU7 in place of ZIP 234.",
+    url: "https://zips.z.cash/zip-0237",
+  },
+  {
+    id: "ZIP 233",
+    title: "Voluntary removals",
+    desc: "A transaction field for taking ZEC out of circulation by choice. A draft, not deployed with NU7.",
+    url: "https://zips.z.cash/zip-0233",
   },
 ];
 
@@ -111,7 +113,15 @@ export default function ShieldedLabsPage() {
           Network Sustainability Mechanism (NSM)
         </h2>
         <p className="mb-3 text-xs text-stone-600">
-          Three proposed changes to ZEC supply economics.{" "}
+          Changes to ZEC supply economics: two active since NU7, one still a
+          draft.{" "}
+          <Link
+            href="/nsm"
+            className="text-amber-700 underline decoration-amber-500/40 underline-offset-2 hover:text-amber-800"
+          >
+            Live NSM balance
+          </Link>{" "}
+          ·{" "}
           <a
             href={NSM}
             target="_blank"

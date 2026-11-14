@@ -1,42 +1,15 @@
 import { expect, it } from "vitest";
-import { APPS, placeOf } from "@/lib/design-routes";
-import { opportunityRoute } from "./route";
-import {
-  sampleCampaigns,
-  sampleOpportunities,
-  sampleOrganizers,
-} from "./model";
-
-it("exposes valid shareable beta routes and rejects unknown records", () => {
-  for (const segments of [
-    [],
-    ["new"],
-    ["campaigns", "new"],
-    ["communities", "new"],
-    ...sampleOpportunities.map((o) => ["tasks", o.id]),
-    ...sampleCampaigns.map((c) => ["campaigns", c.id]),
-    ...sampleOrganizers.map((o) => ["communities", o.id]),
-  ]) {
-    expect(opportunityRoute(segments)?.title).toContain("Beta");
-  }
-  for (const segments of [
-    ["unknown"],
-    ["tasks", "unknown"],
-    ["tasks", "new"],
-    ["campaigns", "unknown"],
-    ["tasks", sampleOpportunities[0].id, "submit"],
-  ]) {
-    expect(opportunityRoute(segments)).toBeNull();
-  }
+import { legacyOpportunityRedirect, opportunityRoute } from "./route";
+import { curatedItems } from "./catalog";
+it("resolves catalog, artwork and preparation routes without a registration route", () => {
+  for (const path of [[], ["art"], ["prepare"], ["platforms"], ...curatedItems.map((x) => ["tasks", x.id])]) expect(opportunityRoute(path)).toBeTruthy();
+  expect(opportunityRoute(["register"])).toBeNull(); expect(opportunityRoute(["tasks", "unrecognized"])).toBeNull();
+  expect(opportunityRoute(["tasks", "zec-previous-source-id"])).toBeTruthy();
 });
-
-it("integrates the beta in ecosystem navigation and preserves its parent on details", () => {
-  const page = APPS.flatMap((app) => app.pages).find(
-    (p) => p.href === "/opportunities",
-  );
-  expect(page).toMatchObject({ label: "Opportunities", beta: true });
-  expect(placeOf("/opportunities")?.app.id).toBe("ecosystem");
-  expect(
-    placeOf("/opportunities/tasks/test-crosslink")?.detail?.parent.href,
-  ).toBe("/opportunities");
+it("moves former signup / publishing journeys to the provider flow and preserves shared challenges", () => {
+  expect(legacyOpportunityRedirect(["new"])).toBe("/opportunities/prepare");
+  expect(legacyOpportunityRedirect(["communities", "new"])).toBe("/opportunities/platforms");
+  expect(legacyOpportunityRedirect(["tasks", "hashsmash-november"])).toBe("/opportunities/tasks/hashsmash");
+  expect(legacyOpportunityRedirect(["tasks", "test-crosslink"])).toBe("/opportunities/tasks/crosslink-incentives");
+  expect(legacyOpportunityRedirect(["tasks", "0xramp-pay-brasil"])).toBe("/opportunities");
 });

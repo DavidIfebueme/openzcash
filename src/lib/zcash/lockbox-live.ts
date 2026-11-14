@@ -4,14 +4,15 @@
  * Every screen that shows the "Lockbox" figure (landing, /zcg, /zcg/coinholder,
  * /lockbox) MUST read it from here so they all agree. It anchors to the latest
  * `lockbox_coinholder` snapshot (the spreadsheet balance) and adds the protocol
- * accrual (0.1875 ZEC per block) up to the current chain tip — the exact same
- * math the /lockbox live feed uses on the client. The chain tip is cached per
- * server instance so this doesn't hit lightwalletd on every render.
+ * accrual up to the current chain tip, each block at the rate its height pays
+ * (0.1875 ZEC before NU7, 0.06249999 ZEC since) — the exact same math the
+ * /lockbox live feed uses on the client. The chain tip is cached per server
+ * instance so this doesn't hit lightwalletd on every render.
  */
 import "server-only";
 import { latestSnapshot } from "@/lib/zcg/snapshots-repo";
 import { getCurrentHeight } from "@/lib/zcash/real/lwd/lwd-client";
-import { LOCKBOX_ZEC_PER_BLOCK, THIRD_HALVING_HEIGHT } from "./lockbox";
+import { lockboxAccruedZat } from "./lockbox";
 
 const LWD_URL = process.env.LWD_URL ?? "zec.rocks:443";
 const TIP_TTL_MS = 60_000;
@@ -53,9 +54,11 @@ export async function currentLockboxZec() {
   const baselineZat = BigInt(snap.zecBalanceZat);
   const baselineHeight = snap.blockHeight ? Number(snap.blockHeight) : 0;
   const tip = await cachedChainTip();
-  const eff = Math.min(tip || baselineHeight, THIRD_HALVING_HEIGHT);
-  const blocks = baselineHeight > 0 ? Math.max(0, eff - baselineHeight) : 0;
-  const accruedZat = BigInt(Math.round(blocks * LOCKBOX_ZEC_PER_BLOCK * 1e8));
+  // Nothing accrues without a baseline height, and nothing from the 3rd halving.
+  const accruedZat =
+    baselineHeight > 0
+      ? BigInt(lockboxAccruedZat(baselineHeight, tip || baselineHeight))
+      : 0n;
 
   return {
     zat: baselineZat + accruedZat,

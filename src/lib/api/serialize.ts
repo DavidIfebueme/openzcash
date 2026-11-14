@@ -9,7 +9,10 @@ export function toCsv(rows: Row[]): string {
   const cols = Object.keys(rows[0]);
   const esc = (v: unknown) => {
     const s = v == null ? "" : String(v);
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    // Cells that could execute as a formula in Excel/Sheets (=, +, @, tab) get
+    // a leading apostrophe; leading "-" is preserved for negative amounts.
+    const guarded = /^[=+@\t]/.test(s) ? `'${s}` : s;
+    return /[",\n]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded;
   };
   return [
     cols.join(","),

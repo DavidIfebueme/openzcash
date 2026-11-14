@@ -9,7 +9,7 @@ describe("Participate headers and redirects", () => {
   it("never opens the frame policy: the native screens need no embedded workspace", async () => {
     vi.stubEnv(
       "PARTICIPATE_UPSTREAM_URL",
-      "http://participate.railway.internal:3000",
+      "http://upstream.railway.internal:3000",
     );
     const { default: config } = await import("../../../next.config");
     const headers = await config.headers!();
@@ -32,7 +32,7 @@ describe("Participate headers and redirects", () => {
   it("redirects the former embedded workspace and decisions paths to the native screen", async () => {
     vi.stubEnv(
       "PARTICIPATE_UPSTREAM_URL",
-      "http://participate.railway.internal:3000",
+      "http://upstream.railway.internal:3000",
     );
     const { default: config } = await import("../../../next.config");
     const redirects = await config.redirects!();

@@ -54,6 +54,10 @@ string disables that fallback.
 | `skills/` | The published agent skills (`zcg-copilot`, `coinholder-copilot`, `zechub-copilot`) |
 | `drizzle/` | Generated SQL migrations |
 | `docs/` | Methodology, design standards, and evaluation records |
+| `data/` | Public coinholder vote snapshots with provenance (mirrors `services/participate/data`) |
+| `docker/` | Dockerfiles for local engine containers (e.g. the zkool GraphQL engine) |
+| `ops/` | Edge/runtime adapters: the error-fallback handler and its tests |
+| `reports/` | Monthly report production tooling and publishing records |
 
 ## A good first task
 
@@ -67,8 +71,12 @@ tests alongside the gate below.
 
 - Branches in this repo use topic prefixes such as `fix/`, `docs/`, or a personal
   `<name>/<topic>` prefix; PRs target `main`.
+- Branch lifecycle: merged branches are kept for 30 days for reference and
+  recovery, then deleted during housekeeping. Never delete an unmerged branch
+  without its author's confirmation.
 - The [CI workflow](.github/workflows/ci.yml) runs typecheck, lint, tests, copilot
-  tests, and the production build on pull requests and pushes to `main`.
+  tests, and the production build on pull requests and pushes to `main`; see the
+  [CI overview](docs/ci.md) for what each job does.
 - Keep PRs to one surface when practical; the test gate below is fast.
 
 ## Tests
@@ -80,6 +88,7 @@ npm run typecheck && npm run lint && npm test && npm run test:copilot && npm run
 ```
 
 Run the gate on the exact changes being submitted and report any skipped suites.
+`npm test` also runs the ecosystem-sync suite (`scripts/lib/ecosystem-*.test.mjs`).
 The CI test job does not configure a database, so the opt-in PostgreSQL suites
 below are skipped there. They should also be run locally when changing imports,
 publication policy, or persisted snapshots.
@@ -138,6 +147,35 @@ the other suites; report any skipped suites with your validation results.
 Open an issue at
 [github.com/Michae2xl/openzcash/issues](https://github.com/Michae2xl/openzcash/issues).
 Discussions are not enabled on this repository.
+
+## Deployment checklist
+
+Deployments promote `main` to Railway. Work through this checklist for every
+production promotion; do not skip steps from habit.
+
+1. **Pre-deploy gate.** CI is green on `main` (typecheck, lint, tests, copilot
+   tests, build, service checks, Participate database checks).
+2. **Configuration review.** Confirm in the Railway service variables:
+   `DATABASE_URL` (production database), `CRON_SECRET` (set and ≥ 16 chars),
+   and, when AI features are enabled, the `ZARVIS_*` and provider variables
+   (`docs/zarvis.md` documents each one and its default). No secrets in Git;
+   no placeholder values in production.
+3. **Migrations.** Boot migrations apply automatically on start
+   (`scripts/migrate.mjs` in the start command); watch the deploy logs for the
+   `zarvis.store` failure line that indicates a migration that did not apply.
+4. **Data import.** Verify the ZCG import ran (deploy logs, or trigger
+   `GET /api/cron/refresh` with the service `CRON_SECRET`) and that the ledger
+   endpoints return current rows.
+5. **Post-deploy smoke.** Check, over HTTPS on the production origin:
+   `GET /api/zarvis/health` (ok), `GET /api/chain-tip` (current height),
+   `GET /api/zcg` (index), and the homepage render. For AI features, one
+   direct-answer question and one model-assisted question with citations.
+6. **Rollback.** Railway's "redeploy previous" reverts the release; migrations
+   are additive by convention (no destructive steps without a paired
+   application change), so rollback does not require a database revert.
+7. **Cron verification.** Confirm the refresh and legal-archive schedules
+   (`src/instrumentation.ts`) and the Zarvis canary (`/api/zarvis/canary`)
+   appear in the logs after one full cycle.
 
 ## Included services
 

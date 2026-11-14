@@ -1,0 +1,22 @@
+name: Feature or data request
+description: Suggest an improvement, a new surface, or additional public data.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: The situation today and why it falls short. New surfaces follow the evidence-led design standard (docs/design-and-credits.md): clear records, accessible sources, visible attribution.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would you like to see?
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Public sources that support it
+      description: Links to public records (ZCG spreadsheet, forum, GitHub, on-chain). Data features need citable sources; figures on the site always carry provenance.

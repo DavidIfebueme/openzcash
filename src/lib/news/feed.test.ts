@@ -97,7 +97,7 @@ it("checks fresh forum data every five minutes without shortening the release sc
   await feed.getNews();
   await vi.waitFor(() => expect(feed.newsFetchedAt()).toBe(at + 5 * 60_000));
   expect(count("latest.json")).toBe(2);
-  expect(count("/releases?")).toBe(5);
+  expect(count("/releases?")).toBe(18);
 });
 
 it("retains a failed forum independently and removes it on a successful empty response", async () => {

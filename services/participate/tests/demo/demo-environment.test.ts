@@ -11,7 +11,7 @@ const demo = {
   PARTICIPATE_DEMO_ENVIRONMENT: "true",
   PARTICIPATE_COMMITTEE_ENABLED: "true",
   DATABASE_URL:
-    "postgresql://app:pw@participate-demo-db.railway.internal:5432/participate_demo",
+    "postgresql://app:pw@demo-db.railway.internal:5432/participate_demo",
   APP_BASE_URL: "https://demo.openzcash.org",
   PASSKEY_ORIGIN: "https://demo.openzcash.org",
   PARTICIPATE_PARENT_ORIGIN: "https://demo.openzcash.org",
@@ -36,14 +36,14 @@ describe("committee demo guard", () => {
     [
       {
         DATABASE_URL:
-          "postgresql://app:pw@participate-db.railway.internal:5432/participate",
+          "postgresql://app:pw@db.railway.internal:5432/participate",
       },
       "DEMO_DATABASE_REQUIRED",
     ],
     [
       {
         DATABASE_URL:
-          "postgresql://app:pw@participate-db.railway.internal:5432/railway",
+          "postgresql://app:pw@db.railway.internal:5432/railway",
       },
       "DEMO_DATABASE_REQUIRED",
     ],

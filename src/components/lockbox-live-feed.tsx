@@ -2,16 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
-  BLOCKS_PER_DAY,
-  BLOCK_SUBSIDY_ZEC,
-  LOCKBOX_ZEC_PER_BLOCK,
-  THIRD_HALVING_HEIGHT,
-  ZCG_ZEC_PER_BLOCK,
+  NU7_HEIGHT,
+  blockRewardsAt,
+  lockboxAccruedZec,
   lockboxZecAt,
 } from "@/lib/zcash/lockbox";
 import { Card, Stat } from "@/components/ui";
 import { IconShield } from "@/components/icons";
-import { cn } from "@/lib/utils";
+import { LivePill } from "@/components/live-pill";
 
 const POLL_MS = 15_000;
 const MAX_ROWS = 30;
@@ -34,10 +32,15 @@ function ago(seenAt: number, now: number): string {
   return `${Math.floor(s / 60)}m ago`;
 }
 
+/** Per-block amounts as consensus pays them: eight decimals, no rounding. */
+const zecExact = (zec: number): string =>
+  zec.toLocaleString("en-US", { maximumFractionDigits: 8 });
+
 /**
  * Live view of the Zcash Lockbox (deferred Dev Fund). Polls the chain tip and,
- * for each newly mined block, shows the 0.1875 ZEC that accrued to the Lockbox.
- * The running total is computed deterministically from the tip height.
+ * for each newly mined block, shows what that block paid into the Lockbox
+ * under the rules at its height (0.06249999 ZEC since NU7). The running total
+ * is computed deterministically from the tip height.
  */
 export function LockboxLiveFeed({
   initialHeight,
@@ -103,17 +106,17 @@ export function LockboxLiveFeed({
     };
   }, []);
 
-  // Anchor to the real spreadsheet balance + accrue 0.1875 ZEC per block since,
-  // so this matches the snapshot screens at the baseline and only the live
-  // blocks pull it ahead. Falls back to the from-genesis math if no snapshot.
-  // Accrual stops at the 3rd halving (funding-model end), matching lockboxZecAt.
-  const effHeight = Math.min(height, THIRD_HALVING_HEIGHT);
+  // Anchor to the real spreadsheet balance and add what each block since has
+  // paid at its own rate, so this matches the snapshot screens at the baseline
+  // and only the live blocks pull it ahead. Falls back to the from-genesis math
+  // if no snapshot. Accrual stops at the 3rd halving (funding-model end).
   const totalZec =
     baselineHeight > 0
-      ? baselineZec +
-        Math.max(0, effHeight - baselineHeight) * LOCKBOX_ZEC_PER_BLOCK
+      ? baselineZec + lockboxAccruedZec(baselineHeight, height)
       : lockboxZecAt(height);
-  const perDayZec = LOCKBOX_ZEC_PER_BLOCK * BLOCKS_PER_DAY;
+  // Until the tip is known, quote the rules in force since NU7.
+  const rewards = blockRewardsAt(height > 0 ? height : NU7_HEIGHT);
+  const perDayZec = rewards.lockboxZec * rewards.blocksPerDay;
 
   return (
     <>
@@ -133,7 +136,7 @@ export function LockboxLiveFeed({
             <p className="mt-1 text-sm text-stone-600 tnum">
               ≈ {usd(totalZec, zecUsd)} · accruing{" "}
               <span className="font-medium text-amber-700">
-                +{LOCKBOX_ZEC_PER_BLOCK} ZEC
+                +{zecExact(rewards.lockboxZec)} ZEC
               </span>{" "}
               every block
             </p>
@@ -146,23 +149,23 @@ export function LockboxLiveFeed({
       <section className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
         <Stat
           label="To Lockbox"
-          value={`+${LOCKBOX_ZEC_PER_BLOCK}`}
+          value={`+${zecExact(rewards.lockboxZec)}`}
           sub="ZEC / block · 12%"
           tone="warn"
         />
         <Stat
           label="Per day"
           value={`~${perDayZec.toLocaleString("en-US", { maximumFractionDigits: 0 })}`}
-          sub={`ZEC · ${BLOCKS_PER_DAY} blocks`}
+          sub={`ZEC · ${rewards.blocksPerDay.toLocaleString("en-US")} blocks`}
         />
         <Stat
           label="ZCG grants"
-          value={`${ZCG_ZEC_PER_BLOCK}`}
+          value={zecExact(rewards.zcgZec)}
           sub="ZEC / block · 8%"
         />
         <Stat
           label="Block subsidy"
-          value={`${BLOCK_SUBSIDY_ZEC}`}
+          value={zecExact(rewards.subsidyZec)}
           sub="ZEC · 80% to miner"
         />
       </section>
@@ -174,7 +177,9 @@ export function LockboxLiveFeed({
       <Card className="p-0">
         {blocks.length > 0 ? (
           <div className="divide-y divide-stone-200 px-5">
-            {blocks.map((b, i) => (
+            {blocks.map((b, i) => {
+              const paid = blockRewardsAt(b.height);
+              return (
               <div
                 key={b.height}
                 className="flex items-center gap-4 py-3"
@@ -188,12 +193,12 @@ export function LockboxLiveFeed({
                     Block #{b.height.toLocaleString("en-US")}
                   </p>
                   <p className="text-xs text-stone-600">
-                    coinbase · {BLOCK_SUBSIDY_ZEC} ZEC subsidy
+                    coinbase · {zecExact(paid.subsidyZec)} ZEC subsidy
                   </p>
                 </div>
                 <div className="shrink-0 text-right">
                   <p className="text-sm font-semibold text-amber-700 tnum">
-                    +{LOCKBOX_ZEC_PER_BLOCK} ZEC
+                    +{zecExact(paid.lockboxZec)} ZEC
                   </p>
                   <p className="text-xs text-stone-600">to Lockbox</p>
                 </div>
@@ -201,7 +206,8 @@ export function LockboxLiveFeed({
                   {ago(b.seenAt, now)}
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="px-5 py-12 text-center text-sm text-stone-600">
@@ -212,34 +218,9 @@ export function LockboxLiveFeed({
 
       <p className="mt-4 text-xs text-stone-600">
         Protocol funding stream (ZIP-1015 / ZIP-1016) read live from the chain
-        tip. No viewing keys involved.
+        tip; per-block amounts follow the 25-second schedule in force since NU7
+        (ZIP-218). No viewing keys involved.
       </p>
     </>
-  );
-}
-
-function LivePill({ live, height }: { live: boolean; height: number }) {
-  return (
-    <div className="flex items-center gap-2 rounded-full border border-stone-200 bg-white px-3 py-1.5 text-xs shadow-sm">
-      <span className="relative flex h-2 w-2">
-        {live ? (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-        ) : null}
-        <span
-          className={cn(
-            "relative inline-flex h-2 w-2 rounded-full",
-            live ? "bg-emerald-500" : "bg-stone-300",
-          )}
-        />
-      </span>
-      <span className="font-medium text-stone-700">
-        {live ? "Live" : "Connecting"}
-      </span>
-      {height > 0 ? (
-        <span className="tnum text-stone-600">
-          · block {height.toLocaleString("en-US")}
-        </span>
-      ) : null}
-    </div>
   );
 }

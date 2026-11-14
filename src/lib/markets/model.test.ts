@@ -16,6 +16,9 @@ import {
   parseSupply,
   dexMilestone,
   spotBenchmark,
+  quoteIsFresh,
+  DIRECT_EXCHANGE_IDS,
+  HOUR,
   type Venue,
   type AddressBalance,
 } from "./model";
@@ -166,6 +169,57 @@ describe("fair volume comparison", () => {
         (e) => e.reason === "Replaced by the direct protocol source",
       ),
     ).toBe(true);
+  });
+  it("yields to the exchange's own API if the aggregator starts listing Bitget, BingX or Bitstamp", () => {
+    // Exchange IDs as published in CoinPaprika's registry on November 11, 2026.
+    const usdt = { pair: "ZEC/USDT", quote_currency_id: "usdt-tether" };
+    const rows = [
+      market,
+      { ...market, ...usdt, exchange_id: "bitget", exchange_name: "Bitget" },
+      { ...market, ...usdt, exchange_id: "bingx", exchange_name: "BingX" },
+      {
+        ...market,
+        exchange_id: "bitstamp",
+        exchange_name: "Bitstamp by Robinhood",
+      },
+    ];
+    const direct = ["bitget", "bingx", "bitstamp"];
+    const parsed = parseMarkets(
+      rows,
+      [...exchanges, ...direct.map((id) => ({ id, type: ["cex"] }))],
+      now,
+    );
+    expect(parsed.venues.map((v) => v.id)).toEqual(["cex"]);
+    expect(parsed.included).toBe(1);
+    expect(parsed.excluded.map((e) => [e.name, e.reason, e.volumeUsd])).toEqual(
+      ["Bitget", "BingX", "Bitstamp by Robinhood"].map((name) => [
+        name,
+        "Replaced by the exchange's own public API",
+        900,
+      ]),
+    );
+    expect([...DIRECT_EXCHANGE_IDS].sort()).toEqual([...direct].sort());
+    // The registry also files BingX under perpetuals; it stays out either way.
+    const asRegistered = parseMarkets(
+      rows,
+      [
+        ...exchanges,
+        { id: "bitget", type: ["cex"] },
+        { id: "bitstamp", type: ["cex"] },
+        { id: "bingx", type: ["cex", "perpetuals"] },
+      ],
+      now,
+    );
+    expect(asRegistered.venues.map((v) => v.id)).toEqual(["cex"]);
+    expect(asRegistered.excluded).toHaveLength(3);
+  });
+  it("judges a quote by one freshness window: two hours back, five minutes ahead", () => {
+    expect(quoteIsFresh(now, now)).toBe(true);
+    expect(quoteIsFresh(now - 2 * HOUR, now)).toBe(true);
+    expect(quoteIsFresh(now - 2 * HOUR - 1, now)).toBe(false);
+    expect(quoteIsFresh(now + 5 * 60_000, now)).toBe(true);
+    expect(quoteIsFresh(now + 5 * 60_000 + 1, now)).toBe(false);
+    expect(quoteIsFresh(Number.NaN, now)).toBe(false);
   });
   it("counts Coinbase and Gemini unified dollar books once without merging other venues' stablecoin markets", () => {
     const quotes = [
