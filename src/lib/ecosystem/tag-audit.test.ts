@@ -136,8 +136,11 @@ describe("September 2026 tag audit regressions", () => {
       expect(result).toEqual(repositories.filter(item => item.owner.toLowerCase() === owner.toLowerCase()));
     }
     expect(filterRepositories(repositories, { ...filters, owner: "elemental-pay" })).toHaveLength(4);
+    // The organization's historical allocation covers each of its repositories, including newly collected ones.
+    const foundation = filterRepositories(repositories, { ...filters, owner: "ZcashFoundation" });
+    expect(foundation.length).toBeGreaterThanOrEqual(72);
     expect(filterRepositories(repositories, { ...filters, owner: "ZcashFoundation", funding: "historical-dev-fund" }))
-      .toHaveLength(72);
+      .toEqual(foundation);
   });
 
   it("keeps support notices scoped to the named repository and separate from flags", () => {

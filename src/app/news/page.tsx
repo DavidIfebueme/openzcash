@@ -7,6 +7,7 @@ import {
   getNews,
   newsFetchedAt,
   githubNewsHealth,
+  githubNewsBehind,
   newsUnavailableSources,
   nowMs,
   type NewsItem,
@@ -69,9 +70,7 @@ export default async function NewsPage({
   const now = nowMs();
   const { source, query, shown, counts, totalCount, newCount } = newsView(items, params, now);
   const githubHealth = githubNewsHealth();
-  const githubUnavailable = githubHealth.filter((source) =>
-    source.status === "cached" || source.status === "unavailable",
-  );
+  const githubUnavailable = githubNewsBehind(githubHealth);
   const showGithubWarning = githubUnavailable.length > 0 && (!source || source === "github");
   const unavailable = newsUnavailableSources();
   const latest = items[0]?.ts ?? "";
