@@ -1,7 +1,7 @@
 import "server-only";
 import { ghHeaders } from "@/lib/zcg/github-headers";
 import type { NewsItem } from "./feed";
-import { RELEASE_REFRESH_MS } from "./config";
+import { RELEASE_REFRESH_MS, RELEASE_RETRY_MS } from "./config";
 
 export const NEWS_GITHUB_REPOSITORIES = [
   "ZcashFoundation/zebra", "zingolabs/zaino", "zcash/zcash",
@@ -21,41 +21,60 @@ export type NewsGitHubHealth = {
   status: "live" | "cached" | "unavailable" | "unchecked";
   fetchedAt: string | null;
   lastSuccessAt: string | null;
+  /** Failed reads in a row since the last success. */
+  failures: number;
 };
 type Entry = { health: NewsGitHubHealth; items: NewsItem[] | null };
 type Store = { entries: Map<string, Entry>; inflight: Map<string, Promise<NewsItem[]>> };
-type Dependencies = { fetcher?: typeof fetch; now?: () => number; ttlMs?: number; store?: Store };
+const INVALID = "GITHUB_RELEASES_UNAVAILABLE";
+type Dependencies = { fetcher?: typeof fetch; now?: () => number; ttlMs?: number; retryMs?: number; store?: Store };
+
+/** The class of a failed read for the server log: never a response body, header or credential. */
+function failureReason(error: unknown): string {
+  const { name, message, cause } = (error ?? {}) as { name?: unknown; message?: unknown; cause?: { message?: unknown } };
+  if (typeof message === "string" && /^HTTP \d{3}$/.test(message)) return message;
+  if (name === "TimeoutError") return "timeout";
+  if (cause?.message === "unexpected redirect") return "redirected";
+  return message === INVALID || name === "SyntaxError" ? "unexpected response" : "network error";
+}
 
 function releases(value: unknown, repository: string): NewsItem[] {
-  if (!Array.isArray(value)) throw new Error("GITHUB_RELEASES_UNAVAILABLE");
+  if (!Array.isArray(value)) throw new Error(INVALID);
   const name = repository.split("/")[1];
   return value.flatMap(row => {
-    if (!row || typeof row !== "object" || Array.isArray(row)) throw new Error("GITHUB_RELEASES_UNAVAILABLE");
+    if (!row || typeof row !== "object" || Array.isArray(row)) throw new Error(INVALID);
     if (row.draft === true) return [];
     if (typeof row.published_at !== "string" || !Number.isFinite(Date.parse(row.published_at)) ||
-        typeof row.tag_name !== "string" || !row.tag_name.trim() || typeof row.html_url !== "string") throw new Error("GITHUB_RELEASES_UNAVAILABLE");
+        typeof row.tag_name !== "string" || !row.tag_name.trim() || typeof row.html_url !== "string" || !URL.canParse(row.html_url)) throw new Error(INVALID);
     const url = new URL(row.html_url);
     if (url.protocol !== "https:" || url.hostname !== "github.com" || url.port || url.username || url.password ||
-        !url.pathname.toLowerCase().startsWith(`/${repository.toLowerCase()}/releases/`)) throw new Error("GITHUB_RELEASES_UNAVAILABLE");
+        !url.pathname.toLowerCase().startsWith(`/${repository.toLowerCase()}/releases/`)) throw new Error(INVALID);
     return [{ id: `github:${url.href}`, source: "github" as const, kind: name,
       title: `${name} ${typeof row.name === "string" && row.name.trim() ? row.name : row.tag_name}${row.prerelease === true ? " (pre-release)" : ""}`,
       url: url.href, ts: new Date(row.published_at).toISOString() }];
   });
 }
 
+/** One missed read is repeated within minutes; a repository is behind once that also fails or nothing is verified yet. */
+export function githubNewsBehind(health: NewsGitHubHealth[]): NewsGitHubHealth[] {
+  return health.filter(source => source.status === "unavailable" || (source.status === "cached" && source.failures > 1));
+}
+
 /** Each repository retains its own last good response; an explicit [] is a success. */
-export function createGitHubNewsReader({ fetcher = fetch, now = Date.now, ttlMs = RELEASE_REFRESH_MS,
+export function createGitHubNewsReader({ fetcher = fetch, now = Date.now, ttlMs = RELEASE_REFRESH_MS, retryMs = RELEASE_RETRY_MS,
   store = { entries: new Map(), inflight: new Map() },
 }: Dependencies = {}) {
+  /** A failed read is repeated sooner than the schedule; the wait doubles, up to the schedule, while it keeps failing. */
+  const spacing = (failures: number) => failures ? Math.min(ttlMs, retryMs * 2 ** (failures - 1)) : ttlMs;
   function health(): NewsGitHubHealth[] {
     return NEWS_GITHUB_REPOSITORIES.map(repository => ({ ...(store.entries.get(repository)?.health ?? {
-      repository, status: "unchecked" as const, fetchedAt: null, lastSuccessAt: null,
+      repository, status: "unchecked" as const, fetchedAt: null, lastSuccessAt: null, failures: 0,
     }) }));
   }
   function read(repository: string): Promise<NewsItem[]> {
     if (!NEWS_GITHUB_REPOSITORIES.some(repo => repo === repository)) return Promise.resolve([]);
     const previous = store.entries.get(repository);
-    if (previous?.health.fetchedAt && now() - Date.parse(previous.health.fetchedAt) < ttlMs) return Promise.resolve(previous.items ?? []);
+    if (previous?.health.fetchedAt && now() - Date.parse(previous.health.fetchedAt) < spacing(previous.health.failures)) return Promise.resolve(previous.items ?? []);
     const pending = store.inflight.get(repository);
     if (pending) return pending;
     const request = (async () => {
@@ -63,17 +82,19 @@ export function createGitHubNewsReader({ fetcher = fetch, now = Date.now, ttlMs 
         const response = await fetcher(`https://api.github.com/repos/${repository}/releases?per_page=${RELEASES_PER_REPOSITORY}`, {
           headers: ghHeaders(), signal: AbortSignal.timeout(7_000), cache: "no-store", redirect: "error",
         });
-        if (!response.ok) throw new Error("GITHUB_RELEASES_UNAVAILABLE");
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const items = releases(await response.json(), repository);
         const fetchedAt = new Date(now()).toISOString();
-        store.entries.set(repository, { items, health: { repository, status: "live", fetchedAt, lastSuccessAt: fetchedAt } });
+        store.entries.set(repository, { items, health: { repository, status: "live", fetchedAt, lastSuccessAt: fetchedAt, failures: 0 } });
         return items;
-      } catch {
+      } catch (error) {
         const prior = store.entries.get(repository);
+        const kept = prior?.items !== null && prior?.items !== undefined;
         const fetchedAt = new Date(now()).toISOString();
+        console.error(`[news] GitHub ${repository} refresh failed (${failureReason(error)}); ${kept ? "keeping last successful response" : "no previous response"}`);
         store.entries.set(repository, { items: prior?.items ?? null, health: {
-          repository, status: prior?.items !== null && prior?.items !== undefined ? "cached" : "unavailable",
-          fetchedAt, lastSuccessAt: prior?.health.lastSuccessAt ?? null,
+          repository, status: kept ? "cached" : "unavailable",
+          fetchedAt, lastSuccessAt: prior?.health.lastSuccessAt ?? null, failures: (prior?.health.failures ?? 0) + 1,
         } });
         return prior?.items ?? [];
       }

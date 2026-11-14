@@ -190,7 +190,10 @@ GitHub collection date. Changes to the collected identity/inventory scope
 require a collector run, not a hash-only reconciliation.
 
 A failed or incomplete full-account scan cannot replace the prior snapshot.
-Selected-repository or activity failures also prevent publication. The collector checks stable repository IDs to prevent a reused path from silently changing project identity.
+Selected-repository or activity failures also prevent publication. A repository
+named in the registry that stops being public therefore holds every daily
+collection (`/api/ecosystem/status` reports `source-unavailable`) until the
+registry is reviewed and the bundled snapshot is collected again. The collector checks stable repository IDs to prevent a reused path from silently changing project identity.
 Review warnings, registry changes, identity transfers, proposal decisions and
 funding evidence before publishing. The GitHub sync does not automatically
 reclassify new grant proposals or validate new funding associations.

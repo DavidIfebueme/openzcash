@@ -8,7 +8,7 @@ import { mergeNews } from "./merge";
 import { NEWS_REFRESH_MS } from "./config";
 import { NEWS_GITHUB_REPOSITORIES, readGitHubNews, githubNewsHealth } from "./github";
 import { LATE_RECORD_MAX_MS, sheetNewsItems, type RecordedPayment } from "./sheet";
-export { githubNewsHealth } from "./github";
+export { githubNewsHealth, githubNewsBehind } from "./github";
 
 /**
  * Cross-source "what's new" feed: the Zcash forum (Discourse), GitHub releases
