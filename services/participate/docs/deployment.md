@@ -52,10 +52,3 @@ restrictions). They are reference adapters, not the generic start command.
 For your own host use `npm run build` and `npm start` with reviewed networking.
 The legacy `deploy/check-public-participate.mjs` checks the iframe workspace;
 validate the current native portal journey separately.
-
-The legacy read-only archive helpers (`anchor-archive-collection.ts` in check
-mode and `check-activity-pilot.ts`) also require `ARCHIVE_SSH_TARGET`,
-`ARCHIVE_SSH_CONTROL_PATH` and `ARCHIVE_RPC_BRIDGE_PATH`. Use your own SSH account,
-absolute control-socket path and audited read-only RPC bridge. No host, socket,
-bridge deployment or credential is bundled. Host-key checking remains strict.
-The activity helper can receive the socket as its third positional argument.

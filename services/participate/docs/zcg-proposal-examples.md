@@ -20,8 +20,6 @@ Inclusion requires an open issue with both **Grant Application** and **Ready For
 
 `data/zcg-review-queue.json` holds the checked metadata. `lib/domain/zcg-review.ts` validates source identity and review eligibility. Review packages preserve `proposal.md` and `record.json`, not the full application or its attachments. They use the `REVIEW_SNAPSHOT` manifest kind, a null decision date and an explicit submission timestamp. The existing historical package format and fingerprints remain valid.
 
-After the archive and committee-scope setup, use `scripts/import-zcg-review-preview.ts` with the existing local preview environment. It only runs in the dedicated preview sandbox, requires the Orchard host and ZCG committee, and publishes these packages idempotently. It issues no credits and creates no ballots or chain transactions. Back up the preview database before importing.
-
 Refreshing captured content requires a new immutable revision and an updated source check. Do not overwrite a published revision or rerun changed content under the same revision number.
 
 ## GitHub labels and sectors
@@ -34,7 +32,7 @@ Refreshing captured content requires a new immutable revision and an updated sou
 
 For example, #478 declares **Education** and receives the additional **Events** classification. Terminal source labels override a leftover Ready For ZCG Review label in public-list filters; #439 is therefore shown as withdrawn. Source status alone creates no votes, signatures, abandonment events or payment receipts. Preserved files continue to describe their capture-time state, and the five dated committee decisions retain their original votes and outcomes.
 
-Run `npx tsx scripts/refresh-zcg-source-metadata.ts` from the repository to refresh these 25 mapped issues. The script checks identity and validates the complete response set before replacing this metadata snapshot. Failed or partial reads leave the previous file intact. Refreshing metadata does not import additional proposals, modify a stored archive package or refresh the independent pilot review roster. There is no automatic polling or real-time sync.
+This snapshot changes only through a reviewed manual update. Refreshing metadata does not import additional proposals, modify a stored archive package or refresh the independent pilot review roster. There is no automatic polling or real-time sync.
 
 ## Historical decisions
 

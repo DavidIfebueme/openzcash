@@ -86,16 +86,7 @@ The 13 October release requires `prisma/upgrades/20261013_comment_versions_activ
 
 Back up the database, apply `prisma/upgrades/20261010_archive_activity.sql`, run `prisma generate` and restart existing application processes. The activity migration is additive and assumes the existing archive and discussion migrations.
 
-With the target database explicitly configured:
-
-```sh
-node --import tsx scripts/archive-activity.ts backfill COMMUNITY_ID
-node --import tsx scripts/archive-activity.ts prepare COMMUNITY_ID
-node --import tsx scripts/archive-activity.ts export BATCH_ID NEW_DIRECTORY
-node --import tsx scripts/archive-activity.ts check BATCH_ID TXID
-```
-
-Preparation and checking use the existing `ARCHIVE_*` configuration. `prepare` and `export` never call a wallet. `check` uses only the viewing-key reader and node. The CLI exposes no signer or automatic sender. Review the exported inventory and exact memo before submitting it through a bounded operator wallet workflow with a fresh journal; do not reuse the journal for the earlier proposal transaction. An unknown send outcome must be reconciled before another submission.
+The manual backfill, prepare, export and check command used for the historical batches is not part of this distribution. `lib/services/archive-activity.ts` and `lib/services/activity-anchors.ts` implement those steps; the worker prepares and checks new activity batches.
 
 Rebuild the distributable verifier after changing its implementation:
 

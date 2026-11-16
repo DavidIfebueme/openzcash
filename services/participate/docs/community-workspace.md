@@ -91,22 +91,6 @@ The integrity installer requires the workspace tables to exist. It adds no schem
 
 Local validation applied the full upgrade to a clone of the prior database. All 15 original table counts and fingerprints of every preexisting column matched; the unassigned legacy poll remained unassigned. New accounting/discussion tables were empty. The original database was unchanged. Installing the integrity guards into the populated preview preserved all 19 table counts and value fingerprints; its existing journals reconciled and the mutation/completeness guards rejected rolled-back diagnostic writes. This is local migration evidence, not a production migration approval.
 
-## Local Sample Preview
-
-The sample script intentionally accepts only `postgresql://dao_test@127.0.0.1:55438/community_workspace`, requires `WORKSPACE_PREVIEW=true`, and rejects production. Prepare that disposable local database and configure a development session secret as described in the [README](../README.md). For a newly created sample database:
-
-```bash
-export DATABASE_URL='postgresql://dao_test@127.0.0.1:55438/community_workspace'
-export WORKSPACE_PREVIEW=true
-npm run db:push
-npx prisma db execute --file prisma/upgrades/20261008_community_workspace_integrity.sql --schema prisma/schema.prisma
-npx prisma db execute --file prisma/upgrades/20261009_proposal_tags.sql --schema prisma/schema.prisma
-npx tsx scripts/seed-workspace-preview.ts
-npm run dev -- --hostname 127.0.0.1
-```
-
-Open `/communities/preview_orchard` and use the workspace sign-in to inspect leader-only views. The fixture defines an owner (`maya.preview`), manager (`ava.preview`), and proposal participant (`leo.preview`); local fixture sign-in details are confined to the sample script. Leader views show three illustrative voting bars, labeled **Simulated**. Treasury amounts are recorded budgets, with **Wallet not connected** shown in the interface. No anchor, ballot receipt, payment, or invitation delivery is fabricated or sent by the seed. Rerunning the seed preserves an existing sample community. Do not use these fixtures or sample accounts in a deployed environment.
-
 ## Verification
 
 Run the repository checks and focused regressions:

@@ -40,7 +40,7 @@ The envelope types are 2,736 single casts, 811 combined delegation-and-cast batc
 
 ## How the activity archive is rebuilt
 
-`scripts/coinholder-activity.py` uses Python's standard library. It reads only the fixed public Zcash Foundation provider and never accesses a wallet or submits transactions.
+The portal's root `scripts/coinholder-activity.py` uses Python's standard library. It reads only the fixed public Zcash Foundation provider and never accesses a wallet or submits transactions.
 
 1. Confirm the finalized round ID and chain ID. Pin pagination to one observed chain height.
 2. Retrieve every commitment-index page. Check increasing block heights, contiguous leaf positions, and the final tree's height, leaf count, and root.
@@ -69,7 +69,7 @@ The server validates the static history once and checks the fixed finalized-summ
 
 ## Reproduce and test
 
-From the repository directory, choose a cache outside the checkout:
+From the portal repository root, choose a cache outside the checkout:
 
 ```sh
 python3 scripts/coinholder-activity.py --cache /tmp/zdao-coinholder-activity --workers 6

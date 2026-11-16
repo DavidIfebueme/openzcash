@@ -83,24 +83,13 @@ The block time is an inclusion timestamp, not an exact wall-clock notarization, 
 
 Frozen export: `work/zebra-operations/mainnet-pilot/participate-20261010/`.
 
-Its collection binds all record IDs, revision IDs, filenames and hashes. Preparing records sends no funds:
-
-```sh
-node --import tsx scripts/export-archive-collection.ts COMMUNITY_ID NEW_DIRECTORY
-node --import tsx scripts/anchor-archive-collection.ts prepare NEW_DIRECTORY
-```
+Its collection binds all record IDs, revision IDs, filenames and hashes. Preparing records sends no funds. The pilot's export and anchoring commands are not part of this distribution; `lib/services/archive-anchors.ts` implements preparation and checks.
 
 Apply both archive SQL upgrades to a backed-up database and regenerate Prisma first. The Merkle upgrade adds an immutable commitment field. Restart an existing development server after generation.
 
 The private operator journal persists prepare → prove → sign → extract → broadcast. The fee cap is 50,000 zatoshis; exact fee, recipient, memo, change ownership, network and expiry are checked. Unknown signing, extraction or broadcast outcomes require reconciliation of the same transaction, never another automatic payment.
 
-Refresh evidence for the **existing** transaction:
-
-```sh
-node --import tsx scripts/anchor-archive-collection.ts check DIRECTORY TXID
-```
-
-This pilot tool uses the existing operator SSH connection. Credentials stay remote. It validates all packages and proofs, observes the chain once and atomically stores the same bound evidence for the batch. Same-transaction rechecks are idempotent; conflicting transactions or commitments are rejected.
+An evidence refresh for the **existing** transaction keeps credentials remote. It validates all packages and proofs, observes the chain once and atomically stores the same bound evidence for the batch. Same-transaction rechecks are idempotent; conflicting transactions or commitments are rejected.
 
 The optional `work/zebra-operations/verify-public-archive.py` wrapper runs the downloaded standalone verifier through a temporary loopback bridge to permitted public-reader and node RPC methods. It uses no application database and exports no RPC credentials.
 

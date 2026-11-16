@@ -16,21 +16,6 @@ its scope has been reviewed.
 See [Email authentication](email-auth.md), [Credits](participation-credits.md)
 and [Submission behavior](participate-submissions.md).
 
-## Authorized administrator preview
-
-An operator may use `scripts/setup-participate-admin.ts --email <verified-email>`
-first as a dry run, then with `--apply` after checking the environment. The script
-requires an active, verified, non-demo account and prompts privately for the
-administrator password. Do not put passwords in arguments, files or chat.
-This does not create committee membership.
-
-The read-only committee preview expires after 15 minutes and is bound to the
-account, host and credential version. Locking or signing out clears the cookie;
-expiry, disabled accounts, revoked roles or changed credentials invalidate it.
-The public-pilot moderation grant is separate: it allows hiding a comment only
-with a recorded reason. A preview token cannot authorize moderation or voting.
-Previously downloaded public text cannot be recalled.
-
 ## Committee release gate
 
 Committee operations stay disabled by default. Global ADMIN and DAO roles do

@@ -23,7 +23,7 @@ The highest daily total is **24,075** on September 29. Every one of the 148 fina
 - `data/coinholder/q3-2026-reveals.json`: the daily archive, including boundary headers and state references.
 - `data/coinholder/q3-2026-summary.json`: the canonical finalized summary.
 - `data/coinholder/activity-q3-2026-transactions.json`: cast timestamps used only to narrow header searches during regeneration.
-- `scripts/coinholder-reveals.py`: standard-library-only reconstruction and offline consistency checks; requires Python 3.9 or later.
+- `scripts/coinholder-reveals.py` (portal repository root): standard-library-only reconstruction and offline consistency checks; requires Python 3.9 or later.
 
 Round: `2cba66eb16c7581a1692cb0b033785da0131059f645a0d2fb4dc2a5131505e01` on `zvote-1`.
 
@@ -43,7 +43,7 @@ The baseline is block **7,201,411**, with zero counters. The final daily boundar
 
 ## Reproduce and verify
 
-From the repository root, verify the committed artifact against the pinned summary without network requests or writes:
+From the portal repository root, verify the committed artifact against the pinned summary without network requests or writes:
 
 ```sh
 python3 scripts/coinholder-reveals.py --verify-only

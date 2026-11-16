@@ -49,14 +49,7 @@ Mutation routes enforce permanent authentication, the exact application origin, 
 
 Apply `prisma/upgrades/20261010_committee_operations.sql`, regenerate Prisma and restart the service. The upgrade adds two role values, membership public name/version, invitations, defaults and audit tables. It preserves existing proposal packages, signatures, balances and transactions. Fresh installations must use [the SQL baseline](database.md), which includes those SQL-only protections.
 
-Configure the verified email sender and the final service origin, then have the intended first owner sign in personally. An authorized operator can preview first-owner setup, using the intended environment’s `DATABASE_URL`:
-
-```bash
-npx tsx scripts/bootstrap-committee-owner.ts \
-  --host <archive-host-id> --email <verified-owner-email> --name <public-owner-name>
-```
-
-Only after checking that environment and account, repeat with `--apply`. The script creates no account, bypasses no email verification and replaces no existing personal owner. It initializes the first owner and retires shared demo seats so they cannot enter a real review roster. It records the transition in the audit log. It is not an HTTP endpoint and is not invoked during demo sign-in. It was not applied to a real account as part of this change.
+Configure the verified email sender and the final service origin, then have the intended first owner sign in personally. First-owner setup is `bootstrapCommitteeOwner` in `lib/services/committee-bootstrap.ts`; this distribution ships no command for it. It is a dry run unless `apply` is true; run it against the intended environment's database only after checking that environment and account. It creates no account, bypasses no email verification and replaces no existing personal owner. It initializes the first owner and retires shared demo seats so they cannot enter a real review roster. It records the transition in the audit log. It is not an HTTP endpoint and is not invoked during demo sign-in.
 
 ## Receipt compatibility and release boundaries
 
