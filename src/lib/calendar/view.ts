@@ -55,6 +55,9 @@ export function whenLabel(event: CalendarEvent): { when: string; until?: string 
     const month = SHORT_MONTH_YEAR.format(asDate(event.start));
     return { when: event.estimated ? `~ ${month}` : month };
   }
+  if (event.precision === "after") {
+    return { when: `After ${monthDay(addDays(event.start, -1))}` };
+  }
   return {
     when: dayLabel(event.start),
     until: event.end && event.end !== event.start ? `to ${dayLabel(event.end)}` : undefined,
@@ -66,6 +69,8 @@ export function lastDay(event: CalendarEvent): string {
 }
 
 export function eventState(event: CalendarEvent, today: string): EventState {
+  // An open-ended step is never done by the calendar alone: only its record ends it.
+  if (event.precision === "after") return { kind: "next", label: "Pending" };
   if (event.precision === "month") {
     return event.start.slice(0, 7) < today.slice(0, 7)
       ? { kind: "done", label: "Done" }
@@ -108,7 +113,7 @@ export interface CalendarView {
 
 /** A month-precision event sorts after the dated events of its month. */
 function sortDay(event: CalendarEvent): string {
-  if (event.precision === "day") return event.start;
+  if (event.precision !== "month") return event.start;
   return addDays(addDays(`${event.start.slice(0, 7)}-01`, 32).slice(0, 7) + "-01", -1);
 }
 

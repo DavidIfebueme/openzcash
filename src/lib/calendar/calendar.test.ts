@@ -46,7 +46,8 @@ describe("calendar events", () => {
       events.find((event) => event.title === "Dev Fund poll: result read"),
     ).toMatchObject({
       start: "2026-12-01",
-      note: "After the poll closes on Nov 30",
+      precision: "after",
+      note: "No date announced yet",
     });
     expect(new Set(events.map((event) => event.id)).size).toBe(events.length);
   });
@@ -124,6 +125,24 @@ describe("calendar events", () => {
     ]);
   });
 
+  it("keeps an Arborist Call's id when its recording later gains notes and a number", () => {
+    const recording = {
+      number: null,
+      date: "2026-11-12",
+      video: "https://youtu.be/b",
+      videoId: "b",
+      url: null,
+    };
+    const withNotes = { ...recording, number: 135, url: "https://github.com/n/135" };
+    const [before] = arboristEvents([recording]);
+    const [after] = arboristEvents([withNotes]);
+    expect(after.id).toBe(before.id);
+    // Both records of the same call collapse into one entry, the one with notes.
+    const both = arboristEvents([recording, withNotes]);
+    expect(both).toHaveLength(1);
+    expect(both[0]).toMatchObject({ id: before.id, title: "Arborist Call #135", link: { label: "Notes" } });
+  });
+
   it("limits payment estimates to this month and the next, at month precision", () => {
     const events = paymentEvents(
       [
@@ -186,6 +205,16 @@ describe("calendar view", () => {
       kind: "done",
       label: "Done",
     });
+  });
+
+  it("keeps an open-ended step pending, after a date, until the record gives it one", () => {
+    const result = { ...day("result", "2026-12-01"), precision: "after" as const };
+    expect(whenLabel(result).when).toBe("After Nov 30");
+    for (const today of ["2026-11-16", "2026-12-01", "2026-12-20"]) {
+      expect(eventState(result, today)).toEqual({ kind: "next", label: "Pending" });
+    }
+    expect(calendarView([result], "2026-12-20").upcoming[0].events.map((event) => event.id)).toEqual(["result"]);
+    expect(calendarView([result], "2026-12-20").past).toEqual([]);
   });
 
   it("groups upcoming events by month, far ones under Later, and keeps 30 days of past", () => {
@@ -280,7 +309,11 @@ describe("calendar feed", () => {
     );
     expect(ics).toContain("DTSTAMP:20261116T010000Z");
     expect(ics).toContain("REFRESH-INTERVAL;VALUE=DURATION:PT6H");
-    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(OPEN_DECISION.steps.length);
+    expect(ics.match(/BEGIN:VEVENT/g)).toHaveLength(
+      OPEN_DECISION.steps.filter((step) => step.to !== null).length,
+    );
+    // The result has no announced date, so the subscription does not invent one.
+    expect(ics).not.toContain("result read");
   });
 
   it("leaves estimates out and never lets text start a new property", () => {

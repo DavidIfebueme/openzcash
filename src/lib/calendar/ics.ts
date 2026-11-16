@@ -4,7 +4,8 @@ import { addDays, isIsoDay, type CalendarEvent } from "./events";
  * iCalendar (RFC 5545) rendering of the Zcash calendar. Every event is an
  * all-day entry with a stable UID, so calendar apps that subscribe update an
  * entry in place when its date or wording changes. Month-precision estimates
- * are left out: a subscription only carries dates that were published.
+ * and open-ended steps are left out: a subscription only carries dates that
+ * were published.
  */
 export const CALENDAR_NAME = "Zcash · OpenZcash";
 export const CALENDAR_DESCRIPTION =

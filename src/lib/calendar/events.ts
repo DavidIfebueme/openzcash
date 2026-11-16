@@ -39,8 +39,11 @@ export interface CalendarEvent {
   note?: string;
   start: string;
   end?: string;
-  /** Month-precision events are shown on the page and left out of the feed. */
-  precision: "day" | "month";
+  /**
+   * "day" events go to the feed. "month" estimates and "after" steps (open-ended,
+   * from `start` on, with no date of their own yet) stay on the page.
+   */
+  precision: "day" | "month" | "after";
   estimated?: boolean;
   link: CalendarLink;
 }
@@ -105,8 +108,8 @@ function lowerFirst(value: string): string {
 
 /**
  * The open governance decision. The polling window is one ranged event; every
- * other step is the day it ends (a deadline), or the day it starts when it has
- * no end yet.
+ * other step is the day it ends (a deadline). A step with no end yet, such as
+ * the result, stays open-ended until the record gives it a date.
  */
 export function governanceEvents(decision: OpenDecision): CalendarEvent[] {
   const name = decision.calendarName ?? decision.round;
@@ -114,18 +117,19 @@ export function governanceEvents(decision: OpenDecision): CalendarEvent[] {
     const window =
       step.from === decision.opens && step.to === decision.closes;
     const day = step.to ?? step.from;
+    const open = step.to === null;
     return {
       id: `governance-${slug(decision.round)}-${slug(step.label)}`,
       category: "governance",
       title: `${name}: ${lowerFirst(step.label)}`,
       note: window
         ? `${decision.title} · ${decision.round}`
-        : step.to === null
-          ? `After the poll closes on ${monthDay(decision.closes)}`
+        : open
+          ? "No date announced yet"
           : undefined,
       start: window ? step.from : day,
       end: window ? decision.closes : undefined,
-      precision: "day",
+      precision: open ? "after" : "day",
       link: { label: "Forum", href: decision.source.href },
     };
   });
@@ -217,12 +221,26 @@ export interface ArboristRecord {
   url: string | null;
 }
 
-/** Arborist Calls that took place, with their notes or recording. */
+/** Notes outrank a call number, which outranks a recording alone. */
+function richness(call: ArboristRecord): number {
+  return (call.url ? 4 : 0) + (call.number != null ? 2 : 0) + (call.video ? 1 : 0);
+}
+
+/**
+ * Arborist Calls that took place, with their notes or recording. One call per
+ * day, keyed by its date: a recording that later gains notes and a number keeps
+ * the same id, so a subscribed calendar updates the entry instead of adding one.
+ */
 export function arboristEvents(calls: ArboristRecord[]): CalendarEvent[] {
-  return calls
-    .filter((call) => isIsoDay(call.date))
+  const byDay = new Map<string, ArboristRecord>();
+  for (const call of calls) {
+    if (!isIsoDay(call.date)) continue;
+    const current = byDay.get(call.date);
+    if (!current || richness(call) > richness(current)) byDay.set(call.date, call);
+  }
+  return [...byDay.values()]
     .map((call) => ({
-      id: `arborist-${call.date}-${call.number ?? slug(call.videoId ?? "call")}`,
+      id: `arborist-${call.date}`,
       category: "community",
       title: call.number == null ? "Arborist Call" : `Arborist Call #${call.number}`,
       note: call.url ? undefined : call.video ? "Recording available" : undefined,
