@@ -1,6 +1,7 @@
 import type { OpenDecision } from "@/lib/governance/open-decisions";
 import type { AnnouncedCycle } from "@/lib/coinholder/cycles";
 import { NSM } from "@/lib/funding/nsm";
+import { projectHalving } from "@/lib/network/halving";
 
 /**
  * The Zcash calendar: dated steps the portal already tracks elsewhere,
@@ -363,6 +364,41 @@ export function nsmReissuanceEvents(chain: ChainReading | null): CalendarEvent[]
       estimated: true,
       link: { label: "NSM", href: "/nsm" },
     },
+  ];
+}
+
+/** One observation of the chain: a height and the moment it was read. */
+export interface NetworkObservation {
+  height: number;
+  /** When the height was read (ms). A reading kept through an outage keeps its own time. */
+  observedAt: number;
+  spacingSeconds: number;
+  nu7ActivationHeight?: number | null;
+}
+
+/**
+ * Every block-anchored date from one observation. Estimates are anchored to the
+ * moment the height was observed, never to the current time, so a stale reading
+ * does not move them forward while no new block is seen.
+ */
+export function networkEvents(observation: NetworkObservation): CalendarEvent[] {
+  if (!Number.isFinite(observation.observedAt)) return [];
+  const chain: ChainReading = {
+    height: observation.height,
+    at: observation.observedAt,
+    spacingSeconds: observation.spacingSeconds,
+  };
+  return [
+    ...halvingEvents(
+      projectHalving({
+        height: observation.height,
+        time: Math.floor(observation.observedAt / 1_000),
+        targetBlockSeconds: observation.spacingSeconds,
+        nu7ActivationHeight: observation.nu7ActivationHeight,
+      }),
+    ),
+    ...feeReductionEvents(chain),
+    ...nsmReissuanceEvents(chain),
   ];
 }
 

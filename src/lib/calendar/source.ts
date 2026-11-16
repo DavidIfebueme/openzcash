@@ -5,18 +5,15 @@ import { getElections, getMeetings } from "@/lib/zcg/governance-repo";
 import { getPaymentSchedule } from "@/lib/zcg/schedule-repo";
 import { getArboristCalls } from "@/lib/arborist/notes";
 import { getDashboardReading } from "@/lib/network/provider";
-import { projectHalving } from "@/lib/network/halving";
 import { UPGRADES } from "@/lib/governance/upgrades";
 import { dateOfHeight } from "@/lib/funding/history";
 import {
   arboristEvents,
   coinholderEvents,
   electionEvents,
-  feeReductionEvents,
   governanceEvents,
-  halvingEvents,
   meetingEvents,
-  nsmReissuanceEvents,
+  networkEvents,
   paymentEvents,
   upgradeEvents,
   utcDay,
@@ -49,25 +46,17 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-/** One reading of the chain dates every block-anchored event. */
+/** One reading of the chain dates every block-anchored event, from when it was read. */
 async function network(): Promise<CalendarEvent[]> {
   const reading = await withTimeout(getDashboardReading(), NETWORK_TIMEOUT_MS);
   if (!reading) throw new Error("no network reading");
   const { info } = reading.data;
-  const now = Date.now();
-  const chain = { height: info.best_block, at: now, spacingSeconds: info.target_block_spacing_secs };
-  return [
-    ...halvingEvents(
-      projectHalving({
-        height: info.best_block,
-        time: Math.floor(now / 1_000),
-        targetBlockSeconds: info.target_block_spacing_secs,
-        nu7ActivationHeight: info.nu7_activation_height,
-      }),
-    ),
-    ...feeReductionEvents(chain),
-    ...nsmReissuanceEvents(chain),
-  ];
+  return networkEvents({
+    height: info.best_block,
+    observedAt: Date.parse(reading.fetchedAt),
+    spacingSeconds: info.target_block_spacing_secs,
+    nu7ActivationHeight: info.nu7_activation_height,
+  });
 }
 
 const SOURCES: Source[] = [

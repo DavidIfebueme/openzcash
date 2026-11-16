@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { OPEN_DECISION } from "@/lib/governance/open-decisions";
 import { ACTIVE_CYCLE } from "@/lib/coinholder/cycles";
 import {
@@ -6,6 +6,7 @@ import {
   arboristEvents,
   blockDay,
   feeReductionEvents,
+  networkEvents,
   nsmReissuanceEvents,
   upgradeEvents,
   coinholderEvents,
@@ -413,6 +414,32 @@ describe("network and governance dates", () => {
     });
     expect(whenLabel(fee).when).toBe("≈ Thu 19 Nov");
     expect(feeReductionEvents(null)).toEqual([]);
+  });
+
+  it("anchors every network estimate to when the height was read, not to the current time", () => {
+    // A reading kept through an outage: the same height, observed at 02:44 UTC on 16 Nov.
+    const observation = {
+      height: 3_577_843,
+      observedAt: Date.parse("2026-11-16T02:44:00Z"),
+      spacingSeconds: 25,
+      nu7ActivationHeight: 3_543_405,
+    };
+    try {
+      vi.useFakeTimers({ now: Date.parse("2026-11-16T03:00:00Z") });
+      const fresh = networkEvents(observation);
+      vi.setSystemTime(Date.parse("2026-11-19T12:00:00Z"));
+      const stale = networkEvents(observation);
+      expect(stale).toEqual(fresh);
+      expect(fresh.map((event) => event.id)).toEqual([
+        "network-halving-6132390",
+        "network-zip-2009-fee",
+        "network-nsm-reissuance",
+      ]);
+      expect(fresh.find((event) => event.id === "network-zip-2009-fee")?.start).toBe("2026-11-19");
+    } finally {
+      vi.useRealTimers();
+    }
+    expect(networkEvents({ ...observation, observedAt: Number.NaN })).toEqual([]);
   });
 
   it("puts the NSM reissuance under its estimated month", () => {
