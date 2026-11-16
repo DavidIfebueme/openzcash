@@ -25,6 +25,16 @@ vi.mock("@/lib/news/feed", async () => ({
   githubNewsBehind: (await vi.importActual<typeof import("@/lib/news/github")>("@/lib/news/github")).githubNewsBehind,
 }));
 vi.mock("@/components/source-refresh", () => ({ SourceRefresh: () => null }));
+vi.mock("@/lib/calendar/source", () => ({
+  getCalendarData: async () => ({
+    events: [
+      { id: "vote", category: "governance", title: "Dev Fund poll: vote", start: "2026-10-05", end: "2026-10-19", precision: "day", link: { label: "Forum", href: "https://forum.zcashcommunity.com/t/1" } },
+      { id: "meeting", category: "zcg", title: "ZCG committee meeting", start: "2026-09-28", precision: "day", link: { label: "Minutes", href: "https://forum.zcashcommunity.com/t/2" } },
+      { id: "halving", category: "network", title: "Next halving", start: "2028-11-24", precision: "month", estimated: true, link: { label: "Network", href: "/zcash-network" } },
+    ],
+    unavailable: ["Arborist Calls"],
+  }),
+}));
 import NewsPage from "./page";
 
 function rows(node: ReactNode): Array<{ key: string | null; title: string }> {
@@ -51,7 +61,8 @@ describe("News filters and rendered record identity", () => {
     const html = renderToStaticMarkup(tree);
     expect(rows(tree).map(row => row.key)).toEqual(items.filter(item => hasSource(item, source)).map(item => item.id));
     expect(rows(tree)).toHaveLength(view.counts[source]);
-    expect(html.match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain(`href="/news?source=${source}"`);
+    const sources = html.match(/<nav class="ws-news-sources"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(sources.match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain(`href="/news?source=${source}"`);
     if (source === "dao") expect(html).toContain("No updates match this view");
   });
 
@@ -97,7 +108,34 @@ describe("News filters and rendered record identity", () => {
   it("handles repeated URL parameters and resets unknown sources to All sources", async () => {
     expect(newsView(items, { source: ["github", "sheet"], q: ["zebra", "other"] }, now).shown.map(item => item.id)).toEqual(["github:zebra"]);
     const html = renderToStaticMarkup(await page({ source: "unknown", q: "   " }));
-    expect(html.match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain('href="/news"');
+    const sources = html.match(/<nav class="ws-news-sources"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(sources.match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain('href="/news"');
     expect(rows(await page({ source: "unknown" }))).toHaveLength(items.length);
+  });
+});
+
+describe("News views", () => {
+  const tabs = (html: string) => html.match(/<nav[^>]*aria-label="News views"[\s\S]*?<\/nav>/)?.[0] ?? "";
+
+  it("opens on the feed, with a Calendar tab counting what is open or ahead", async () => {
+    const html = renderToStaticMarkup(await page());
+    expect(tabs(html).match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain('href="/news"');
+    expect(tabs(html)).toContain("<span>Feed</span><strong>8</strong>");
+    expect(tabs(html)).toContain("<span>Calendar</span><strong>2</strong>");
+    expect(tabs(html)).toContain("8 updates · 5 new in 48 hours");
+    expect(html).not.toContain("Add the Zcash calendar to yours");
+  });
+
+  it("shows the calendar with subscription links, estimates and the past month", async () => {
+    const html = renderToStaticMarkup(await page({ view: "calendar" }));
+    expect(tabs(html).match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain('href="/news?view=calendar"');
+    expect(rows(await page({ view: "calendar" }))).toHaveLength(0);
+    expect(html).toContain("Add the Zcash calendar to yours");
+    expect(html).toContain('href="https://calendar.google.com/calendar/r?cid=webcal%3A%2F%2Fopenzcash.org%2Fapi%2Ffeeds%2Fcalendar.ics"');
+    expect(html).toContain('href="webcal://openzcash.org/api/feeds/calendar.ics"');
+    expect(html).toContain("Opens today");
+    expect(html).toContain("~ Nov 2028");
+    expect(html).toContain("Past 30 days");
+    expect(html).toContain("Temporarily unable to read Arborist Calls");
   });
 });

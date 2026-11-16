@@ -38,6 +38,8 @@ export async function GET() {
           "/api/feeds/zechub.xml": "ZecHub treasury payouts as RSS.",
           "/api/feeds/meetings.ics":
             "Committee meetings as an iCalendar subscription.",
+          "/api/feeds/calendar.ics":
+            "The Zcash calendar from News (governance polls, Coinholder Grants rounds, ZCG meetings and elections, Arborist Calls) as an iCalendar subscription.",
         },
       },
       notes: [

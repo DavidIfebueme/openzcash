@@ -29,6 +29,8 @@ export interface OpenDecision {
   title: string;
   /** How the organizers name the round. */
   round: string;
+  /** Short name for calendar entries, e.g. "Dev Fund poll". */
+  calendarName?: string;
   /** The polling window as shown, and its first and last day. */
   window: string;
   opens: string;
@@ -43,6 +45,7 @@ export interface OpenDecision {
 export const OPEN_DECISION: OpenDecision = {
   title: "ZCG's share of the Dev Fund",
   round: "NU7.1 poll",
+  calendarName: "Dev Fund poll",
   window: "Nov 16 to 30",
   opens: "2026-11-16",
   closes: "2026-11-30",

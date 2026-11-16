@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { pageMetadata } from "@/lib/seo/page-metadata";
+import { pageMetadata, SITE_URL } from "@/lib/seo/page-metadata";
 /* eslint-disable @next/next/no-img-element */
 import { PageHeader } from "@/components/ui";
 import { COMMUNITIES } from "@/lib/communities/data";
@@ -17,12 +17,18 @@ import { NewsSeen } from "@/components/news-seen";
 import { newsReferences } from "@/lib/news/merge";
 import { SourceRefresh } from "@/components/source-refresh";
 import { newsView, NEWS_SOURCES, NEW_WINDOW_MS, type NewsSearchParams } from "@/lib/news/view";
+import { getCalendarData } from "@/lib/calendar/source";
+import { calendarView } from "@/lib/calendar/view";
+import { utcDay } from "@/lib/calendar/events";
+import { subscribeLinks } from "@/lib/calendar/subscribe";
+import { NewsCalendar } from "./news-calendar";
+import styles from "./news.module.css";
 
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata({
   title: "News · OpenZcash",
   description:
-    "The last seven days across Zcash: proposals, community discussions, releases and grant payments.",
+    "The last seven days across Zcash and the dates ahead: proposals, discussions, releases, grant payments, polls and meetings.",
   path: "/news",
   card: { kicker: "The last seven days across the Zcash ecosystem" },
 });
@@ -66,8 +72,11 @@ export default async function NewsPage({
   searchParams: Promise<NewsSearchParams>;
 }) {
   const params = await searchParams;
-  const items = await getNews();
+  const calendarMode = (Array.isArray(params.view) ? params.view[0] : params.view) === "calendar";
+  const [items, calendar] = await Promise.all([getNews(), getCalendarData()]);
   const now = nowMs();
+  const today = utcDay(now);
+  const agenda = calendarView(calendar.events, today);
   const { source, query, shown, counts, totalCount, newCount } = newsView(items, params, now);
   const githubHealth = githubNewsHealth();
   const githubUnavailable = githubNewsBehind(githubHealth);
@@ -86,15 +95,41 @@ export default async function NewsPage({
       <SourceRefresh />
       <PageHeader
         title="News"
-        subtitle="Proposals, discussions, releases and grant payments from the last seven days."
+        subtitle="The last seven days across Zcash, and the dates ahead."
       />
 
+      <nav className={styles.tabs} aria-label="News views">
+        <Link href="/news" aria-current={calendarMode ? undefined : "page"}>
+          <span>Feed</span>
+          <strong>{totalCount}</strong>
+        </Link>
+        <Link href="/news?view=calendar" aria-current={calendarMode ? "page" : undefined}>
+          <span>Calendar</span>
+          <strong>{agenda.upcomingCount}</strong>
+        </Link>
+        <p className={styles.tabsMeta}>
+          {calendarMode
+            ? "Times in UTC"
+            : `${shown.length === totalCount ? `${totalCount} updates` : `${shown.length} of ${totalCount} updates`} · ${newCount} new in 48 hours`}
+        </p>
+      </nav>
+
+      {calendarMode ? (
+        <NewsCalendar
+          view={agenda}
+          today={today}
+          links={subscribeLinks(SITE_URL)}
+          unavailable={calendar.unavailable}
+        />
+      ) : (
+      <>
+      <div className="ws-news-bar">
       <nav className="ws-news-sources" aria-label="News sources">
         <Link
           href={query ? `/news?q=${encodeURIComponent(query)}` : "/news"}
           aria-current={!source ? "page" : undefined}
         >
-          <span>All sources</span>
+          <span>All</span>
           <strong>{totalCount}</strong>
         </Link>
         {NEWS_SOURCES.map(key => (
@@ -114,34 +149,23 @@ export default async function NewsPage({
         className="ws-news-search"
         role="search"
       >
-        <label className="ws-news-search-field">
-          <span>Search</span>
-          <input
-            name="q"
-            type="search"
-            aria-label="Search news"
-            placeholder="Search this week's updates…"
-            defaultValue={query}
-          />
-        </label>
+        <input
+          name="q"
+          type="search"
+          aria-label="Search news"
+          placeholder="Search this week's updates…"
+          defaultValue={query}
+        />
         {source ? (
           <input type="hidden" name="source" value={source} />
         ) : null}
-        <button className="ws-button">Search</button>
         {query ? (
           <Link href={source ? `/news?source=${source}` : "/news"}>
             Clear
           </Link>
         ) : null}
       </form>
-
-      <p className="ws-news-meta">
-        {shown.length === totalCount
-          ? `${totalCount} updates`
-          : `${shown.length} of ${totalCount} updates`}
-        {" · "}
-        {newCount} new in 48 hours
-      </p>
+      </div>
 
       {unavailable.length > 0 ? (
         <p role="status" className="ws-news-meta">
@@ -222,6 +246,8 @@ export default async function NewsPage({
           <p>{fetchedAgo ? `Feed checked ${fetchedAgo}. ` : ""}This feed covers the last seven days. Older entries remain on their source pages.</p>
         </div>
       </details>
+      </>
+      )}
     </>
   );
 }
