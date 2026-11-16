@@ -19,7 +19,7 @@ import { SourceRefresh } from "@/components/source-refresh";
 import { newsView, NEWS_SOURCES, NEW_WINDOW_MS, type NewsSearchParams } from "@/lib/news/view";
 import { getCalendarData } from "@/lib/calendar/source";
 import { calendarView } from "@/lib/calendar/view";
-import { utcDay } from "@/lib/calendar/events";
+import { CALENDAR_CATEGORIES, utcDay } from "@/lib/calendar/events";
 import { subscribeLinks } from "@/lib/calendar/subscribe";
 import { NewsCalendar } from "./news-calendar";
 import styles from "./news.module.css";
@@ -76,7 +76,12 @@ export default async function NewsPage({
   const [items, calendar] = await Promise.all([getNews(), getCalendarData()]);
   const now = nowMs();
   const today = utcDay(now);
-  const agenda = calendarView(calendar.events, today);
+  const everything = calendarView(calendar.events, today);
+  const rawType = Array.isArray(params.type) ? params.type[0] : params.type;
+  const type = CALENDAR_CATEGORIES.find((category) => category === rawType);
+  const agenda = type
+    ? calendarView(calendar.events.filter((event) => event.category === type), today)
+    : everything;
   const { source, query, shown, counts, totalCount, newCount } = newsView(items, params, now);
   const githubHealth = githubNewsHealth();
   const githubUnavailable = githubNewsBehind(githubHealth);
@@ -105,7 +110,7 @@ export default async function NewsPage({
         </Link>
         <Link href="/news?view=calendar" aria-current={calendarMode ? "page" : undefined}>
           <span>Calendar</span>
-          <strong>{agenda.upcomingCount}</strong>
+          <strong>{everything.upcomingCount}</strong>
         </Link>
         <p className={styles.tabsMeta}>
           {calendarMode
@@ -117,6 +122,8 @@ export default async function NewsPage({
       {calendarMode ? (
         <NewsCalendar
           view={agenda}
+          totals={everything}
+          type={type}
           today={today}
           links={subscribeLinks(SITE_URL)}
           unavailable={calendar.unavailable}

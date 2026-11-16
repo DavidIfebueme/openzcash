@@ -1,5 +1,6 @@
 import type { OpenDecision } from "@/lib/governance/open-decisions";
 import type { AnnouncedCycle } from "@/lib/coinholder/cycles";
+import { NSM } from "@/lib/funding/nsm";
 
 /**
  * The Zcash calendar: dated steps the portal already tracks elsewhere,
@@ -123,10 +124,12 @@ export function governanceEvents(decision: OpenDecision): CalendarEvent[] {
       category: "governance",
       title: `${name}: ${lowerFirst(step.label)}`,
       note: window
-        ? `${decision.title} · ${decision.round}`
+        ? `${decision.title} · closes ${monthDay(decision.closes)}${step.endsAt ? `, ${step.endsAt}` : ""}`
         : open
           ? "No date announced yet"
-          : undefined,
+          : step.endsAt
+            ? `Deadline ${step.endsAt}`
+            : undefined,
       start: window ? step.from : day,
       end: window ? decision.closes : undefined,
       precision: open ? "after" : "day",
@@ -279,6 +282,88 @@ export function paymentEvents(
       precision: "month",
       link: { label: "Schedule", href: "/zcg/schedule" },
     }));
+}
+
+export interface UpgradeRecord {
+  name: string;
+  /** "NU7 · 25-second blocks and the NSM": the name, then what it changed. */
+  label: string;
+  height: number;
+}
+
+/** Network upgrades, dated by the day their activation block was mined. */
+export function upgradeEvents(
+  upgrades: UpgradeRecord[],
+  dateOf: (height: number) => string | null,
+): CalendarEvent[] {
+  return upgrades.flatMap((upgrade): CalendarEvent[] => {
+    const day = dateOf(upgrade.height);
+    if (!isIsoDay(day)) return [];
+    const [name, ...what] = upgrade.label.split(" · ");
+    return [
+      {
+        id: `network-upgrade-${slug(upgrade.name)}`,
+        category: "network",
+        title: `${name} activation`,
+        note: [...what, `block ${upgrade.height.toLocaleString("en-US")}`].join(" · "),
+        start: day,
+        precision: "day",
+        link: { label: "Upgrades", href: "/governance?view=upgrades" },
+      },
+    ];
+  });
+}
+
+/** Where the chain stands: the height, when it was read, and the target spacing. */
+export interface ChainReading {
+  height: number;
+  at: number;
+  spacingSeconds: number;
+}
+
+/** The UTC day a block is expected (or was likely mined), from the current height. */
+export function blockDay(height: number, chain: ChainReading): string {
+  return utcDay(chain.at + (height - chain.height) * chain.spacingSeconds * 1_000);
+}
+
+/**
+ * ZIP 2009 lowers the ZIP 317 marginal fee from 5,000 to 1,000 zatoshis per
+ * logical action at FEE_REDUCTION_HEIGHT; wallets switch at that block, not
+ * when their release ships (ZIP 2009, Deployment).
+ */
+export const FEE_REDUCTION = { height: 3_590_000, zip: 2009 } as const;
+
+export function feeReductionEvents(chain: ChainReading | null): CalendarEvent[] {
+  if (!chain) return [];
+  return [
+    {
+      id: "network-zip-2009-fee",
+      category: "network",
+      title: "Standard fee drops to 1,000 zatoshis",
+      note: `ZIP ${FEE_REDUCTION.zip} · block ${FEE_REDUCTION.height.toLocaleString("en-US")} · date estimated`,
+      start: blockDay(FEE_REDUCTION.height, chain),
+      precision: "day",
+      estimated: true,
+      link: { label: `ZIP ${FEE_REDUCTION.zip}`, href: `https://zips.z.cash/zip-${FEE_REDUCTION.zip}` },
+    },
+  ];
+}
+
+/** The block from which the NSM balance starts flowing back (ZIP 237). */
+export function nsmReissuanceEvents(chain: ChainReading | null): CalendarEvent[] {
+  if (!chain) return [];
+  return [
+    {
+      id: "network-nsm-reissuance",
+      category: "network",
+      title: `NSM reissuance begins · block ${NSM.reissuanceHeight.toLocaleString("en-US")}`,
+      note: "Date estimated from the current block height",
+      start: blockDay(NSM.reissuanceHeight, chain),
+      precision: "month",
+      estimated: true,
+      link: { label: "NSM", href: "/nsm" },
+    },
+  ];
 }
 
 export interface HalvingEstimate {

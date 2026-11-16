@@ -53,13 +53,13 @@ export function monthLabel(day: string): string {
 export function whenLabel(event: CalendarEvent): { when: string; until?: string } {
   if (event.precision === "month") {
     const month = SHORT_MONTH_YEAR.format(asDate(event.start));
-    return { when: event.estimated ? `~ ${month}` : month };
+    return { when: event.estimated ? `≈ ${month}` : month };
   }
   if (event.precision === "after") {
     return { when: `After ${monthDay(addDays(event.start, -1))}` };
   }
   return {
-    when: dayLabel(event.start),
+    when: `${event.estimated ? "≈ " : ""}${dayLabel(event.start)}`,
     until: event.end && event.end !== event.start ? `to ${dayLabel(event.end)}` : undefined,
   };
 }
@@ -99,8 +99,8 @@ export interface MonthCell {
   today: boolean;
   /** Inside a window (a ranged event) that has not ended. */
   inWindow: boolean;
-  /** Category of the first event that starts or ends on this day. */
-  mark: CalendarCategory | null;
+  /** Categories of the events that start or end on this day, at most three. */
+  marks: CalendarCategory[];
 }
 
 export interface CalendarView {
@@ -142,14 +142,16 @@ function monthGrid(events: CalendarEvent[], today: string): MonthCell[] {
   const length = daysBetween(first, addDays(first, 31).slice(0, 7) + "-01");
   const dated = events.filter((event) => event.precision === "day");
   const cells: MonthCell[] = Array.from({ length: lead }, () => ({
-    day: null, date: null, today: false, inWindow: false, mark: null,
+    day: null, date: null, today: false, inWindow: false, marks: [],
   }));
   for (let day = 1; day <= length; day++) {
     const date = addDays(first, day - 1);
-    const marked = dated
-      .filter((event) => event.start === date || event.end === date)
-      .sort((a, b) =>
-        CALENDAR_CATEGORIES.indexOf(a.category) - CALENDAR_CATEGORIES.indexOf(b.category));
+    const onDay = new Set(
+      dated
+        .filter((event) => event.start === date || event.end === date)
+        .map((event) => event.category),
+    );
+    const marks = CALENDAR_CATEGORIES.filter((category) => onDay.has(category)).slice(0, 3);
     cells.push({
       day,
       date,
@@ -157,7 +159,7 @@ function monthGrid(events: CalendarEvent[], today: string): MonthCell[] {
       inWindow: dated.some((event) =>
         event.end !== undefined && event.end !== event.start &&
         event.end >= today && event.start <= date && date <= event.end),
-      mark: marked[0]?.category ?? null,
+      marks,
     });
   }
   return cells;

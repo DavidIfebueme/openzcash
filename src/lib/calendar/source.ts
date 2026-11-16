@@ -6,14 +6,19 @@ import { getPaymentSchedule } from "@/lib/zcg/schedule-repo";
 import { getArboristCalls } from "@/lib/arborist/notes";
 import { getDashboardReading } from "@/lib/network/provider";
 import { projectHalving } from "@/lib/network/halving";
+import { UPGRADES } from "@/lib/governance/upgrades";
+import { dateOfHeight } from "@/lib/funding/history";
 import {
   arboristEvents,
   coinholderEvents,
   electionEvents,
+  feeReductionEvents,
   governanceEvents,
   halvingEvents,
   meetingEvents,
+  nsmReissuanceEvents,
   paymentEvents,
+  upgradeEvents,
   utcDay,
   type CalendarEvent,
 } from "./events";
@@ -44,18 +49,25 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
 }
 
-async function halving(): Promise<CalendarEvent[]> {
+/** One reading of the chain dates every block-anchored event. */
+async function network(): Promise<CalendarEvent[]> {
   const reading = await withTimeout(getDashboardReading(), NETWORK_TIMEOUT_MS);
   if (!reading) throw new Error("no network reading");
   const { info } = reading.data;
-  return halvingEvents(
-    projectHalving({
-      height: info.best_block,
-      time: Math.floor(Date.now() / 1_000),
-      targetBlockSeconds: info.target_block_spacing_secs,
-      nu7ActivationHeight: info.nu7_activation_height,
-    }),
-  );
+  const now = Date.now();
+  const chain = { height: info.best_block, at: now, spacingSeconds: info.target_block_spacing_secs };
+  return [
+    ...halvingEvents(
+      projectHalving({
+        height: info.best_block,
+        time: Math.floor(now / 1_000),
+        targetBlockSeconds: info.target_block_spacing_secs,
+        nu7ActivationHeight: info.nu7_activation_height,
+      }),
+    ),
+    ...feeReductionEvents(chain),
+    ...nsmReissuanceEvents(chain),
+  ];
 }
 
 const SOURCES: Source[] = [
@@ -76,7 +88,7 @@ const SOURCES: Source[] = [
     name: "Arborist Calls",
     read: async () => arboristEvents(await getArboristCalls()),
   },
-  { name: "the network height", read: halving },
+  { name: "the network height", read: network },
 ];
 
 // One cache for the News page and the feed, which Next may bundle apart.
@@ -119,6 +131,7 @@ async function collect(): Promise<Collected> {
   const events = [
     ...governanceEvents(OPEN_DECISION),
     ...coinholderEvents(ACTIVE_CYCLE),
+    ...upgradeEvents(UPGRADES, (height) => dateOfHeight(height)),
     ...read,
   ];
   // One id, one entry: calendar apps would otherwise drop one of the two.

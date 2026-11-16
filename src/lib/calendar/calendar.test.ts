@@ -2,7 +2,12 @@ import { describe, expect, it } from "vitest";
 import { OPEN_DECISION } from "@/lib/governance/open-decisions";
 import { ACTIVE_CYCLE } from "@/lib/coinholder/cycles";
 import {
+  FEE_REDUCTION,
   arboristEvents,
+  blockDay,
+  feeReductionEvents,
+  nsmReissuanceEvents,
+  upgradeEvents,
   coinholderEvents,
   electionEvents,
   governanceEvents,
@@ -171,7 +176,7 @@ describe("calendar events", () => {
       precision: "month",
       estimated: true,
     });
-    expect(whenLabel(halving).when).toBe("~ Nov 2028");
+    expect(whenLabel(halving).when).toBe("≈ Nov 2028");
   });
 });
 
@@ -278,10 +283,24 @@ describe("calendar view", () => {
     expect(byDay.get(16)).toMatchObject({
       today: true,
       inWindow: true,
-      mark: "zcg",
+      marks: ["zcg"],
     });
-    expect(byDay.get(9)).toMatchObject({ inWindow: false, mark: "zcg" });
-    expect(byDay.get(15)).toMatchObject({ inWindow: false, mark: null });
+    expect(byDay.get(9)).toMatchObject({ inWindow: false, marks: ["zcg"] });
+    expect(byDay.get(15)).toMatchObject({ inWindow: false, marks: [] });
+  });
+
+  it("marks every category of a day once, in the legend's order, up to three", () => {
+    const { month } = calendarView(
+      [
+        { ...day("vote", "2026-11-16", "2026-11-30"), category: "governance" },
+        { ...day("review", "2026-11-16", "2026-12-16"), category: "coinholder" },
+        { ...day("another", "2026-11-16"), category: "coinholder" },
+        { ...day("call", "2026-11-16"), category: "community" },
+        { ...day("meeting", "2026-11-16"), category: "zcg" },
+      ],
+      TODAY,
+    );
+    expect(month.cells.find((cell) => cell.day === 16)?.marks).toEqual(["governance", "coinholder", "zcg"]);
   });
 });
 
@@ -356,5 +375,69 @@ describe("calendar feed", () => {
       "https://forum.zcashcommunity.com/t/1",
     );
     expect(absoluteUrl("webcal://example.org/x.ics", SITE)).toBeNull();
+  });
+});
+
+
+describe("network and governance dates", () => {
+  // 16 Nov 2026, 02:44 UTC, at block 3,577,843 with 25-second blocks.
+  const chain = { height: 3_577_843, at: Date.parse("2026-11-16T02:44:00Z"), spacingSeconds: 25 };
+
+  it("dates each network upgrade by the day its activation block was mined", () => {
+    const events = upgradeEvents(
+      [
+        { name: "nu7", label: "NU7 · 25-second blocks and the NSM", height: 3_543_405 },
+        { name: "orchard-mitigation", label: "Orchard mitigation soft fork", height: 3_363_426 },
+        { name: "future", label: "NU9", height: 9_000_000 },
+      ],
+      (height) => (height === 3_543_405 ? "2026-11-06" : height === 3_363_426 ? "2026-06-02" : null),
+    );
+    expect(events.map((event) => [event.id, event.title, event.note, event.start])).toEqual([
+      ["network-upgrade-nu7", "NU7 activation", "25-second blocks and the NSM · block 3,543,405", "2026-11-06"],
+      ["network-upgrade-orchard-mitigation", "Orchard mitigation soft fork activation", "block 3,363,426", "2026-06-02"],
+    ]);
+  });
+
+  it("estimates the day of a scheduled block from the current height", () => {
+    expect(blockDay(3_590_000, chain)).toBe("2026-11-19");
+    expect(blockDay(3_577_843, chain)).toBe("2026-11-16");
+    const [fee] = feeReductionEvents(chain);
+    expect(FEE_REDUCTION.height).toBe(3_590_000);
+    expect(fee).toMatchObject({
+      id: "network-zip-2009-fee",
+      title: "Standard fee drops to 1,000 zatoshis",
+      start: "2026-11-19",
+      precision: "day",
+      estimated: true,
+      link: { label: "ZIP 2009", href: "https://zips.z.cash/zip-2009" },
+    });
+    expect(whenLabel(fee).when).toBe("≈ Thu 19 Nov");
+    expect(feeReductionEvents(null)).toEqual([]);
+  });
+
+  it("puts the NSM reissuance under its estimated month", () => {
+    const [reissuance] = nsmReissuanceEvents(chain);
+    expect(reissuance).toMatchObject({
+      id: "network-nsm-reissuance",
+      title: "NSM reissuance begins · block 8,939,664",
+      precision: "month",
+      estimated: true,
+    });
+    expect(reissuance.start.slice(0, 7)).toBe("2031-02");
+    expect(nsmReissuanceEvents(null)).toEqual([]);
+  });
+
+  it("gives the poll deadlines their announced UTC time", () => {
+    const events = governanceEvents(OPEN_DECISION);
+    expect(events.find((event) => event.title === "Dev Fund poll: coinholders and panels vote")?.note)
+      .toBe("ZCG's share of the Dev Fund · closes Nov 30, 23:59 UTC");
+    expect(events.find((event) => event.title === "Dev Fund poll: proposals closed")?.note).toBe("Deadline 23:59 UTC");
+  });
+
+  it("carries an estimated day into the feed, saying the date is estimated", () => {
+    const ics = calendarIcs(feeReductionEvents(chain), { now: chain.at, siteUrl: SITE });
+    expect(ics).toContain("UID:network-zip-2009-fee@openzcash.org");
+    expect(ics).toContain("DTSTART;VALUE=DATE:20261119");
+    expect(ics.replace(/\r\n /g, "")).toContain("date estimated");
   });
 });

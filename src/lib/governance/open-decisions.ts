@@ -18,6 +18,8 @@ export interface CalendarStep {
   /** First and last day of the step (ISO, UTC); null while it has no end. */
   from: string;
   to: string | null;
+  /** The UTC time the step ends, when the organizers announced one. */
+  endsAt?: string;
 }
 
 export interface Pointer {
@@ -56,6 +58,7 @@ export const OPEN_DECISION: OpenDecision = {
       label: "Proposals closed",
       from: "2026-11-05",
       to: "2026-11-08",
+      endsAt: "23:59 UTC",
     },
     {
       when: "Nov 10 and 13",
@@ -74,6 +77,7 @@ export const OPEN_DECISION: OpenDecision = {
       label: "Coinholders and panels vote",
       from: "2026-11-16",
       to: "2026-11-30",
+      endsAt: "23:59 UTC",
     },
     {
       when: "After Nov 30",

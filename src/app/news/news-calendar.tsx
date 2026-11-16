@@ -1,7 +1,9 @@
+import Link from "next/link";
 import { CopyLinkButton } from "@/components/copy-link-button";
 import {
   CALENDAR_CATEGORIES,
   CATEGORY_LABEL,
+  type CalendarCategory,
   type CalendarEvent,
 } from "@/lib/calendar/events";
 import {
@@ -79,12 +81,18 @@ function MonthGrid({ view }: { view: CalendarView }) {
         {view.month.cells.map((cell, index) => (
           <span
             key={cell.date ?? `blank-${index}`}
-            className={`${styles.cell} ${styles.cat}`}
+            className={styles.cell}
             data-today={cell.today || undefined}
             data-window={cell.inWindow || undefined}
-            data-category={cell.mark ?? undefined}
           >
             {cell.day ?? ""}
+            {cell.marks.length > 0 ? (
+              <span className={styles.marks}>
+                {cell.marks.map((mark) => (
+                  <i key={mark} className={`${styles.mark} ${styles.cat}`} data-category={mark} />
+                ))}
+              </span>
+            ) : null}
           </span>
         ))}
       </div>
@@ -92,13 +100,52 @@ function MonthGrid({ view }: { view: CalendarView }) {
   );
 }
 
+/** The legend is the filter: each category links to the calendar showing only it. */
+function Filters({ totals, type }: { totals: CalendarView; type?: CalendarCategory }) {
+  const items: { key?: CalendarCategory; label: string; count: number }[] = [
+    { label: "All", count: totals.upcomingCount },
+    ...CALENDAR_CATEGORIES.map((category) => ({
+      key: category,
+      label: CATEGORY_LABEL[category],
+      count: totals.counts[category],
+    })),
+  ];
+  return (
+    <nav className={styles.filters} aria-label="Calendar categories">
+      {items.map((item) => (
+        <Link
+          key={item.key ?? "all"}
+          className={styles.filter}
+          href={item.key ? `/news?view=calendar&type=${item.key}` : "/news?view=calendar"}
+          aria-current={type === item.key ? "page" : undefined}
+          scroll={false}
+        >
+          {item.key ? (
+            <i className={`${styles.dot} ${styles.cat}`} data-category={item.key} aria-hidden="true" />
+          ) : (
+            <i className={styles.dotAll} aria-hidden="true" />
+          )}
+          <span>{item.label}</span>
+          <strong>{item.count}</strong>
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
 export function NewsCalendar({
   view,
+  totals,
+  type,
   today,
   links,
   unavailable,
 }: {
+  /** The calendar as shown, filtered by `type` when one is chosen. */
   view: CalendarView;
+  /** The whole calendar, for the counts in the filter. */
+  totals: CalendarView;
+  type?: CalendarCategory;
   today: string;
   links: SubscribeLinks;
   unavailable: string[];
@@ -130,6 +177,10 @@ export function NewsCalendar({
       ) : null}
 
       <div className={styles.layout}>
+        <aside className={styles.side} aria-label="This month">
+          <MonthGrid view={view} />
+          <Filters totals={totals} type={type} />
+        </aside>
         <div className={styles.agenda}>
           {empty ? <p className={styles.empty}>No dates to show right now.</p> : null}
           {view.upcoming.map((group) => (
@@ -145,20 +196,6 @@ export function NewsCalendar({
             </section>
           ) : null}
         </div>
-        <aside className={styles.side} aria-label="This month">
-          <MonthGrid view={view} />
-          <dl className={styles.legend}>
-            {CALENDAR_CATEGORIES.map((category) => (
-              <div key={category}>
-                <dt className={styles.cat} data-category={category}>
-                  <i className={styles.dot} aria-hidden="true" />
-                  {CATEGORY_LABEL[category]}
-                </dt>
-                <dd>{view.counts[category]}</dd>
-              </div>
-            ))}
-          </dl>
-        </aside>
       </div>
 
       <p className={styles.foot}>

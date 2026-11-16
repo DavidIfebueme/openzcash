@@ -134,8 +134,22 @@ describe("News views", () => {
     expect(html).toContain('href="https://calendar.google.com/calendar/r?cid=webcal%3A%2F%2Fopenzcash.org%2Fapi%2Ffeeds%2Fcalendar.ics"');
     expect(html).toContain('href="webcal://openzcash.org/api/feeds/calendar.ics"');
     expect(html).toContain("Opens today");
-    expect(html).toContain("~ Nov 2028");
+    expect(html).toContain("≈ Nov 2028");
     expect(html).toContain("Past 30 days");
     expect(html).toContain("Temporarily unable to read Arborist Calls");
+  });
+
+  it("filters the calendar by category and keeps every count in the menu", async () => {
+    const html = renderToStaticMarkup(await page({ view: "calendar", type: "network" }));
+    const filters = html.match(/<nav[^>]*aria-label="Calendar categories"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(filters.match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain('href="/news?view=calendar&amp;type=network"');
+    expect(filters).toContain("<span>All</span><strong>2</strong>");
+    expect(filters).toContain("<span>Governance</span><strong>1</strong>");
+    expect(filters).toContain("<span>Network</span><strong>1</strong>");
+    expect(html).toContain("Next halving");
+    expect(html).not.toContain("Dev Fund poll: vote");
+    expect(tabs(html)).toContain("<span>Calendar</span><strong>2</strong>");
+    const unknown = renderToStaticMarkup(await page({ view: "calendar", type: "nope" }));
+    expect(unknown).toContain("Dev Fund poll: vote");
   });
 });
