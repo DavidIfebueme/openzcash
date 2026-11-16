@@ -57,6 +57,24 @@ const SOURCE: Record<NewsSource, { label: string; mark: string; glyph?: boolean 
   application: { label: "Proposals", mark: "/logos/zcg.png" },
 };
 
+function FeedIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <rect x="2" y="2.5" width="12" height="11" rx="2" />
+      <path d="M5 6h6M5 8.5h6M5 11h3.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CalendarViewIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <rect x="2" y="3" width="12" height="11" rx="2" />
+      <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 function rel(ts: string, now: number): string {
   const d = Math.floor((now - Date.parse(ts)) / 86_400_000);
   if (d <= 0) return "today";
@@ -104,23 +122,28 @@ export default async function NewsPage({
       <PageHeader
         title="News"
         subtitle="The last seven days across Zcash, and the dates ahead."
+        actions={
+          <div className={styles.views}>
+            <nav className={styles.switcher} aria-label="News views">
+              <Link href="/news" aria-current={calendarMode ? undefined : "page"}>
+                <FeedIcon />
+                <span>Feed</span>
+                <strong>{totalCount}</strong>
+              </Link>
+              <Link href="/news?view=calendar" aria-current={calendarMode ? "page" : undefined}>
+                <CalendarViewIcon />
+                <span>Calendar</span>
+                <strong>{everything.upcomingCount}</strong>
+              </Link>
+            </nav>
+            <p className={styles.viewsMeta}>
+              {calendarMode
+                ? "Times in UTC"
+                : `${shown.length === totalCount ? `${totalCount} updates` : `${shown.length} of ${totalCount} updates`} · ${newCount} new in 48 hours`}
+            </p>
+          </div>
+        }
       />
-
-      <nav className={styles.tabs} aria-label="News views">
-        <Link href="/news" aria-current={calendarMode ? undefined : "page"}>
-          <span>Feed</span>
-          <strong>{totalCount}</strong>
-        </Link>
-        <Link href="/news?view=calendar" aria-current={calendarMode ? "page" : undefined}>
-          <span>Calendar</span>
-          <strong>{everything.upcomingCount}</strong>
-        </Link>
-        <p className={styles.tabsMeta}>
-          {calendarMode
-            ? "Times in UTC"
-            : `${shown.length === totalCount ? `${totalCount} updates` : `${shown.length} of ${totalCount} updates`} · ${newCount} new in 48 hours`}
-        </p>
-      </nav>
 
       {calendarMode ? (
         <NewsCalendar

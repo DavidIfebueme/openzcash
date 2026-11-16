@@ -122,7 +122,11 @@ describe("News views", () => {
     expect(tabs(html).match(/<a[^>]*aria-current="page"[^>]*>/)?.[0]).toContain('href="/news"');
     expect(tabs(html)).toContain("<span>Feed</span><strong>8</strong>");
     expect(tabs(html)).toContain("<span>Calendar</span><strong>2</strong>");
-    expect(tabs(html)).toContain("8 updates · 5 new in 48 hours");
+    // The menu sits in the page header, beside the title; the summary sits under it, outside the nav.
+    const header = html.match(/<header[^>]*oz-page-heading[\s\S]*?<\/header>/)?.[0] ?? "";
+    expect(header).toContain('aria-label="News views"');
+    expect(header).toContain("8 updates · 5 new in 48 hours");
+    expect(tabs(html)).not.toContain("new in 48 hours");
     expect(html).not.toContain("Add the Zcash calendar to yours");
   });
 
