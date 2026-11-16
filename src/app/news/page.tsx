@@ -79,9 +79,12 @@ export default async function NewsPage({
   const everything = calendarView(calendar.events, today);
   const rawType = Array.isArray(params.type) ? params.type[0] : params.type;
   const type = CALENDAR_CATEGORIES.find((category) => category === rawType);
-  const agenda = type
-    ? calendarView(calendar.events.filter((event) => event.category === type), today)
-    : everything;
+  const month = Array.isArray(params.month) ? params.month[0] : params.month;
+  const agenda = calendarView(
+    type ? calendar.events.filter((event) => event.category === type) : calendar.events,
+    today,
+    month,
+  );
   const { source, query, shown, counts, totalCount, newCount } = newsView(items, params, now);
   const githubHealth = githubNewsHealth();
   const githubUnavailable = githubNewsBehind(githubHealth);

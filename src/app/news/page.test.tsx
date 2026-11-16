@@ -152,4 +152,19 @@ describe("News views", () => {
     const unknown = renderToStaticMarkup(await page({ view: "calendar", type: "nope" }));
     expect(unknown).toContain("Dev Fund poll: vote");
   });
+
+  it("opens another month, goes back to today, and keeps the month when filtering", async () => {
+    const html = renderToStaticMarkup(await page({ view: "calendar", type: "zcg", month: "2026-09" }));
+    const months = html.match(/<nav[^>]*aria-label="Months"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(html).toContain("September 2026");
+    expect(months).toContain("Today 5");
+    // The next month is the current one, so its link carries no month.
+    expect(months).toContain('href="/news?view=calendar&amp;type=zcg"');
+    expect(months).not.toContain("month=2026-08");
+    const filters = html.match(/<nav[^>]*aria-label="Calendar categories"[\s\S]*?<\/nav>/)?.[0] ?? "";
+    expect(filters).toContain('href="/news?view=calendar&amp;type=governance&amp;month=2026-09"');
+    expect(filters).toContain('href="/news?view=calendar&amp;month=2026-09"');
+    const current = renderToStaticMarkup(await page({ view: "calendar", month: "bad" }));
+    expect(current).toContain("October 2026");
+  });
 });

@@ -3,7 +3,7 @@ import type { NewsItem, NewsSource } from "./feed";
 
 export const NEWS_SOURCES = ["forum", "github", "sheet", "proposal", "dao"] as const satisfies readonly NewsSource[];
 export const NEW_WINDOW_MS = 48 * 60 * 60 * 1000;
-export type NewsSearchParams = { source?: string | string[]; q?: string | string[]; view?: string | string[]; type?: string | string[] };
+export type NewsSearchParams = { source?: string | string[]; q?: string | string[]; view?: string | string[]; type?: string | string[]; month?: string | string[] };
 
 /** A single selection drives the rows, counters and links, including shared URLs. */
 export function newsView(items: NewsItem[], params: NewsSearchParams, now: number) {

@@ -68,24 +68,73 @@ function Row({ event, today }: { event: CalendarEvent; today: string }) {
   );
 }
 
-function MonthGrid({ view }: { view: CalendarView }) {
-  const today = view.month.cells.find((cell) => cell.today)?.day;
+function ChevronIcon({ flip }: { flip?: boolean }) {
   return (
-    <div className={styles.mini} aria-hidden="true">
-      <p className={styles.miniHead}>
-        {view.month.label}
-        {today ? <span>today {today}</span> : null}
-      </p>
-      <div className={styles.grid}>
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+      <path d={flip ? "M6 3.5L10.5 8 6 12.5" : "M10 3.5L5.5 8 10 12.5"} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** The calendar's address for a category and a month; today's month needs no parameter. */
+function calendarHref(type: CalendarCategory | undefined, month: string | null): string {
+  const query = new URLSearchParams({ view: "calendar" });
+  if (type) query.set("type", type);
+  if (month) query.set("month", month);
+  return `/news?${query.toString()}`;
+}
+
+function MonthGrid({ view, type, today }: { view: CalendarView; type?: CalendarCategory; today: string }) {
+  const { month } = view;
+  const currentKey = today.slice(0, 7);
+  const target = (key: string) => calendarHref(type, key === currentKey ? null : key);
+  return (
+    <div className={styles.mini}>
+      <div className={styles.miniHead}>
+        <span className={styles.iconTile} aria-hidden="true">
+          <CalendarIcon />
+        </span>
+        <p className={styles.miniTitle}>{month.label}</p>
+      </div>
+      <nav className={styles.monthNav} aria-label="Months">
+        {month.prev ? (
+          <Link href={target(month.prev)} aria-label="Previous month" scroll={false}>
+            <ChevronIcon />
+          </Link>
+        ) : (
+          <span className={styles.navOff} aria-hidden="true">
+            <ChevronIcon />
+          </span>
+        )}
+        <Link
+          className={styles.today}
+          href={calendarHref(type, null)}
+          aria-current={month.current ? "date" : undefined}
+          scroll={false}
+        >
+          Today {month.todayDay}
+        </Link>
+        {month.next ? (
+          <Link href={target(month.next)} aria-label="Next month" scroll={false}>
+            <ChevronIcon flip />
+          </Link>
+        ) : (
+          <span className={styles.navOff} aria-hidden="true">
+            <ChevronIcon flip />
+          </span>
+        )}
+      </nav>
+      <div className={styles.grid} aria-hidden="true">
         {WEEKDAYS.map((day, index) => <b key={index}>{day}</b>)}
-        {view.month.cells.map((cell, index) => (
+        {month.cells.map((cell) => (
           <span
-            key={cell.date ?? `blank-${index}`}
+            key={cell.date}
             className={styles.cell}
+            data-outside={cell.outside || undefined}
             data-today={cell.today || undefined}
             data-window={cell.inWindow || undefined}
           >
-            {cell.day ?? ""}
+            {cell.day}
             {cell.marks.length > 0 ? (
               <span className={styles.marks}>
                 {cell.marks.map((mark) => (
@@ -100,8 +149,8 @@ function MonthGrid({ view }: { view: CalendarView }) {
   );
 }
 
-/** The legend is the filter: each category links to the calendar showing only it. */
-function Filters({ totals, type }: { totals: CalendarView; type?: CalendarCategory }) {
+/** The legend is the filter: each category links to the calendar showing only it, in the same month. */
+function Filters({ totals, type, month }: { totals: CalendarView; type?: CalendarCategory; month: string | null }) {
   const items: { key?: CalendarCategory; label: string; count: number }[] = [
     { label: "All", count: totals.upcomingCount },
     ...CALENDAR_CATEGORIES.map((category) => ({
@@ -116,7 +165,7 @@ function Filters({ totals, type }: { totals: CalendarView; type?: CalendarCatego
         <Link
           key={item.key ?? "all"}
           className={styles.filter}
-          href={item.key ? `/news?view=calendar&type=${item.key}` : "/news?view=calendar"}
+          href={calendarHref(item.key, month)}
           aria-current={type === item.key ? "page" : undefined}
           scroll={false}
         >
@@ -178,8 +227,8 @@ export function NewsCalendar({
 
       <div className={styles.layout}>
         <aside className={styles.side} aria-label="This month">
-          <MonthGrid view={view} />
-          <Filters totals={totals} type={type} />
+          <MonthGrid view={view} type={type} today={today} />
+          <Filters totals={totals} type={type} month={view.month.current ? null : view.month.key} />
         </aside>
         <div className={styles.agenda}>
           {empty ? <p className={styles.empty}>No dates to show right now.</p> : null}

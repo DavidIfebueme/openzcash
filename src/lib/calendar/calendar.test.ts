@@ -268,7 +268,7 @@ describe("calendar view", () => {
     );
     expect(month.label).toBe("November 2026");
     // 1 November 2026 is a Sunday: six blank cells before it.
-    expect(month.cells.slice(0, 7).map((cell) => cell.day)).toEqual([
+    expect(month.cells.slice(0, 7).map((cell) => (cell.outside ? null : cell.day))).toEqual([
       null,
       null,
       null,
@@ -278,7 +278,7 @@ describe("calendar view", () => {
       1,
     ]);
     const byDay = new Map(
-      month.cells.filter((cell) => cell.day).map((cell) => [cell.day, cell]),
+      month.cells.filter((cell) => !cell.outside).map((cell) => [cell.day, cell]),
     );
     expect(byDay.size).toBe(30);
     expect(byDay.get(16)).toMatchObject({
@@ -301,7 +301,40 @@ describe("calendar view", () => {
       ],
       TODAY,
     );
-    expect(month.cells.find((cell) => cell.day === 16)?.marks).toEqual(["governance", "coinholder", "zcg"]);
+    expect(month.cells.find((cell) => !cell.outside && cell.day === 16)?.marks).toEqual(["governance", "coinholder", "zcg"]);
+  });
+
+  it("moves between months within the dates the calendar has, and back to today", () => {
+    const events = [
+      day("old", "2026-09-10"),
+      day("dec", "2026-12-17"),
+      { ...day("far", "2028-11-01"), precision: "month" as const },
+    ];
+    expect(calendarView(events, TODAY).month).toMatchObject({
+      key: "2026-11",
+      label: "November 2026",
+      current: true,
+      todayDay: 16,
+      prev: "2026-10",
+      next: "2026-12",
+    });
+    const december = calendarView(events, TODAY, "2026-12").month;
+    expect(december).toMatchObject({ key: "2026-12", label: "December 2026", current: false, prev: "2026-11", next: null });
+    expect(december.cells.find((cell) => !cell.outside && cell.day === 17)?.marks).toEqual(["zcg"]);
+    expect(calendarView(events, TODAY, "2026-09").month.prev).toBeNull();
+    // A month outside the calendar's dates, or a malformed one, opens the current month.
+    expect(calendarView(events, TODAY, "2030-01").month.key).toBe("2026-11");
+    expect(calendarView(events, TODAY, "2026-13").month.key).toBe("2026-11");
+  });
+
+  it("always draws six weeks, with the neighbouring months' days marked outside", () => {
+    const { cells } = calendarView([day("dec", "2026-12-03")], TODAY).month;
+    expect(cells).toHaveLength(42);
+    expect(cells[0]).toMatchObject({ day: 26, outside: true, marks: [] });
+    expect(cells[6]).toMatchObject({ day: 1, outside: false });
+    // Days of the next month are drawn but not marked: their month shows them.
+    expect(cells[38]).toMatchObject({ day: 3, outside: true, marks: [] });
+    expect(cells[41]).toMatchObject({ day: 6, outside: true });
   });
 });
 
