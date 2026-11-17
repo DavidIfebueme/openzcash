@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "a0b7dd9c0fc1a801",
+  "sourceRevision": "25dc5416cd266e73",
   "sourceFiles": 73,
   "documents": [
     {
@@ -175,7 +175,7 @@
       "id": "src/app/coinholders/proposals/page.tsx:0",
       "url": "https://openzcash.org/coinholders/proposals",
       "title": "coinholders · proposals",
-      "text": "Proposals · Coinholder Grants · OpenZcash\nCoinholder grant proposals, requested funding and the current round's schedule.\nProposals\nSubmit proposal\n↗\nUSD\nproposal(s) have no specified USD amount.\nSources & method\nOpen applications from this round carrying FPF's exact “\n” label. Requested amounts are not awards.\nChecks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.\nAI-generated tags describe the work, not funding decisions. Full applications are reanalyzed when their content changes; original categories remain in the source.\nGitHub submissions\nChecked"
+      "text": "Proposals · Coinholder Grants · OpenZcash\nCoinholder grant proposals, requested funding and the current round's schedule.\nProposals\nSubmit proposal\n↗\nUSD\nproposal(s) have no specified USD amount.\nProgram administration\nNot a retroactive grant\nForum\nRequested\nRead on the forum\n:\nSources & method\nOpen applications from this round carrying FPF's exact “\n” label. Requested amounts are not awards.\nThe count and total also include program administration filed on the forum, which is not a GitHub application.\nChecks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.\nAI-generated tags describe the work, not funding decisions. Full applications are reanalyzed when their content changes; original categories remain in the source.\nGitHub submissions\nChecked"
     },
     {
       "id": "src/app/coinholders/results/page.tsx:0",

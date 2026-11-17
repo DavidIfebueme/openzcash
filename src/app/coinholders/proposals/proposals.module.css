@@ -45,8 +45,8 @@
 :global(.rd-shell[data-theme="dark"]) .category[data-tone="teal"] { --category-ink: #8ed2c4; }
 :global(.rd-shell[data-theme="dark"]) .category[data-tone="purple"] { --category-ink: #c6b3e4; }
 :global(.rd-shell[data-theme="dark"]) .category[data-tone="amber"] { --category-ink: #eac487; }
-.proposal h2 { margin: 0; color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.015em; overflow-wrap: anywhere; }
-.proposal h2 a:hover { color: var(--accent-ink); }
+.proposal :is(h2, h3) { margin: 0; color: var(--ink); font-size: 17px; font-weight: 600; line-height: 1.45; letter-spacing: -.015em; overflow-wrap: anywhere; }
+.proposal :is(h2, h3) a:hover { color: var(--accent-ink); }
 .applicant { display: flex; align-items: center; gap: 6px; color: color-mix(in srgb, var(--ink) 75%, var(--muted)); font-size: 13px; font-weight: 500; margin: 8px 0 0; line-height: 1.5; }
 .applicant svg { flex: 0 0 14px; color: var(--muted); }
 .applicant span { min-width: 0; overflow-wrap: anywhere; }
@@ -60,6 +60,11 @@
 .viewProposal { grid-column: 1; grid-row: 2; justify-self: start; display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-height: 34px; padding: 6px 11px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--surface2); color: var(--accent-ink); margin: 12px 0 0; font-size: 12px; font-weight: 500; white-space: nowrap; }
 .viewProposal svg { flex: 0 0 14px; }
 .viewProposal:hover { border-color: var(--accent-ink); background: var(--accent-soft); }
+.administration { margin-top: 28px; }
+.sectionTitle { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 2px 12px; color: var(--ink); font-size: 15px; font-weight: 600; line-height: 1.5; }
+.sectionTitle span { color: var(--muted); font-size: 12px; font-weight: 500; }
+.adminSummary { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 8px 0 0; }
+.disclosure { color: var(--muted); font-size: 12px; line-height: 1.6; margin: 8px 0 0; font-style: italic; }
 .empty { border: 1px dashed var(--line-strong); border-radius: 12px; padding: 32px 24px; text-align: center; color: var(--muted); font-size: 14px; }
 .empty h2 { color: var(--ink); font-size: 18px; font-weight: 500; margin: 0 0 8px; }
 .empty p { margin: 0; }
@@ -119,7 +124,7 @@
   .resultCount { margin-top: 12px; }
   .proposal { grid-template-columns: minmax(0, 1fr); padding: 16px; }
   .proposalContent { grid-column: 1 / -1; padding: 0 0 14px; }
-  .proposal h2 { font-size: 17px; }
+  .proposal :is(h2, h3) { font-size: 17px; }
   .request { grid-row: 2; border-top: 1px solid var(--line); padding-top: 14px; }
   .request { grid-column: 1; border-left: 0; padding-inline: 12px; }
   .request strong { font-size: 25px; }

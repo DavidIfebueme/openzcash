@@ -20,6 +20,15 @@ they retain the ready label. Older rounds are not inferred from titles.
 If FPF adds a round marker, update this selection rule and its tests together.
 This page represents active submissions; it is not an archive of all Q4 votes.
 
+Program administration is filed on the forum, not as a GitHub application, so
+the listing never contains it. `src/lib/coinholder/administration.ts` records
+each such request with its forum link and the cycle whose vote carries it; for
+Q4 2026 that is FPF's 2027 renewal ($58,000). The page lists it in its own
+**Program administration** section below the applications, and the round's
+Proposals count and total requested include it (on November 17, 2026, 54
+GitHub applications plus this request made 55). The API returns it in `administration`, apart from
+`proposals` and `totals`.
+
 Amounts come only from `Requested Grant Amount (USD)` and are stored in cents.
 An explicit amount may include a parenthetical `reduced from` or `increased from`
 history note, optionally dated and referencing another section. For example,

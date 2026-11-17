@@ -94,7 +94,7 @@ export function q4Summary(proposal: Q4Proposal): Q4ProposalSummary {
   return summary;
 }
 
-export function q4Totals(proposals: Q4ProposalSummary[]) {
+export function q4Totals(proposals: Pick<Q4ProposalSummary, "requestedUsdCents">[]) {
   return {
     requestedUsdCents: proposals.reduce((sum, p) => sum + (p.requestedUsdCents ?? 0), 0),
     missingAmounts: proposals.filter((p) => p.requestedUsdCents === null).length,

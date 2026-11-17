@@ -1,5 +1,6 @@
 import { readQ4 } from "@/lib/coinholder/q4-server";
 import { Q4, READY_FOR_VOTE_LABEL, q4Phase, q4Summary, q4Totals } from "@/lib/coinholder/q4";
+import { cycleAdministration } from "@/lib/coinholder/administration";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ export async function GET() {
     round: Q4, phase: q4Phase().label, requiredLabel: READY_FOR_VOTE_LABEL,
     status: snapshot.status, fetchedAt: snapshot.fetchedAt,
     totals: proposals === null ? null : q4Totals(proposals), proposals,
-    notes: `Open, undecided submissions from the ${Q4.label} call carrying FPF's exact ready-for-vote label. Amounts are requested USD cents, not awards or payments.`,
+    administration: cycleAdministration(),
+    notes: `Open, undecided submissions from the ${Q4.label} call carrying FPF's exact ready-for-vote label. Amounts are requested USD cents, not awards or payments. Program administration filed on the forum is listed in administration and is not part of totals.`,
   }, { status: snapshot.status === "unavailable" ? 503 : 200, headers: { "Cache-Control": "no-store" } });
 }

@@ -53,4 +53,20 @@ describe("Q4 entry and source failure", () => {
     expect(renderToStaticMarkup(await Page())).toContain("No proposals yet");
     expect((await GET()).status).toBe(200);
   });
+  it("adds FPF's forum administration request to the count and total, listed apart from GitHub applications", async () => {
+    const proposal = { number: 70, title: "Maya integration", url: "https://github.com/example/70", applicant: "example", organization: null, category: null, summary: null, requestedUsdCents: 5_000_000, createdAt: "2026-11-01T12:00:00Z", updatedAt: "2026-11-01T12:00:00Z", body: "" };
+    reader.readQ4.mockResolvedValue({ status: "current", fetchedAt: "2026-11-17T12:00:00Z", proposals: [proposal, { ...proposal, number: 71, requestedUsdCents: 1_000_000 }] });
+    const html = renderToStaticMarkup(await Page());
+    expect(html).toMatch(/<dt>Proposals<\/dt><dd>3<\/dd>/);
+    expect(html).toContain("$118,000");
+    expect(html).toContain("Program administration");
+    expect(html).toContain("Not a retroactive grant");
+    expect(html).toContain("2027 Renewal");
+    expect(html).toContain("$58,000");
+    expect(html).toContain("forum.zcashcommunity.com/t/proposal-funding-fpf-s-administrative-operational-role-for-the-coinholder-directed-retroactive-grants-program-2027-renewal/59063");
+    const body = await (await GET()).json();
+    expect(body.proposals).toHaveLength(2);
+    expect(body.totals.requestedUsdCents).toBe(6_000_000);
+    expect(body.administration).toEqual([expect.objectContaining({ id: "fpf-admin-2027", requestedUsdCents: 5_800_000, applicant: "Financial Privacy Foundation (FPF)" })]);
+  });
 });
