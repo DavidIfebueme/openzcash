@@ -1,5 +1,6 @@
 import "server-only";
 import { z } from "zod";
+import { junoBlockTime } from "./juno-block-time";
 
 /**
  * ZecHub DAO governance feed.
@@ -33,6 +34,8 @@ export type ZechubProposal = {
   /** DAO DAO status: open | passed | executed | rejected | closed | … */
   status: string;
   createdAt: string; // ISO 8601, or "" when the source has no timestamp.
+  /** On-chain creation block, used to recover dates if the indexer is down. */
+  startHeight?: number;
   yes: number;
   no: number;
   abstain: number;
@@ -57,6 +60,7 @@ const itemsSchema = z.array(z.object({
   proposal: z.object({
     title: z.string().trim().min(1), status: z.string().min(1),
     proposer: z.string(), description: z.string().optional(),
+    start_height: z.number().int().positive().max(Number.MAX_SAFE_INTEGER).optional().catch(undefined),
     votes: z.object({ yes: votes, no: votes, abstain: votes }),
   }),
 })).max(MAX_PROPOSALS).refine((items) => new Set(items.map((item) => item.id)).size === items.length);
@@ -96,6 +100,7 @@ async function read(source: "indexer" | "chain"): Promise<ZechubGovernance | nul
       // timestamp for the same ID; never substitute fetch time or expiry time.
       createdAt: item.createdAt && Number.isFinite(Date.parse(item.createdAt)) ? item.createdAt
         : cache?.proposals.find((previous) => previous.id === item.id)?.createdAt ?? "",
+      startHeight: item.proposal.start_height,
       yes: item.proposal.votes.yes, no: item.proposal.votes.no, abstain: item.proposal.votes.abstain,
       proposer: item.proposal.proposer, url: `${ZECHUB_DAO_URL}/proposals/${PREFIX}${item.id}`,
       description: excerpt(item.proposal.description),
@@ -124,7 +129,11 @@ export async function getZechubGovernance(limit = 40): Promise<ZechubGovernance>
   return { ...result, proposals: result.proposals.slice(0, count) };
 }
 
-/** Compatibility reader for news; undated chain proposals remain undated. */
+/** News needs creation dates. Resolve only its requested window, not the whole DAO history. */
 export async function getZechubProposals(limit = 30): Promise<ZechubProposal[]> {
-  return (await getZechubGovernance(limit)).proposals;
+  const { proposals } = await getZechubGovernance(limit);
+  return Promise.all(proposals.map(async (proposal) => ({
+    ...proposal,
+    createdAt: proposal.createdAt || await junoBlockTime(proposal.startHeight),
+  })));
 }
