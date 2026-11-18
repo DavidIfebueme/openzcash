@@ -46,12 +46,12 @@ const BY_HANDLE = new Map(
   ]),
 );
 
-/** Each source shows its mark, a PNG served locally (strict CSP). Ink glyphs
- * flip to light in the dark theme. */
-const SOURCE: Record<NewsSource, { label: string; mark: string; glyph?: boolean }> = {
+/** Source marks are local images or text symbols. Ink images flip to light
+ * in the dark theme; text symbols inherit the theme's ink color. */
+const SOURCE: Record<NewsSource, { label: string; mark: string; glyph?: boolean; symbol?: boolean }> = {
   forum: { label: "Forum", mark: "/logos/marks/openzcash.png" },
   github: { label: "Releases", mark: "/logos/marks/github.png", glyph: true },
-  sheet: { label: "Spreadsheet", mark: "/logos/marks/sheets.png", glyph: true },
+  sheet: { label: "Pagamentos recentes", mark: "Ƶ", symbol: true },
   proposal: { label: "Proposals", mark: "/logos/zcg.png" },
   dao: { label: "ZecHub DAO", mark: "/logos/zechub.png" },
   application: { label: "Proposals", mark: "/logos/zcg.png" },
@@ -218,6 +218,10 @@ export default async function NewsPage({
               {community ? (
                 <span className="ws-news-flag" title={community.name}>
                   {community.flag}
+                </span>
+              ) : s.symbol ? (
+                <span className={`ws-news-mark ${styles.currencyMark}`} aria-hidden="true">
+                  {s.mark}
                 </span>
               ) : (
                 <img
