@@ -1,4 +1,5 @@
 import { formatUsdCents } from "@/lib/zcg/format";
+import { formatZec } from "@/lib/zcash/units";
 import type { NewsItem } from "./feed";
 
 /**
@@ -17,6 +18,8 @@ export type PaidLedgerRow = {
   recipient: string | null;
   project: string | null;
   usd: bigint | null;
+  /** Disbursed ZEC in zatoshis; null when the ledger has no recorded amount. */
+  zec: bigint | null;
   /** ISO day from the sheet's "Paid Out" column. */
   paid: string | null;
   isTest: boolean;
@@ -104,12 +107,13 @@ export function sheetNewsItems(
     const paid = paidTime(row.paid);
     if (!Number.isFinite(paid)) return [];
     const amount = formatUsdCents(row.usd ?? 0n);
+    const zec = row.zec != null ? ` | ${formatZec(row.zec)}` : "";
     return [
       {
         id: `sheet:${row.id}`,
         source: "sheet" as const,
         kind: "ZCG ledger",
-        title: `${row.recipient ?? "Grant"} — ${amount} · paid ${paidDay.format(paid)}`,
+        title: `${row.recipient ?? "Grant"} — ${amount}${zec} · paid ${paidDay.format(paid)}`,
         url: row.project
           ? `/zcg/grant?g=${encodeURIComponent(row.project)}`
           : "/zcg/disbursements",

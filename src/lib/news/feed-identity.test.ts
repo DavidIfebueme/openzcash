@@ -80,12 +80,12 @@ describe("News record identity", () => {
   });
 
   it("lists a payment the ledger recorded this week even when it was paid weeks earlier", async () => {
-    records.sheet = [{ id: "late", recipient: "Least Authority", usd: 434_112n, paid: "2026-09-10", project: "Zcash Ecosystem Security Lead", isTest: false }];
+    records.sheet = [{ id: "late", recipient: "Least Authority", usd: 434_112n, zec: 812_216_001n, paid: "2026-09-10", project: "Zcash Ecosystem Security Lead", isTest: false }];
     records.recorded = [{ title: "Zcash Ecosystem Security Lead", detail: "1 payment · $4,341", at: new Date("2026-10-04T01:25:57Z") }];
     const feed = await import("./feed");
     expect(await feed.getNews()).toMatchObject([{
       id: "sheet:late", ts: "2026-10-04T01:25:57.000Z",
-      title: "Least Authority — $4,341.12 · paid Sep 10",
+      title: "Least Authority — $4,341.12 | 8.12216001 ZEC · paid Sep 10",
     }]);
   });
 

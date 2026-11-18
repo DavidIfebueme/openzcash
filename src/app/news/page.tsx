@@ -51,7 +51,7 @@ const BY_HANDLE = new Map(
 const SOURCE: Record<NewsSource, { label: string; mark: string; glyph?: boolean; symbol?: boolean }> = {
   forum: { label: "Forum", mark: "/logos/marks/openzcash.png" },
   github: { label: "Releases", mark: "/logos/marks/github.png", glyph: true },
-  sheet: { label: "Pagamentos recentes", mark: "Ƶ", symbol: true },
+  sheet: { label: "Recent payments", mark: "ᙇ", symbol: true },
   proposal: { label: "Proposals", mark: "/logos/zcg.png" },
   dao: { label: "ZecHub DAO", mark: "/logos/zechub.png" },
   application: { label: "Proposals", mark: "/logos/zcg.png" },
@@ -220,7 +220,7 @@ export default async function NewsPage({
                   {community.flag}
                 </span>
               ) : s.symbol ? (
-                <span className={`ws-news-mark ${styles.currencyMark}`} aria-hidden="true">
+                <span className={styles.currencyMark} aria-hidden="true">
                   {s.mark}
                 </span>
               ) : (

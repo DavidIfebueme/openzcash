@@ -156,6 +156,7 @@ async function fetchSheet(): Promise<NewsItem[]> {
         id: zcgDisbursements.id,
         recipient: zcgDisbursements.recipientNameRaw,
         usd: zcgDisbursements.amountUsdCents,
+        zec: zcgDisbursements.zecDisbursedZat,
         paid: zcgDisbursements.paidOutDate,
         project: zcgDisbursements.project,
         isTest: zcgDisbursements.isTest,

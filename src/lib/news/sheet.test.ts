@@ -9,6 +9,7 @@ const row = (over: Partial<PaidLedgerRow> & { id: string }): PaidLedgerRow => ({
   recipient: "ZcashMe, Inc.",
   project: "Zcash Network School Kazakhstan",
   usd: 428_500n,
+  zec: null,
   paid: "2026-11-01",
   isTest: false,
   ...over,
@@ -24,6 +25,21 @@ const stamps = (rows: PaidLedgerRow[], records: RecordedPayment[]) =>
   Object.fromEntries(sheetNewsItems(rows, records).map((i) => [i.id, i.ts]));
 
 describe("spreadsheet payments in the news feed", () => {
+  it.each([
+    [812_216_001n, "8.12216001 ZEC"],
+    [123_456_789_012n, "1,234.56789012 ZEC"],
+    [0n, "0 ZEC"],
+    [-100_000_001n, "-1.00000001 ZEC"],
+  ])("shows recorded ZEC beside USD, preserving the amount %s", (zec, expected) => {
+    const [item] = sheetNewsItems([row({ id: "paid", zec })], []);
+    expect(item.title).toBe(`ZcashMe, Inc. — $4,285 | ${expected} · paid Nov 1`);
+  });
+
+  it("does not turn an unrecorded ZEC amount into zero or a price conversion", () => {
+    const [item] = sheetNewsItems([row({ id: "unknown", zec: null })], []);
+    expect(item.title).toBe("ZcashMe, Inc. — $4,285 · paid Nov 1");
+  });
+
   it("dates a payment by when the ledger recorded it, not its earlier paid-out date", () => {
     const [item] = sheetNewsItems(
       [row({ id: "ms1" })],
