@@ -73,7 +73,7 @@
 .txMenu a:hover svg, .txMenu a:focus-visible svg { color: var(--accent-ink); }
 @media (pointer: coarse) { .txMenu a { min-height: 38px; } }
 .transactionValue { text-align: right; }
-.transactionValue time { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 18px; }
+.transactionValue small, .transactionValue time { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 18px; }
 .transactionAmount { display: flex; justify-content: flex-end; align-items: baseline; flex-wrap: wrap; gap: 0 5px; font-size: 15px; line-height: 20px; font-weight: 550; font-variant-numeric: tabular-nums; }
 .transactionAmount > span { min-width: 0; }
 .transactionAmount[data-direction="incoming"] { color: var(--treasury-incoming); }

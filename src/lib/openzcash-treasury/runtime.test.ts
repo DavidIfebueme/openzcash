@@ -88,7 +88,7 @@ describe("treasuryRuntimeConfig", () => {
       // The flags documented for a local engine that holds only the public viewing key.
       engineArgs: [
         "--db-path",
-        "/data/openzcash-treasury/engine/treasury.db",
+        "/data/openzcash-treasury/engine/treasury-with-change.db",
         "--lwd-url",
         "https://zec.rocks",
         "--port",

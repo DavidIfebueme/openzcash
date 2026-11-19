@@ -2,6 +2,7 @@ import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { z } from "zod";
 import { TREASURY_ACCOUNT } from "../src/lib/openzcash-treasury/account";
+import { populateTreasuryFees } from "../src/lib/openzcash-treasury/fees";
 import { buildTreasurySnapshot } from "../src/lib/openzcash-treasury/ledger";
 import { readTreasuryFeed, treasurySnapshotPath, writeTreasuryFeed } from "../src/lib/openzcash-treasury/store";
 import { acquireTreasuryLock, TreasuryLockLostError, TREASURY_SYNC_TIMEOUT_MS } from "../src/lib/openzcash-treasury/sync-lock";
@@ -14,7 +15,7 @@ if (!["127.0.0.1", "localhost", "[::1]"].includes(endpoint.hostname) || endpoint
 const indexer = new URL(process.env.OPENZCASH_TREASURY_INDEXER || "https://zec.rocks");
 if (indexer.protocol !== "https:" || indexer.username || indexer.password) throw new Error("The mainnet indexer must use HTTPS");
 const indexerGrpc = `${indexer.hostname}:${indexer.port || "443"}`;
-const name = "OpenZcash public treasury";
+const name = "OpenZcash public treasury (external and internal)";
 const watch = process.argv.includes("--watch");
 const stop = new AbortController();
 process.once("SIGINT", () => stop.abort());
@@ -54,7 +55,7 @@ async function prepareAccount() {
   if (accounts.length > 1) throw new Error("Ambiguous treasury account");
   let id: number;
   if (accounts.length === 0) {
-    const result = z.object({ createAccount: z.number().int().positive() }).parse(await gql("mutation ($account: NewAccount!) { createAccount(newAccount: $account) }", { account: { name, key: TREASURY_ACCOUNT.viewingKey, aindex: 0, birth, useInternal: false } }));
+    const result = z.object({ createAccount: z.number().int().positive() }).parse(await gql("mutation ($account: NewAccount!) { createAccount(newAccount: $account) }", { account: { name, key: TREASURY_ACCOUNT.viewingKey, aindex: 0, birth, useInternal: true } }));
     id = result.createAccount;
   } else {
     id = accounts[0].id;
@@ -70,9 +71,9 @@ const ledgerQuery = `query ($id: Int!) {
   accounts(accountFilter: { id: $id }) { id birth height incomingOnly }
   balanceByAccount(idAccount: $id) { height total }
   transactionsByAccount(idAccount: $id) {
-    txid height time value fee
+    txid height time value
     notes { scope memo }
-    outputs { memo }
+    outputs { value memo }
   }
 }`;
 
@@ -92,6 +93,8 @@ async function main() {
         await lock.refresh();
         const raw = await gql(ledgerQuery, { id }, 120_000);
         const snapshot = buildTreasurySnapshot(raw, synchronizeAccount, new Date().toISOString());
+        await populateTreasuryFees(snapshot, lastGood, stop.signal);
+        await lock.refresh();
         await writeTreasuryFeed("synced", snapshot);
         lastGood = snapshot;
         console.log(`Synced block ${snapshot.syncedHeight}; balance ${snapshot.balanceZatoshis} zatoshis; ${snapshot.transactions.length} confirmed transaction(s).`);

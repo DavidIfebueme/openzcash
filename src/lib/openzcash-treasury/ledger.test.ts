@@ -2,17 +2,17 @@ import { describe, expect, it } from "vitest";
 import { buildTreasurySnapshot, parseZec, treasurySnapshotSchema } from "./ledger";
 
 const incoming = { txid: "a".repeat(64), height: 3500010, time: "2026-11-10T13:00:00", value: "1.00000001", fee: "0.0001", notes: [{ scope: 0, memo: "For community work" }], outputs: [] };
-const outgoing = { txid: "b".repeat(64), height: 3500011, time: "2026-11-10T13:05:00", value: "-0.2501", fee: "1E-4", notes: [{ scope: 1, memo: "change" }], outputs: [{ memo: "Contributor reward" }, { memo: "Contributor reward" }] };
+const outgoing = { txid: "b".repeat(64), height: 3500011, time: "2026-11-10T13:05:00", value: "-0.2501", fee: "1E-4", notes: [{ scope: 1, memo: "change" }], outputs: [{ value: "0.125", memo: "Contributor reward" }, { value: "0.125", memo: "Contributor reward" }] };
 export const engineFixture = { accounts: [{ id: 1, birth: 3500000, height: 3500012, incomingOnly: false }], balanceByAccount: { height: 3500012, total: "0.74990001" }, transactionsByAccount: [incoming, outgoing] };
 const syncedAt = "2026-11-10T13:10:00.000Z";
 
 describe("treasury reconciliation", () => {
-  it("reconciles net movements, excludes change and preserves fees, memos and exact zatoshis", () => {
+  it("reconciles net movements, excludes change and preserves recovered output amounts, memos and exact zatoshis", () => {
     const s = buildTreasurySnapshot(engineFixture, 3500012, syncedAt);
     expect(s.balanceZatoshis).toBe("74990001");
     expect(s.receivedZatoshis).toBe("100000001");
     expect(s.spentZatoshis).toBe("25010000");
-    expect(s.transactions[0]).toMatchObject({ direction: "outgoing", feeZatoshis: "10000", memos: ["Contributor reward"], confirmedAt: "2026-11-10T13:05:00.000Z" });
+    expect(s.transactions[0]).toMatchObject({ direction: "outgoing", feeZatoshis: null, recoveredOutputZatoshis: "25000000", memos: ["Contributor reward"], confirmedAt: "2026-11-10T13:05:00.000Z" });
     expect(s.transactions[1].memos).toEqual(["For community work"]);
   });
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { zatoshisToZecString } from "@/lib/zcash/units";
 import { useState } from "react";
 import { treasuryCopy } from "@/lib/openzcash-treasury/content";
 import type { TreasuryTransaction } from "@/lib/openzcash-treasury/ledger";
@@ -13,10 +14,20 @@ export type { TreasuryTransaction } from "@/lib/openzcash-treasury/ledger";
 /** The panel stays one screen tall however long the history grows. */
 const PAGE_SIZE = 5;
 
-function formatAmount(zatoshis: string) {
-  const amount = BigInt(zatoshis);
-  const fraction = (amount % 100_000_000n).toString().padStart(8, "0").replace(/0+$/, "");
-  return `${amount / 100_000_000n}${fraction ? `.${fraction}` : ""}`;
+function TransactionAmount({ tx }: { tx: TreasuryTransaction }) {
+  const outgoing = tx.direction === "outgoing";
+  const debit = BigInt(tx.amountZatoshis);
+  const fee = outgoing && tx.feeZatoshis !== null ? BigInt(tx.feeZatoshis) : null;
+  const splitFee = fee !== null && tx.recoveredOutputZatoshis === (debit - fee).toString();
+  const amount = splitFee ? debit - fee : debit;
+  const sign = amount === 0n ? "" : outgoing ? "−" : tx.direction === "incoming" ? "+" : "";
+  return <>
+    <div className={styles.transactionAmount} data-direction={tx.direction}>
+      <span>{sign}{zatoshisToZecString(amount)}</span><span>ZEC</span>
+    </div>
+    {splitFee && <small>{treasuryCopy.fee} {zatoshisToZecString(fee)} ZEC</small>}
+    {outgoing && !splitFee && <small>{treasuryCopy.includesFees}</small>}
+  </>;
 }
 
 /** null means no verified feed; [] means a verified feed with no transactions. */
@@ -61,7 +72,7 @@ export function TreasuryTransactions({ transactions }: { transactions: readonly 
             </div>
           </td>
           <td className={styles.transactionValue}>
-            <div className={styles.transactionAmount} data-direction={tx.direction} title={tx.direction === "outgoing" ? t.includesFees : undefined}><span>{tx.direction === "incoming" ? "+" : tx.direction === "outgoing" ? "−" : ""}{formatAmount(tx.amountZatoshis)}</span><span>ZEC</span></div>
+            <TransactionAmount tx={tx} />
             <time dateTime={tx.confirmedAt} title={`${t.date}: ${new Date(tx.confirmedAt).toISOString()}`}>{new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" }).format(new Date(tx.confirmedAt))}</time>
           </td>
         </tr>)}

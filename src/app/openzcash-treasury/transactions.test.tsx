@@ -6,13 +6,14 @@ import { TreasuryTransactions, type TreasuryTransaction } from "./transactions";
 afterEach(cleanup);
 const transactions: TreasuryTransaction[] = [
   { txid: "a".repeat(64), direction: "incoming", amountZatoshis: "100000001", confirmedAt: "2026-11-10T13:00:00Z", height: 3500002, feeZatoshis: "10000", memos: [] },
-  { txid: "b".repeat(64), direction: "outgoing", amountZatoshis: "25000000", confirmedAt: "2026-11-09T13:00:00Z", height: 3500001, feeZatoshis: "10000", memos: [] },
+  { txid: "b".repeat(64), direction: "outgoing", amountZatoshis: "25010000", recoveredOutputZatoshis: "25000000", confirmedAt: "2026-11-09T13:00:00Z", height: 3500001, feeZatoshis: "10000", memos: [] },
 ];
 
 it("filters incoming and outgoing transfers without losing zatoshi precision", () => {
   render(<TreasuryTransactions transactions={transactions} />);
   expect(screen.getByText("+1.00000001", { exact: false })).toBeTruthy();
   expect(screen.getByText("−0.25", { exact: false })).toBeTruthy();
+  expect(screen.getByText("Network fee 0.0001 ZEC")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "Incoming" }));
   expect(screen.getByRole("button", { name: "Incoming" }).getAttribute("aria-pressed")).toBe("true");
   expect(screen.queryByText("−0.25", { exact: false })).toBeNull();
@@ -94,3 +95,15 @@ it("shows no pager while the history fits on one page, and keeps a valid page wh
   expect(visibleRows(view.container)).toBe(2);
 });
 
+
+it("separates a recovered 0.5 ZEC payment from its mined fee and falls back to net for incomplete outputs", () => {
+  const payment = { ...transactions[1], amountZatoshis: "50004000", recoveredOutputZatoshis: "50000000", feeZatoshis: "4000" };
+  const view = render(<TreasuryTransactions transactions={[payment]} />);
+  expect(screen.getByText("−0.5")).toBeTruthy();
+  expect(screen.getByText("Network fee 0.00004 ZEC")).toBeTruthy();
+  for (const uncertain of [{ ...payment, feeZatoshis: null }, { ...payment, recoveredOutputZatoshis: "10000000" }]) {
+    view.rerender(<TreasuryTransactions transactions={[uncertain]} />);
+    expect(screen.getByText("−0.50004")).toBeTruthy();
+    expect(screen.getByText("Includes network fees")).toBeTruthy();
+  }
+});

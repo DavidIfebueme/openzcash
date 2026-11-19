@@ -9,7 +9,7 @@ import { publishedTreasurySnapshotPath, readTreasuryFeed, writeTreasuryFeed } fr
 const dirs: string[] = [];
 afterEach(async () => { await Promise.all(dirs.splice(0).map((dir) => rm(dir, { recursive: true, force: true }))); });
 async function location() { const dir = await mkdtemp(path.join(os.tmpdir(), "treasury-test-")); dirs.push(dir); return path.join(dir, "snapshot.json"); }
-const snapshot: TreasurySnapshot = { version: 1, network: "mainnet", address: TREASURY_ACCOUNT.address, viewingKeySha256: TREASURY_KEY_SHA256, source: "ZKool · public full viewing key", scanStartHeight: 3500000, syncedHeight: 3500012, tipHeight: 3500012, syncedAt: "2026-11-10T13:10:00.000Z", balanceZatoshis: "0", receivedZatoshis: "0", spentZatoshis: "0", transactions: [] };
+const snapshot: TreasurySnapshot = { version: 1, scanScope: "external-and-internal", network: "mainnet", address: TREASURY_ACCOUNT.address, viewingKeySha256: TREASURY_KEY_SHA256, source: "ZKool · public full viewing key", scanStartHeight: 3500000, syncedHeight: 3500012, tipHeight: 3500012, syncedAt: "2026-11-10T13:10:00.000Z", balanceZatoshis: "0", receivedZatoshis: "0", spentZatoshis: "0", transactions: [] };
 const now = Date.parse(snapshot.syncedAt);
 /** No published snapshot: these tests are about the live file alone. */
 const NONE = path.join(os.tmpdir(), "treasury-test-no-published-snapshot.json");
@@ -17,6 +17,9 @@ const NONE = path.join(os.tmpdir(), "treasury-test-no-published-snapshot.json");
 it("does not turn a missing, malformed or wrong-account snapshot into zero", async () => {
   const file = await location();
   expect(await readTreasuryFeed(file, now, NONE)).toEqual({ status: "unavailable", snapshot: null });
+  const { scanScope: _legacy, ...externalOnly } = snapshot;
+  await writeFile(file, JSON.stringify({ status: "synced", snapshot: externalOnly }));
+  expect((await readTreasuryFeed(file, now, NONE)).snapshot).toBeNull();
   await writeFile(file, "{");
   expect((await readTreasuryFeed(file, now, NONE)).snapshot).toBeNull();
   await writeFile(file, JSON.stringify({ status: "synced", snapshot: { ...snapshot, viewingKeySha256: "another account" } }));

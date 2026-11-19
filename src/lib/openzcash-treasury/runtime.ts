@@ -141,7 +141,8 @@ export function treasuryRuntimeConfig(
       enginePort,
       engineArgs: [
         "--db-path",
-        path.join(engineDir, "treasury.db"),
+        // Rebuild from birth once. The previous database skipped internal change notes.
+        path.join(engineDir, "treasury-with-change.db"),
         "--lwd-url",
         indexer,
         "--port",

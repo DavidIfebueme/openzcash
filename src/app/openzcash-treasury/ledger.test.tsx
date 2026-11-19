@@ -6,7 +6,7 @@ import { TREASURY_KEY_SHA256, type TreasurySnapshot } from "@/lib/openzcash-trea
 import { TreasuryLedger } from "./ledger";
 
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers(); });
-const snapshot: TreasurySnapshot = { version: 1, network: "mainnet", address: TREASURY_ACCOUNT.address, viewingKeySha256: TREASURY_KEY_SHA256, source: "ZKool · public full viewing key", scanStartHeight: 3500000, syncedHeight: 3500012, tipHeight: 3500012, syncedAt: "2026-11-10T13:10:00.000Z", balanceZatoshis: "100000001", receivedZatoshis: "100000001", spentZatoshis: "0", transactions: [{ txid: "a".repeat(64), direction: "incoming", amountZatoshis: "100000001", height: 3500010, confirmedAt: "2026-11-10T13:00:00.000Z", feeZatoshis: null, memos: ["For the community"] }] };
+const snapshot: TreasurySnapshot = { version: 1, scanScope: "external-and-internal", network: "mainnet", address: TREASURY_ACCOUNT.address, viewingKeySha256: TREASURY_KEY_SHA256, source: "ZKool · public full viewing key", scanStartHeight: 3500000, syncedHeight: 3500012, tipHeight: 3500012, syncedAt: "2026-11-10T13:10:00.000Z", balanceZatoshis: "100000001", receivedZatoshis: "100000001", spentZatoshis: "0", transactions: [{ txid: "a".repeat(64), direction: "incoming", amountZatoshis: "100000001", height: 3500010, confirmedAt: "2026-11-10T13:00:00.000Z", feeZatoshis: null, memos: ["For the community"] }] };
 
 it("retains verified data through an unresolved refresh and marks failures without replacing it with zero", async () => {
   let reject!: (reason: Error) => void;
