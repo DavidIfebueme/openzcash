@@ -13,6 +13,7 @@ export type ReadingLanguage = "en" | "pt" | "es";
 export type LegalItem = {
   id: string;
   title: string;
+  portugueseTitle?: string;
   summary: string;
   url: string;
   reader?: string;

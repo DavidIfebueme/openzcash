@@ -59,6 +59,16 @@ describe("Legal newsroom", () => {
     expect(html.match(/Week of 28 Sept? 2026/g)).toHaveLength(2);
   });
 
+  it("opens the English edition from the featured report and the unfiltered update title", () => {
+    const html = renderToStaticMarkup(<LegalPage feed={feed}/>);
+    const link = '<a href="/legal/read/regulacao-crypto-no-brasil?lang=en">The beginning of crypto regulation in Brazil</a>';
+    expect(html.split(link)).toHaveLength(3);
+    expect(html).toMatch(/href="\/legal\/read\/regulacao-crypto-no-brasil" hrefLang="pt">Ler em português/i);
+    location.query = "language=pt&q=regulação";
+    const list = renderToStaticMarkup(<LegalNewsroom feed={withLegalReadings(feed)}/>);
+    expect(list).toContain("O início da regulação crypto no Brasil</a>");
+  });
+
   it("shows both editions of a matching report once and keeps the language filter in reader links", () => {
     location.query = "source=brazil-reports&language=en";
     const html = renderToStaticMarkup(<LegalNewsroom feed={withLegalReadings(feed)}/>);

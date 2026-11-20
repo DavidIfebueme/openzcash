@@ -39,6 +39,6 @@ export function filterLegalItems(items: readonly LegalItem[], filters: { region?
     && (!filters.region || filters.region === "all" || item.regions.some(region => region === filters.region))
     && (!filters.language || languagesOf(item).includes(filters.language))
     && (!filters.topic || item.topics.some(topic => topic === filters.topic))
-    && words.every(word => `${item.title} ${item.summary} ${item.contributor ?? ""} ${item.jurisdictions.join(" ")} ${item.topics.join(" ")}`.toLocaleLowerCase().includes(word)))
+    && words.every(word => `${item.title} ${item.portugueseTitle ?? ""} ${item.summary} ${item.contributor ?? ""} ${item.jurisdictions.join(" ")} ${item.topics.join(" ")}`.toLocaleLowerCase().includes(word)))
     .sort((a, b) => b.publishedAt.localeCompare(a.publishedAt) || a.id.localeCompare(b.id));
 }

@@ -91,7 +91,7 @@ export function LegalNewsroom({ feed }: { feed: LegalFeed }) {
           <div className={styles.articleMeta}><time dateTime={item.publishedAt}>{legalItemDate(item)}</time><span>{item.jurisdictions.join(" · ")}</span></div>
           <div className={styles.articleBody}>
             <div className={styles.sourceLine}><span>{sources.get(item.sourceId)?.name ?? item.sourceId}</span><span aria-hidden="true">·</span><span>{item.kind}</span>{item.contributor && !sources.get(item.sourceId)?.name.includes(item.contributor) && <><span aria-hidden="true">·</span><span>{item.contributor}</span></>}<span className={styles.status} data-status={item.status}>{item.status}</span></div>
-            <h3>{item.reader ? <a href={readerUrl(item, language ?? languagesOf(item)[0], params.toString())}>{item.title}</a> : <a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}<span className={styles.srOnly}> (opens in a new tab)</span></a>}</h3>
+            <h3>{item.reader ? <a href={readerUrl(item, language ?? languagesOf(item)[0], params.toString())}>{language === "pt" ? item.portugueseTitle ?? item.title : item.title}</a> : <a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}<span className={styles.srOnly}> (opens in a new tab)</span></a>}</h3>
             <p className={styles.summary}>{item.summary}</p>
             {(item.effectiveAt || item.reportingPeriod) && <div className={styles.articleFoot}>{item.effectiveAt && <span>Applies from {legalDate(item.effectiveAt)}</span>}{item.reportingPeriod && <span>{item.reportingPeriod}</span>}</div>}
             {item.sourceUpdatedAt && item.dateBasis !== "updated" && <p className={styles.context}>Publisher updated this source on {legalDate(item.sourceUpdatedAt)}.</p>}

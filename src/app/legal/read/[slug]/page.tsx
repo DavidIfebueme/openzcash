@@ -28,7 +28,7 @@ export async function generateMetadata({ params, searchParams }: Props) {
   const item = report?.item ?? forumReadings.find(post => post.item.id === slug)?.item;
   if (!item) return {};
   const en = report?.record.english && (await searchParams).lang === "en";
-  return pageMetadata({ title: (en ? (await loadEdition(report.record.english)).title : item.title) + " · OpenZcash", description: item.summary,
+  return pageMetadata({ title: (en ? (await loadEdition(report.record.english)).title : item.portugueseTitle ?? item.title) + " · OpenZcash", description: item.summary,
     path: readingPath(item) + (en ? "?lang=en" : "") });
 }
 

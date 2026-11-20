@@ -16,12 +16,12 @@ type EditionProps = {
   mark: string;
   item: LegalItem;
   lang: "pt-BR" | "en";
+  href: string;
   collection: string;
-  alternate?: { label: string; href: string };
+  alternate?: { label: string; href: string; language: "pt" | "en" };
 };
 
-function Edition({ id, source, contributor, mark, item, lang, collection, alternate }: EditionProps) {
-  const path = readingPath(item);
+function Edition({ id, source, contributor, mark, item, lang, href, collection, alternate }: EditionProps) {
   return <section id={id} className={styles.edition} aria-labelledby={id + "-title"}>
     <header className={styles.imprint}>
       <div className={styles.mark}><Image src={mark} alt="" width={80} height={56} unoptimized/></div>
@@ -29,11 +29,11 @@ function Edition({ id, source, contributor, mark, item, lang, collection, altern
     </header>
     <div className={styles.editionBody}>
       <div className={styles.dateline}><span>{item.kind}</span><time dateTime={item.publishedAt}>{legalItemDate(item)}</time></div>
-      <h3 lang={lang}><a href={path}>{item.title}</a></h3>
+      <h3 lang={lang}><a href={href}>{item.title}</a></h3>
       <p>{item.summary}</p>
       <div className={styles.readActions}>
-        <ReadingLink href={path} language={lang === "pt-BR" ? "pt" : "en"} label={lang === "pt-BR" ? "Ler em português" : "Read in English"}/>
-        {alternate && <ReadingLink href={alternate.href} language="en" label={alternate.label} external={alternate.href.startsWith("https://")}/>}
+        <ReadingLink href={href} language={lang === "pt-BR" ? "pt" : "en"} label={lang === "pt-BR" ? "Ler em português" : "Read in English"}/>
+        {alternate && <ReadingLink href={alternate.href} language={alternate.language} label={alternate.label} external={alternate.href.startsWith("https://")}/>}
       </div>
     </div>
     <a className={styles.collection} href={"/legal?source=" + item.sourceId + "#updates"}>{collection}<span aria-hidden="true">→</span></a>
@@ -53,11 +53,12 @@ export function LegalPage({ feed: archive }: { feed: LegalFeed }) {
     </header>
     <div className={styles.editions}>
       <Edition id="pgp" source="Pretty Good Policy for Zcash" contributor={forum.source.author} mark="/logos/pgpz.png"
-        item={forum.item} lang="en" collection="All forum readings"
-        alternate={{ label: "Forum original", href: forum.item.url }}/>
+        item={forum.item} href={readingPath(forum.item)} lang="en" collection="All forum readings"
+        alternate={{ label: "Forum original", language: "en", href: forum.item.url }}/>
       <Edition id="brasil" source={brazilDeskName} contributor={record.author} mark="/legal/brasil/zcash-brasil.webp"
-        item={brazilReport} lang="pt-BR" collection={`All ${brazilDeskName} reports`}
-        alternate={record.english ? { label: "English", href: readingPath(brazilReport) + "?lang=en" } : undefined}/>
+        item={brazilReport} href={readingPath(brazilReport) + (record.english ? "?lang=en" : "")}
+        lang={record.english ? "en" : "pt-BR"} collection={`All ${brazilDeskName} reports`}
+        alternate={record.english ? { label: "Ler em português", language: "pt", href: readingPath(brazilReport) } : undefined}/>
     </div>
     <section id="updates" className={styles.updates} aria-labelledby="updates-title">
       <div className={styles.sectionHeading}><h2 id="updates-title">Updates</h2></div>

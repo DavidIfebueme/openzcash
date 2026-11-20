@@ -8,9 +8,10 @@ export const brazilDeskName = "Policy Brazil";
 
 export const brazilReports = reports.map(record => {
   const item: LegalItem = {
-    id: record.slug, title: record.title, summary: record.summary,
+    id: record.slug, title: record.english ? record.englishTitle : record.title,
+    portugueseTitle: record.title, summary: record.summary,
     url: record.original, contributor: record.author, sourceId: "brazil-reports", publishedAt: record.received,
-    languages: record.english ? ["pt", "en"] : ["pt"],
+    languages: record.english ? ["en", "pt"] : ["pt"],
     dateBasis: "received", regions: ["latam"], jurisdictions: ["Brazil"],
     topics: LEGAL_TOPICS.filter(topic => record.topics.includes(topic)),
     kind: "Country report", status: "Analysis",
