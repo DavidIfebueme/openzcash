@@ -1,7 +1,7 @@
 import type { LegalItem, ReadingLanguage } from "./types";
 
 export const readingLanguages = {
-  en: { name: "English", flag: "🇬🇧" },
+  en: { name: "English", flag: "🇺🇸" },
   pt: { name: "Português", flag: "🇧🇷" },
   es: { name: "Español", flag: "🇪🇸" },
 } satisfies Record<ReadingLanguage, { name: string; flag: string }>;

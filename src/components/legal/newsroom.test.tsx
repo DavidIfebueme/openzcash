@@ -66,7 +66,7 @@ describe("Legal newsroom", () => {
     expect(html).toMatch(/href="[^"]+source=brazil-reports&amp;language=en&amp;lang=en" hrefLang="en"/i);
     expect(html).toMatch(/href="[^"]+source=brazil-reports&amp;language=en" hrefLang="pt"/i);
     expect(html).toContain("🇧🇷</span></a>");
-    expect(html).toContain("🇬🇧</span></a>");
+    expect(html).toContain("🇺🇸</span></a>");
     location.query = "source=brazil-reports&language=es";
     expect(renderToStaticMarkup(<LegalNewsroom feed={withLegalReadings(feed)}/>)).toContain("No matching updates");
   });
