@@ -46,3 +46,4 @@
 .signature strong { font: italic 600 clamp(23px,3vw,30px)/1.25 Georgia, serif; }
 .signature nav { display: flex; flex-wrap: wrap; gap: 3px 18px; }
 .signature a { display: inline-flex; align-items: center; min-height: 44px; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 3px; font-size: 14px; }
+.socialIcon { flex: none; width: 18px; height: 18px; margin-inline-end: 7px; background: currentColor; mask-repeat: no-repeat; mask-position: center; mask-size: contain; }

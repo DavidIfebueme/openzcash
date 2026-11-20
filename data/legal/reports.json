@@ -20,15 +20,13 @@
     "socials": [
       {
         "label": "LinkedIn",
-        "url": "https://br.linkedin.com/in/miris-bensiman-digitalassetslawyer"
+        "url": "https://br.linkedin.com/in/miris-bensiman-digitalassetslawyer",
+        "icon": "/logos/social/linkedin.svg"
       },
       {
         "label": "Instagram",
-        "url": "https://www.instagram.com/miris_bensiman/"
-      },
-      {
-        "label": "YouTube",
-        "url": "https://www.youtube.com/@mirisbensiman"
+        "url": "https://www.instagram.com/miris_bensiman/",
+        "icon": "/logos/social/instagram.svg"
       }
     ]
   }

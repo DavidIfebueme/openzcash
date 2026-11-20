@@ -104,7 +104,12 @@ export default async function Page({ params, searchParams }: Props) {
           <span className={styles.creditLabel}>{isEnglish ? "Written by" : "Escrito por"}</span>
           <strong>{record.author}</strong>
           <nav aria-label={isEnglish ? "Author’s social profiles" : "Redes sociais da autora"}>
-            {record.socials.map(profile => <a key={profile.url} href={profile.url} target="_blank" rel="noopener noreferrer">{profile.label} ↗</a>)}
+            {record.socials.map(profile => (
+              <a key={profile.url} href={profile.url} target="_blank" rel="noopener noreferrer">
+                <span aria-hidden="true" className={styles.socialIcon} style={{ maskImage: `url(${profile.icon})` }}/>
+                {profile.label}<span aria-hidden="true">&nbsp;↗</span>
+              </a>
+            ))}
           </nav>
         </footer>
       </div>
