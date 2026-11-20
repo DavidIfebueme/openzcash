@@ -1,0 +1,158 @@
+{
+  "title": "O INÍCIO DA REGULAÇÃO CRYPTO NO BRASIL",
+  "subtitle": "A lei 14.478/2022, as Resoluções BCB 519, 520 e 521 e a transformação das stablecoins em infraestrutura financeira no Brasil",
+  "sections": [
+    {
+      "heading": "I - Introdução",
+      "blocks": [
+        "A regulação dos criptoativos no Brasil começou com a Lei nº 14.478, de 21 de dezembro de 2022, conhecida como marco legal dos criptoativos. A lei, porém, era predominantemente conceitual e principiológica: definiu o que é ativo virtual e prestadora de serviços de ativos virtuais e fixou diretrizes gerais, mas não estabeleceu as regras do jogo, isto é, os requisitos de autorização, de governança, de capital e de operação que as empresas teriam de cumprir. Um dos pontos mais relevantes da Lei 14.478/22 veio depois, com um decreto presidencial superveniente, nº 11.563, de 13 de junho de 2023, que atribuiu ao Banco Central do Brasil a competência para regular, autorizar e supervisionar o mercado de ativos virtuais no país.[11] Faltava, portanto, que o próprio Banco Central escrevesse essas regras, o que ele fez por meio de suas resoluções.",
+        "Essas regras vieram em 10 de novembro de 2025. Depois de um longo processo de consultas públicas, o Banco Central do Brasil publicou três resoluções que, juntas, formam o primeiro regime regulatório completo para o mercado brasileiro de ativos virtuais.",
+        "A Resolução BCB nº 519 trata dos processos de autorização.",
+        "A Resolução BCB nº 520 disciplina a constituição e o funcionamento das sociedades prestadoras de serviços de ativos virtuais (as SPSAVs) e a prestação desses serviços por outras instituições autorizadas.",
+        "A Resolução BCB nº 521 leva para dentro do mercado de câmbio e das regras de capitais internacionais uma parte das operações com ativos virtuais, com destaque para as stablecoins. As três entraram em vigor em 2 de fevereiro de 2026, com exceção de alguns dispositivos de reporte da Resolução 521, aplicáveis desde 4 de maio de 2026.",
+        "Com o pacote, o BC exerceu a competência recebida do Decreto nº 11.563/2023 e deu conteúdo prático à Lei nº 14.478/2022. O discurso declarado do regulador ao publicar essas Resoluções foi oferecer proteção e segurança operacional aos usuários sem impor restrições que impedissem o desenvolvimento eficiente do mercado brasileiro."
+      ]
+    },
+    {
+      "heading": "II - O ponto de partida: o mercado de stablecoins no Brasil",
+      "blocks": [
+        "Quando as resoluções foram publicadas, o mercado brasileiro de criptoativos já tinha mudado de natureza. Em fevereiro de 2025, o presidente do BC, Gabriel Galípolo, afirmou que cerca de 90% do fluxo de criptoativos observado no Brasil estava ligado a stablecoins.",
+        "Os dados declarados à Receita Federal confirmam a tendência. Em junho de 2026, a Receita informou que, entre agosto de 2019 e dezembro de 2025, foram declarados cerca de R$ 1,58 trilhão em compras e vendas dos principais criptoativos, dos quais aproximadamente R$ 1,13 trilhão (71,7%) correspondeu a stablecoins. A participação das stablecoins no volume mensal passou de 3,5% em 2019 para 79,7% em 2022 e chegou a 91,5% em 2023, estabilizando-se entre 76% e 80% em 2024 e 2025.[14]",
+        "Pelo arquivo mais recente disponibilizado pela Receita Federal, o volume de stablecoins foi de R$ 368,4 bilhões em 2025. No primeiro semestre de 2026, o volume já somava R$ 239,9 bilhões, e as stablecoins representavam 92% do volume total dos principais criptoativos.",
+        {
+          "image": "/legal/brasil/e49f07d2690f3d40f3c6.webp",
+          "caption": "Gráfico 1. Volume anual de stablecoins declarado à Receita Federal (R$ bilhões)",
+          "width": 452,
+          "height": 234
+        },
+        "O mercado também é muito concentrado. A Tether (USDT), referenciada no dólar, respondeu por 88,7% de todo o volume declarado em stablecoins entre agosto de 2019 e dezembro de 2025, cerca de R$ 1 trilhão. Em seguida vêm a USD Coin (USDC), com 7,1%, e a Brazilian Digital Token (BRZ), com 3,4%, que é a principal stablecoin referenciada em real no conjunto analisado.",
+        "A Receita registrou ainda 185,7 milhões de operações com stablecoins no período e observou que parte expressiva desse volume passa por prestadoras sediadas fora do país.",
+        {
+          "image": "/legal/brasil/f8e4c3547fb7649a592c.webp",
+          "caption": "Gráfico 2. Composição do volume de stablecoins declarado no Brasil",
+          "width": 452,
+          "height": 188
+        },
+        "A comparação internacional mostra a dimensão do Brasil nesse mercado. Segundo a edição de 2025 do relatório da Chainalysis, o país recebeu US$ 318,8 bilhões em criptoativos entre julho de 2024 e junho de 2025, cerca de um terço de toda a atividade da América Latina e alta de 109,9% sobre o período anterior, e subiu do 10º para o 5º lugar no índice global de adoção."
+      ]
+    },
+    {
+      "heading": "III - Resolução 519: a porta de entrada no sistema regulado",
+      "blocks": [
+        "A Resolução 519, do Banco Central do Brasil, define quem pode pedir autorização e o que precisa demonstrar. Ela não trata só das SPSAVs: alcança também as sociedades corretoras de câmbio e as corretoras e distribuidoras de títulos e valores mobiliários, o que coloca as empresas de ativos virtuais no mesmo processo de autorização usado para instituições financeiras tradicionais.",
+        "Os requisitos para a autorização seguem a lógica do sistema financeiro. Os controladores precisam ter capacidade econômico-financeira compatível com o capital necessário para estruturar e operar a instituição e para enfrentar contingências de mercado, e os recursos usados na integralização do capital e na aquisição de controle ou de participação qualificada precisam ter origem lícita. O empreendimento deve ser viável, a infraestrutura de tecnologia e a estrutura de governança devem ser compatíveis com a complexidade e os riscos do negócio, e administradores, controladores e detentores de participação qualificada devem ter reputação ilibada. Exige-se ainda que a administração conheça o ramo, a dinâmica do mercado e os riscos envolvidos, que os administradores tenham capacitação técnica, que os requerimentos mínimos de capital e patrimônio sejam cumpridos e que a sede tenha endereço físico informado.",
+        "A norma também lista os atos que dependem de autorização prévia do BC. Além do próprio funcionamento, estão nessa lista a mudança de modalidade da SPSAV, a transferência ou alteração de controle, as operações de fusão, cisão, incorporação e transformação societária, a posse de administradores, a alteração do capital social, a mudança de denominação e a mudança de objeto social para outro tipo de instituição regulada. O Banco Central divulgou os documentos e prazos de cada processo, através da Instrução Normativa BCB nº 704, de 29 de janeiro de 2026.",
+        "Um dos pontos mais sensíveis dos requisitos é a definição de controle. Controlador é quem detém, sozinho ou em grupo, direitos de sócio correspondentes à maioria do capital votante, diretamente no caso de pessoa natural ou, no caso de pessoa jurídica, também de forma indireta, desde que esteja no último nível da cadeia de controle.",
+        "Para os administradores, a resolução exige residência no país, ausência de impedimentos legais e de condenações por determinados crimes, não estar inabilitado nem suspenso para cargos em instituições financeiras, não ser falido ou insolvente e não ter sofrido indeferimento ou revisão de autorização pelo BC nos três anos anteriores. Na análise reputacional, o Banco Central considera a existência de processos criminais ou inquéritos, de processos relacionados ao sistema financeiro, ao sistema de pagamentos ou à prestação de serviços de ativos virtuais, de processos de insolvência e de inadimplemento, levando em conta relevância, gravidade, recorrência e circunstâncias de cada caso.",
+        "Para quem já operava em 2 de fevereiro de 2026, a análise ocorre em duas fases (art. 26). Na primeira, o BC verifica se a empresa estava de fato em atividade na data de corte, examina a reputação de controladores e detentores de participação qualificada e confere o atendimento ao capital mínimo. Na segunda, analisa os demais requisitos.",
+        "O capital mínimo foi o ponto que mais repercutiu no mercado de ativos virtuais no Brasil. O valor do capital mínimo exigido para as SPSAVs varia de R$ 10,8 milhões a R$ 37,2 milhões, a depender do conjunto de atividades, muito acima da faixa de R$ 1 milhão a R$ 3 milhões que se discutida nas consultas públicas anteriores as Resoluções.",
+        {
+          "image": "/legal/brasil/fcd1b9bcaefcda8ea72d.webp",
+          "caption": "Quadro 1. Resolução BCB nº 519 em resumo: o caminho até a autorização",
+          "width": 900,
+          "height": 988
+        }
+      ]
+    },
+    {
+      "heading": "IV - Resolução 520: como a SPSAV deve funcionar",
+      "blocks": [
+        "A Resolução 520 é a mais extensa das três. Ela determina que a prestação de serviços de ativos virtuais no Brasil dependa da constituição de sociedade no país, com sede e administração em território nacional e sujeitas à lei e às autoridades brasileiras.",
+        "Também fixa um vocabulário comum. Stablecoin é o ativo virtual lastreado em ativos de reserva e criado para manter seu valor vinculado a uma moeda fiduciária de referência. Os ativos de reserva são a própria moeda fiduciária e os títulos públicos emitidos pelo mesmo governo. A resolução ainda traz bastante conceitos sobre o mercado de ativos virtuais, tais como carteira de ativos virtuais, chave privada, contrato inteligente e negociação de ativos virtuais.",
+        "As SPSAVs se dividem em três modalidades:",
+        "1 - A intermediária pode subscrever emissões de ativos virtuais, comprar, vender e trocar ativos para terceiros, administrar carteiras, atuar como agente fiduciário, realizar operações de staking e prestar serviços de ativos virtuais no mercado de câmbio.",
+        "2 - A custodiante guarda e controla os instrumentos que dão acesso aos ativos, como as chaves privadas, mantém a posição de cada cliente conciliada com os registros em blockchain, cumpre as ordens de movimentação e trata os eventos que incidem sobre os ativos.",
+        "3 - A corretora reúne intermediação e custódia. Intermediárias e custodiantes não podem combinar atividades de outra modalidade, e nenhuma SPSAV pode oferecer crédito aos clientes, captar recursos do público, salvo por emissão de ações, ou participar do capital de outras instituições financeiras.",
+        "Também foram definidas as estruturas societárias para se tornar uma Sociedade Prestadora de Servicos de Ativos Virtuais. Para se constituir, a SPSAV deve ser sociedade limitada ou anônima, ter como objeto principal as atividades da sua modalidade e contar com pelo menos três diretores responsáveis perante o BC. Esses diretores dividem a responsabilidade pela condução dos negócios, pela prevenção à lavagem de dinheiro e ao financiamento do terrorismo, pelos controles internos e pela conformidade, pela gestão de riscos e de capital e pela segurança cibernética.",
+        "O nome empresarial deve conter a expressão “Sociedade Prestadora de Serviços de Ativos Virtuais”, e a empresa deve informar com clareza, nos canais de atendimento, no sítio e nos aplicativos, sua condição e sua modalidade. A política de governança deve ser documentada, aprovada pela alta administração e revista a cada dois anos. O capital deve ser realizado em moeda corrente.",
+        "Além das SPSAVs, podem prestar intermediação e custódia os bancos comerciais, de câmbio, de investimento e múltiplos.",
+        "Na operação do dia a dia, a resolução atribui à prestadora a responsabilidade pela liquidação das operações nos prazos combinados, pela legitimidade dos ativos ofertados e custodiados, pela segurança e pelo sigilo dos dados, pelos registros de todas as operações e pela legitimidade dos documentos de transferência. Os recursos financeiros dos clientes devem ficar em contas individualizadas, separados dos recursos da empresa, e os ativos virtuais também devem ser segregados, sendo proibido usar ativos de clientes em operações próprias.",
+        "Pelos arts. 29 e 30, a política de segregação deve prever carteiras separadas, métodos de prova de reservas e auditoria independente a cada dois anos, com nível de asseguração razoável.",
+        "Pontos importantes desta Resolução: Dois pontos da Resolução 520 dizem respeito diretamente às stablecoins.",
+        "1 - O primeiro é a travel rule do art. 44: em cada operação, a prestadora deve enviar à instituição recebedora o nome, a conta, o endereço, o CPF ou CNPJ e a carteira do remetente, além do nome, da conta e da carteira do beneficiário. A implementação ocorre em duas etapas: primeiro entre prestadoras brasileiras, em até 365 dias da entrada em vigor, e depois com contrapartes no exterior, em até 365 dias após o fim da primeira etapa (art. 89).",
+        "2 - O segundo ponto é o art. 65, que obriga a prestadora a avaliar, antes de listar uma stablecoin, sua regularidade no país do emissor, eventuais alertas de autoridades ou organismos internacionais, a qualidade do mecanismo de estabilização e a política do emissor para os ativos de reserva.",
+        {
+          "image": "/legal/brasil/bbb233f09c3d9e4965dd.webp",
+          "caption": "Quadro 2. Resolução BCB nº 520 em resumo: como a SPSAV funciona",
+          "width": 900,
+          "height": 1038
+        }
+      ]
+    },
+    {
+      "heading": "V - Resolução 521: as stablecoins dentro do mercado de câmbio",
+      "blocks": [
+        "A Resolução 521 é a que mais afeta os pagamentos com stablecoins. Ela altera a Resolução BCB nº 277, que regulamenta o mercado de câmbio da Lei nº 14.286/2021, e passa a incluir nesse mercado quatro tipos de serviço com ativos virtuais: pagamentos e transferências internacionais; transferências para quitar obrigações decorrentes do uso internacional de cartão ou outro meio de pagamento eletrônico; transferências de ou para carteira autocustodiada; e a compra, a venda ou a troca de ativos virtuais referenciados em moeda fiduciária, isto é, de stablecoins. Pela redação, este último item entra no perímetro cambial mesmo quando a operação não tem nenhum elemento internacional.",
+        "A norma considera pagamento internacional com ativos virtuais tanto a liquidação por mudança de titularidade entre residente e não residente, quanto o envio ou recebimento de ativos para ou do exterior pela mesma pessoa. Quando há uma prestadora estrangeira envolvida, a brasileira deve verificar se ela está sob supervisão prudencial e de conduta efetiva ou, se a jurisdição não exigir isso, documentar sua própria avaliação de risco. A partir de agora, as empresas que prestam serviços de ativos virtuais devem identificar o proprietário de carteira autocustodiada e documentar a verificação da origem e do destino dos ativos",
+        "Há limites por operação. Quando a contraparte não é instituição autorizada a operar câmbio, o pagamento ou a transferência internacional com ativos virtuais fica limitado ao equivalente a US$ 100.000 para as SPSAVs e a US$ 500.000 para as corretoras de câmbio. Bancos podem operar todo o mercado de câmbio, mas só fazem operações cambiais com ativos virtuais se atuarem como prestadores de serviços de ativos virtuais, necessitando, portanto, também de autorização do Banco Central.",
+        "Desde 4 de maio de 2026, a prestadora também precisa obter do cliente a finalidade de cada pagamento, coletar dados sobre o pagador ou recebedor no exterior e reportar as operações ao BC até o dia 5 do mês seguinte.",
+        "Na apresentação das normas à imprensa, o BC destacou que a inclusão dos ativos virtuais nas operações de investimento estrangeiro direto, crédito externo e capitais brasileiros no exterior também alinha as estatísticas do setor externo às recomendações internacionais.",
+        {
+          "image": "/legal/brasil/e0c5947e240a26a59099.webp",
+          "caption": "Quadro 3. Resolução BCB nº 521 em resumo: stablecoins dentro do mercado de câmbio",
+          "width": 900,
+          "height": 936
+        }
+      ]
+    },
+    {
+      "heading": "VI - O impacto no mercado",
+      "blocks": [
+        "Antes mesmo da entrada em vigor das Resoluções, uma pesquisa da Associação Brasileira de Criptoeconomia (ABcripto) com a PwC, divulgada em 28 de novembro de 2025, mostrou que 90% das empresas consultadas viam a regulação como o maior entrave ao avanço do setor, embora 80% considerassem as criptomoedas a tecnologia de maior impacto para seus negócios.",
+        "A reação institucional foi ambígua. As Associações do setor chamaram as resoluções de “marco histórico”, mas criticaram os prazos curtos de adequação e o capital mínimo, cerca de dez vezes maior que o sugerido na consulta pública, fora o custo de permanência das exigências de report e adequacao de compliance e cibersegurança das empresas que pesou mais que o capital inicial.",
+        "Advogados estimaram entre R$ 5 milhões e R$ 10 milhões por ano apenas para manter a estrutura de compliance, valor que pode inviabilizar corretoras médias e pequenas.[",
+        "O efeito mais visível foi a consolidação. Hoje temos apenas 120 empresas que aplicaram para pedido de licença no Banco Central, sendo que destas, cerca de 30% já apresentaram inconsistências regulatórias e devem ter seus pedidos de licença inseridos, segundo falas do Representante do Banco Central, Atilio de Aquino.",
+        "A NovaDAX fechou em junho e levou sua base para a Foxbit, mesmo destino escolhido pela Digitra.com, e a Mynt, braço cripto do BTG Pactual, foi absorvida pelo banco.",
+        "A Coinext encerrou a operação de varejo em outubro, depois de quase uma década; a empresa tinha mais de 420 mil clientes.",
+        "A Bitso transferiu seus clientes para o Mercado Bitcoin e deixou o Brasil, e a Revolut suspendeu sua oferta de criptomoedas no país citando as novas regras. A Binance, por sua vez, disse ao mercado que a redução do número de participantes pode prejudicar a concorrência.",
+        "No mercado doméstico, o volume declarado à Receita não caiu. Pela planilha de dados abertos, as stablecoins movimentaram R$ 52,5 bilhões em maio de 2026, o maior volume mensal da série, e R$ 48,4 bilhões em junho.",
+        {
+          "image": "/legal/brasil/a60a24a1083a0d5ba158.webp",
+          "caption": "Gráfico 3. Volume mensal de stablecoins declarado à Receita Federal (R$ bilhões)",
+          "width": 452,
+          "height": 259
+        },
+        "A Chainalysis chegou a uma leitura semelhante no relatório de 2026. O Brasil assumiu o primeiro lugar mundial no índice de adoção e movimentou US$ 252,5 bilhões nos 12 meses até junho de 2026, muito acima de Argentina (US$ 88,5 bilhões) e México (US$ 77,6 bilhões), apesar de uma leve retração de 1,6% no período.",
+        "Segundo a propria Chainalysis a economia de stablecoins do Brasil cresceu 495%, contra 89,4% no restante da América Latina.",
+        {
+          "image": "/legal/brasil/719258a5cea42eb44537.webp",
+          "caption": "Gráfico 4. Valor em cripto recebido por país na América Latina, 12 meses até junho de 2026",
+          "width": 452,
+          "height": 164
+        }
+      ]
+    },
+    {
+      "heading": "VII - Stablecoins como infraestrutura financeira",
+      "blocks": [
+        "O relatório State of Crypto 2025 da a16z crypto descreve as stablecoins como a forma mais rápida, barata e global de transferir um dólar, em menos de um segundo e por menos de um centavo. Segundo o relatório, elas movimentaram US$ 46 trilhões em 12 meses, alta de 106%, ou US$ 9 trilhões em base ajustada, que tenta excluir robôs e atividade inflada. Esse valor ajustado é mais de cinco vezes o volume do PayPal e mais da metade do da Visa, ressalvado que se trata sobretudo de fluxos financeiros, e não de pagamentos de varejo. A oferta total superava US$ 300 bilhões, com 87% concentrados em Tether e USDC. Mais de 1% de todos os dólares americanos já existiam como stablecoins, que somavam mais de US$ 150 bilhões em títulos do Tesouro dos EUA e eram o 17º maior detentor desses títulos.",
+        "O painel interativo do mesmo relatório, que a a16z atualiza todo mês, permite acompanhar essa evolução. Ele mede o valor das transferências on-chain de stablecoins por rede, com dados da Allium, e também exclui atividade inorgânica. Pela série baixada do painel, o volume mensal ajustado chegou a US$ 305,3 bilhões em setembro de 2026, 45% acima dos US$ 210,1 bilhões de setembro de 2025.",
+        {
+          "image": "/legal/brasil/120af25ddd24fdcec287.webp",
+          "caption": "Gráfico 5. Volume mensal ajustado de stablecoins no mundo, segundo o painel da a16z (US$ bilhões)",
+          "width": 452,
+          "height": 261
+        },
+        "O mesmo painel mostra onde esse volume circula. Nos 12 meses até setembro de 2026, a rede Tron concentrou cerca de 64% do volume ajustado, seguida por Ethereum (13%), Solana (8%) e BNB Chain (6%). Isso importa para o Brasil, porque a USDT, que domina o volume declarado à Receita, circula em grande parte nessas redes. As obrigações da Resolução 521 e da travel rule, portanto, incidem justamente sobre os trilhos que mais movimentam stablecoins no mundo.",
+        {
+          "image": "/legal/brasil/19b9fcf3890f4211acf9.webp",
+          "caption": "Gráfico 6. Volume ajustado de stablecoins por rede, outubro de 2025 a setembro de 2026",
+          "width": 452,
+          "height": 227
+        },
+        "No Brasil, a infraestrutura de stablecoins se conectou ao Pix. Na entrevista ao podcast Future of Money, Hector Fardin, cofundador da Avenia, descreveu o que o mercado chama de “stablecoin sandwich”: a empresa recebe reais via Pix, converte-os em stablecoin de dólar e usa parceiros para liquidar em moeda local no exterior, por ACH, wire ou SEPA, sem que nenhuma das pontas precise lidar com criptoativos. Segundo ele, a vantagem é substituir o trecho Swift por um trilho mais rápido e barato e oferecer câmbio 24 horas por dia, inclusive em fins de semana, ainda que com menos liquidez nesses horários.",
+        "A Chainalysis aponta sinais de uso de varejo no Brasil: as transferências entre pessoas de US$ 100 a US$ 1 mil cresceram 666%, e as carteiras com pelo menos US$ 10 mil em stablecoins aumentaram 347% desde julho de 2024.",
+        "A Receita registra mais de 185 milhões de operações com stablecoins entre 2019 e 2025."
+      ]
+    },
+    {
+      "heading": "VIII - Considerações finais",
+      "blocks": [
+        "Um ano depois da publicação, as Resoluções 519, 520 e 521 cumpriram o papel de tirar o setor da zona cinzenta. As prestadoras passaram a ter as mesmas exigências de governança, capital e controles de uma instituição financeira, e as stablecoins, que já eram o principal instrumento do mercado, foram incorporadas à lógica do câmbio. O custo dessa transição foi a saída de várias plataformas e a concentração do mercado em menos participantes, com mais capital. A concentração e o controle desse mercado ficaram nas mãos de grandes bancos e grandes empresas internacionais que detinham capacidade econômica e financeira de atender às enormes exigências do Banco Central. Quem perdeu foi o mercado, que foi sufocado pela Regulação. infelizmente, o regulador não teve o equilíbrio necessário entre proteger usuários e ditar as regras do jogo e, ao mesmo tempo, impedir o avanço da tecnologia, deixando o Brasil em uma posição de ter uma das regulações mais severas do mundo, sobre o mercado de ativos virtuais.",
+        "O mercado perdeu muito, apesar de ser ainda muito cedo para termos dados de retração do uso de stablecoins no Brasil. E essa não é a tendência. A tendência é a adoção aumentar cada vez mais. Mas, a concentração das operações serem conduzidas por grandes bancos, ceifando a concorrência de mercado, impedindo a liberdade de escolha do cidadão e a liberdade econômica do país.",
+        "Os próximos marcos devem definir o desenho final do mercado: a retenção de 24 horas e as regras prudenciais a partir de 1º de janeiro de 2027, a segunda etapa da travel rule, as decisões do BC sobre os pedidos de autorização, o destino do PL 4.308/2024 e eventual decreto sobre IOF.",
+        "Estamos acompanhando de perto as mudanças."
+      ]
+    }
+  ]
+}

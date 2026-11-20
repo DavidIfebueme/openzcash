@@ -14,7 +14,7 @@ export function LegalNewsroom({ feed }: { feed: LegalFeed }) {
   const q = params.get("q") ?? "";
   const sourceId = feed.sources.some(source => source.id === params.get("source")) ? params.get("source")! : "";
   const update = (changes: Record<string, string>) => {
-    const next = new URLSearchParams(params.toString());
+    const next = new URLSearchParams(window.location.search);
     for (const [key, value] of Object.entries(changes)) {
       if (value && value !== "all") next.set(key, value);
       else next.delete(key);
@@ -59,8 +59,8 @@ export function LegalNewsroom({ feed }: { feed: LegalFeed }) {
         {shown.slice(0, limit).map(item => <article key={item.id} className={styles.article}>
           <div className={styles.articleMeta}><time dateTime={item.publishedAt}>{legalItemDate(item)}</time><span>{item.jurisdictions.join(" · ")}</span></div>
           <div className={styles.articleBody}>
-            <div className={styles.sourceLine}><span>{sources.get(item.sourceId)?.name ?? item.sourceId}</span><span aria-hidden="true">·</span><span>{item.kind}</span></div>
-            <h2><a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}<span aria-hidden="true">↗</span><span className={styles.srOnly}> (opens source in a new tab)</span></a></h2>
+            <div className={styles.sourceLine}><span>{sources.get(item.sourceId)?.name ?? item.sourceId}</span><span aria-hidden="true">·</span><span>{item.kind}</span>{item.contributor && <><span aria-hidden="true">·</span><span>{item.contributor}</span></>}</div>
+            <h2>{item.reader ? <a href={item.reader + (params.size ? "?" + params.toString() : "")}>{item.title}<span aria-hidden="true">→</span></a> : <a href={item.url} target="_blank" rel="noopener noreferrer">{item.title}<span aria-hidden="true">↗</span><span className={styles.srOnly}> (opens source in a new tab)</span></a>}</h2>
             <p className={styles.summary}>{item.summary}</p>
             <div className={styles.articleFoot}><span className={styles.status} data-status={item.status}>{item.status}</span>{item.effectiveAt && <span>Applies from {legalDate(item.effectiveAt)}</span>}{item.reportingPeriod && <span>{item.reportingPeriod}</span>}</div>
             {item.sourceUpdatedAt && item.dateBasis !== "updated" && <p className={styles.context}>Publisher updated this source on {legalDate(item.sourceUpdatedAt)}.</p>}

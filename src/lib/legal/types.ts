@@ -14,10 +14,12 @@ export type LegalItem = {
   title: string;
   summary: string;
   url: string;
+  reader?: string;
+  contributor?: string;
   sourceId: string;
   publishedAt: string;
   /** Date semantics: publication, publisher update, memo week or labeled archive date. */
-  dateBasis?: "published" | "updated" | "reporting-period" | "source-date";
+  dateBasis?: "published" | "updated" | "reporting-period" | "source-date" | "received";
   /** Publisher timestamp, separately preserved when a first-publication date exists. */
   sourceUpdatedAt?: string;
   /** A later observed source revision does not renew the earlier editorial review. */
@@ -25,7 +27,7 @@ export type LegalItem = {
   regions: LegalRegion[];
   jurisdictions: string[];
   topics: LegalTopic[];
-  kind: "Policy memo" | "Regulation" | "Court ruling" | "Consultation" | "Official update";
+  kind: "Country report" | "Forum post" | "Policy memo" | "Regulation" | "Court ruling" | "Consultation" | "Official update";
   status: LegalStatus;
   /** Dated statement of what the source establishes; not a country legality rating. */
   statusDetail?: string;
@@ -38,7 +40,7 @@ export type LegalSource = {
   id: string;
   name: string;
   url: string;
-  role: "Advocacy & analysis" | "Primary authority";
+  role: "Contributor analysis" | "Advocacy & analysis" | "Primary authority";
   mode: "live" | "curated";
 };
 export type LegalFeed = {

@@ -25,7 +25,9 @@ describe("Legal newsroom", () => {
   });
   it("features PGP before the shared feed and links signup to its official site", () => {
     const html = renderToStaticMarkup(<LegalPage feed={feed}/>);
-    expect(html.indexOf('id="pgp"')).toBeLessThan(html.indexOf('id="updates"'));
+    expect(html).toContain('id="pgp"');
+    expect(html.indexOf('id="pgp"')).toBeLessThan(html.indexOf('id="brasil"'));
+    expect(html.indexOf('id="brasil"')).toBeLessThan(html.indexOf('id="updates"'));
     expect(html).toContain('https://community.pgpz.org/signin?callbackUrl=%2F&amp;reason=signup');
     expect(html).toContain('Join PGP by email');
     expect(html).toContain('Memos and reports are public.');

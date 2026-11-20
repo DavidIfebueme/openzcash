@@ -1,12 +1,30 @@
 # Privacy & Policy
 
-`/legal` is one Updates desk, placed directly after ZEC Observatory in desktop, mobile and command-palette navigation. PGPZ appears first in an editorial feature. `/legal/pgp` redirects to the same desk with `source=pgp`, preserving search, topic and region filters. There is no second PGP page or tab.
+`/legal` is one Updates desk, placed directly after ZEC Observatory in desktop, mobile and command-palette navigation. The latest Brazil report and selected forum readings lead the page. Equal-sized source cards identify both contributors. Sources & coverage links to the PGPZ archive and email signup. `/legal/pgp` redirects to the same desk with `source=pgp`, preserving search, topic and region filters. There is no second PGP page or tab.
 
 ## PGP and email access
 
-Pretty Good Policy for Zcash is an independent source of education, analysis and advocacy. The feature uses its official logo unchanged, links its public website, and highlights the newest dated public item. **Join PGP by email** opens the official community signup at `https://community.pgpz.org/signin?callbackUrl=%2F&reason=signup`.
+Pretty Good Policy for Zcash is an independent source of education, analysis and advocacy. The PGPZ card uses its official logo and links to the newest selected forum post. **Join PGP by email** opens the official community signup at `https://community.pgpz.org/signin?callbackUrl=%2F&reason=signup`.
 
 Verified on 15 October 2026: PGPZ now advertises public memos and special reports at `https://pgpz.org/updates`, and invites visitors to join its community to receive policy memos by email. The signup is on PGPZ; OpenZcash does not collect email addresses or submit subscription forms.
+
+## Como contribuir com a Policy Brazil
+
+A colaboradora pode entregar o texto em português no documento que já usa. Em cada entrega, enviar o título, a assinatura desejada, a data, as fontes oficiais e a versão final dos gráficos. Se houver uma edição em inglês, enviá-la junto. Para quem já publica em um site ou tópico público próprio, basta compartilhar o link permanente da edição e indicar as revisões.
+
+Para importar um DOCX no formato do primeiro relatório, usar Python 3 e `cwebp` (WebP). O exemplo abaixo extrai o título, o subtítulo, as seções numeradas e as figuras com suas legendas.
+
+```sh
+python3 scripts/legal/import-report.py "/caminho/relatorio.docx" regulacao-novembro.pt
+```
+
+O editor confere a edição em `data/legal/reports/` e a registra em `data/legal/reports.json`. Cada edição contém título, subtítulo e seções com parágrafos e figuras. Os gráficos ficam em `public/legal/`. O catálogo aceita a fonte original (arquivo local ou URL pública), o crédito acordado, os temas e uma referência oficial. O campo `english` pode ficar vazio. Manter o mesmo slug ao corrigir um relatório preserva os links compartilhados.
+
+O relatório mais recentemente recebido ganha o destaque. A mesma entrada aparece em All regions, LATAM, na busca e nos filtros de tema e fonte. A data de recebimento tem rótulo próprio. O primeiro relatório veio de dois DOCX e um PDF em inglês. Os dois DOCX identificam Open Zcash Brasil como criador e Miris Bensiman como última editora. O PDF credita Open Zcash Brasil. A equipe confirmou Miris Bensiman como autora do artigo. A assinatura editorial usa seu nome em texto e a marca-d’água do documento. Os perfis públicos são os divulgados em https://linktr.ee/mirisbensiman. As opiniões e os dados de mercado são os do texto entregue.
+
+## Forum reading copies
+
+Select a post by its topic and post number in `data/legal/forum/posts.json`. Run `node scripts/legal/refresh-forum.mjs` from the repository root and review the diff. The importer checks the topic and the public author's handle, retains source dates and Markdown, and writes the snapshot after all selected posts are retrieved. The reader reuses the proposal renderer. Readers can follow the exact post link for the current version, responses and attachments. The daily regulator collector has a separate schedule.
 
 ## Coverage
 
@@ -51,7 +69,7 @@ Current source check: `docs/audits/2026-10-15-legal-collection.json`. ANPD and E
 
 Initial audit: `docs/audits/2026-10-05-zcash-legal-sources.json`. Signup/brand audit: `docs/audits/2026-10-05-pgp-signup.json`.
 
-Official logo: `https://pgpz.org/assets/brand/pgpz-primary-on-dark-2048w.png`, saved unchanged at `public/logos/pgpz.png`. Decorative circles and the editorial panel are site styling, not a recreated PGP logo.
+Official logo: `https://pgpz.org/assets/brand/pgpz-primary-on-dark-2048w.png`, saved unchanged at `public/logos/pgpz.png`.
 
 ## Verification
 

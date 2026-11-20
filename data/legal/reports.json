@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "regulacao-crypto-no-brasil",
+    "title": "O início da regulação crypto no Brasil",
+    "summary": "The report examines how Brazil’s central bank regulates crypto providers and how the new rules affect the use of stablecoins.",
+    "received": "2026-11-20",
+    "byline": "Open Zcash Brasil",
+    "portuguese": "brasil.pt",
+    "english": "brasil.en",
+    "original": "/legal/brasil/crypto-regulation.en.pdf",
+    "originalLabel": "PDF original (EN)",
+    "reference": "https://www.bcb.gov.br/detalhenoticia/20918/nota",
+    "referenceLabel": "Banco Central do Brasil · Resoluções 519, 520 e 521",
+    "topics": [
+      "Regulation",
+      "Policy"
+    ],
+    "author": "Miris Bensiman",
+    "watermark": "/legal/brasil/report-watermark.webp",
+    "socials": [
+      {
+        "label": "LinkedIn",
+        "url": "https://br.linkedin.com/in/miris-bensiman-digitalassetslawyer"
+      },
+      {
+        "label": "Instagram",
+        "url": "https://www.instagram.com/miris_bensiman/"
+      },
+      {
+        "label": "YouTube",
+        "url": "https://www.youtube.com/@mirisbensiman"
+      }
+    ]
+  }
+]

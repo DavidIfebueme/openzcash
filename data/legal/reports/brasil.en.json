@@ -1,0 +1,158 @@
+{
+  "title": "THE BEGINNING OF CRYPTO REGULATION IN BRAZIL",
+  "subtitle": "Law 14.478/2022, BCB Resolutions 519, 520, and 521, and the transformation of stablecoins into financial infrastructure in Brazil",
+  "sections": [
+    {
+      "heading": "I - Introduction",
+      "blocks": [
+        "The regulation of crypto-assets in Brazil began with Law No. 14.478 of December 21, 2022, known as the legal framework for crypto-assets. The law, however, was predominantly conceptual and principle-based: it defined what a virtual asset and a virtual asset service provider are and set general guidelines, but it did not establish the rules of the game, that is, the authorization, governance, capital, and operational requirements that companies would have to meet. One of the most relevant points of Law 14.478/22 came later, with a subsequent presidential decree, No. 11.563 of June 13, 2023, which granted the Central Bank of Brazil the authority to regulate, authorize, and supervise the virtual asset market in the country.[11] What was still missing, therefore, was for the Central Bank itself to write these rules, which it did through its resolutions.",
+        "These rules came on November 10, 2025. After a long public consultation process, the Central Bank of Brazil published three resolutions that, together, form the first complete regulatory regime for the Brazilian virtual asset market.",
+        "BCB Resolution No. 519 addresses the authorization processes.",
+        "BCB Resolution No. 520 governs the establishment and operation of virtual asset service provider companies (the SPSAVs) and the provision of these services by other authorized institutions.",
+        "BCB Resolution No. 521 brings a portion of the operations with virtual assets, notably stablecoins, into the foreign exchange market and the international capital rules. All three entered into force on February 2, 2026, except for certain reporting provisions of Resolution 521, which have applied since May 4, 2026.",
+        "With this package, the Central Bank exercised the authority it received from Decree No. 11.563/2023 and gave practical substance to Law No. 14.478/2022. The regulator’s stated discourse when publishing these Resolutions was to offer users protection and operational security without imposing restrictions that would prevent the efficient development of the Brazilian market."
+      ]
+    },
+    {
+      "heading": "II - The starting point: the stablecoin market in Brazil",
+      "blocks": [
+        "When the resolutions were published, the Brazilian crypto-asset market had already changed in nature. In February 2025, the president of the Central Bank, Gabriel Galípolo, stated that about 90% of the crypto-asset flow observed in Brazil was linked to stablecoins.",
+        "The data reported to the Federal Revenue Service (Receita Federal) confirm the trend. In June 2026, the Federal Revenue Service reported that, between August 2019 and December 2025, about R$ 1.58 trillion in purchases and sales of the main crypto-assets was declared, of which approximately R$ 1.13 trillion (71.7%) corresponded to stablecoins. The share of stablecoins in monthly volume rose from 3.5% in 2019 to 79.7% in 2022 and reached 91.5% in 2023, stabilizing between 76% and 80% in 2024 and 2025.[14]",
+        "According to the most recent file made available by the Federal Revenue Service, stablecoin volume was R$ 368.4 billion in 2025. In the first half of 2026, volume already totaled R$ 239.9 billion, and stablecoins accounted for 92% of the total volume of the main crypto-assets.",
+        {
+          "image": "/legal/brasil/e49f07d2690f3d40f3c6.webp",
+          "caption": "Chart 1. Annual stablecoin volume declared to the Federal Revenue Service (R$ billions)",
+          "width": 452,
+          "height": 234
+        },
+        "The market is also highly concentrated. Tether (USDT), referenced to the dollar, accounted for 88.7% of all declared stablecoin volume between August 2019 and December 2025, about R$ 1 trillion. Next come USD Coin (USDC), with 7.1%, and Brazilian Digital Token (BRZ), with 3.4%, which is the main stablecoin referenced to the real in the set analyzed.",
+        "The Federal Revenue Service also recorded 185.7 million stablecoin transactions in the period and noted that a significant portion of this volume passes through providers headquartered outside the country.",
+        {
+          "image": "/legal/brasil/f8e4c3547fb7649a592c.webp",
+          "caption": "Chart 2. Composition of declared stablecoin volume in Brazil",
+          "width": 452,
+          "height": 188
+        },
+        "The international comparison shows Brazil’s scale in this market. According to the 2025 edition of the Chainalysis report, the country received US$ 318.8 billion in crypto-assets between July 2024 and June 2025, about one-third of all activity in Latin America and an increase of 109.9% over the previous period, and it rose from 10th to 5th place in the global adoption index."
+      ]
+    },
+    {
+      "heading": "III - Resolution 519: the gateway into the regulated system",
+      "blocks": [
+        "Resolution 519 of the Central Bank of Brazil defines who may apply for authorization and what must be demonstrated. It does not deal only with SPSAVs: it also covers foreign exchange brokerage firms and securities brokerage and dealer firms, which places virtual asset companies in the same authorization process used for traditional financial institutions.",
+        "The authorization requirements follow the logic of the financial system. Controllers must have economic and financial capacity compatible with the capital needed to structure and operate the institution and to face market contingencies, and the funds used to pay in the capital and to acquire control or a qualifying holding must be of lawful origin. The venture must be viable, the technology infrastructure and the governance structure must be compatible with the complexity and risks of the business, and managers, controllers, and holders of qualifying holdings must have an unblemished reputation. It is further required that management know the industry, the market dynamics, and the risks involved, that managers have technical qualifications, that the minimum capital and equity requirements be met, and that the headquarters have a declared physical address.",
+        "The rule also lists the acts that depend on the Central Bank prior authorization. In addition to operation itself, this list includes the change of the SPSAV’s modality, the transfer or change of control, merger, spin-off, absorption, and corporate transformation transactions, the taking of office by managers, the change in share capital, the change of corporate name, and the change of corporate purpose to another type of regulated institution. The Central Bank disclosed the documents and deadlines for each process through BCB Normative Instruction No. 704 of January 29, 2026.",
+        "One of the most sensitive points of the requirements is the definition of control. A controller is whoever holds, alone or in a group, shareholder rights corresponding to the majority of the voting capital, directly in the case of a natural person or, in the case of a legal entity, also indirectly, provided that it is at the last level of the control chain.",
+        "For managers, the resolution requires residence in the country, the absence of legal impediments and of convictions for certain crimes, not being disqualified or suspended from holding positions in financial institutions, not being bankrupt or insolvent, and not having had an authorization denied or reviewed by the Central Bank in the previous three years. In the reputational analysis, the Central Bank considers the existence of criminal proceedings or inquiries, of proceedings related to the financial system, to the payment system, or to the provision of virtual asset services, of insolvency proceedings, and of defaults, taking into account the relevance, severity, recurrence, and circumstances of each case.",
+        "For those already operating on February 2, 2026, the analysis takes place in two phases (art. 26). In the first, the Central Bank verifies whether the company was in fact active on the cutoff date, examines the reputation of controllers and holders of qualifying holdings, and checks compliance with the minimum capital. In the second, it analyzes the remaining requirements.",
+        "Minimum capital was the point that had the greatest repercussion in the virtual asset market in Brazil. The amount of minimum capital required for SPSAVs ranges from R$ 10.8 million to R$ 37.2 million, depending on the set of activities, far above the range of R$ 1 million to R$ 3 million that was discussed in the public consultations prior to the Resolutions.",
+        {
+          "image": "/legal/brasil/fcd1b9bcaefcda8ea72d.webp",
+          "caption": "Box 1. BCB Resolution No. 519 in summary: the path to authorization",
+          "width": 900,
+          "height": 988
+        }
+      ]
+    },
+    {
+      "heading": "IV - Resolution 520: how the SPSAV must operate",
+      "blocks": [
+        "Resolution 520 is the most extensive of the three. It determines that the provision of virtual asset services in Brazil depends on the establishment of a company in the country, with headquarters and management in national territory and subject to Brazilian law and authorities.",
+        "It also establishes a common vocabulary. A stablecoin is a virtual asset backed by reserve assets and created to keep its value linked to a reference fiat currency. Reserve assets are the fiat currency itself and the government securities issued by the same government. The resolution also contains a considerable number of concepts about the virtual asset market, such as virtual asset wallet, private key, smart contract, and virtual asset trading.",
+        "SPSAVs are divided into three modalities:",
+        "1 - The intermediary may underwrite issuances of virtual assets, buy, sell, and exchange assets for third parties, manage portfolios, act as a fiduciary agent, carry out staking operations, and provide virtual asset services in the foreign exchange market.",
+        "2 - The custodian safeguards and controls the instruments that provide access to the assets, such as private keys, keeps each client’s position reconciled with the blockchain records, carries out transfer orders, and handles the events affecting the assets.",
+        "3 - The broker combines intermediation and custody. Intermediaries and custodians may not combine activities of another modality, and no SPSAV may offer credit to clients, raise funds from the public, except through the issuance of shares, or hold equity in other financial institutions.",
+        "The corporate structures for becoming a Virtual Asset Service Provider Company were also defined. To be established, the SPSAV must be a limited liability company or a corporation, have as its main purpose the activities of its modality, and have at least three directors accountable to the Central Bank. These directors share responsibility for the conduct of business, for the prevention of money laundering and terrorist financing, for internal controls and compliance, for risk and capital management, and for cybersecurity.",
+        "The corporate name must contain the expression “Sociedade Prestadora de Serviços de Ativos Virtuais” (Virtual Asset Service Provider Company), and the company must clearly disclose its status and its modality in its customer service channels, on its website, and in its apps. The governance policy must be documented, approved by senior management, and reviewed every two years. Capital must be paid in national currency.",
+        "In addition to SPSAVs, commercial banks, foreign exchange banks, investment banks, and multiple-service banks may provide intermediation and custody.",
+        "In day-to-day operations, the resolution assigns to the provider responsibility for settling transactions within the agreed time frames, for the legitimacy of the assets offered and held in custody, for the security and confidentiality of data, for the records of all transactions, and for the legitimacy of transfer documents. Clients’ financial resources must be kept in individualized accounts, separate from the company’s resources, and virtual assets must also be segregated, it being prohibited to use client assets in proprietary operations.",
+        "Under arts. 29 and 30, the segregation policy must provide for separate wallets, proof-of-reserves methods, and an independent audit every two years, with a reasonable level of assurance.",
+        "Important points of this Resolution: Two points of Resolution 520 directly concern stablecoins:",
+        "1 - The first is the travel rule of art. 44: in each transaction, the provider must send to the receiving institution the originator’s name, account, address, CPF or CNPJ (Brazilian individual or corporate taxpayer ID), and wallet, as well as the beneficiary’s name, account, and wallet. Implementation takes place in two stages: first among Brazilian providers, within 365 days of entry into force, and then with counterparties abroad, within 365 days after the end of the first stage (art. 89).",
+        "2 - The second point is art. 65, which requires the provider to assess, before listing a stablecoin, its regulatory standing in the issuer’s country, any alerts from authorities or international bodies, the quality of the stabilization mechanism, and the issuer’s policy for reserve assets.",
+        {
+          "image": "/legal/brasil/bbb233f09c3d9e4965dd.webp",
+          "caption": "Box 2. BCB Resolution No. 520 in summary: how the SPSAV operates",
+          "width": 900,
+          "height": 1038
+        }
+      ]
+    },
+    {
+      "heading": "V - Resolution 521: stablecoins within the foreign exchange market",
+      "blocks": [
+        "Resolution 521 is the one that most affects stablecoin payments. It amends BCB Resolution No. 277, which regulates the foreign exchange market under Law No. 14.286/2021, and brings into this market four types of service with virtual assets: international payments and transfers; transfers to settle obligations arising from the international use of a card or other electronic means of payment; transfers from or to a self-custodied wallet; and the purchase, sale, or exchange of virtual assets referenced to fiat currency, that is, stablecoins. By its wording, this last item falls within the foreign exchange perimeter even when the transaction has no international element.",
+        "The rule considers an international payment with virtual assets to be both settlement by change of ownership between a resident and a non-resident and the sending or receiving of assets to or from abroad by the same person. When a foreign provider is involved, the Brazilian provider must verify whether it is under effective prudential and conduct supervision or, if the jurisdiction does not require this, document its own risk assessment. From now on, companies that provide virtual asset services must identify the owner of a self-custodied wallet and document the verification of the origin and destination of the assets.",
+        "There are per transaction limits. When the counterparty is not an institution authorized to operate in foreign exchange, an international payment or transfer with virtual assets is limited to the equivalent of US$ 100,000 for SPSAVs and US$ 500,000 for foreign exchange brokerage firms. Banks may operate across the entire foreign exchange market, but they only carry out foreign exchange transactions with virtual assets if they act as virtual asset service providers, and they therefore also need authorization from the Central Bank.",
+        "Since May 4, 2026, the provider must also obtain from the client the purpose of each payment, collect data on the payer or recipient abroad, and report the transactions to the Central Bank by the 5th of the following month.",
+        "When presenting the rules to the press, the Central Bank highlighted that the inclusion of virtual assets in foreign direct investment, external credit, and Brazilian capital abroad transactions also aligns external sector statistics with international recommendations.",
+        {
+          "image": "/legal/brasil/e0c5947e240a26a59099.webp",
+          "caption": "Box 3. BCB Resolution No. 521 in summary: stablecoins within the foreign exchange market",
+          "width": 900,
+          "height": 936
+        }
+      ]
+    },
+    {
+      "heading": "VI - The impact on the market",
+      "blocks": [
+        "Even before the Resolutions entered into force, a survey by the Brazilian Association of Cryptoeconomics (ABcripto) with PwC, released on November 28, 2025, showed that 90% of the companies surveyed saw regulation as the greatest obstacle to the sector’s advancement, although 80% considered cryptocurrencies the technology with the greatest impact on their businesses.",
+        "The institutional reaction was ambiguous. The sector’s Associations called the resolutions a “historic milestone,” but criticized the short adaptation deadlines and the minimum capital, about ten times higher than that suggested in the public consultation, not to mention the ongoing cost of the reporting requirements and of the companies’ compliance and cybersecurity adaptation, which weighed more than the initial capital.",
+        "Lawyers estimated between R$ 5 million and R$ 10 million per year just to maintain the compliance structure, an amount that could make medium-sized and small exchanges unviable.[",
+        "The most visible effect was consolidation. Today we have only 120 companies that have applied for a license from the Central Bank, and of these, about 30% have already presented regulatory inconsistencies and should have their license applications inserted, according to statements by the Central Bank Representative, Atilio de Aquino.",
+        "NovaDAX closed in June and took its customer base to Foxbit, the same destination chosen by Digitra.com, and Mynt, BTG Pactual’s crypto arm, was absorbed by the bank.",
+        "Coinext shut down its retail operation in October, after almost a decade; the company had more than 420,000 clients.",
+        "Bitso transferred its clients to Mercado Bitcoin and left Brazil, and Revolut suspended its cryptocurrency offering in the country, citing the new rules. Binance, for its part, told the market that the reduction in the number of participants could harm competition.",
+        "In the domestic market, the volume declared to the Federal Revenue Service did not fall. According to the open data spreadsheet, stablecoins moved R$ 52.5 billion in May 2026, the highest monthly volume in the series, and R$ 48.4 billion in June.",
+        {
+          "image": "/legal/brasil/a60a24a1083a0d5ba158.webp",
+          "caption": "Chart 3. Monthly stablecoin volume declared to the Federal Revenue Service (R$ billions)",
+          "width": 452,
+          "height": 259
+        },
+        "Chainalysis reached a similar reading in its 2026 report. Brazil took first place worldwide in the adoption index and moved US$ 252.5 billion in the 12 months through June 2026, far above Argentina (US$ 88.5 billion) and Mexico (US$ 77.6 billion), despite a slight decline of 1.6% in the period.",
+        "According to Chainalysis itself, Brazil’s stablecoin economy grew 495%, compared with 89.4% in the rest of Latin America.",
+        {
+          "image": "/legal/brasil/719258a5cea42eb44537.webp",
+          "caption": "Chart 4. Crypto value received by country in Latin America, 12 months through June 2026",
+          "width": 452,
+          "height": 164
+        }
+      ]
+    },
+    {
+      "heading": "VII - Stablecoins as financial infrastructure",
+      "blocks": [
+        "The State of Crypto 2025 report by a16z crypto describes stablecoins as the fastest, cheapest, and most global way to transfer a dollar, in less than a second and for less than a cent. According to the report, they moved US$ 46 trillion in 12 months, an increase of 106%, or US$ 9 trillion on an adjusted basis, which seeks to exclude bots and inflated activity. This adjusted figure is more than five times PayPal’s volume and more than half of Visa’s, with the caveat that it consists mainly of financial flows, not retail payments. Total supply exceeded US$ 300 billion, with 87% concentrated in Tether and USDC. More than 1% of all US dollars already existed as stablecoins, which held more than US$ 150 billion in US Treasury securities and were the 17th largest holder of these securities.",
+        "The interactive dashboard of the same report, which a16z updates every month, makes it possible to track this evolution. It measures the value of on-chain stablecoin transfers by network, with data from Allium, and also excludes inorganic activity. According to the series downloaded from the dashboard, adjusted monthly volume reached US$ 305.3 billion in September 2026, 45% above the US$ 210.1 billion of September 2025.",
+        {
+          "image": "/legal/brasil/120af25ddd24fdcec287.webp",
+          "caption": "Chart 5. Adjusted monthly stablecoin volume worldwide, according to the a16z dashboard (US$ billions)",
+          "width": 452,
+          "height": 261
+        },
+        "The same dashboard shows where this volume circulates. In the 12 months through September 2026, the Tron network concentrated about 64% of the adjusted volume, followed by Ethereum (13%), Solana (8%), and BNB Chain (6%). This matters for Brazil, because USDT, which dominates the volume declared to the Federal Revenue Service, circulates largely on these networks. The obligations of Resolution 521 and of the travel rule, therefore, apply precisely to the rails that move the most stablecoins in the world.",
+        {
+          "image": "/legal/brasil/19b9fcf3890f4211acf9.webp",
+          "caption": "Chart 6. Adjusted stablecoin volume by network, October 2025 to September 2026",
+          "width": 452,
+          "height": 227
+        },
+        "In Brazil, stablecoin infrastructure has connected to Pix. In an interview with the Future of Money podcast, Hector Fardin, co-founder of Avenia, described what the market calls a “stablecoin sandwich”: the company receives reais via Pix, converts them into a dollar stablecoin, and uses partners to settle in local currency abroad, via ACH, wire, or SEPA, without either end needing to deal with crypto-assets. According to him, the advantage is replacing the Swift leg with a faster and cheaper rail and offering foreign exchange 24 hours a day, including on weekends, albeit with less liquidity during those hours.",
+        "Chainalysis points to signs of retail use in Brazil: person-to-person transfers of US$ 100 to US$ 1,000 grew 666%, and wallets with at least US$ 10,000 in stablecoins have increased 347% since July 2024.",
+        "The Federal Revenue Service records more than 185 million stablecoin transactions between 2019 and 2025."
+      ]
+    },
+    {
+      "heading": "VIII - Final considerations",
+      "blocks": [
+        "One year after their publication, Resolutions 519, 520, and 521 fulfilled the role of taking the sector out of the gray zone. Providers came to have the same governance, capital, and control requirements as a financial institution, and stablecoins, which were already the market’s main instrument, were incorporated into the logic of foreign exchange. The cost of this transition was the exit of several platforms and the concentration of the market among fewer participants, with more capital. The concentration and control of this market ended up in the hands of large banks and large international companies that had the economic and financial capacity to meet the Central Bank’s enormous requirements. The one that lost was the market, which was stifled by Regulation. Unfortunately, the regulator did not have the necessary balance between protecting users and setting the rules of the game and, at the same time, hindering the advancement of technology, leaving Brazil in the position of having one of the most severe regulations in the world on the virtual asset market.",
+        "The market lost a great deal, although it is still too early for us to have data on a decline in the use of stablecoins in Brazil. And that is not the trend. The trend is for adoption to increase more and more. But operations are being concentrated and conducted by large banks, cutting off market competition and preventing citizens’ freedom of choice and the country’s economic freedom.",
+        "The next milestones should define the final design of the market: the 24-hour retention and the prudential rules starting January 1, 2027, the second stage of the travel rule, the Central Bank’s decisions on authorization applications, the fate of Bill PL 4.308/2024, and a possible decree on IOF (Tax on Financial Operations).",
+        "We are closely following the changes."
+      ]
+    }
+  ]
+}

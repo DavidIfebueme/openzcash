@@ -270,6 +270,8 @@ export function placeOf(pathname: string): Place | undefined {
     : undefined;
   const detail = DETAILS[pathname] ?? (opportunityLabel ? {parent:"/opportunities",label:opportunityLabel} : undefined) ?? (/^\/ecosystem\/history\/[a-z0-9-]+$/.test(pathname)
     ? { parent: "/ecosystem/history", label: "Project history" }
+    : /^\/legal\/read\/[a-z0-9-]+$/.test(pathname)
+    ? { parent: "/legal", label: "Policy reading" }
     : /^\/coinholders\/proposals\/[1-9]\d*$/.test(pathname)
     ? { parent: "/coinholders/proposals", label: "Proposal detail" }
     : /^\/coinholders\/verify\/[a-z0-9-]+\/[^/]+$/.test(pathname)
