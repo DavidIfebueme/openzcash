@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LEGAL_ITEMS, LEGAL_SOURCES } from "@/lib/legal/curated";
+import { withLegalReadings } from "@/lib/legal/readings";
 import type { LegalFeed } from "@/lib/legal/types";
 const location = vi.hoisted(() => ({ query: "" }));
 vi.mock("next/navigation", () => ({ useSearchParams: () => new URLSearchParams(location.query) }));
@@ -58,4 +59,28 @@ describe("Legal newsroom", () => {
     expect(html.match(/Week of 28 Sept? 2026/g)).toHaveLength(2);
   });
 
+  it("shows both editions of a matching report once and keeps the language filter in reader links", () => {
+    location.query = "source=brazil-reports&language=en";
+    const html = renderToStaticMarkup(<LegalNewsroom feed={withLegalReadings(feed)}/>);
+    expect(html.match(/<article /g)).toHaveLength(1);
+    expect(html).toMatch(/href="[^"]+source=brazil-reports&amp;language=en&amp;lang=en" hrefLang="en"/i);
+    expect(html).toMatch(/href="[^"]+source=brazil-reports&amp;language=en" hrefLang="pt"/i);
+    expect(html).toContain("🇧🇷</span></a>");
+    expect(html).toContain("🇬🇧</span></a>");
+    location.query = "source=brazil-reports&language=es";
+    expect(renderToStaticMarkup(<LegalNewsroom feed={withLegalReadings(feed)}/>)).toContain("No matching updates");
+  });
+
+  it("marks external editions and leaves an unclassified source unlabeled", () => {
+    location.query = "language=es";
+    const html = renderToStaticMarkup(<LegalNewsroom feed={feed}/>);
+    expect(html).toContain("Argentina regulates");
+    expect(html).toMatch(/hrefLang="es" target="_blank"/i);
+    expect(html).toContain("🇪🇸</span></a>");
+    location.query = "";
+    const unknown = { ...LEGAL_ITEMS[0], sourceId: "new-source" };
+    const row = renderToStaticMarkup(<LegalNewsroom feed={{ ...feed, items: [unknown] }}/>).split("<article ")[1];
+    expect(row).toContain("Open source");
+    expect(row).not.toMatch(/hrefLang=/i);
+  });
 });

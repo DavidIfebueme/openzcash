@@ -35,7 +35,7 @@ export default async function Page({ params, searchParams }: Props) {
   const { slug } = await params;
   const query = await searchParams;
   const filters = new URLSearchParams();
-  for (const key of ["q", "region", "source", "topic"]) {
+  for (const key of ["q", "region", "source", "topic", "language"]) {
     const value = query[key];
     if (typeof value === "string" && value) filters.set(key, value);
   }

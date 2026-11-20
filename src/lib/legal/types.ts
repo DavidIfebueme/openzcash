@@ -9,12 +9,14 @@ export type LegalRegion = Exclude<(typeof LEGAL_REGIONS)[number]["id"], "all">;
 export const LEGAL_TOPICS = ["Privacy", "Regulation", "Courts", "Policy"] as const;
 export type LegalTopic = (typeof LEGAL_TOPICS)[number];
 export type LegalStatus = "Analysis" | "Proposal" | "Consultation" | "Adopted" | "In force" | "Court decision" | "Official update";
+export type ReadingLanguage = "en" | "pt" | "es";
 export type LegalItem = {
   id: string;
   title: string;
   summary: string;
   url: string;
   reader?: string;
+  languages?: ReadingLanguage[];
   contributor?: string;
   sourceId: string;
   publishedAt: string;

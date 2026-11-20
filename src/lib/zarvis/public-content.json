@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "sourceRevision": "27620ec0734116e4",
+  "sourceRevision": "aeefc848d8cff5f6",
   "sourceFiles": 73,
   "documents": [
     {
@@ -2293,7 +2293,7 @@
       "id": "src/components/legal/page.tsx:0",
       "url": "https://openzcash.org/legal",
       "title": "legal",
-      "text": "→\nPrivacy & Policy\nCountry reports, community analysis and official updates on financial privacy.\nForum original\nEnglish\nUpdates\nBrowse by region, source or topic.\nLoading filters…\nSources & coverage\n+\nDaily collection covers the PGPZ public archive, Banco Central do Brasil, Argentina’s AAIP and Uruguay’s URCDP. Reviewed documents add context from other authorities. Publication, update, memo period and application dates stay separate.\nDaily collection:\n:\nThe daily collector retrieves public metadata. Contributor reports and selected forum posts have reading copies on OpenZcash. Undated PGPZ reports remain available on its public archive. PGPZ provides independent analysis; it does not speak for regulators.\nMemos and reports are public.\nJoin PGP by email ↗\n·\nAbout PGP ↗\n↗\nCoverage is selective. Status labels summarize dated source documents; they do not replace legal advice or establish Zcash’s legality in every jurisdiction."
+      "text": "Language: en\n→\nPrivacy & Policy\nCountry reports, community analysis and official updates on financial privacy.\nForum original\nEnglish\nUpdates\nLoading filters…\nSources & coverage\n+\nDaily collection covers the PGPZ public archive, Banco Central do Brasil, Argentina’s AAIP and Uruguay’s URCDP. Reviewed documents add context from other authorities. Publication, update, memo period and application dates stay separate.\nDaily collection:\n:\nThe daily collector retrieves public metadata. Contributor reports and selected forum posts have reading copies on OpenZcash. Undated PGPZ reports remain available on its public archive. PGPZ provides independent analysis; it does not speak for regulators.\nMemos and reports are public.\nJoin PGP by email ↗\n·\nAbout PGP ↗\n↗\nCoverage is selective. Status labels summarize dated source documents; they do not replace legal advice or establish Zcash’s legality in every jurisdiction."
     },
     {
       "id": "narratives:pitch:cash-online:en:sentence",

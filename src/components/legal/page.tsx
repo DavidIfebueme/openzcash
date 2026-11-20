@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { brazilDeskName, brazilReports, forumReadings, readingPath, withLegalReadings } from "@/lib/legal/readings";
 import type { LegalFeed, LegalItem } from "@/lib/legal/types";
 import { legalDate, legalItemDate } from "@/lib/legal/presentation";
+import { ReadingLink } from "./reading-link";
 import { LegalNewsroom } from "./newsroom";
 import styles from "./legal.module.css";
 
@@ -31,8 +32,8 @@ function Edition({ id, source, contributor, mark, item, lang, collection, altern
       <h3 lang={lang}><a href={path}>{item.title}</a></h3>
       <p>{item.summary}</p>
       <div className={styles.readActions}>
-        <a className={styles.readButton} href={path} lang={lang}>{lang === "pt-BR" ? "Ler em português" : "Read in English"} →</a>
-        {alternate && <a href={alternate.href} target={alternate.href.startsWith("https://") ? "_blank" : undefined} rel={alternate.href.startsWith("https://") ? "noopener noreferrer" : undefined}>{alternate.label} {alternate.href.startsWith("https://") ? "↗" : "→"}</a>}
+        <ReadingLink href={path} language={lang === "pt-BR" ? "pt" : "en"} label={lang === "pt-BR" ? "Ler em português" : "Read in English"}/>
+        {alternate && <ReadingLink href={alternate.href} language="en" label={alternate.label} external={alternate.href.startsWith("https://")}/>}
       </div>
     </div>
     <a className={styles.collection} href={"/legal?source=" + item.sourceId + "#updates"}>{collection}<span aria-hidden="true">→</span></a>
@@ -59,7 +60,7 @@ export function LegalPage({ feed: archive }: { feed: LegalFeed }) {
         alternate={record.english ? { label: "English", href: readingPath(brazilReport) + "?lang=en" } : undefined}/>
     </div>
     <section id="updates" className={styles.updates} aria-labelledby="updates-title">
-      <div className={styles.sectionHeading}><h2 id="updates-title">Updates</h2><span>Browse by region, source or topic.</span></div>
+      <div className={styles.sectionHeading}><h2 id="updates-title">Updates</h2></div>
       <Suspense fallback={<p>Loading filters…</p>}><LegalNewsroom feed={feed}/></Suspense>
     </section>
     <details className={styles.sources}><summary>Sources &amp; coverage <span aria-hidden="true">+</span></summary>

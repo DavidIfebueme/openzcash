@@ -10,6 +10,7 @@ export const brazilReports = reports.map(record => {
   const item: LegalItem = {
     id: record.slug, title: record.title, summary: record.summary,
     url: record.original, contributor: record.author, sourceId: "brazil-reports", publishedAt: record.received,
+    languages: record.english ? ["pt", "en"] : ["pt"],
     dateBasis: "received", regions: ["latam"], jurisdictions: ["Brazil"],
     topics: LEGAL_TOPICS.filter(topic => record.topics.includes(topic)),
     kind: "Country report", status: "Analysis",
@@ -33,7 +34,7 @@ export const forumReadings = posts.map(post => {
   const item: LegalItem = {
     id: post.slug, title: post.title, summary: post.summary, contributor: source.author,
     url: "https://forum.zcashcommunity.com/t/" + post.topic + "/" + post.number,
-    publishedAt: source.posted.slice(0, 10), sourceId: "divij-forum", regions,
+    languages: ["en"], publishedAt: source.posted.slice(0, 10), sourceId: "divij-forum", regions,
     jurisdictions: post.jurisdictions, topics: ["Policy"], kind: "Forum post", status: "Analysis",
   };
   return { item, source };
