@@ -9,7 +9,7 @@
 .actions,.actions nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
 .actions { margin-top: 15px; }
 .actions nav { gap: 3px; border: 1px solid var(--line-strong); border-radius: 5px; padding: 2px; }
-.actions nav a { padding: 0 13px; color: var(--ink); border-radius: 4px; }
+.actions nav a { gap: 6px; padding: 0 13px; color: var(--ink); border-radius: 4px; }
 .actions a[aria-current] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 650; }
 .layout { display: grid; grid-template-columns: minmax(155px, .7fr) minmax(0, 2fr); gap: clamp(24px,4vw,56px); align-items: start; }
 .contents { padding-bottom: 14px; border-bottom: 1px solid var(--line); }

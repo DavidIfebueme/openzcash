@@ -2,7 +2,8 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { ProposalMarkdown } from "@/components/participate/workspace/proposal-markdown";
 import styles from "@/components/legal/reader.module.css";
-import { legalDate } from "@/lib/legal/presentation";
+import { ReadingLink } from "@/components/legal/reading-link";
+import { isReadingLanguage, legalDate, readingLanguages } from "@/lib/legal/presentation";
 import { brazilDeskName, brazilReports, forumReadings, readingPath } from "@/lib/legal/readings";
 import { pageMetadata } from "@/lib/seo/page-metadata";
 type Report = {
@@ -64,6 +65,8 @@ export default async function Page({ params, searchParams }: Props) {
 
   const { record, item } = entry;
   const isEnglish = Boolean(record.english) && query.lang === "en";
+  const originalLanguage = isReadingLanguage(record.originalLanguage) ? record.originalLanguage : undefined;
+  const pdfLabel = isEnglish ? "Original PDF" : "PDF original";
   const report = await loadEdition(isEnglish ? record.english : record.portuguese);
   const enParams = new URLSearchParams(filters);
   enParams.set("lang", "en");
@@ -77,10 +80,11 @@ export default async function Page({ params, searchParams }: Props) {
       <p>{isEnglish ? "By" : "Por"} {record.author} · {record.byline}</p>
       <div className={styles.actions}>
         <nav aria-label={isEnglish ? "Report language" : "Idioma do relatório"}>
-          <a href={path + suffix} hrefLang="pt-BR" lang="pt-BR" aria-current={!isEnglish ? "page" : undefined}>Português</a>
-          {record.english && <a href={path + "?" + enParams} hrefLang="en" lang="en" aria-current={isEnglish ? "page" : undefined}>English</a>}
+          <a href={path + suffix} hrefLang="pt-BR" lang="pt-BR" aria-current={!isEnglish ? "page" : undefined}>{readingLanguages.pt.name} <span aria-hidden="true">{readingLanguages.pt.flag}</span></a>
+          {record.english && <a href={path + "?" + enParams} hrefLang="en" lang="en" aria-current={isEnglish ? "page" : undefined}>{readingLanguages.en.name} <span aria-hidden="true">{readingLanguages.en.flag}</span></a>}
         </nav>
-        <a href={record.original} target="_blank" rel="noopener noreferrer">{record.originalLabel} ↗</a>
+        <ReadingLink href={record.original} external language={originalLanguage}
+          label={originalLanguage ? pdfLabel + " (" + originalLanguage.toUpperCase() + ")" : pdfLabel}/>
       </div>
     </header>
     <div className={styles.layout}>

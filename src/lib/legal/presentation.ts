@@ -6,6 +6,10 @@ export const readingLanguages = {
   es: { name: "Español", flag: "🇪🇸" },
 } satisfies Record<ReadingLanguage, { name: string; flag: string }>;
 
+export function isReadingLanguage(value: string | null): value is ReadingLanguage {
+  return value !== null && Object.hasOwn(readingLanguages, value);
+}
+
 // Languages of the registered publication endpoints (including archived records).
 const sourceLanguages: Partial<Record<string, ReadingLanguage>> = {
   pgp: "en", sec: "en", treasury: "en", bcb: "pt", rfb: "pt", aaip: "es", urcdp: "es", cnv: "es",

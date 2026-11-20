@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { LEGAL_REGIONS, LEGAL_TOPICS, type LegalFeed, type LegalItem, type ReadingLanguage } from "@/lib/legal/types";
-import { filterLegalItems, legalDate, legalItemDate, languagesOf, readingLanguages } from "@/lib/legal/presentation";
+import { filterLegalItems, legalDate, legalItemDate, isReadingLanguage, languagesOf, readingLanguages } from "@/lib/legal/presentation";
 import { ReadingLink } from "./reading-link";
 import styles from "./legal.module.css";
 
@@ -27,7 +27,7 @@ export function LegalNewsroom({ feed }: { feed: LegalFeed }) {
   const region = LEGAL_REGIONS.some(item => item.id === params.get("region")) ? params.get("region")! : "all";
   const topic = LEGAL_TOPICS.some(item => item === params.get("topic")) ? params.get("topic")! : "";
   const languageParam = params.get("language");
-  const language = languageParam && Object.hasOwn(readingLanguages, languageParam) ? languageParam as ReadingLanguage : undefined;
+  const language = isReadingLanguage(languageParam) ? languageParam : undefined;
   const q = params.get("q") ?? "";
   const sourceId = feed.sources.some(source => source.id === params.get("source")) ? params.get("source")! : "";
   const update = (changes: Record<string, string>) => {

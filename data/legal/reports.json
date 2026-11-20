@@ -8,7 +8,7 @@
     "portuguese": "brasil.pt",
     "english": "brasil.en",
     "original": "/legal/brasil/crypto-regulation.en.pdf",
-    "originalLabel": "PDF original (EN)",
+    "originalLanguage": "en",
     "reference": "https://www.bcb.gov.br/detalhenoticia/20918/nota",
     "referenceLabel": "Banco Central do Brasil · Resoluções 519, 520 e 521",
     "topics": [
