@@ -1,6 +1,6 @@
 # Source distribution
 
-This candidate combines the portal's November 2026 mainline with the independently
+The public OpenZcash repository contains the portal and the independently
 runnable Participate and Private Chat services. See [Local development](local-development.md)
 for setup and [Contributors](../CONTRIBUTORS.md) for attribution.
 
@@ -21,10 +21,14 @@ The distribution retains application code, public-source importers, verification
 scripts, tests, technical documentation, public historical snapshots, published
 Monthly documents, contributor credit, and applicable asset/font licenses.
 
-It excludes the private Git history, environment files, provider credentials,
-live databases, backups, wallet keys and journals, internal operating reports,
-private screenshots, funding applications and grant-request preparation material.
-Public grant information used by the application remains part of its data model.
+OpenZcash made its existing repository public on November 20, 2026. Earlier
+commits and branches remain accessible, including pilot screenshots and
+operational records that are absent from the current release.
+
+The default branch includes example environment files and public grant data.
+For self-hosting, supply your own provider credentials and databases. Keep
+private wallet material, backups, journals and unpublished grant materials
+outside Git.
 
 A new installation does not contain the hosted site's users, credit balances,
 notifications or observed history. Data import and provider availability determine

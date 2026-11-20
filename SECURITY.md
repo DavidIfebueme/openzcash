@@ -8,9 +8,8 @@ known issues. Review the [installation guide](docs/local-development.md),
 
 ## Reporting a vulnerability
 
-Use GitHub **private vulnerability reporting** on this repository (Settings →
-Security → "Report a vulnerability"); it reaches the maintainers directly and
-keeps the report private. If it is unavailable, contact a maintainer through
+Use the [private vulnerability report form](https://github.com/Michae2xl/openzcash/security/advisories/new)
+to reach the maintainers directly. If the form is unavailable, contact a maintainer through
 their published GitHub profile and ask for a private channel before sharing
 sensitive details. Do not open a public issue containing credentials, personal
 data or an unmitigated exploit.
