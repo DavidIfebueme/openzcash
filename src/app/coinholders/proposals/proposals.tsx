@@ -57,6 +57,7 @@ export function Proposals({ proposals }: { proposals: Q4ProposalSummary[] }) {
           <div className={styles.proposalContent}>
             <div className={styles.meta}>
               <span className={styles.proposalNumber}>#{p.number}</span>
+              {p.reviewDecisionUrl ? <span className={styles.category}>Provisionally listed by FPF</span> : null}
               {p.topics.map((topic) => <span key={topic.id} className={styles.category} data-category={topic.label} data-tone={topic.tone} title={topic.note}>{topic.label}</span>)}
             </div>
             <h2><Link href={`${Q4.href}/${p.number}`}>{p.title}</Link></h2>

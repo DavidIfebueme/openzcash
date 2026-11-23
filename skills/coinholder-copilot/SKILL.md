@@ -42,8 +42,10 @@ Present evidence and uncertainty. Leave the voting decision to the user.
 ## Check the round's dates
 
 Start current-round research with /api/coinholders/proposals and its round label,
-announced dates, status and fetchedAt. It includes only open, undecided applications
+announced dates, status and fetchedAt. It includes open, undecided applications
 from the current intake with the exact label `Ready For Vote - All Steps Completed`.
+For a temporarily hidden issue, check `reviewDecisionUrl` for FPF's provisional
+listing decision and `url` for the public application.
 Amounts use requestedUsdCents; divide by 100 for USD. Null is unknown, and
 totals.missingAmounts identifies incomplete totals. A stale snapshot is dated evidence;
 HTTP 503 with unavailable status means the source could not be checked, not zero proposals.

@@ -45,6 +45,8 @@ it("uses the current request when a parenthetical note records its previous amou
   expect(requestedCents("$1,690 (reduced from $2,000 on 2026-11-02, see Other Funding Sources)")).toBe(169000);
   expect(requestedCents("USD 1,690.25 (reduced from US$2,000)")).toBe(169025);
   expect(requestedCents("2,500 USD (increased from $2,000 on 2026-11-02)")).toBe(250000);
+  expect(requestedCents("$1,620 (reduced from $2,000 on 2026-11-02 and to $1,620 on 2026-11-22, see Other Funding Sources)")).toBe(162000);
+  expect(requestedCents("$1,250.50 (increased from $900 and to $1,000 and to $1,250.50)")).toBe(125050);
 });
 
 it("does not turn ambiguous, conditional or contradictory notes into requested totals", () => {
@@ -58,6 +60,10 @@ it("does not turn ambiguous, conditional or contradictory notes into requested t
     "$1,690 (reduced from $2,000, see $310 contribution)",
     "$1,690 (reduced from $2,000) plus $310",
     "$1,690 (reduced from $2k)",
+    "$1,620 (reduced from $2,000 and to $1,690)",
+    "$1,620 (reduced from $2,000 and to $1,500 and to $1,620)",
+    "$1,620 (reduced from $2,000 and to $1,620 if approved)",
+    "$1,620 (reduced from $2k and to $1,620)",
   ]) expect(requestedCents(value), value).toBeNull();
 });
 

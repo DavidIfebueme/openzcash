@@ -12,6 +12,6 @@ export async function GET() {
     status: snapshot.status, fetchedAt: snapshot.fetchedAt,
     totals: proposals === null ? null : q4Totals(proposals), proposals,
     administration: cycleAdministration(),
-    notes: `Open, undecided submissions from the ${Q4.label} call carrying FPF's exact ready-for-vote label. Amounts are requested USD cents, not awards or payments. Program administration filed on the forum is listed in administration and is not part of totals.`,
+    notes: `Open ${Q4.label} submissions with FPF's ready-for-vote label, plus any hidden application provisionally retained by a linked FPF review decision. Amounts reflect the latest applicant request in USD cents. Program administration is listed separately in administration and excluded from totals.`,
   }, { status: snapshot.status === "unavailable" ? 503 : 200, headers: { "Cache-Control": "no-store" } });
 }

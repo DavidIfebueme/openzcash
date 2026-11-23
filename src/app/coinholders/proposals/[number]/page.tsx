@@ -28,14 +28,17 @@ export default async function ProposalPage({ params }: { params: Promise<{ numbe
         </div>
         <div className={styles.detailAmount}>
           <span>Requested · USD</span><strong>{proposal.requestedUsdCents === null ? "Not specified" : q4Usd(proposal.requestedUsdCents)}</strong>
-          <span className={styles.phase}>Ready for vote</span>
+          <span className={styles.phase}>{proposal.reviewDecisionUrl ? "Provisionally listed by FPF" : "Ready for vote"}</span>
         </div>
       </header>
       <div className={styles.detailBar}>
-        <a href={proposal.url} target="_blank" rel="noreferrer">Source &amp; discussion ↗</a>
-        <span>Edited <time dateTime={proposal.updatedAt}>{q4Timestamp(proposal.updatedAt)}</time></span>
+        <a href={proposal.url} target="_blank" rel="noreferrer">{proposal.reviewDecisionUrl ? "Full application on the forum" : "Source & discussion"} ↗</a>
+        <span>{proposal.reviewDecisionUrl ? "FPF update" : "Edited"} <time dateTime={proposal.updatedAt}>{q4Timestamp(proposal.updatedAt)}</time></span>
       </div>
-      <article className={styles.markdown} aria-label="Application text"><ProposalMarkdown>{proposal.body || "No application text was provided. Open the GitHub submission for details."}</ProposalMarkdown></article>
+      {proposal.reviewDecisionUrl ? <div className={styles.markdown}>
+        <p>{proposal.summary}</p>
+        <p>FPF is keeping this application in review while its GitHub issue is hidden. It asked for access to be restored with about one week of review left. <a href={proposal.reviewDecisionUrl} target="_blank" rel="noreferrer">Read FPF’s decision ↗</a></p>
+      </div> : <article className={styles.markdown} aria-label="Application text"><ProposalMarkdown>{proposal.body || "No application text was provided. Open the GitHub submission for details."}</ProposalMarkdown></article>}
     </> : <p className={base.lede}>This submission could not be checked. Please open the source above or try again shortly.</p>}
   </div>;
 }

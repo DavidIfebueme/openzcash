@@ -22,6 +22,7 @@ export type Q4Proposal = {
   number: number;
   title: string;
   url: string;
+  reviewDecisionUrl?: string;
   applicant: string;
   organization: string | null;
   category: string | null;
@@ -52,17 +53,24 @@ function standaloneUsdCents(text: string): number | null {
  * a project's total budget or the previous amount from the note. */
 export function requestedCents(text: string | undefined): number | null {
   if (!text) return null;
-  const revision = text.trim().match(/^(.+?)\s+\((reduced|increased)\s+from\s+(.+?)(?:\s+on\s+\d{4}-\d{2}-\d{2})?(?:,\s*see\s+[a-z][a-z /&-]*)?\)$/i);
+  const revision = text.trim().match(/^(.+?)\s+\((reduced|increased)\s+from\s+(.+?)(?:,\s*see\s+[a-z][a-z /&-]*)?\)$/i);
   const current = standaloneUsdCents(revision?.[1] ?? text);
   if (!revision || current === null) return current;
-  const previous = standaloneUsdCents(revision[3]);
-  if (previous === null) return null;
-  const consistent = revision[2].toLowerCase() === "reduced" ? current < previous : current > previous;
-  return consistent ? current : null;
+  const amounts = revision[3].split(/\s+and\s+to\s+/i).map((part) =>
+    standaloneUsdCents(part.replace(/\s+on\s+\d{4}-\d{2}-\d{2}$/i, "")));
+  if (amounts.length === 1) amounts.push(current);
+  if (amounts.at(-1) !== current) return null;
+  const reduced = revision[2].toLowerCase() === "reduced";
+  for (let i = 1; i < amounts.length; i++) {
+    const previous = amounts[i - 1], next = amounts[i];
+    if (previous === null || next === null || (reduced ? next >= previous : next <= previous)) return null;
+  }
+  return current;
 }
 
-export function q4Proposals(issues: Q4Issue[]): Q4Proposal[] {
+export function q4Proposals(issues: Q4Issue[], retained?: Q4Proposal): Q4Proposal[] {
   const byNumber = new Map<number, Q4Proposal>();
+  if (retained && !issues.some((issue) => issue.number === retained.number)) byNumber.set(retained.number, retained);
   for (const issue of issues) {
     const labels = issue.labels.map((label) => typeof label === "string" ? label : label.name);
     const created = Date.parse(issue.created_at);
