@@ -87,7 +87,8 @@ export default async function ProposalsPage() {
         <details>
           <summary>Sources &amp; method</summary>
           <div className={styles.method}>
-            <p>Open applications from this round carrying FPF&apos;s exact “{READY_FOR_VOTE_LABEL}” label. Requested amounts are not awards.</p>
+            <p>The list tracks open GitHub applications with FPF&apos;s “{READY_FOR_VOTE_LABEL}” label. A forum decision can temporarily keep a hidden application in review.</p>
+            <p>Amounts reflect each applicant&apos;s latest request. FPF&apos;s published review list records the amounts at the submission deadline. <a href="https://forum.zcashcommunity.com/t/59298" target="_blank" rel="noreferrer">FPF review list ↗</a></p>
             {administration.length ? <p>The count and total also include program administration filed on the forum, which is not a GitHub application.</p> : null}
             <p>Checks every 5 minutes. Withdrawn, decided and earlier-round applications are excluded.</p>
             <p>AI-generated tags describe the work, not funding decisions. Full applications are reanalyzed when their content changes; original categories remain in the source.</p>

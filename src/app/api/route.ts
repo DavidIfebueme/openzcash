@@ -24,7 +24,7 @@ export async function GET() {
           "/api/zcg/coinholder/round":
             "Dated Coinholder round archive: proposals, published outcomes, tallies and recorded payouts. Check round.label and round.status.",
           "/api/coinholders/proposals":
-            "Current Coinholder submissions carrying FPF's exact ready-for-vote label, announced schedule and source freshness. Requested amounts are in USD cents, not awards or payments.",
+            "Current Coinholder submissions, FPF review decisions for hidden applications, announced schedule and source freshness. Requested amounts are in USD cents, not awards or payments.",
         },
         zechub: {
           "/api/zechub/treasury":

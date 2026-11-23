@@ -37,7 +37,7 @@ describe("Q4 source snapshots", () => {
       const read = createQ4Reader(vi.fn<typeof fetch>().mockResolvedValue(res));
       expect(await read()).toEqual({ status: "unavailable", fetchedAt: null, proposals: null });
     }
-    const empty = createQ4Reader(vi.fn<typeof fetch>().mockResolvedValue(response([])));
+    const empty = createQ4Reader(vi.fn<typeof fetch>().mockResolvedValue(response([])), () => Date.parse("2026-11-17T00:00:00Z"));
     expect(await empty()).toMatchObject({ status: "current", proposals: [] });
   });
   it("removes a delisted submission on the next successful refresh", async () => {
@@ -55,9 +55,15 @@ describe("Q4 source snapshots", () => {
       updated_at: "2026-11-02T23:42:01Z",
       body: "### Requested Grant Amount (USD)\n$1,690 (reduced from $2,000 on 2026-11-02, see Other Funding Sources)\n### Total Budget (USD)\n$2,000",
     };
+    const revisedAgain = {
+      ...edited,
+      updated_at: "2026-11-22T15:44:26Z",
+      body: "### Requested Grant Amount (USD)\n$1,620 (reduced from $2,000 on 2026-11-02 and to $1,620 on 2026-11-22, see Other Funding Sources)\n### Total Budget (USD)\n$2,000",
+    };
     const fetcher = vi.fn<typeof fetch>()
       .mockResolvedValueOnce(response([original, issue]))
-      .mockResolvedValueOnce(response([edited, issue]));
+      .mockResolvedValueOnce(response([edited, issue]))
+      .mockResolvedValueOnce(response([revisedAgain, issue]));
     const read = createQ4Reader(fetcher, () => now);
     const before = await read();
     expect(q4Totals(before.proposals!)).toEqual({ requestedUsdCents: 5200000, missingAmounts: 0 });
@@ -66,5 +72,60 @@ describe("Q4 source snapshots", () => {
     expect(after).toMatchObject({ status: "current", fetchedAt: new Date(now).toISOString() });
     expect(after.proposals?.find((p) => p.number === 76)).toMatchObject({ requestedUsdCents: 169000, updatedAt: edited.updated_at, body: edited.body });
     expect(q4Totals(after.proposals!)).toEqual({ requestedUsdCents: 5169000, missingAmounts: 0 });
+    now += 300_001;
+    const latest = await read();
+    expect(latest.proposals?.map((p) => p.number)).toEqual([76, 70]);
+    expect(q4Totals(latest.proposals!)).toEqual({ requestedUsdCents: 5162000, missingAmounts: 0 });
+  });
+});
+
+describe("FPF's provisional Cryppit listing", () => {
+  const review = Date.parse("2026-11-23T00:00:00Z");
+  const restored = { ...issue, number: 87, title: "Restored application" };
+  const hidden = () => new Response(null, { status: 404 });
+
+  it("includes the forum application on a direct 404, then switches to the restored issue once", async () => {
+    let now = review;
+    const fetcher = vi.fn<typeof fetch>()
+      .mockResolvedValueOnce(response([issue])).mockResolvedValueOnce(hidden())
+      .mockResolvedValueOnce(response([issue, restored]));
+    const read = createQ4Reader(fetcher, () => now);
+    const provisional = await read();
+    expect(String(fetcher.mock.calls[1][0])).toMatch(/\/issues\/87$/);
+    expect(provisional.proposals?.map((p) => p.number)).toEqual([87, 70]);
+    expect(provisional.proposals?.[0]).toMatchObject({ requestedUsdCents: 1_600_000, reviewDecisionUrl: expect.stringContaining("58901/8") });
+    now += 300_001;
+    const live = await read();
+    expect(live.proposals?.map((p) => p.number)).toEqual([87, 70]);
+    expect(live.proposals?.[0]).toMatchObject({ title: restored.title, url: expect.stringContaining("github.com") });
+    expect(live.proposals?.[0].reviewDecisionUrl).toBeUndefined();
+    expect(fetcher).toHaveBeenCalledTimes(3);
+  });
+
+  it("honors a visible issue's actual eligibility and a confirmed removal", async () => {
+    for (const detail of [response({ ...restored, state: "closed" }), response({ ...restored, labels: [] }),
+      response({ ...restored, labels: [READY_FOR_VOTE_LABEL, "Withdrawn"] }), new Response(null, { status: 410 })]) {
+      const read = createQ4Reader(vi.fn<typeof fetch>().mockResolvedValueOnce(response([issue])).mockResolvedValueOnce(detail), () => review);
+      expect((await read()).proposals?.map((p) => p.number)).toEqual([70]);
+    }
+  });
+
+  it("preserves the last complete snapshot on an inconclusive GitHub error", async () => {
+    let now = review;
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response([issue])).mockResolvedValueOnce(hidden())
+      .mockResolvedValueOnce(response([issue])).mockResolvedValueOnce(new Response(null, { status: 503 }));
+    const read = createQ4Reader(fetcher, () => now);
+    const first = await read();
+    now += 300_001;
+    expect(await read()).toEqual({ ...first, status: "stale" });
+  });
+
+  it("limits the exception to the period covered by FPF's decision", async () => {
+    for (const at of ["2026-11-21T13:51:59Z", "2026-12-09T20:00:00Z", "2026-12-17T00:00:00Z"]) {
+      const fetcher = vi.fn<typeof fetch>().mockResolvedValueOnce(response([issue]));
+      const read = createQ4Reader(fetcher, () => Date.parse(at));
+      expect((await read()).proposals?.map((p) => p.number)).toEqual([70]);
+      expect(fetcher).toHaveBeenCalledTimes(1);
+    }
   });
 });

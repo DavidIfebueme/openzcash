@@ -20,6 +20,14 @@ they retain the ready label. Older rounds are not inferred from titles.
 If FPF adds a round marker, update this selection rule and its tests together.
 This page represents active submissions; it is not an archive of all Q4 votes.
 
+FPF [kept Cryppit #87 in community review](https://forum.zcashcommunity.com/t/58901/8)
+on November 21 while GitHub temporarily hid the issue. During that exception,
+a direct GitHub 404 selects the [forum application](https://forum.zcashcommunity.com/t/58901)
+for the same issue number and its $16,000 request. A visible issue follows the
+normal eligibility rules. The mirror stops using the provisional forum record
+in the final week of review (December 9 at 20:00 UTC), based on FPF's request
+to restore access with about a week left. The detail page links the decision.
+
 Program administration is filed on the forum, not as a GitHub application, so
 the listing never contains it. `src/lib/coinholder/administration.ts` records
 each such request with its forum link and the cycle whose vote carries it; for
@@ -29,12 +37,14 @@ Proposals count and total requested include it (on November 17, 2026, 54
 GitHub applications plus this request made 55). The API returns it in `administration`, apart from
 `proposals` and `totals`.
 
-Amounts come only from `Requested Grant Amount (USD)` and are stored in cents.
+Amounts come from `Requested Grant Amount (USD)` in the application and are stored in cents.
 An explicit amount may include a parenthetical `reduced from` or `increased from`
 history note, optionally dated and referencing another section. For example,
-`$1,690 (reduced from $2,000 on 2026-11-02, see Other Funding Sources)` contributes
-$1,690 to the total. Both amounts must be valid USD values and agree with the
-stated direction. Conditional amounts and arbitrary prose remain unknown.
+`$1,620 (reduced from $2,000 on 2026-11-02 and to $1,620 on 2026-11-22, see Other Funding Sources)`
+contributes $1,620 to the total. Each historical step must agree with the
+stated direction and the final amount must match the explicit request. These
+figures reflect applicants' latest requests. FPF's [review list](https://forum.zcashcommunity.com/t/59298)
+records amounts at the submission deadline. Conditional amounts and arbitrary prose remain unknown.
 Unrecognized or missing amounts stay unknown; project cost is not substituted.
 The list sends summaries to the client and renders the full Markdown only on
 the application page using the existing safe proposal renderer.
