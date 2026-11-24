@@ -35,8 +35,7 @@ export type NewsItem = {
   title: string;
   url: string;
   ts: string; // ISO 8601 (normalized to milliseconds for stable ordering)
-  /** Forum username of the original poster, when the source exposes one.
-   * Lets the UI badge an item with the community that published it. */
+  /** Source-provided author or applicant used by the News search. */
   author?: string;
   references?: NewsReference[];
   program?: "zcg" | "coinholder";

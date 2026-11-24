@@ -11,7 +11,7 @@ const items: NewsItem[] = [
   { id: "sheet:payment-2", source: "sheet", kind: "ZCG ledger", title: "ZcashMe — $4,000", url: "/zcg/grant?g=Zcash%20Name%20Service", ts: "2026-10-01T00:00:00Z" },
   { id: "github:zebra", source: "github", kind: "zebra", title: "Zebra 7.0.0", url: "https://github.com/ZcashFoundation/zebra/releases/tag/v7", ts: "2026-10-02T00:00:00Z" },
   { id: "github:zaino", source: "github", kind: "zaino", title: "Zaino 0.10.1", url: "https://github.com/zingolabs/zaino/releases/tag/0.10.1", ts: "2026-10-04T00:00:00Z" },
-  { id: "forum:1", source: "forum", kind: "Forum", title: "Zebra community discussion", author: "alice", url: "https://forum.zcashcommunity.com/t/1", ts: "2026-10-05T00:00:00Z" },
+  { id: "forum:1", source: "forum", kind: "Forum", title: "Zebra community discussion", author: "Michae2xl", url: "https://forum.zcashcommunity.com/t/1", ts: "2026-10-05T00:00:00Z" },
   { id: "proposal:1", source: "proposal", kind: "ZCG proposal", title: "Education proposal", url: "/zcg/proposals", ts: "2026-10-04T00:00:00Z" },
   { id: "proposal:2", source: "proposal", kind: "ZCG proposal", title: "Wallet proposal", url: "/zcg/proposals", ts: "2026-10-04T00:00:00Z" },
   { id: "application:1", source: "application", kind: "Grant application", title: "Wallet application", url: "https://github.com/ZcashCommunityGrants/zcashcommunitygrants/issues/1", ts: "2026-10-04T00:00:00Z" },
@@ -66,6 +66,14 @@ describe("News filters and rendered record identity", () => {
     if (source === "dao") expect(html).toContain("No updates match this view");
   });
 
+  it.each([{}, { source: "forum" }])("uses the Forum mark and label for a community member's post in %j", async params => {
+    const article = rows(await page(params)).find(row => row.key === "forum:1")?.title;
+    expect(article).toContain('src="/logos/marks/openzcash.png"');
+    expect(article).toContain('<span class="ws-news-kind">Forum</span>');
+    expect(article).toContain('href="https://forum.zcashcommunity.com/t/1"');
+    expect(article).not.toMatch(/Michae2xl|Zcash Brazil|🇧🇷/i);
+  });
+
   it("combines case-insensitive trimmed search and source; all tab counts use that search", async () => {
     const view = newsView(items, { q: "  ZeBrA  ", source: "github" }, now);
     expect(view.shown.map(item => item.id)).toEqual(["github:zebra"]);
@@ -86,7 +94,7 @@ describe("News filters and rendered record identity", () => {
   });
 
   it("searches author and kind and retains safe URL encoding when switching tabs", async () => {
-    expect(newsView(items, { q: "alice" }, now).shown.map(item => item.id)).toEqual(["forum:1"]);
+    expect(newsView(items, { q: "michae2xl" }, now).shown.map(item => item.id)).toEqual(["forum:1"]);
     expect(newsView(items, { q: "ZCG ledger" }, now).shown).toHaveLength(2);
     const html = renderToStaticMarkup(await page({ q: "a & b" }));
     expect(html).toContain('/news?source=github&amp;q=a%20%26%20b');
