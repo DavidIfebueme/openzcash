@@ -1406,7 +1406,6 @@ a.rd-treasury-pool:hover .rd-treasury-name {
 .rd-content .ws-news-row:hover { background: var(--accent-soft); }
 .rd-content .ws-news-mark { width: 16px; height: 16px; border-radius: 3px; object-fit: contain; }
 .rd-shell[data-theme="dark"] .ws-news-mark-glyph { filter: invert(1); }
-.rd-content .ws-news-flag { font-size: 15px; line-height: 1; text-align: center; }
 .rd-content .ws-news-title { display: flex; align-items: center; gap: 8px; min-width: 0; font-weight: 520; color: inherit; text-decoration: none; }
 .rd-content .ws-news-title > span { overflow-wrap: anywhere; }
 .rd-content .ws-news-new { flex-shrink: 0; width: 6px; height: 6px; border-radius: 50%; background: var(--neg); }
@@ -1435,7 +1434,7 @@ a.rd-treasury-pool:hover .rd-treasury-name {
   .rd-content .ws-news-search input[type="search"]:not(#_) { height: 40px; font-size: 16px; }
   .rd-content .ws-news-row { grid-template-columns: 16px minmax(0, 1fr); align-items: start; gap: 4px 10px; padding: 11px 14px; }
   .rd-content .ws-news-title { font-size: 15px; }
-  .rd-content .ws-news-mark, .rd-content .ws-news-flag { margin-top: 3px; }
+  .rd-content .ws-news-mark { margin-top: 3px; }
   .rd-content .ws-news-date { grid-column: 2; grid-row: 2; align-self: center; text-align: left; }
   .rd-content .ws-news-links { grid-column: 2; grid-row: 2; justify-self: end; }
   .rd-content .ws-news-links a { min-height: 32px; }

@@ -2,7 +2,6 @@ import Link from "next/link";
 import { pageMetadata, SITE_URL } from "@/lib/seo/page-metadata";
 /* eslint-disable @next/next/no-img-element */
 import { PageHeader } from "@/components/ui";
-import { COMMUNITIES } from "@/lib/communities/data";
 import {
   getNews,
   newsFetchedAt,
@@ -32,19 +31,6 @@ export const metadata = pageMetadata({
   path: "/news",
   card: { kicker: "The last seven days across the Zcash ecosystem" },
 });
-
-
-/**
- * Forum handle to community, so a post by a community lead is badged with
- * that community instead of the generic forum mark. Handles are matched
- * case-insensitively against the curated directory.
- */
-const BY_HANDLE = new Map(
-  COMMUNITIES.filter((c) => c.links.forumUser).map((c) => [
-    c.links.forumUser!.toLowerCase(),
-    c,
-  ]),
-);
 
 /** Source marks are local images or text symbols. Ink images flip to light
  * in the dark theme; text symbols inherit the theme's ink color. */
@@ -203,23 +189,11 @@ export default async function NewsPage({
         ) : null}
         {shown.map((i: NewsItem) => {
           const s = SOURCE[i.source];
-          const community = i.author
-            ? BY_HANDLE.get(i.author.toLowerCase())
-            : undefined;
           const isNew = Date.parse(i.ts) > newCut;
           const external = i.url.startsWith("http");
-          const kind = community
-            ? community.name
-            : i.source === "proposal" || i.source === "github"
-              ? (i.kind ?? s.label)
-              : (i.kind ?? "");
           return (
             <article key={i.id} className="ws-news-row">
-              {community ? (
-                <span className="ws-news-flag" title={community.name}>
-                  {community.flag}
-                </span>
-              ) : s.symbol ? (
+              {s.symbol ? (
                 <span className={styles.currencyMark} aria-hidden="true">
                   {s.mark}
                 </span>
@@ -236,7 +210,7 @@ export default async function NewsPage({
                 <span>{i.title}</span>
                 {isNew ? <i className="ws-news-new" aria-label="new" /> : null}
               </a>
-              <span className="ws-news-kind">{kind}</span>
+              <span className="ws-news-kind">{i.kind}</span>
               <nav className="ws-news-links" aria-label={`Sources for ${i.title}`}>
                 {newsReferences(i).map(ref => {
                   const label = ref.source === "github" ? "GitHub" : ref.source === "proposal" ? "Record" : SOURCE[ref.source].label;
